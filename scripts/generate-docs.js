@@ -49,7 +49,8 @@ function formatLink(l) {
   const iconHtml = favicon
     ? `<img src="${favicon}" alt="" width="16" height="16" loading="lazy" decoding="async" style="vertical-align: middle; margin-right: 6px;" />`
     : '';
-  return `- ${iconHtml}[**${escapeMd(l.title)}**](${l.url}) — \`${domain}\``;
+  const desc = l.description || domain;
+  return `- ${iconHtml}[**${escapeMd(l.title)}**](${l.url}) — ${escapeMd(desc)}`;
 }
 
 function buildFolderContent(folder, headingLevel = 2) {

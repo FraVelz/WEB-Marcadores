@@ -43,6 +43,12 @@ export default defineConfig({
 			customCss: ['./src/styles/custom.css'],
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/FraVelz/' }],
 			sidebar: getSidebar(),
+			head: [
+				{
+					tag: 'script',
+					attrs: { src: '/scripts/link-preview.js', defer: true },
+				},
+			],
 		}),
 	],
 });
