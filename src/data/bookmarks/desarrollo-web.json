@@ -12,22 +12,26 @@
         {
           "type": "link",
           "title": "frontend mentor",
-          "url": "https://www.frontendmentor.io/challenges/social-links-profile-UG32l9m6dQ"
+          "url": "https://www.frontendmentor.io/challenges/social-links-profile-UG32l9m6dQ",
+          "description": "Desafíos frontend para practicar"
         },
         {
           "type": "link",
           "title": "CSS Battle",
-          "url": "https://cssbattle.dev/"
+          "url": "https://cssbattle.dev/",
+          "description": "Juegos de CSS para practicar"
         },
         {
           "type": "link",
           "title": "Grid Garden",
-          "url": "https://cssgridgarden.com/"
+          "url": "https://cssgridgarden.com/",
+          "description": "Aprende CSS Grid jugando"
         },
         {
           "type": "link",
           "title": "Flex-box Froggy",
-          "url": "https://flexboxfroggy.com/"
+          "url": "https://flexboxfroggy.com/",
+          "description": "Aprende Flexbox jugando"
         }
       ]
     },
@@ -40,32 +44,38 @@
         {
           "type": "link",
           "title": "Linkedin",
-          "url": "https://www.linkedin.com/in/francisco-v%C3%A9lez-4a1159399/"
+          "url": "https://www.linkedin.com/in/francisco-v%C3%A9lez-4a1159399/",
+          "description": "Perfil LinkedIn"
         },
         {
           "type": "link",
           "title": "https://x.com/midudev/status/1803810081852551533",
-          "url": "https://x.com/midudev/status/1803810081852551533"
+          "url": "https://x.com/midudev/status/1803810081852551533",
+          "description": "Publicación en X/Twitter"
         },
         {
           "type": "link",
           "title": "Curso React",
-          "url": "https://cursoreact.dev/"
+          "url": "https://cursoreact.dev/",
+          "description": "Curso de React"
         },
         {
           "type": "link",
           "title": "MDN Web Docs",
-          "url": "https://developer.mozilla.org/en-US/"
+          "url": "https://developer.mozilla.org/en-US/",
+          "description": "Documentación web MDN"
         },
         {
           "type": "link",
           "title": "Tailwind Template",
-          "url": "https://tailwindcss.com/plus/ui-blocks"
+          "url": "https://tailwindcss.com/plus/ui-blocks",
+          "description": "Bloques UI de Tailwind"
         },
         {
           "type": "link",
           "title": "Tympanus - Blog",
-          "url": "https://tympanus.net/codrops/"
+          "url": "https://tympanus.net/codrops/",
+          "description": "Blog de recursos y tutoriales"
         }
       ]
     },
@@ -78,12 +88,14 @@
         {
           "type": "link",
           "title": "Vercel",
-          "url": "https://vercel.com/fravelzs-projects"
+          "url": "https://vercel.com/fravelzs-projects",
+          "description": "Plataforma de despliegue"
         },
         {
           "type": "link",
           "title": "Netlify drop",
-          "url": "https://app.netlify.com/drop"
+          "url": "https://app.netlify.com/drop",
+          "description": "Despliegue rápido por drag & drop"
         }
       ]
     },
@@ -96,7 +108,8 @@
         {
           "type": "link",
           "title": "OpenGraph",
-          "url": "https://www.opengraph.xyz/"
+          "url": "https://www.opengraph.xyz/",
+          "description": "Previsualizar meta tags Open Graph"
         }
       ]
     }
@@ -105,7 +118,8 @@
     {
       "type": "link",
       "title": "Alg0 - Algoritmos",
-      "url": "https://www.alg0.dev/"
+      "url": "https://www.alg0.dev/",
+      "description": "Visualización de algoritmos"
     }
   ]
 }

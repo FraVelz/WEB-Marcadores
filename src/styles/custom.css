@@ -18,3 +18,61 @@
   border-radius: 4px;
   flex-shrink: 0;
 }
+
+/* Preview de enlaces (metadatos Open Graph) */
+.link-preview-tooltip {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.link-preview-tooltip.link-preview-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.link-preview-card {
+  background: var(--sl-color-background);
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  max-width: 360px;
+  min-width: 280px;
+}
+
+.link-preview-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.link-preview-body {
+  padding: 12px 14px;
+}
+
+.link-preview-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--sl-color-text);
+  margin-bottom: 6px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.link-preview-desc {
+  font-size: 0.8rem;
+  color: var(--sl-color-text-accent);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
