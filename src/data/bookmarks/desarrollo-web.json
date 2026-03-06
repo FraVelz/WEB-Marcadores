@@ -1,0 +1,111 @@
+{
+  "type": "folder",
+  "name": "Desarrollo-WEB",
+  "slug": "desarrollo-web",
+  "children": [
+    {
+      "type": "folder",
+      "name": "Practice",
+      "slug": "practice",
+      "children": [],
+      "links": [
+        {
+          "type": "link",
+          "title": "frontend mentor",
+          "url": "https://www.frontendmentor.io/challenges/social-links-profile-UG32l9m6dQ"
+        },
+        {
+          "type": "link",
+          "title": "CSS Battle",
+          "url": "https://cssbattle.dev/"
+        },
+        {
+          "type": "link",
+          "title": "Grid Garden",
+          "url": "https://cssgridgarden.com/"
+        },
+        {
+          "type": "link",
+          "title": "Flex-box Froggy",
+          "url": "https://flexboxfroggy.com/"
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "Documentation",
+      "slug": "documentation",
+      "children": [],
+      "links": [
+        {
+          "type": "link",
+          "title": "Linkedin",
+          "url": "https://www.linkedin.com/in/francisco-v%C3%A9lez-4a1159399/"
+        },
+        {
+          "type": "link",
+          "title": "https://x.com/midudev/status/1803810081852551533",
+          "url": "https://x.com/midudev/status/1803810081852551533"
+        },
+        {
+          "type": "link",
+          "title": "Curso React",
+          "url": "https://cursoreact.dev/"
+        },
+        {
+          "type": "link",
+          "title": "MDN Web Docs",
+          "url": "https://developer.mozilla.org/en-US/"
+        },
+        {
+          "type": "link",
+          "title": "Tailwind Template",
+          "url": "https://tailwindcss.com/plus/ui-blocks"
+        },
+        {
+          "type": "link",
+          "title": "Tympanus - Blog",
+          "url": "https://tympanus.net/codrops/"
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "Despliegue",
+      "slug": "despliegue",
+      "children": [],
+      "links": [
+        {
+          "type": "link",
+          "title": "Vercel",
+          "url": "https://vercel.com/fravelzs-projects"
+        },
+        {
+          "type": "link",
+          "title": "Netlify drop",
+          "url": "https://app.netlify.com/drop"
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "Metatag",
+      "slug": "metatag",
+      "children": [],
+      "links": [
+        {
+          "type": "link",
+          "title": "OpenGraph",
+          "url": "https://www.opengraph.xyz/"
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "type": "link",
+      "title": "Alg0 - Algoritmos",
+      "url": "https://www.alg0.dev/"
+    }
+  ]
+}

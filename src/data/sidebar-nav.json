@@ -30,33 +30,33 @@
     "count": 23
   },
   {
-    "label": "Perfiles-Git-Web",
-    "slug": "perfiles-git-web",
+    "label": "Portfolios",
+    "slug": "portfolios",
     "count": 17
   },
   {
-    "label": "Desarrollo-WEB",
+    "label": "Desarrollo Web",
     "slug": "desarrollo-web",
     "count": 14
   },
   {
-    "label": "User Interface",
-    "slug": "user-interface",
+    "label": "Diseño UI",
+    "slug": "diseno-ui",
     "count": 49
   },
   {
-    "label": "shorcuts",
-    "slug": "shorcuts",
+    "label": "Atajos",
+    "slug": "atajos",
     "count": 7
   },
   {
-    "label": "Others",
-    "slug": "others",
-    "count": 22
+    "label": "Herramientas",
+    "slug": "herramientas",
+    "count": 113
   },
   {
-    "label": "herrramientas",
-    "slug": "herrramientas",
-    "count": 113
+    "label": "Utilidades",
+    "slug": "utilidades",
+    "count": 22
   }
 ]

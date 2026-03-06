@@ -10,8 +10,10 @@
     "astro": "astro",
     "parse": "node scripts/parse-bookmarks.js",
     "generate": "node scripts/generate-docs.js",
+    "split": "node scripts/split-bookmarks.js",
     "sync": "pnpm parse && pnpm generate",
-    "prebuild": "pnpm generate"
+    "prebuild": "pnpm generate",
+    "predev": "pnpm generate"
   },
   "dependencies": {
     "@astrojs/starlight": "^0.37.6",
