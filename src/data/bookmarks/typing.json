@@ -1,0 +1,58 @@
+{
+  "type": "folder",
+  "name": "Typing",
+  "slug": "typing",
+  "children": [],
+  "links": [
+    {
+      "type": "link",
+      "title": "AgileFingers",
+      "url": "https://agilefingers.com/es#google_vignette"
+    },
+    {
+      "type": "link",
+      "title": "Mecanografia",
+      "url": "https://www.mecanografia-online.com/charactersResult"
+    },
+    {
+      "type": "link",
+      "title": "10FastFingers",
+      "url": "https://10fastfingers.com/"
+    },
+    {
+      "type": "link",
+      "title": "ZType",
+      "url": "https://zty.pe/"
+    },
+    {
+      "type": "link",
+      "title": "Práctica de mecanografía para programadores | SpeedCoder",
+      "url": "https://www-speedcoder-net.translate.goog/?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=es&_x_tr_pto=tc"
+    },
+    {
+      "type": "link",
+      "title": "Settings | Monkeytype",
+      "url": "https://monkeytype.com/settings"
+    },
+    {
+      "type": "link",
+      "title": "Lecciones de Tecleo - Aprende a Escribir y Mejora la Velocidad de Escritura Gratis - Typing.com",
+      "url": "https://www.typing.com/es/student/lessons"
+    },
+    {
+      "type": "link",
+      "title": "Práctica",
+      "url": "https://www.keybr.com/es/index"
+    },
+    {
+      "type": "link",
+      "title": "Se acabaron los intentos de completar ejercicios — Ratatype",
+      "url": "https://www.ratatype.es/u8045032/unlimited-typing/"
+    },
+    {
+      "type": "link",
+      "title": "Edclub",
+      "url": "https://www.edclub.com/sportal/program-3.game"
+    }
+  ]
+}

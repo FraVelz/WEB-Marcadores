@@ -1,0 +1,158 @@
+{
+  "type": "folder",
+  "name": "Apps",
+  "slug": "apps",
+  "children": [
+    {
+      "type": "folder",
+      "name": "App",
+      "slug": "app",
+      "children": [],
+      "links": [
+        {
+          "type": "link",
+          "title": "CapCut",
+          "url": "https://www.capcut.com/my-edit?start_tab=image"
+        },
+        {
+          "type": "link",
+          "title": "Chess",
+          "url": "https://www.chess.com/home"
+        },
+        {
+          "type": "link",
+          "title": "Git FraVelz",
+          "url": "https://github.com/FraVelz/"
+        },
+        {
+          "type": "link",
+          "title": "Notion",
+          "url": "https://www.notion.so/fravelz/1cf9ce1d77de4848a27463c00089c3f8"
+        },
+        {
+          "type": "link",
+          "title": "Canva",
+          "url": "https://www.canva.com/"
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "Others",
+      "slug": "others",
+      "children": [],
+      "links": [
+        {
+          "type": "link",
+          "title": "DNI Preguntas",
+          "url": "https://dni.gov.co/preguntas-frecuentes/"
+        },
+        {
+          "type": "link",
+          "title": "Eyecandy",
+          "url": "https://eyecannndy.com/"
+        },
+        {
+          "type": "link",
+          "title": "Kittl | The most intuitive collaborative design platform",
+          "url": "https://www.kittl.com/"
+        },
+        {
+          "type": "link",
+          "title": "Vídeo sin título",
+          "url": "https://app.clipchamp.com/editor/c16229eb-1134-4b93-ac23-599504c63a79/export"
+        },
+        {
+          "type": "link",
+          "title": "Objectivos - Miro",
+          "url": "https://miro.com/app/board/uXjVI9QV47s=/"
+        },
+        {
+          "type": "link",
+          "title": "DeepSeek - Into the Unknown",
+          "url": "https://chat.deepseek.com/"
+        },
+        {
+          "type": "link",
+          "title": "Home | Brilliant",
+          "url": "https://brilliant.org/home/"
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "Tools",
+      "slug": "tools",
+      "children": [],
+      "links": [
+        {
+          "type": "link",
+          "title": "Open AI",
+          "url": "https://chat.openai.com/"
+        },
+        {
+          "type": "link",
+          "title": "Adobe Acrobat",
+          "url": "https://acrobat.adobe.com/?x_api_client_id=bookmark&x_api_client_location=Reader"
+        },
+        {
+          "type": "link",
+          "title": "Translator",
+          "url": "https://translate.google.com/?hl=es"
+        },
+        {
+          "type": "link",
+          "title": "Amazon",
+          "url": "https://www.amazon.com/-/es/cart?ref_=ewc_gtc"
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "type": "link",
+      "title": "WhatsApp",
+      "url": "https://web.whatsapp.com/"
+    },
+    {
+      "type": "link",
+      "title": "github",
+      "url": "https://github.com/biglexj/hypr-ely-neon"
+    },
+    {
+      "type": "link",
+      "title": "HTB",
+      "url": "https://academy.hackthebox.com/dashboard"
+    },
+    {
+      "type": "link",
+      "title": "Nerd Fonts - Iconic font aggregator, glyphs/icons collection, &amp; fonts patcher",
+      "url": "https://www.nerdfonts.com/cheat-sheet"
+    },
+    {
+      "type": "link",
+      "title": "Language Tool",
+      "url": "https://languagetool.org/editor/46953359"
+    },
+    {
+      "type": "link",
+      "title": "📙 Emojipedia — 😃 Home of Emoji Meanings 💁👌🎍😍",
+      "url": "https://emojipedia.org/"
+    },
+    {
+      "type": "link",
+      "title": "Material Symbols &amp; Icons - Google Fonts",
+      "url": "https://fonts.google.com/icons"
+    },
+    {
+      "type": "link",
+      "title": "zhaleff (Zhaleff )",
+      "url": "https://github.com/zhaleff"
+    },
+    {
+      "type": "link",
+      "title": "TodoIst",
+      "url": "https://app.todoist.com/app/project/tareas-6cxWV4vGwcc965jw"
+    }
+  ]
+}

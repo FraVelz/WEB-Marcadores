@@ -18,12 +18,12 @@ function getSidebar() {
 			{ label: 'Edition', slug: 'edition' },
 			{ label: 'Typing', slug: 'typing' },
 			{ label: 'Hacking', slug: 'hacking' },
-			{ label: 'Perfiles Git', slug: 'perfiles-git-web' },
-			{ label: 'Desarrollo WEB', slug: 'desarrollo-web' },
-			{ label: 'User Interface', slug: 'user-interface' },
-			{ label: 'Atajos', slug: 'shorcuts' },
-			{ label: 'Otros', slug: 'others' },
-			{ label: 'Herramientas', slug: 'herrramientas' },
+			{ label: 'Portfolios', slug: 'portfolios' },
+			{ label: 'Desarrollo Web', slug: 'desarrollo-web' },
+			{ label: 'Diseño UI', slug: 'diseno-ui' },
+			{ label: 'Atajos', slug: 'atajos' },
+			{ label: 'Herramientas', slug: 'herramientas' },
+			{ label: 'Utilidades', slug: 'utilidades' },
 		];
 	}
 	const items = JSON.parse(readFileSync(path, 'utf-8'));

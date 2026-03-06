@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Parser de bookmarks.html (formato Netscape/Firefox)
- * Extrae la estructura jerárquica de carpetas y enlaces
+ * Parsea bookmarks.html (Firefox/Netscape) y genera src/data/bookmarks/
+ * Un archivo JSON por cada carpeta raíz.
  */
 import { readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
@@ -10,17 +10,13 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const BOOKMARKS_PATH = join(ROOT, 'bookmarks.html');
-const OUTPUT_PATH = join(ROOT, 'src/data/bookmarks.json');
+const OUTPUT_DIR = join(ROOT, 'src/data/bookmarks');
 
 const IGNORE_FOLDERS = new Set(['Mozilla Firefox', 'Bookmarks Toolbar', '.........', 'Unfiled Bookmarks']);
 
 function slugify(text) {
-  return text
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
+  return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
 function parseBookmarks(html) {
@@ -40,7 +36,6 @@ function parseBookmarks(html) {
     while (i < lines.length) {
       const line = lines[i];
       const indent = getIndent(line);
-
       if (indent < minIndent) break;
 
       const h3Match = line.match(/<DT><H3[^>]*>([^<]+)<\/H3>/);
@@ -82,7 +77,6 @@ function parseBookmarks(html) {
       }
       i++;
     }
-
     return { folders, links };
   }
 
@@ -92,14 +86,30 @@ function parseBookmarks(html) {
 
   const root = parseLevel([], 0);
   result.folders = root.folders;
-
   return result;
 }
 
 const html = readFileSync(BOOKMARKS_PATH, 'utf-8');
 const parsed = parseBookmarks(html);
 
-mkdirSync(dirname(OUTPUT_PATH), { recursive: true });
-writeFileSync(OUTPUT_PATH, JSON.stringify(parsed, null, 2), 'utf-8');
+mkdirSync(OUTPUT_DIR, { recursive: true });
+
+const slugs = [];
+for (const folder of parsed.folders) {
+  const slug = folder.slug;
+  slugs.push(slug);
+  writeFileSync(
+    join(OUTPUT_DIR, `${slug}.json`),
+    JSON.stringify(folder, null, 2),
+    'utf-8'
+  );
+}
+
+writeFileSync(
+  join(OUTPUT_DIR, 'index.json'),
+  JSON.stringify({ folders: slugs, allLinks: parsed.allLinks }, null, 2),
+  'utf-8'
+);
+
 console.log(`Parseados ${parsed.allLinks.length} marcadores`);
-console.log(`Carpetas raíz: ${parsed.folders.length}`);
+console.log(`${slugs.length} carpetas en ${OUTPUT_DIR}`);

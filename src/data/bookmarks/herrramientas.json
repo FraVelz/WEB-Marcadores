@@ -1,0 +1,582 @@
+{
+  "type": "folder",
+  "name": "herrramientas",
+  "slug": "herrramientas",
+  "children": [
+    {
+      "type": "folder",
+      "name": "Documenttacion Github IA",
+      "slug": "documenttacion-github-ia",
+      "children": [],
+      "links": [
+        {
+          "type": "link",
+          "title": "Mintlify",
+          "url": "https://www.mintlify.com/"
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "type": "link",
+      "title": "Create a Portfolio Landing Page Using HTML CSS and JS ✨ - YouTube",
+      "url": "https://www.youtube.com/watch?v=G5AJHlRpVag"
+    },
+    {
+      "type": "link",
+      "title": "fravelz - Overview – Vercel",
+      "url": "https://vercel.com/fravelzs-projects/fravelz"
+    },
+    {
+      "type": "link",
+      "title": "Curso de JAVASCRIPT desde CERO (Completo) - Nivel Master - YouTube",
+      "url": "https://www.youtube.com/watch?v=EbMi1Qj4rVE&list=PLE8uP447fYpiBqMVF1hdWl9uFeVEeXRTm&index=8"
+    },
+    {
+      "type": "link",
+      "title": "¡Resuelvo Prueba Técnica de React para Juniors y Trainee! - YouTube",
+      "url": "https://www.youtube.com/watch?v=XYpadB4VadY&list=PLUofhDIg_38q4D0xNWp7FEHOTcZhjWJ29&index=7"
+    },
+    {
+      "type": "link",
+      "title": "Niri vs Hyprland Sway",
+      "url": "https://chatgpt.com/c/699de8f5-8ba4-8329-bca4-c7505a40d2cb"
+    },
+    {
+      "type": "link",
+      "title": "Google Traductor",
+      "url": "https://translate.google.com/?sl=es&tl=en&op=translate"
+    },
+    {
+      "type": "link",
+      "title": "https://github.com/FraVelz/WEB-Fravelz",
+      "url": "https://github.com/FraVelz/WEB-Fravelz"
+    },
+    {
+      "type": "link",
+      "title": "http://localhost:4321/es/",
+      "url": "http://localhost:4321/es/"
+    },
+    {
+      "type": "link",
+      "title": "Bento Grids",
+      "url": "https://bentogrids.com/shots/clte06fbo0001p23cy17j6ldq"
+    },
+    {
+      "type": "link",
+      "title": "sher | instant preview links for your projects",
+      "url": "https://sher.sh/"
+    },
+    {
+      "type": "link",
+      "title": "errore vs Effect — Side-by-Side Comparison",
+      "url": "https://errore.org/errore-vs-effect"
+    },
+    {
+      "type": "link",
+      "title": "iScreen — AI-Powered iOS UI Generator",
+      "url": "https://www.iscreen.live/"
+    },
+    {
+      "type": "link",
+      "title": "Plitzi/plitzi-plugin-template",
+      "url": "https://github.com/Plitzi/plitzi-plugin-template"
+    },
+    {
+      "type": "link",
+      "title": "goey-toast — Morphing toast notifications for React",
+      "url": "https://goey-toast.vercel.app/"
+    },
+    {
+      "type": "link",
+      "title": "Krnel — Manage Tasks. Review Code. One Place.",
+      "url": "https://krnel.app/"
+    },
+    {
+      "type": "link",
+      "title": "Tailwind CSS Colors - All colors + Custom color generator",
+      "url": "https://uicolors.app/generate/4d7607"
+    },
+    {
+      "type": "link",
+      "title": "Codex | Lorian Portfolio",
+      "url": "https://codex.centaury.net/"
+    },
+    {
+      "type": "link",
+      "title": "404: NOT_FOUND",
+      "url": "https://portafolio-full-stack-developer-sigma.vercel.app/"
+    },
+    {
+      "type": "link",
+      "title": "Edu Calvo on X: &quot;Your coding agent has been working in complete silence. That is not a benefit. That is a problem. I built codevator — elevator music that plays while Claude Code works. It stops when it needs your attention. Please try to enjoy each floor equally. npx codevator codevator https://t.co/mwsG15UNJH&quot; / X",
+      "url": "https://x.com/educalvolpz/status/2025863963209060390"
+    },
+    {
+      "type": "link",
+      "title": "Deep Hacking - Blog de Ciberseguridad",
+      "url": "https://blog.deephacking.tech/es/"
+    },
+    {
+      "type": "link",
+      "title": "Prompt Optimizer",
+      "url": "https://prompt.always200.com/#/basic/system"
+    },
+    {
+      "type": "link",
+      "title": "sadmann7/diceui: Accessible shadcn/ui components built with React, TypeScript, and Tailwind CSS. Copy-paste ready, and customizable.",
+      "url": "https://github.com/sadmann7/diceui"
+    },
+    {
+      "type": "link",
+      "title": "Copy with Text Morph - Code Blocks",
+      "url": "https://code-blocks.pheralb.dev/docs/react/blocks/copy-text-morph"
+    },
+    {
+      "type": "link",
+      "title": "؜؜؜؜؜؜؜؜؜؜؜؜؜؜؜؜؜؜؜؜؜lochie on X: &quot;effortlessly and seamlessly transition between text with &amp;lt;TextMorph/&amp;gt; built on Intl.Locale and Web Animations API. dependency-free and ready to use in your favourite framework ✨ → https://t.co/09ko4KaK9Z https://t.co/vHgHrQYFXJ&quot; / X",
+      "url": "https://x.com/lochieaxon/status/2023434902814003315?s=20"
+    },
+    {
+      "type": "link",
+      "title": "Origin Map — Reverse Engineering Toolkit for Web Apps",
+      "url": "https://originmap.net/"
+    },
+    {
+      "type": "link",
+      "title": "Puck - Create your own AI page builder",
+      "url": "https://puckeditor.com/"
+    },
+    {
+      "type": "link",
+      "title": "EmulatorJS/EmulatorJS at dailydev",
+      "url": "https://github.com/EmulatorJS/EmulatorJS?ref=dailydev"
+    },
+    {
+      "type": "link",
+      "title": "Introduction - Ultracite",
+      "url": "https://docs.ultracite.ai/"
+    },
+    {
+      "type": "link",
+      "title": "Components | ElevenLabs UI",
+      "url": "https://ui.elevenlabs.io/docs/components"
+    },
+    {
+      "type": "link",
+      "title": "soundcn - Free Sound Effects for Modern Web Apps",
+      "url": "https://www.soundcn.xyz/"
+    },
+    {
+      "type": "link",
+      "title": "The Singularity will Occur on a Tuesday - Cam Pedersen",
+      "url": "https://campedersen.com/singularity"
+    },
+    {
+      "type": "link",
+      "title": "Sileo — Beautiful Toast Notifications for React",
+      "url": "https://sileo.aaryan.design/"
+    },
+    {
+      "type": "link",
+      "title": "ai-agent-board - npm",
+      "url": "https://www.npmjs.com/package/ai-agent-board"
+    },
+    {
+      "type": "link",
+      "title": "Miguel Ángel Durán on X: &quot;¡Aprende Inglés sin gastar dinero! De 0 → https://t.co/p1mQ1fPPE7 Speaking → https://t.co/hHm1aFUvT9 Gramática → https://t.co/GwhjcT64Vo Con películas → https://t.co/Fw10X9SPh4 Cambridge → https://t.co/rPCBO0RSsD Listening → https://t.co/L4yBoAlkka https://t.co/l4Rzff3Cvs&quot; / X",
+      "url": "https://x.com/midudev/status/2022672766357426576?s=20"
+    },
+    {
+      "type": "link",
+      "title": "Light Cycle Arena | The Gridcn",
+      "url": "https://thegridcn.com/game"
+    },
+    {
+      "type": "link",
+      "title": "Pablo on X: &quot;Introducing Code Blocks A set of UI components &amp;amp; utilities to show your code beautifully. ✓ Copy-Paste. 100% free. ✓ Shiki or Sugar-High for syntax highlighter. ✓ Add components with @shadcn /ui CLI. ✓ Docs built with @nextjs + @base_ui ✨ https://t.co/6jzOuJe7j6 https://t.co/UvUmAHsxZ7&quot; / X",
+      "url": "https://x.com/pheralb_/status/2021269178939019601"
+    },
+    {
+      "type": "link",
+      "title": "pheralb/code-blocks: 🍪 A set of UI components &amp; utilities to show your code beautifully.",
+      "url": "https://github.com/pheralb/code-blocks"
+    },
+    {
+      "type": "link",
+      "title": "A code-block UI component and utilities - Code Blocks",
+      "url": "https://code-blocks.pheralb.dev/"
+    },
+    {
+      "type": "link",
+      "title": "dev-workflows — Write rules once, compile everywhere",
+      "url": "https://www.dev-workflows.com/"
+    },
+    {
+      "type": "link",
+      "title": "Pixel Icon Library | Open-Source Pixelated Icons By HackerNoon",
+      "url": "https://pixeliconlibrary.com/"
+    },
+    {
+      "type": "link",
+      "title": "1042 Studio Store | Pixel Icon Set",
+      "url": "https://www.1042.studio/store/pixel-icon-set"
+    },
+    {
+      "type": "link",
+      "title": "Readdy: Crea sitios web que destacan | Constructor de sitios web con IA",
+      "url": "https://readdy.ai/es"
+    },
+    {
+      "type": "link",
+      "title": "Profile Readme Generator",
+      "url": "https://profile-readme-generator.com/es"
+    },
+    {
+      "type": "link",
+      "title": "Miguel Ángel Durán on X: &quot;¡Brutal biblioteca para Drag &amp;amp; Drop en JavaScript! ✓ Funciona en React, Vue, Angular y Svelte ✓ Usada por Trello, Jira y Confluence ✓ Compatible con móviles ✓ Ocupa sólo 4.7KB → npm install @atlaskit/pragmatic-drag-and-drop https://t.co/uEdag74NKW&quot; / X",
+      "url": "https://x.com/midudev/status/2020497069434155053?s=20"
+    },
+    {
+      "type": "link",
+      "title": "warcraftcn - Warcraft UI components",
+      "url": "https://www.warcraftcn.com/"
+    },
+    {
+      "type": "link",
+      "title": "Litematica Web Viewer",
+      "url": "https://litematica-render.vercel.app/"
+    },
+    {
+      "type": "link",
+      "title": "nehu3n/trad: 🌎 Extremely-fast offline Rust translation library for 200+ languages. CPU-optimized and fully local.",
+      "url": "https://github.com/nehu3n/trad"
+    },
+    {
+      "type": "link",
+      "title": "Miguel Ángel Durán on X: &quot;¡Desarrolla webs Responsive 5 veces más rápido! Extensión obligada para desarrolladores frontend. https://t.co/XGhfVMYK0N&quot; / X",
+      "url": "https://x.com/midudev/status/2020182555429912994?s=20"
+    },
+    {
+      "type": "link",
+      "title": "Leptos Components · Rust UI Component Library | Rust/UI",
+      "url": "https://rust-ui.com/"
+    },
+    {
+      "type": "link",
+      "title": "National Design Studio",
+      "url": "https://ndstudio.gov/"
+    },
+    {
+      "type": "link",
+      "title": "TrumpRx",
+      "url": "https://trumprx.gov/"
+    },
+    {
+      "type": "link",
+      "title": "Harvard CS50 (2026) – Full Computer Science University Course - YouTube",
+      "url": "https://www.youtube.com/watch?v=gmuTjeQUbTM"
+    },
+    {
+      "type": "link",
+      "title": "Building Bulletproof React Components - Shu Ding",
+      "url": "https://shud.in/thoughts/build-bulletproof-react-components"
+    },
+    {
+      "type": "link",
+      "title": "Contenido - Manz.dev",
+      "url": "https://bootcamp.manz.dev/contenido/"
+    },
+    {
+      "type": "link",
+      "title": "web.dev",
+      "url": "https://web.dev/?hl=es-419"
+    },
+    {
+      "type": "link",
+      "title": "Free Online Animated Video Backgrounds Generator",
+      "url": "https://www.krumzi.com/tools/animated-background-generator"
+    },
+    {
+      "type": "link",
+      "title": "Miguel Ángel Durán on X: &quot;¡Buen recurso para programadores y diseñadores web! Una herramienta para crear fondos animados con gradientes de colores. https://t.co/RdWAlMUisd&quot; / X",
+      "url": "https://x.com/midudev/status/2019440863294701679?s=20"
+    },
+    {
+      "type": "link",
+      "title": "Miguel Ángel Durán on X: &quot;Recurso TOP para aprender Algoritmos de Programación. Paso a paso, con código y visual. +70 algoritmos en JavaScript, Java y C++ → https://t.co/jRAvfY85ub https://t.co/syGfW0NGm5&quot; / X",
+      "url": "https://x.com/midudev/status/2019424940114559054?s=20"
+    },
+    {
+      "type": "link",
+      "title": "█: ████████████ — Epstein Emails",
+      "url": "https://jmail.world/thread/HOUSE_OVERSIGHT_029504?view=inbox"
+    },
+    {
+      "type": "link",
+      "title": "Miguel Ángel Durán on X: &quot;7 páginas para practicar Lógica de Programación. Sin coste, interactivas y divertidas: ① adventjs․dev ② exercism․org ③ leetcode․com ④ codewars․com ⑤ coderbyte․com ⑥ codesignal․com ⑦ hackerrank․com https://t.co/VDNtfA5tiY&quot; / X",
+      "url": "https://x.com/midudev/status/2019078471419396357?s=20"
+    },
+    {
+      "type": "link",
+      "title": "Agentation",
+      "url": "https://agentation.dev/"
+    },
+    {
+      "type": "link",
+      "title": "durgeshsamariya/awesome-github-profile-readme-templates: This repository contains best profile readme&#39;s for your reference.",
+      "url": "https://github.com/durgeshsamariya/awesome-github-profile-readme-templates"
+    },
+    {
+      "type": "link",
+      "title": "mrcodedev/frontend-developer-resources: Recursos gratuitos para empezar a ser un Frontend Developer o ampliar conocimientos",
+      "url": "https://github.com/mrcodedev/frontend-developer-resources?tab=readme-ov-file"
+    },
+    {
+      "type": "link",
+      "title": "Tremor – Copy-and-Paste Tailwind CSS UI Components for Charts and Dashboards",
+      "url": "https://www.tremor.so/"
+    },
+    {
+      "type": "link",
+      "title": "Nextra – Next.js Static Site Generator",
+      "url": "https://nextra.site/"
+    },
+    {
+      "type": "link",
+      "title": "Un-common Components for shadcn/ui | Skiper UI",
+      "url": "https://skiper-ui.com/"
+    },
+    {
+      "type": "link",
+      "title": "The Monolith Project",
+      "url": "https://themonolithproject.net/"
+    },
+    {
+      "type": "link",
+      "title": "Santiago Goncalvez | Desarrollo Web &amp; Sistemas a Medida",
+      "url": "https://santiagogoncalvez.com/"
+    },
+    {
+      "type": "link",
+      "title": "Focus Climb | Deep Study Sessions",
+      "url": "https://focusclimb.app/"
+    },
+    {
+      "type": "link",
+      "title": "audio/ui - Build accessible React audio interfaces fast with composable Audio UI components. Copy, paste, and own. Explore docs and ready-made components.",
+      "url": "https://audio-ui.xyz/"
+    },
+    {
+      "type": "link",
+      "title": "Ezequiel Díaz – Portfolio",
+      "url": "https://edev.online/en"
+    },
+    {
+      "type": "link",
+      "title": "(1) Miguel Ángel Durán on X: &quot;¡Qué ilusión! Mi extensión Better SVG está en portada en el marketplace de Visual Studio Code. Optimiza y previsualiza tus archivos .svg sin salir del editor. Mejora tu experiencia de desarrollo. Ya casi tenemos 10.000 descargas. ¡Vamos! https://t.co/Kf6Yao1TAl&quot; / X",
+      "url": "https://x.com/midudev/status/2016526149447262397?s=20"
+    },
+    {
+      "type": "link",
+      "title": "Modales | El Rincón del Front-end",
+      "url": "https://el-rincon-del-front-end.netlify.app/modales"
+    },
+    {
+      "type": "link",
+      "title": "Miguel Ángel Durán on X: &quot;La gente ve el éxito de Clawdbot y piensa: &quot;Qué suerte&quot; Pero lo que no ve es todo lo que hay detrás. El creador de Clawdbot no apareció de la nada. Clawdbot no es un golpe de suerte. Es constancia. Mira su GitHub: https://t.co/GJVOKYKR9H&quot; / X",
+      "url": "https://x.com/midudev/status/2016556615097344485?s=20"
+    },
+    {
+      "type": "link",
+      "title": "Miguel Ángel Durán on X: &quot;¿Te cuesta elegir la fuente para tu web? ¡Este recurso es perfecto para diseñadores y programadores! Te da las mejores combinaciones de fuentes gratuitas: → https://t.co/KvKLW7V0Gu https://t.co/bTxQRgaffF&quot; / X",
+      "url": "https://x.com/midudev/status/2016183224364314753?s=20"
+    },
+    {
+      "type": "link",
+      "title": "open-circle/formisch: The modular and type-safe form library for any framework",
+      "url": "https://github.com/open-circle/formisch"
+    },
+    {
+      "type": "link",
+      "title": "Formisch: The modular and type-safe form library for any framework",
+      "url": "https://formisch.dev/"
+    },
+    {
+      "type": "link",
+      "title": "Errore - Errors as Values in TypeScript",
+      "url": "https://errore.org/"
+    },
+    {
+      "type": "link",
+      "title": "DevDocs API Documentation",
+      "url": "https://devdocs.io/"
+    },
+    {
+      "type": "link",
+      "title": "Popular Tailwind kits | TailAwesome",
+      "url": "https://www.tailawesome.com/?type=kit"
+    },
+    {
+      "type": "link",
+      "title": "itshover/itshover: Icons that move with intent",
+      "url": "https://github.com/itshover/itshover"
+    },
+    {
+      "type": "link",
+      "title": "golbat",
+      "url": "https://www.golb.at/?url=https%3A%2F%2Fwww.golb.at%2F"
+    },
+    {
+      "type": "link",
+      "title": "golbat",
+      "url": "https://www.golb.at/"
+    },
+    {
+      "type": "link",
+      "title": "nauvalazhar/selia: Interfaces That Feel Right, Out of the Box (For React)",
+      "url": "https://github.com/nauvalazhar/selia"
+    },
+    {
+      "type": "link",
+      "title": "https://awesomeshadcn.dev/categories/libs-and-components/vengence-ui",
+      "url": "https://awesomeshadcn.dev/categories/libs-and-components/vengence-ui"
+    },
+    {
+      "type": "link",
+      "title": "Interfaces That Feel Right, Out of the Box – Selia",
+      "url": "https://selia.earth/"
+    },
+    {
+      "type": "link",
+      "title": "https://www.vengenceui.com/docs/creepy-button",
+      "url": "https://www.vengenceui.com/docs/creepy-button"
+    },
+    {
+      "type": "link",
+      "title": "Better Upload - Simple and easy file uploads for React",
+      "url": "https://better-upload.com/"
+    },
+    {
+      "type": "link",
+      "title": "https://www.vengenceui.com/docs/perspective-grid",
+      "url": "https://www.vengenceui.com/docs/perspective-grid"
+    },
+    {
+      "type": "link",
+      "title": "Starwind UI",
+      "url": "https://starwind.dev/"
+    },
+    {
+      "type": "link",
+      "title": "TvUi",
+      "url": "https://ui.todovue.blog/"
+    },
+    {
+      "type": "link",
+      "title": "Jeraidi.dev Portfolio",
+      "url": "https://jeraidi.dev/"
+    },
+    {
+      "type": "link",
+      "title": "WEB-Icfes-antigua",
+      "url": "https://web-pruebas-icfes.web.app/"
+    },
+    {
+      "type": "link",
+      "title": "Anara | AI you can trust",
+      "url": "https://anara.com/"
+    },
+    {
+      "type": "link",
+      "title": "stan-smith/FossFLOW: Make beautiful isometric infrastructure diagrams",
+      "url": "https://github.com/stan-smith/FossFLOW"
+    },
+    {
+      "type": "link",
+      "title": "The Gridcn | Tron-Inspired shadcn/ui Theme",
+      "url": "https://thegridcn.com/"
+    },
+    {
+      "type": "link",
+      "title": "Flowbite",
+      "url": "https://flowbite.com/#components"
+    },
+    {
+      "type": "link",
+      "title": "https://overreacted.io/the-two-reacts/",
+      "url": "https://overreacted.io/the-two-reacts/"
+    },
+    {
+      "type": "link",
+      "title": "2025 JavaScript Rising Stars",
+      "url": "https://risingstars.js.org/2025/en"
+    },
+    {
+      "type": "link",
+      "title": "React Bits - Index",
+      "url": "https://reactbits.dev/get-started/index"
+    },
+    {
+      "type": "link",
+      "title": "Tailwind Components",
+      "url": "https://daisyui.com/components/"
+    },
+    {
+      "type": "link",
+      "title": "Qwen Image Multiple Angles 3D Camera - a Hugging Face Space by multimodalart",
+      "url": "https://huggingface.co/spaces/multimodalart/qwen-image-multiple-angles-3d-camera"
+    },
+    {
+      "type": "link",
+      "title": "github/relative-time-element: Web component extensions to the standard &lt;time&gt; element.",
+      "url": "https://github.com/github/relative-time-element"
+    },
+    {
+      "type": "link",
+      "title": "DevLinks | Astro",
+      "url": "https://astro.build/themes/details/devlinks/"
+    },
+    {
+      "type": "link",
+      "title": "CarlosC-desing/Weyland-Yutani-Project: Enciclopedia interactiva del universo Alien/Predator desarrollada con React y TypeScript, enfocada en una experiencia de usuario (UX) inmersiva y tipado de datos estricto.",
+      "url": "https://github.com/CarlosC-desing/Weyland-Yutani-Project"
+    },
+    {
+      "type": "link",
+      "title": "El problema no eres tú (es tu primer año como programador) - YouTube",
+      "url": "https://www.youtube.com/watch?v=x0y28JJcJpc"
+    },
+    {
+      "type": "link",
+      "title": "200+ recursos para Desarrollo Web en un solo lugar - YouTube",
+      "url": "https://www.youtube.com/watch?v=KUWLNNaORo0"
+    },
+    {
+      "type": "link",
+      "title": "Free Web Development Resources",
+      "url": "https://web-dev-resources.com/list/"
+    },
+    {
+      "type": "link",
+      "title": "https://next-auth.js.org/",
+      "url": "https://next-auth.js.org/"
+    },
+    {
+      "type": "link",
+      "title": "Guardar ventanas como marcadores",
+      "url": "https://chatgpt.com/c/69a0ac0a-f228-8332-bf93-9d87fa6560b7"
+    },
+    {
+      "type": "link",
+      "title": "Gabo Fullstack Github",
+      "url": "https://github.com/GaboInsane6489"
+    },
+    {
+      "type": "link",
+      "title": "Gabo Fullstack",
+      "url": "https://gabo-fullstack.vercel.app/en/"
+    }
+  ]
+}
