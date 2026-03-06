@@ -1,0 +1,317 @@
+{
+  "type": "folder",
+  "name": "User Interface",
+  "slug": "user-interface",
+  "children": [
+    {
+      "type": "folder",
+      "name": "Colors",
+      "slug": "colors",
+      "children": [],
+      "links": [
+        {
+          "type": "link",
+          "title": "ColorHunt",
+          "url": "https://colorhunt.co/"
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "Icons Svg",
+      "slug": "icons-svg",
+      "children": [],
+      "links": [
+        {
+          "type": "link",
+          "title": "Icons0.dev",
+          "url": "https://icons0.dev/"
+        },
+        {
+          "type": "link",
+          "title": "Icon Icons",
+          "url": "https://icon-icons.com/"
+        },
+        {
+          "type": "link",
+          "title": "Hero Icons",
+          "url": "https://heroicons.com/"
+        },
+        {
+          "type": "link",
+          "title": "Font Awesome",
+          "url": "https://fontawesome.com/"
+        },
+        {
+          "type": "link",
+          "title": "Svg Iconos",
+          "url": "https://www.svgrepo.com/"
+        },
+        {
+          "type": "link",
+          "title": "Remix Icon",
+          "url": "https://remixicon.com/"
+        },
+        {
+          "type": "link",
+          "title": "Box Icons",
+          "url": "https://boxicons.com/"
+        },
+        {
+          "type": "link",
+          "title": "Tabler Icons",
+          "url": "https://tablericons.com/"
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "Generators",
+      "slug": "generators",
+      "children": [],
+      "links": [
+        {
+          "type": "link",
+          "title": "BoxShadowCSS",
+          "url": "https://www.cssmatic.com/box-shadow"
+        },
+        {
+          "type": "link",
+          "title": "CSS Grid Generator",
+          "url": "https://cssgrid-generator.netlify.app/"
+        },
+        {
+          "type": "link",
+          "title": "Image - Clippy CSS",
+          "url": "https://bennettfeely.com/clippy/"
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "Gradients",
+      "slug": "gradients",
+      "children": [],
+      "links": [
+        {
+          "type": "link",
+          "title": "CSS Gradient.io",
+          "url": "https://cssgradient.io/"
+        },
+        {
+          "type": "link",
+          "title": "Gradient Generator",
+          "url": "https://www.joshwcomeau.com/gradient-generator/"
+        },
+        {
+          "type": "link",
+          "title": "Gradient Backgrounds",
+          "url": "https://cssgradient.io/gradient-backgrounds/"
+        },
+        {
+          "type": "link",
+          "title": "CssGradient",
+          "url": "https://cssgradient.io/"
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "Animations",
+      "slug": "animations",
+      "children": [],
+      "links": [
+        {
+          "type": "link",
+          "title": "Animista.net",
+          "url": "https://animista.net/"
+        },
+        {
+          "type": "link",
+          "title": "LottieFiles",
+          "url": "https://lottiefiles.com/"
+        },
+        {
+          "type": "link",
+          "title": "Jitter Video",
+          "url": "https://jitter.video/"
+        },
+        {
+          "type": "link",
+          "title": "AnimeJS",
+          "url": "https://animejs.com/"
+        },
+        {
+          "type": "link",
+          "title": "https://efecto.app/",
+          "url": "https://efecto.app/"
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "Full screen",
+      "slug": "full-screen",
+      "children": [],
+      "links": [
+        {
+          "type": "link",
+          "title": "SVG Wave",
+          "url": "https://svgwave.in/"
+        },
+        {
+          "type": "link",
+          "title": "SVG Waves",
+          "url": "https://www.svgwaves.io/"
+        },
+        {
+          "type": "link",
+          "title": "Get Waves",
+          "url": "https://getwaves.io/"
+        },
+        {
+          "type": "link",
+          "title": "App Haikei",
+          "url": "https://app.haikei.app/"
+        },
+        {
+          "type": "link",
+          "title": "Transition.css",
+          "url": "https://www.transition.style/"
+        },
+        {
+          "type": "link",
+          "title": "BGJar",
+          "url": "https://bgjar.com/"
+        },
+        {
+          "type": "link",
+          "title": "Pattern Monster",
+          "url": "https://pattern.monster/"
+        },
+        {
+          "type": "link",
+          "title": "Hero Patterns",
+          "url": "https://heropatterns.com/"
+        },
+        {
+          "type": "link",
+          "title": "TemplateMonster",
+          "url": "https://www.templatemonster.com/es/plantillas/?text=free"
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "UI",
+      "slug": "ui",
+      "children": [],
+      "links": [
+        {
+          "type": "link",
+          "title": "Sileo",
+          "url": "https://github.com/hiaaryan/sileo"
+        },
+        {
+          "type": "link",
+          "title": "Blob maker",
+          "url": "https://www.blobmaker.app/"
+        },
+        {
+          "type": "link",
+          "title": "SVG Backgrounds",
+          "url": "https://www.svgbackgrounds.com/"
+        },
+        {
+          "type": "link",
+          "title": "Neumorphism.io",
+          "url": "https://neumorphism.io/#e0e0e0"
+        },
+        {
+          "type": "link",
+          "title": "Components Tailwind CSS",
+          "url": "https://www.creative-tim.com/twcomponents/components"
+        },
+        {
+          "type": "link",
+          "title": "UI Shadcn",
+          "url": "https://ui.shadcn.com/"
+        },
+        {
+          "type": "link",
+          "title": "Reactbits",
+          "url": "https://reactbits.dev/"
+        },
+        {
+          "type": "link",
+          "title": "Universe.io",
+          "url": "https://uiverse.io/"
+        },
+        {
+          "type": "link",
+          "title": "https://flowbite.com/",
+          "url": "https://flowbite.com/"
+        },
+        {
+          "type": "link",
+          "title": "Material Tailwind",
+          "url": "https://www.material-tailwind.com/"
+        },
+        {
+          "type": "link",
+          "title": "MagicUIDesign",
+          "url": "https://magicui.design/"
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "Designs",
+      "slug": "designs",
+      "children": [],
+      "links": [
+        {
+          "type": "link",
+          "title": "Stitch",
+          "url": "https://stitch.withgoogle.com/"
+        },
+        {
+          "type": "link",
+          "title": "BentoGrids",
+          "url": "https://bentogrids.com/"
+        },
+        {
+          "type": "link",
+          "title": "Landingfolio",
+          "url": "https://www.landingfolio.com/"
+        },
+        {
+          "type": "link",
+          "title": "https://scroll-driven-animations.style/",
+          "url": "https://scroll-driven-animations.style/"
+        },
+        {
+          "type": "link",
+          "title": "Awwwards",
+          "url": "https://www.awwwards.com/"
+        },
+        {
+          "type": "link",
+          "title": "Carrd.co",
+          "url": "https://carrd.co/build"
+        },
+        {
+          "type": "link",
+          "title": "Dribbble",
+          "url": "https://dribbble.com/shots/popular"
+        },
+        {
+          "type": "link",
+          "title": "Carrd",
+          "url": "https://carrd.co/build"
+        }
+      ]
+    }
+  ],
+  "links": []
+}

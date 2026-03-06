@@ -1,0 +1,118 @@
+{
+  "type": "folder",
+  "name": "Others",
+  "slug": "others",
+  "children": [],
+  "links": [
+    {
+      "type": "link",
+      "title": "Rendercv",
+      "url": "https://rendercv.com/"
+    },
+    {
+      "type": "link",
+      "title": "Bennettfeely",
+      "url": "https://bennettfeely.com/clippy/"
+    },
+    {
+      "type": "link",
+      "title": "Coolors.co",
+      "url": "https://coolors.co/"
+    },
+    {
+      "type": "link",
+      "title": "Emojis",
+      "url": "https://emojipedia.org/"
+    },
+    {
+      "type": "link",
+      "title": "Fonts",
+      "url": "https://fonts.google.com/?preview.text=Hola%20Mundo%20!!%20&subset=latin&noto.script=Latn"
+    },
+    {
+      "type": "link",
+      "title": "Render CV",
+      "url": "https://rendercv.com/"
+    },
+    {
+      "type": "link",
+      "title": "Consejos",
+      "url": "https://medium.com/refactoring-ui/7-practical-tips-for-cheating-at-design-40c736799886"
+    },
+    {
+      "type": "link",
+      "title": "Little Language",
+      "url": "https://blog.google/intl/es-419/noticias-de-la-empresa/tecnologia/little-language-lessons-utiliza-ia-generativa-para-hacer-que-la-practica-de-idiomas-sea-mas-personalizada/"
+    },
+    {
+      "type": "link",
+      "title": "https://pagespeed.web.dev/",
+      "url": "https://pagespeed.web.dev/"
+    },
+    {
+      "type": "link",
+      "title": "Verdent IA",
+      "url": "https://www.verdent.ai/"
+    },
+    {
+      "type": "link",
+      "title": "Axios",
+      "url": "https://github.com/axios/axios"
+    },
+    {
+      "type": "link",
+      "title": "Geist-font",
+      "url": "https://github.com/vercel/geist-font"
+    },
+    {
+      "type": "link",
+      "title": "Tools",
+      "url": "https://www.fffuel.co/"
+    },
+    {
+      "type": "link",
+      "title": "ui.aceternity",
+      "url": "https://ui.aceternity.com/components"
+    },
+    {
+      "type": "link",
+      "title": "https://codepen.io/filipz/pen/GgpMOEq",
+      "url": "https://codepen.io/filipz/pen/GgpMOEq"
+    },
+    {
+      "type": "link",
+      "title": "portafolio-chi-teal-79",
+      "url": "https://portafolio-chi-teal-79.vercel.app/"
+    },
+    {
+      "type": "link",
+      "title": "https://www.shadertoy.com/",
+      "url": "https://www.shadertoy.com/"
+    },
+    {
+      "type": "link",
+      "title": "https://sparkjs.dev/examples/#splat-shader-effects",
+      "url": "https://sparkjs.dev/examples/#splat-shader-effects"
+    },
+    {
+      "type": "link",
+      "title": "RyunixJS",
+      "url": "https://github.com/UnSetSoft/Ryunixjs"
+    },
+    {
+      "type": "link",
+      "title": "hover",
+      "url": "https://codepen.io/AThorne/pen/ZEjGZrV"
+    },
+    {
+      "type": "link",
+      "title": "Lilex Font",
+      "url": "https://github.com/mishamyrt/Lilex"
+    },
+    {
+      "type": "link",
+      "title": "Github Pheralp",
+      "url": "https://github.com/pheralb"
+    }
+  ]
+}
