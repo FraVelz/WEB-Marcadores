@@ -1,0 +1,62 @@
+[
+  {
+    "label": "Inicio",
+    "slug": "index",
+    "count": null
+  },
+  {
+    "label": "Apps",
+    "slug": "apps",
+    "count": 25
+  },
+  {
+    "label": "Learning",
+    "slug": "learning",
+    "count": 14
+  },
+  {
+    "label": "Edition",
+    "slug": "edition",
+    "count": 12
+  },
+  {
+    "label": "Typing",
+    "slug": "typing",
+    "count": 10
+  },
+  {
+    "label": "Hacking",
+    "slug": "hacking",
+    "count": 23
+  },
+  {
+    "label": "Perfiles-Git-Web",
+    "slug": "perfiles-git-web",
+    "count": 17
+  },
+  {
+    "label": "Desarrollo-WEB",
+    "slug": "desarrollo-web",
+    "count": 14
+  },
+  {
+    "label": "User Interface",
+    "slug": "user-interface",
+    "count": 49
+  },
+  {
+    "label": "shorcuts",
+    "slug": "shorcuts",
+    "count": 7
+  },
+  {
+    "label": "Others",
+    "slug": "others",
+    "count": 22
+  },
+  {
+    "label": "herrramientas",
+    "slug": "herrramientas",
+    "count": 113
+  }
+]
