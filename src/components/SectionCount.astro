@@ -1,0 +1,28 @@
+---
+/**
+ * Badge con conteo de enlaces para una sección
+ */
+interface Props {
+  count: number;
+}
+
+const { count } = Astro.props;
+---
+
+<span class="section-count" aria-label={`${count} enlaces`}>{count}</span>
+
+<style>
+  .section-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.5em;
+    padding: 0.15em 0.4em;
+    font-size: 0.75em;
+    font-weight: 600;
+    background: var(--sl-color-accent);
+    color: var(--sl-color-white);
+    border-radius: 999px;
+    margin-left: 0.5rem;
+  }
+</style>
