@@ -3,7 +3,16 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const dashboardPaths = ["/marcadores", "/atajos", "/perfil"];
 
+function isDemoMode(): boolean {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  return !url || !key || url === "" || key === "";
+}
+
 export async function middleware(request: NextRequest) {
+  if (isDemoMode()) {
+    return NextResponse.next({ request });
+  }
   let response = NextResponse.next({ request });
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
