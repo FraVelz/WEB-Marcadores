@@ -4,7 +4,7 @@ export default function AtajosPage() {
     { keys: "Ctrl+2", desc: "Ir a Atajos" },
     { keys: "Ctrl+3", desc: "Ir a Perfil" },
     { keys: "Vista: Grilla", desc: "Marcadores en grid con tags" },
-    { keys: "Vista: Tema › Subtema", desc: "Marcadores agrupados por tema y subtema" },
+    { keys: "Vista: Tema › Subtema", desc: "Marcadores agrupados por tema y subtema (vista por defecto)" },
     { keys: "Ctrl+F", desc: "Enfocar input de filtro por nombre" },
     { keys: "Ctrl+K", desc: "Enfocar input de búsqueda por tags" },
     { keys: "Ctrl+N", desc: "Enfocar grid de marcadores (navegación vim)" },

@@ -111,6 +111,7 @@ export default function TagAutocomplete({
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         autoComplete="off"
+        data-no-vim
         className={className}
         aria-autocomplete="list"
         aria-expanded={isOpen}

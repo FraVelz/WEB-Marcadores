@@ -70,6 +70,7 @@ export default function LoginPage() {
             type="email"
             placeholder="Email"
             value={email}
+            data-no-vim
             onChange={(e) => setEmail(e.target.value)}
             className="rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-white placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
             required
@@ -78,6 +79,7 @@ export default function LoginPage() {
             type="password"
             placeholder="Contraseña"
             value={password}
+            data-no-vim
             onChange={(e) => setPassword(e.target.value)}
             className="rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-white placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
             required
