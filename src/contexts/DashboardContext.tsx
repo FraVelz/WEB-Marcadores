@@ -42,7 +42,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [allTags, setAllTags] = useState<string[]>([]);
   const [allThemes, setAllThemes] = useState<string[]>([]);
   const [allSubthemes, setAllSubthemes] = useState<string[]>([]);
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [viewMode, setViewMode] = useState<ViewMode>("hierarchical");
   const mainKeyDownRef = useRef<((e: React.KeyboardEvent) => void) | null>(null);
 
   const refreshTags = useCallback(async () => {

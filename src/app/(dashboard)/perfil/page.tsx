@@ -97,6 +97,7 @@ export default function PerfilPage() {
               type="password"
               placeholder="Nueva contraseña"
               value={newPassword}
+              data-no-vim
               onChange={(e) => setNewPassword(e.target.value)}
               className="w-full rounded-lg border border-zinc-600 bg-zinc-800 px-4 py-2 text-white placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
               minLength={6}
