@@ -135,7 +135,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
           )}
         </div>
         <p className="mt-4 text-xs text-zinc-500">
-          Ctrl+1/2/3: secciones | Ctrl+F: filtro | Ctrl+K: tags | Ctrl+N: foco grid
+          Ctrl+1/2/3: secciones | Ctrl+F: filtro | Ctrl+K: tags | Ctrl+N: foco grid | hjkl: navegar
         </p>
       </aside>
       <main

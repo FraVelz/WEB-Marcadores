@@ -131,24 +131,25 @@ export default function MarcadoresPage() {
           return;
         }
       }
-      if (e.key === "ArrowDown" || e.key === "j") {
+      const COLS = 3;
+      if (e.key === "j") {
         e.preventDefault();
-        setSelectedIndex((i) => (i + 1) % totalCount);
+        setSelectedIndex((i) => Math.min(i + COLS, totalCount - 1));
         return;
       }
-      if (e.key === "ArrowUp" || e.key === "k") {
+      if (e.key === "k") {
         e.preventDefault();
-        setSelectedIndex((i) => (i - 1 + totalCount) % totalCount);
+        setSelectedIndex((i) => Math.max(i - COLS, 0));
         return;
       }
-      if (e.key === "ArrowRight" || e.key === "l") {
+      if (e.key === "l") {
         e.preventDefault();
-        setSelectedIndex((i) => Math.min(i + 3, totalCount - 1));
+        setSelectedIndex((i) => Math.min(i + 1, totalCount - 1));
         return;
       }
-      if (e.key === "ArrowLeft" || e.key === "h") {
+      if (e.key === "h") {
         e.preventDefault();
-        setSelectedIndex((i) => Math.max(i - 3, 0));
+        setSelectedIndex((i) => Math.max(i - 1, 0));
         return;
       }
     },
