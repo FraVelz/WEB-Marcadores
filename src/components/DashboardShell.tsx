@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useDashboard } from "@/contexts/DashboardContext";
+import TagAutocomplete from "@/components/TagAutocomplete";
 
 const navItems = [
   { href: "/marcadores", label: "Marcadores" },
@@ -13,7 +14,8 @@ const navItems = [
 
 export default function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { filterRef, searchRef, mainRef, focusMain, filterValue, setFilterValue, searchValue, setSearchValue, allTags, mainKeyDownRef } = useDashboard();
+  const router = useRouter();
+  const { filterRef, searchRef, mainRef, focusMain, filterValue, setFilterValue, searchValue, setSearchValue, themeFilter, setThemeFilter, allTags, allThemes, viewMode, setViewMode, mainKeyDownRef } = useDashboard();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -29,14 +31,21 @@ export default function DashboardShell({ children }: { children: React.ReactNode
         e.preventDefault();
         focusMain();
       }
+      if (e.ctrlKey && /^[1-9]$/.test(e.key)) {
+        const idx = parseInt(e.key, 10) - 1;
+        if (idx < navItems.length) {
+          e.preventDefault();
+          router.push(navItems[idx].href);
+        }
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [filterRef, searchRef, focusMain]);
+  }, [filterRef, searchRef, focusMain, router]);
 
   return (
     <div className="flex min-h-screen bg-zinc-950">
-      <aside className="flex w-64 flex-col border-r border-zinc-800 bg-zinc-900 p-4">
+      <aside className="top-0 h-screen flex w-64 flex-col border-r border-zinc-800 bg-zinc-900 p-4">
         <nav className="flex flex-col gap-1">
           {navItems.map((item) => (
             <Link
@@ -71,32 +80,62 @@ export default function DashboardShell({ children }: { children: React.ReactNode
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs text-zinc-500">Buscar por tags (Ctrl+K)</label>
-            <input
-              ref={searchRef}
-              type="text"
-              placeholder="Etiqueta..."
+            <label className="mb-1 block text-xs text-zinc-500">
+              Buscar por tags (Ctrl+K) — Tab: navegar, Enter: seleccionar
+            </label>
+            <TagAutocomplete
+              inputRef={searchRef}
               value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              list="tag-suggestions"
-              autoComplete="off"
+              onChange={setSearchValue}
+              options={allTags}
+              onEnter={focusMain}
+              placeholder="Etiqueta..."
               className="w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  focusMain();
-                }
-              }}
             />
-            <datalist id="tag-suggestions">
-              {allTags.map((tag) => (
-                <option key={tag} value={tag} />
-              ))}
-            </datalist>
           </div>
+          {pathname === "/marcadores" && (
+            <div>
+              <label className="mb-1 block text-xs text-zinc-500">Filtrar por tema</label>
+              <select
+                value={themeFilter}
+                onChange={(e) => setThemeFilter(e.target.value)}
+                className="w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none"
+              >
+                <option value="">Todos los temas</option>
+                {allThemes.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+          )}
+          {pathname === "/marcadores" && (
+            <div>
+              <label className="mb-1 block text-xs text-zinc-500">Vista</label>
+              <div className="flex gap-1 rounded-lg border border-zinc-600 bg-zinc-800 p-1">
+                <button
+                  type="button"
+                  onClick={() => setViewMode("grid")}
+                  className={`flex-1 rounded px-2 py-1.5 text-xs transition-colors ${
+                    viewMode === "grid" ? "bg-zinc-600 text-white" : "text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  Grilla
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode("hierarchical")}
+                  className={`flex-1 rounded px-2 py-1.5 text-xs transition-colors ${
+                    viewMode === "hierarchical" ? "bg-zinc-600 text-white" : "text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  Tema › Subtema
+                </button>
+              </div>
+            </div>
+          )}
         </div>
         <p className="mt-4 text-xs text-zinc-500">
-          Ctrl+F: filtro | Ctrl+K: búsqueda | Ctrl+N: foco grid | Enter: abrir
+          Ctrl+1/2/3: secciones | Ctrl+F: filtro | Ctrl+K: tags | Ctrl+N: foco grid
         </p>
       </aside>
       <main

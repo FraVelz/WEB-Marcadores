@@ -33,6 +33,11 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# Export/classificación temporal
+bookmarks-export.json
+bookmarks-classified.sql
 
 # vercel
 .vercel
