@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient, isDemoMode } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { DEMO_BOOKMARKS } from "@/lib/demo-data";
 
 export default function PerfilPage() {
   const [user, setUser] = useState<{ email?: string } | null>(null);
@@ -15,6 +16,11 @@ export default function PerfilPage() {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (isDemoMode()) {
+        setUser({ email: "demo@ejemplo.com" });
+        setBookmarkCount(DEMO_BOOKMARKS.length);
+        return;
+      }
       const { data: { user: u } } = await supabase.auth.getUser();
       setUser(u ?? null);
       if (u) {
@@ -26,12 +32,18 @@ export default function PerfilPage() {
   }, [supabase]);
 
   const handleSignOut = async () => {
+    if (isDemoMode()) {
+      router.push("/");
+      router.refresh();
+      return;
+    }
     await supabase.auth.signOut();
     router.push("/");
     router.refresh();
   };
 
   const handleChangePassword = async (e: React.FormEvent) => {
+    if (isDemoMode()) return;
     e.preventDefault();
     if (!newPassword || newPassword.length < 6) {
       setPasswordMsg("La contraseña debe tener al menos 6 caracteres.");
