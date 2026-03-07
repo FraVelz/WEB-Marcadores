@@ -12,12 +12,9 @@ type Bookmark = {
   title: string;
   url: string;
   description?: string;
-  notes?: string;
   theme?: string;
   subtheme?: string;
   tags?: string[];
-  favicon?: string;
-  color?: string;
   created_at?: string;
 };
 
@@ -102,6 +99,10 @@ export default function MarcadoresPage() {
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
+      const active = document.activeElement;
+      if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA" || (active as HTMLElement).closest?.('[role="dialog"]'))) {
+        return;
+      }
       if (totalCount === 0) return;
       if (selectMode) {
         if (e.key === "Enter") {
@@ -165,9 +166,13 @@ export default function MarcadoresPage() {
   }, [selectedIndex]);
 
   useEffect(() => {
-    setMainKeyDown(handleKeyDown);
+    if (modalOpen || detailBookmark) {
+      setMainKeyDown(null);
+    } else {
+      setMainKeyDown(handleKeyDown);
+    }
     return () => setMainKeyDown(null);
-  }, [setMainKeyDown, handleKeyDown]);
+  }, [setMainKeyDown, handleKeyDown, modalOpen, detailBookmark]);
 
   const handleAdd = () => {
     setEditingBookmark(null);
@@ -186,22 +191,23 @@ export default function MarcadoresPage() {
   };
 
   const handleModalSubmit = async (data: BookmarkFormData) => {
+    const tags = data.tags ? data.tags.split(",").map((t) => t.trim()).filter(Boolean) : [];
+    const theme = data.theme || undefined;
+    const subtheme = data.subtheme || undefined;
+
     if (isDemoMode()) {
-      const tags = data.tags ? data.tags.split(",").map((t) => t.trim()).filter(Boolean) : [];
-      const theme = data.theme || undefined;
-      const subtheme = data.subtheme || undefined;
       if (editingBookmark) {
         setBookmarks((prev) =>
           prev
             .map((b) =>
               b.id === editingBookmark.id
-                ? { ...b, title: data.title, url: data.url, description: data.description || undefined, notes: data.notes || undefined, theme, subtheme, tags }
+                ? { ...b, title: data.title, url: data.url, description: data.description || undefined, theme, subtheme, tags }
                 : b
             )
             .sort((a, b) => (a.title || "").localeCompare(b.title || ""))
         );
         if (detailBookmark?.id === editingBookmark.id) {
-          setDetailBookmark((prev) => (prev ? { ...prev, title: data.title, url: data.url, description: data.description || undefined, notes: data.notes || undefined, theme, subtheme, tags } : null));
+          setDetailBookmark((prev) => (prev ? { ...prev, title: data.title, url: data.url, description: data.description || undefined, theme, subtheme, tags } : null));
         }
       } else {
         const newB: Bookmark = {
@@ -209,7 +215,6 @@ export default function MarcadoresPage() {
           title: data.title,
           url: data.url,
           description: data.description || undefined,
-          notes: data.notes || undefined,
           theme,
           subtheme,
           tags,
@@ -219,30 +224,31 @@ export default function MarcadoresPage() {
       }
       refreshTags();
       setEditingBookmark(null);
-      setModalOpen(false);
       return;
     }
+
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      throw new Error("Debes iniciar sesión para agregar marcadores");
+    }
 
     const payload = {
       title: data.title,
       url: data.url,
       description: data.description || null,
-      notes: data.notes || null,
       theme: data.theme || null,
       subtheme: data.subtheme || null,
       tags: data.tags ? data.tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
-      favicon: data.favicon || null,
-      color: data.color || null,
     };
 
     if (editingBookmark) {
-      await supabase.from("bookmarks").update(payload).eq("id", editingBookmark.id);
+      const { error } = await supabase.from("bookmarks").update(payload).eq("id", editingBookmark.id);
+      if (error) throw new Error(error.message);
     } else {
-      await supabase.from("bookmarks").insert({ user_id: user.id, ...payload });
+      const { error } = await supabase.from("bookmarks").insert({ user_id: user.id, ...payload });
+      if (error) throw new Error(error.message);
     }
-    fetchBookmarks();
+    await fetchBookmarks();
     refreshTags();
     setEditingBookmark(null);
   };
@@ -289,10 +295,9 @@ export default function MarcadoresPage() {
     });
   };
 
-  const getFavicon = (b: Bookmark) => {
-    if (b.favicon) return b.favicon;
+  const getFavicon = (url: string) => {
     try {
-      return `https://www.google.com/s2/favicons?domain=${new URL(b.url).hostname}&sz=32`;
+      return `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=32`;
     } catch {
       return "";
     }
@@ -303,8 +308,7 @@ export default function MarcadoresPage() {
     currentIdx: number,
     isSelected: boolean,
     isChecked: boolean,
-    tags: string[],
-    borderColor?: string
+    tags: string[]
   ) => {
     const content = (
       <>
@@ -326,9 +330,9 @@ export default function MarcadoresPage() {
           </div>
         )}
         <div className="flex items-start gap-3">
-          {getFavicon(b) && (
+          {getFavicon(b.url) && (
             <img
-              src={getFavicon(b)}
+              src={getFavicon(b.url)}
               alt=""
               className="h-8 w-8 flex-shrink-0 rounded"
               onError={(e) => {
@@ -338,13 +342,18 @@ export default function MarcadoresPage() {
           )}
           <div className="min-w-0 flex-1">
             <span className="font-medium text-white">{b.title}</span>
+            {(() => {
+              try {
+                const host = new URL(b.url).hostname.replace(/^www\./, "");
+                return <p className="mt-0.5 text-xs text-zinc-500 truncate">{host}</p>;
+              } catch {
+                return null;
+              }
+            })()}
             {b.description && (
               <p className="mt-1 text-sm text-zinc-400">{b.description}</p>
             )}
-            {b.notes && (
-              <p className="mt-1 text-xs text-zinc-500 line-clamp-2">{b.notes}</p>
-            )}
-            {viewMode === "grid" && tags.length > 0 && (
+            {tags.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1">
                 {tags.map((tag) => (
                   <span
@@ -366,7 +375,6 @@ export default function MarcadoresPage() {
         ? "border-blue-500 bg-zinc-800 ring-2 ring-blue-500"
         : "border-zinc-800 bg-zinc-900 hover:border-zinc-600 hover:bg-zinc-800"
     }`;
-    const style = borderColor ? { borderLeftWidth: 4, borderLeftColor: borderColor } : undefined;
 
     if (selectMode) {
       return (
@@ -385,7 +393,6 @@ export default function MarcadoresPage() {
             }
           }}
           className={`${baseClass} cursor-pointer ${selectMode ? "pl-10" : ""}`}
-          style={style}
         >
           {content}
         </div>
@@ -403,7 +410,6 @@ export default function MarcadoresPage() {
         rel="noopener noreferrer"
         tabIndex={-1}
         className={baseClass}
-        style={style}
       >
         {content}
       </a>
@@ -480,8 +486,7 @@ export default function MarcadoresPage() {
                         const isSelected = currentIdx === selectedIndex;
                         const isChecked = selectedIds.has(b.id);
                         const tags = b.tags?.length ? b.tags : [];
-                        const borderColor = b.color || undefined;
-                        return renderBookmarkCard(b, currentIdx, isSelected, isChecked, tags, borderColor);
+                        return renderBookmarkCard(b, currentIdx, isSelected, isChecked, tags);
                       })}
                     </div>
                   </div>
@@ -498,8 +503,7 @@ export default function MarcadoresPage() {
             currentIdx,
             currentIdx === selectedIndex,
             selectedIds.has(b.id),
-            b.tags?.length ? b.tags : [],
-            b.color
+            b.tags?.length ? b.tags : []
           )
         )}
       </div>
@@ -528,12 +532,9 @@ export default function MarcadoresPage() {
                 title: editingBookmark.title,
                 url: editingBookmark.url,
                 description: editingBookmark.description || "",
-                notes: editingBookmark.notes || "",
                 theme: editingBookmark.theme || "",
                 subtheme: editingBookmark.subtheme || "",
                 tags: editingBookmark.tags?.join(", ") || "",
-                favicon: editingBookmark.favicon || "",
-                color: editingBookmark.color || "",
               }
             : null
         }

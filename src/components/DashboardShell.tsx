@@ -68,6 +68,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
               ref={filterRef}
               type="text"
               placeholder="Nombre del marcador..."
+              data-no-vim
               value={filterValue}
               onChange={(e) => setFilterValue(e.target.value)}
               className="w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-blue-500 focus:outline-none"

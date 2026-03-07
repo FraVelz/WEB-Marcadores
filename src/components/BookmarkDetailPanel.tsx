@@ -8,12 +8,9 @@ type Bookmark = {
   title: string;
   url: string;
   description?: string;
-  notes?: string;
   theme?: string;
   subtheme?: string;
   tags?: string[];
-  favicon?: string;
-  color?: string;
   created_at?: string;
 };
 
@@ -58,7 +55,7 @@ export default function BookmarkDetailPanel({
   if (!bookmark) return null;
 
   const tags = bookmark.tags || [];
-  const favicon = bookmark.favicon || getFaviconUrl(bookmark.url);
+  const favicon = getFaviconUrl(bookmark.url);
   const created = bookmark.created_at
     ? new Date(bookmark.created_at).toLocaleDateString("es", {
         day: "numeric",
@@ -97,6 +94,11 @@ export default function BookmarkDetailPanel({
       />
       <div
         ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Detalle del marcador"
+        data-no-vim
+        onKeyDown={(e) => e.stopPropagation()}
         className="fixed right-0 top-0 z-50 h-full w-80 border-l border-zinc-800 bg-zinc-900 shadow-xl"
       >
       <div className="flex h-full flex-col p-4">
@@ -149,13 +151,6 @@ export default function BookmarkDetailPanel({
             <div>
               <label className="mb-1 block text-xs text-zinc-500">Descripción</label>
               <p className="text-sm text-zinc-300">{bookmark.description}</p>
-            </div>
-          )}
-
-          {bookmark.notes && (
-            <div>
-              <label className="mb-1 block text-xs text-zinc-500">Notas</label>
-              <p className="whitespace-pre-wrap text-sm text-zinc-400">{bookmark.notes}</p>
             </div>
           )}
 
