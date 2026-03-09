@@ -6,6 +6,14 @@ import { DEMO_TAGS } from "@/lib/demo-data";
 
 export type ViewMode = "grid" | "hierarchical";
 
+export type Folder = {
+  id: string;
+  parent_id: string | null;
+  name: string;
+  sort_order: number;
+  children?: Folder[];
+};
+
 type DashboardContextType = {
   filterRef: React.RefObject<HTMLInputElement | null>;
   searchRef: React.RefObject<HTMLInputElement | null>;
@@ -15,22 +23,20 @@ type DashboardContextType = {
   setFilterValue: (v: string) => void;
   searchValue: string;
   setSearchValue: (v: string) => void;
-  themeFilter: string;
-  setThemeFilter: (v: string) => void;
   allTags: string[];
-  allThemes: string[];
-  allSubthemes: string[];
   refreshTags: () => void;
   viewMode: ViewMode;
   setViewMode: (m: ViewMode) => void;
   setMainKeyDown: (handler: ((e: React.KeyboardEvent) => void) | null) => void;
   mainKeyDownRef: React.MutableRefObject<((e: React.KeyboardEvent) => void) | null>;
+  selectedFolderId: string | null;
+  setSelectedFolderId: (id: string | null) => void;
+  folders: Folder[];
+  setFolders: (folders: Folder[]) => void;
+  refreshFolders: () => void;
 };
 
 const DashboardContext = createContext<DashboardContextType | null>(null);
-
-const DEMO_THEMES = ["Desarrollo", "Herramientas", "Documentación"];
-const DEMO_SUBTHEMES = ["Frontend", "Backend", "Control de versiones", "Web"];
 
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const filterRef = useRef<HTMLInputElement>(null);
@@ -38,40 +44,56 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const mainRef = useRef<HTMLElement>(null);
   const [filterValue, setFilterValue] = useState("");
   const [searchValue, setSearchValue] = useState("");
-  const [themeFilter, setThemeFilter] = useState("");
   const [allTags, setAllTags] = useState<string[]>([]);
-  const [allThemes, setAllThemes] = useState<string[]>([]);
-  const [allSubthemes, setAllSubthemes] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("hierarchical");
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  const [folders, setFolders] = useState<Folder[]>([]);
   const mainKeyDownRef = useRef<((e: React.KeyboardEvent) => void) | null>(null);
 
   const refreshTags = useCallback(async () => {
     if (isDemoMode()) {
       setAllTags(DEMO_TAGS);
-      setAllThemes(DEMO_THEMES);
-      setAllSubthemes(DEMO_SUBTHEMES);
       return;
     }
     const supabase = createClient();
-    const { data } = await supabase.from("bookmarks").select("tags, theme, subtheme");
+    const { data } = await supabase.from("bookmarks").select("tags");
     const tags = new Set<string>();
-    const themes = new Set<string>();
-    const subthemes = new Set<string>();
     for (const row of data || []) {
       for (const t of row.tags || []) {
         if (t?.trim()) tags.add(t.trim());
       }
-      if (row.theme?.trim()) themes.add(row.theme.trim());
-      if (row.subtheme?.trim()) subthemes.add(row.subtheme.trim());
     }
     setAllTags(Array.from(tags).sort());
-    setAllThemes(Array.from(themes).sort());
-    setAllSubthemes(Array.from(subthemes).sort());
+  }, []);
+
+  const refreshFolders = useCallback(async () => {
+    if (isDemoMode()) return;
+    const supabase = createClient();
+    const { data } = await supabase.from("folders").select("*").order("sort_order");
+    if (!data) return;
+    const byParent: Record<string, Folder[]> = {};
+    for (const f of data) {
+      const pid = f.parent_id || "root";
+      if (!byParent[pid]) byParent[pid] = [];
+      byParent[pid].push({ ...f, children: [] });
+    }
+    const buildTree = (parentId: string): Folder[] => {
+      const list = byParent[parentId] || [];
+      return list
+        .sort((a, b) => a.sort_order - b.sort_order)
+        .map((f) => ({ ...f, children: buildTree(f.id) }));
+    };
+    setFolders(buildTree("root"));
   }, []);
 
   useEffect(() => {
     refreshTags();
   }, [refreshTags]);
+
+  useEffect(() => {
+    refreshFolders();
+  }, [refreshFolders]);
+
   const setMainKeyDown = useCallback((handler: ((e: React.KeyboardEvent) => void) | null) => {
     mainKeyDownRef.current = handler;
   }, []);
@@ -91,16 +113,17 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         setFilterValue,
         searchValue,
         setSearchValue,
-        themeFilter,
-        setThemeFilter,
         allTags,
-        allThemes,
-        allSubthemes,
         refreshTags,
         viewMode,
         setViewMode,
         setMainKeyDown,
         mainKeyDownRef,
+        selectedFolderId,
+        setSelectedFolderId,
+        folders,
+        setFolders,
+        refreshFolders,
       }}
     >
       {children}
