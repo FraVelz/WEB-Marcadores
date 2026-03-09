@@ -7,10 +7,11 @@ export type BookmarkFormData = {
   title: string;
   url: string;
   description: string;
-  theme: string;
-  subtheme: string;
+  folder_id: string;
   tags: string;
 };
+
+type Folder = { id: string; parent_id: string | null; name: string; sort_order: number };
 
 type Props = {
   isOpen: boolean;
@@ -18,18 +19,31 @@ type Props = {
   onSubmit: (data: BookmarkFormData) => void | Promise<void>;
   initialData?: Partial<BookmarkFormData> | null;
   allTags: string[];
-  allThemes: string[];
-  allSubthemes: string[];
+  folders: Folder[];
+  currentFolderId: string | null;
 };
 
 const emptyForm: BookmarkFormData = {
   title: "",
   url: "",
   description: "",
-  theme: "",
-  subtheme: "",
+  folder_id: "",
   tags: "",
 };
+
+function buildFolderOptions(folders: Folder[]): { id: string; label: string }[] {
+  const result: { id: string; label: string }[] = [];
+  const add = (parentId: string | null, prefix: string) => {
+    const children = folders.filter((f) => (f.parent_id || null) === parentId).sort((a, b) => a.sort_order - b.sort_order);
+    for (const f of children) {
+      const label = prefix ? `${prefix} › ${f.name}` : f.name;
+      result.push({ id: f.id, label });
+      add(f.id, label);
+    }
+  };
+  add(null, "");
+  return result;
+}
 
 export default function BookmarkModal({
   isOpen,
@@ -37,11 +51,12 @@ export default function BookmarkModal({
   onSubmit,
   initialData,
   allTags,
-  allThemes,
-  allSubthemes,
+  folders,
+  currentFolderId,
 }: Props) {
-  const data = { ...emptyForm, ...initialData };
+  const data = { ...emptyForm, folder_id: currentFolderId || "", ...initialData };
   const [tagsValue, setTagsValue] = useState(data.tags);
+  const [folderId, setFolderId] = useState(data.folder_id);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
@@ -57,17 +72,18 @@ export default function BookmarkModal({
 
   useEffect(() => {
     if (isOpen) {
-      setTagsValue(initialData?.tags ?? "");
+      setTagsValue(initialData?.tags ?? data.tags);
+      setFolderId(initialData?.folder_id ?? currentFolderId ?? "");
       setSubmitError(null);
       requestAnimationFrame(() => firstInputRef.current?.focus());
     }
-  }, [isOpen, initialData?.tags]);
+  }, [isOpen, initialData?.tags, initialData?.folder_id, currentFolderId]);
 
   useEffect(() => {
     if (!isOpen || !modalContentRef.current) return;
     const el = modalContentRef.current;
     const focusables = el.querySelectorAll<HTMLElement>(
-      'input:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      'input:not([disabled]), textarea:not([disabled]), button:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
     );
     const first = focusables[0];
     const last = focusables[focusables.length - 1];
@@ -91,6 +107,8 @@ export default function BookmarkModal({
 
   if (!isOpen) return null;
 
+  const folderOptions = buildFolderOptions(folders);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitError(null);
@@ -100,8 +118,7 @@ export default function BookmarkModal({
       title: (form.elements.namedItem("title") as HTMLInputElement).value,
       url: (form.elements.namedItem("url") as HTMLInputElement).value,
       description: (form.elements.namedItem("description") as HTMLInputElement).value,
-      theme: (form.elements.namedItem("theme") as HTMLInputElement).value.trim(),
-      subtheme: (form.elements.namedItem("subtheme") as HTMLInputElement).value.trim(),
+      folder_id: folderId || "",
       tags: tagsValue,
     };
     try {
@@ -123,11 +140,7 @@ export default function BookmarkModal({
       data-no-vim
       onKeyDown={(e) => e.stopPropagation()}
     >
-      <div
-        className="absolute inset-0"
-        onClick={onClose}
-        aria-hidden
-      />
+      <div className="absolute inset-0" onClick={onClose} aria-hidden />
       <div
         ref={modalContentRef}
         className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl border border-zinc-700 bg-zinc-900 p-6 shadow-xl"
@@ -167,53 +180,34 @@ export default function BookmarkModal({
                 name="description"
                 defaultValue={data.description}
                 data-no-vim
-                className="w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-white placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
               />
             </div>
           </section>
 
           <section className="space-y-4">
-            <h3 className="text-sm font-medium text-zinc-400">Clasificación</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="mb-1 block text-xs text-zinc-500">Tema</label>
-                <input
-                  name="theme"
-                  defaultValue={data.theme}
-                  data-no-vim
-                  list="theme-list"
-                  placeholder="Ej: Desarrollo, Herramientas"
-                  className="w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-white placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
-                />
-                <datalist id="theme-list">
-                  {allThemes.map((t) => (
-                    <option key={t} value={t} />
-                  ))}
-                </datalist>
-              </div>
-              <div>
-                <label className="mb-1 block text-xs text-zinc-500">Subtema</label>
-                <input
-                  name="subtheme"
-                  defaultValue={data.subtheme}
-                  data-no-vim
-                  list="subtheme-list"
-                  placeholder="Ej: Frontend, Backend"
-                  className="w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-white placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
-                />
-                <datalist id="subtheme-list">
-                  {allSubthemes.map((s) => (
-                    <option key={s} value={s} />
-                  ))}
-                </datalist>
-              </div>
+            <h3 className="text-sm font-medium text-zinc-400">Carpeta</h3>
+            <div>
+              <label className="mb-1 block text-xs text-zinc-500">Ubicación</label>
+              <select
+                value={folderId}
+                onChange={(e) => setFolderId(e.target.value)}
+                data-no-vim
+                className="w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
+              >
+                <option value="">Raíz (Marcadores)</option>
+                {folderOptions.map((opt) => (
+                  <option key={opt.id} value={opt.id}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
             </div>
           </section>
 
           <section className="space-y-4">
-            <h3 className="text-sm font-medium text-zinc-400">Detalles</h3>
+            <h3 className="text-sm font-medium text-zinc-400">Tags</h3>
             <div>
-              <label className="mb-1 block text-xs text-zinc-500">Tags (selecciona o escribe y Enter para añadir)</label>
               <TagAutocomplete
                 value={tagsValue}
                 onChange={setTagsValue}

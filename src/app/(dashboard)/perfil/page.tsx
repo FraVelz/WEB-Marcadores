@@ -62,7 +62,7 @@ export default function PerfilPage() {
   };
 
   return (
-    <div>
+    <div className="overflow-auto p-6">
       <h1 className="mb-6 text-2xl font-bold text-white">Perfil</h1>
       <div className="max-w-md space-y-6">
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-6">
