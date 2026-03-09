@@ -1,10 +1,41 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useDashboard } from "@/contexts/DashboardContext";
+import type { Folder } from "@/contexts/DashboardContext";
 import ExplorerTree from "@/components/ExplorerTree";
+
+function findFolderInTree(folders: Folder[], id: string): Folder | undefined {
+  for (const f of folders) {
+    if (f.id === id) return f;
+    if (f.children) {
+      const found = findFolderInTree(f.children, id);
+      if (found) return found;
+    }
+  }
+  return undefined;
+}
+
+function folderHasChildren(folders: Folder[], id: string): boolean {
+  const f = findFolderInTree(folders, id);
+  return !!(f?.children?.length);
+}
+
+function flattenTree(folders: Folder[], collapsedIds: Set<string>): (string | null)[] {
+  const result: (string | null)[] = [null];
+  const add = (items: Folder[]) => {
+    for (const f of items) {
+      result.push(f.id);
+      if (f.children && f.children.length > 0 && !collapsedIds.has(f.id)) {
+        add(f.children);
+      }
+    }
+  };
+  add(folders);
+  return result;
+}
 
 const navItems = [
   { href: "/marcadores", label: "Marcadores" },
@@ -17,13 +48,97 @@ export default function DashboardShell({ children }: { children: React.ReactNode
   const router = useRouter();
   const {
     mainRef,
+    sidebarRef,
     focusMain,
+    focusSidebar,
     mainKeyDownRef,
     selectedFolderId,
     setSelectedFolderId,
     folders,
   } = useDashboard();
   const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set());
+
+  const flatSidebarItems = useMemo(
+    () => flattenTree(folders, collapsedIds),
+    [folders, collapsedIds]
+  );
+
+  useEffect(() => {
+    if (pathname === "/marcadores") {
+      requestAnimationFrame(() => mainRef.current?.focus());
+    }
+  }, [pathname, mainRef]);
+
+  const handleSidebarKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "n" && !e.ctrlKey) {
+        e.preventDefault();
+        focusMain();
+        return;
+      }
+      const idx = flatSidebarItems.indexOf(selectedFolderId);
+      const currentIdx = idx >= 0 ? idx : 0;
+      if (e.key === "j" || e.key === "ArrowDown") {
+        e.preventDefault();
+        const nextIdx = Math.min(currentIdx + 1, flatSidebarItems.length - 1);
+        setSelectedFolderId(flatSidebarItems[nextIdx]);
+        return;
+      }
+      if (e.key === "k" || e.key === "ArrowUp") {
+        e.preventDefault();
+        const prevIdx = Math.max(currentIdx - 1, 0);
+        setSelectedFolderId(flatSidebarItems[prevIdx]);
+        return;
+      }
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const id = flatSidebarItems[currentIdx];
+        if (id) {
+          const folder = folders.find((f) => f.id === id) ?? findFolderInTree(folders, id);
+          if (folder?.children?.length) {
+            setCollapsedIds((prev) => {
+              const next = new Set(prev);
+              if (next.has(id)) next.delete(id);
+              else next.add(id);
+              return next;
+            });
+          }
+        }
+        setSelectedFolderId(flatSidebarItems[currentIdx]);
+        focusMain();
+        return;
+      }
+      if (e.key === "h" || e.key === "ArrowLeft") {
+        e.preventDefault();
+        const id = flatSidebarItems[currentIdx];
+        if (id && collapsedIds.has(id)) return;
+        if (id) {
+          setCollapsedIds((prev) => new Set(prev).add(id));
+        }
+        return;
+      }
+      if (e.key === "l" || e.key === "ArrowRight") {
+        e.preventDefault();
+        const id = flatSidebarItems[currentIdx];
+        if (id && folderHasChildren(folders, id)) {
+          setCollapsedIds((prev) => {
+            const next = new Set(prev);
+            next.delete(id);
+            return next;
+          });
+        }
+        return;
+      }
+    },
+    [
+      flatSidebarItems,
+      selectedFolderId,
+      setSelectedFolderId,
+      folders,
+      collapsedIds,
+      focusMain,
+    ]
+  );
 
   const toggleCollapsed = (id: string) => {
     setCollapsedIds((prev) => {
@@ -36,9 +151,17 @@ export default function DashboardShell({ children }: { children: React.ReactNode
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === "n") {
+      if (e.key === "n" && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        const active = document.activeElement;
+        if (active?.tagName === "INPUT" || active?.tagName === "TEXTAREA" || (active as HTMLElement).closest?.('[role="dialog"]')) return;
         e.preventDefault();
-        focusMain();
+        if (pathname === "/marcadores") {
+          const isSidebarFocused = sidebarRef.current?.contains(active);
+          if (isSidebarFocused) focusMain();
+          else focusSidebar();
+        } else {
+          focusMain();
+        }
       }
       if (e.ctrlKey && /^[1-9]$/.test(e.key)) {
         const idx = parseInt(e.key, 10) - 1;
@@ -50,7 +173,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [focusMain, router]);
+  }, [pathname, focusMain, focusSidebar, sidebarRef, router]);
 
   return (
     <div className="flex min-h-screen bg-[#1e1e1e]">
@@ -84,7 +207,12 @@ export default function DashboardShell({ children }: { children: React.ReactNode
           ))}
         </nav>
         {pathname === "/marcadores" && (
-          <div className="flex-1 overflow-y-auto p-2">
+          <div
+            ref={sidebarRef}
+            tabIndex={0}
+            className="flex-1 overflow-y-auto p-2 outline-none focus:ring-0"
+            onKeyDown={handleSidebarKeyDown}
+          >
             <ExplorerTree
               folders={folders}
               selectedFolderId={selectedFolderId}

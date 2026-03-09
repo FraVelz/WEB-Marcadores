@@ -77,6 +77,11 @@ export default function MarcadoresPage() {
     setDetailBookmark,
   });
 
+  const handleAdd = useCallback(() => {
+    setEditingBookmark(null);
+    setModalOpen(true);
+  }, []);
+
   const handleKeyDown = useMarcadoresKeyboard({
     flatList,
     selectedIndex,
@@ -96,6 +101,8 @@ export default function MarcadoresPage() {
     setDetailBookmark,
     handlePasteFolder,
     handlePasteLink,
+    onAddBookmark: handleAdd,
+    onNewFolder: () => setShowNewFolder(true),
   });
 
   useMarcadoresEffects({
@@ -118,11 +125,6 @@ export default function MarcadoresPage() {
     filterRef,
     searchRef,
   });
-
-  const handleAdd = useCallback(() => {
-    setEditingBookmark(null);
-    setModalOpen(true);
-  }, []);
 
   const onCreateFolder = useCallback(async () => {
     if (!newFolderName.trim()) return;

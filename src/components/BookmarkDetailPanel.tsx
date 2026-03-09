@@ -41,7 +41,10 @@ export default function BookmarkDetailPanel({
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key !== "Escape") return;
+      // No cerrar si hay un modal abierto (p. ej. crear/editar enlace) - que el modal lo maneje
+      if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
+      onClose();
     };
     if (bookmark) window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);

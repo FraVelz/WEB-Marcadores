@@ -18,7 +18,9 @@ type DashboardContextType = {
   filterRef: React.RefObject<HTMLInputElement | null>;
   searchRef: React.RefObject<HTMLInputElement | null>;
   mainRef: React.RefObject<HTMLElement | null>;
+  sidebarRef: React.RefObject<HTMLDivElement | null>;
   focusMain: () => void;
+  focusSidebar: () => void;
   filterValue: string;
   setFilterValue: (v: string) => void;
   searchValue: string;
@@ -42,6 +44,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const filterRef = useRef<HTMLInputElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const mainRef = useRef<HTMLElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
   const [filterValue, setFilterValue] = useState("");
   const [searchValue, setSearchValue] = useState("");
   const [allTags, setAllTags] = useState<string[]>([]);
@@ -102,13 +105,19 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     mainRef.current?.focus();
   }, []);
 
+  const focusSidebar = useCallback(() => {
+    sidebarRef.current?.focus();
+  }, []);
+
   return (
     <DashboardContext.Provider
       value={{
         filterRef,
         searchRef,
         mainRef,
+        sidebarRef,
         focusMain,
+        focusSidebar,
         filterValue,
         setFilterValue,
         searchValue,
