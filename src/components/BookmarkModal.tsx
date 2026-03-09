@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import TagAutocomplete from "./TagAutocomplete";
+import { buildFolderOptions } from "@/lib/bookmark-utils";
+import BookmarkFormBasicInfo from "./bookmark/BookmarkFormBasicInfo";
+import BookmarkFormFolderSelect from "./bookmark/BookmarkFormFolderSelect";
+import BookmarkFormTagsSection from "./bookmark/BookmarkFormTagsSection";
 
 export type BookmarkFormData = {
   title: string;
@@ -30,20 +33,6 @@ const emptyForm: BookmarkFormData = {
   folder_id: "",
   tags: "",
 };
-
-function buildFolderOptions(folders: Folder[]): { id: string; label: string }[] {
-  const result: { id: string; label: string }[] = [];
-  const add = (parentId: string | null, prefix: string) => {
-    const children = folders.filter((f) => (f.parent_id || null) === parentId).sort((a, b) => a.sort_order - b.sort_order);
-    for (const f of children) {
-      const label = prefix ? `${prefix} › ${f.name}` : f.name;
-      result.push({ id: f.id, label });
-      add(f.id, label);
-    }
-  };
-  add(null, "");
-  return result;
-}
 
 export default function BookmarkModal({
   isOpen,
@@ -149,79 +138,26 @@ export default function BookmarkModal({
           {initialData ? "Editar marcador" : "Agregar marcador"}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <section className="space-y-4">
-            <h3 className="text-sm font-medium text-zinc-400">Información básica</h3>
-            <div>
-              <label className="mb-1 block text-xs text-zinc-500">Título *</label>
-              <input
-                ref={firstInputRef}
-                name="title"
-                defaultValue={data.title}
-                required
-                autoComplete="off"
-                data-no-vim
-                className="w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs text-zinc-500">URL *</label>
-              <input
-                name="url"
-                type="url"
-                defaultValue={data.url}
-                required
-                data-no-vim
-                className="w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs text-zinc-500">Descripción</label>
-              <input
-                name="description"
-                defaultValue={data.description}
-                data-no-vim
-                className="w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-white placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
-              />
-            </div>
-          </section>
-
-          <section className="space-y-4">
-            <h3 className="text-sm font-medium text-zinc-400">Carpeta</h3>
-            <div>
-              <label className="mb-1 block text-xs text-zinc-500">Ubicación</label>
-              <select
-                value={folderId}
-                onChange={(e) => setFolderId(e.target.value)}
-                data-no-vim
-                className="w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
-              >
-                <option value="">Raíz (Marcadores)</option>
-                {folderOptions.map((opt) => (
-                  <option key={opt.id} value={opt.id}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </section>
-
-          <section className="space-y-4">
-            <h3 className="text-sm font-medium text-zinc-400">Tags</h3>
-            <div>
-              <TagAutocomplete
-                value={tagsValue}
-                onChange={setTagsValue}
-                options={allTags}
-                onSelectTag={(tag) => {
-                  const current = tagsValue.split(",").map((t) => t.trim()).filter(Boolean);
-                  if (!current.includes(tag)) setTagsValue([...current, tag].join(", "));
-                }}
-                placeholder="web, herramientas, ..."
-                className="w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
-              />
-            </div>
-          </section>
-
+          <BookmarkFormBasicInfo
+            title={data.title}
+            url={data.url}
+            description={data.description}
+            firstInputRef={firstInputRef}
+          />
+          <BookmarkFormFolderSelect
+            folderId={folderId}
+            folderOptions={folderOptions}
+            onChange={setFolderId}
+          />
+          <BookmarkFormTagsSection
+            value={tagsValue}
+            onChange={setTagsValue}
+            options={allTags}
+            onSelectTag={(tag) => {
+              const current = tagsValue.split(",").map((t) => t.trim()).filter(Boolean);
+              if (!current.includes(tag)) setTagsValue([...current, tag].join(", "));
+            }}
+          />
           {submitError && (
             <p className="rounded-lg border border-red-600/50 bg-red-900/20 px-3 py-2 text-sm text-red-400">
               {submitError}
