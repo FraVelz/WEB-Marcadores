@@ -23,6 +23,8 @@ type Params = {
   setDetailBookmark: React.Dispatch<React.SetStateAction<Bookmark | null>>;
   handlePasteFolder: (folderId: string, destParentId: string | null) => Promise<void>;
   handlePasteLink: (bookmarkId: string, destFolderId: string | null) => Promise<void>;
+  onAddBookmark: () => void;
+  onNewFolder: () => void;
 };
 
 export function useMarcadoresKeyboard(params: Params) {
@@ -45,6 +47,8 @@ export function useMarcadoresKeyboard(params: Params) {
     setDetailBookmark,
     handlePasteFolder,
     handlePasteLink,
+    onAddBookmark,
+    onNewFolder,
   } = params;
 
   return useCallback(
@@ -57,6 +61,17 @@ export function useMarcadoresKeyboard(params: Params) {
           (active as HTMLElement).closest?.('[role="dialog"]'))
       )
         return;
+
+      if (e.key === "a" && !e.ctrlKey) {
+        e.preventDefault();
+        onAddBookmark();
+        return;
+      }
+      if (e.ctrlKey && e.key === "a") {
+        e.preventDefault();
+        onNewFolder();
+        return;
+      }
 
       if (e.ctrlKey && e.key === "x") {
         e.preventDefault();
@@ -188,6 +203,8 @@ export function useMarcadoresKeyboard(params: Params) {
       setDetailBookmark,
       handlePasteFolder,
       handlePasteLink,
+      onAddBookmark,
+      onNewFolder,
     ]
   );
 }
