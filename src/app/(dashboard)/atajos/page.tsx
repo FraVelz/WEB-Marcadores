@@ -7,6 +7,8 @@ export default function AtajosPage() {
     { keys: "↑ / k", desc: "Marcador anterior" },
     { keys: "↓ / j", desc: "Marcador siguiente" },
     { keys: "Enter", desc: "Abrir enlace o entrar en carpeta" },
+    { keys: "Ctrl+X", desc: "Cortar carpeta o enlace (mover)" },
+    { keys: "Ctrl+V", desc: "Pegar en la carpeta actual" },
     { keys: "i", desc: "Ver propiedades del marcador" },
     { keys: "Doble clic", desc: "Abrir marcador en nueva pestaña" },
   ];
