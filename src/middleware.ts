@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 const dashboardPaths = ["/marcadores", "/atajos", "/perfil"];
 
 function isDemoMode(): boolean {
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") return true;
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   return !url || !key || url === "" || key === "";
@@ -48,5 +49,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/marcadores", "/marcadores/:path*", "/atajos", "/perfil"],
+  matcher: ["/", "/demo", "/marcadores", "/marcadores/:path*", "/atajos", "/perfil"],
 };

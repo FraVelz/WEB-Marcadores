@@ -14,6 +14,7 @@ export default function AtajosPage() {
     { keys: "Ctrl+A", desc: "Crear nueva carpeta" },
     { keys: "Ctrl+X", desc: "Cortar carpeta o enlace (mover)" },
     { keys: "Ctrl+V", desc: "Pegar en la carpeta actual" },
+    { keys: "r", desc: "Modificar enlace o renombrar carpeta (marcadores y sidebar)" },
     { keys: "i", desc: "Ver propiedades del marcador" },
     { keys: "Doble clic", desc: "Abrir marcador en nueva pestaña" },
   ];
