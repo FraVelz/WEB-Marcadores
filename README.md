@@ -1,6 +1,17 @@
 # Marcadores
 
-App de marcadores con Next.js y Supabase. Incluye modo demo (sin credenciales) para probar en local.
+Gestor de marcadores y favoritos con Next.js y Supabase. Organiza tus enlaces en carpetas, usa atajos y explora tu colección con una interfaz oscura tipo explorador.
+
+![Interfaz principal](public/screenshot.png)
+
+## Versión demo
+
+Puedes probar la aplicación **sin iniciar sesión**:
+
+- **Local:** ejecuta `pnpm dev` sin configurar `.env.local` — verás el botón "Probar demo" en la página de login.
+- **En línea:** accede a `/demo` para ir directamente a la interfaz principal (requiere `NEXT_PUBLIC_DEMO_MODE=true` en el despliegue).
+
+La demo muestra carpetas de ejemplo (Aprendizaje, Compras, Desarrollo, Diseño, etc.) y marcadores. Los cambios se guardan en memoria durante la sesión.
 
 ## Uso
 
@@ -13,19 +24,29 @@ Sin `.env.local` o sin credenciales Supabase: usa modo demo (datos en memoria).
 
 ## Scripts
 
-- `pnpm run classify:ai` — Clasifica con OpenAI (tema, subtema, tags). Requiere `OPENAI_API_KEY`
-- `pnpm run fetch:bookmarks` — Exporta marcadores a stdout (redirigir a `bookmarks-export.json`)
-- `pnpm run classify:apply` — Clasifica y aplica a Supabase (lee `bookmarks-export.json`)
+- `pnpm run dev` — Servidor de desarrollo
+- `pnpm run fetch:bookmarks` — Exporta marcadores a stdout (ej: `> bookmarks.json`)
+- `pnpm run descriptions:generate` — Genera descripciones y tags con OpenAI para marcadores sin descripción
 - `pnpm run db:create-table` — Crea tabla en Supabase (requiere migración)
 - `pnpm run db:sql` — Imprime SQL para crear tabla
-- `pnpm run db:sql:section` — Imprime SQL para migrar section → tags
-- `pnpm run db:sql:theme` — Imprime SQL para añadir theme y subtheme
 
 ## Estructura
 
-- `src/app/` — Rutas Next.js (login, marcadores, atajos, perfil)
-- `src/components/` — BookmarkModal, TagAutocomplete, etc.
+- `src/app/` — Rutas Next.js (login, marcadores, atajos, perfil, demo)
+- `src/components/` — BookmarkModal, TagAutocomplete, DashboardShell, etc.
+- `src/lib/demo-data.ts` — Datos de ejemplo para modo demo
 
 ## Variables de entorno
 
 Copia `.env.example` a `.env.local` y rellena las credenciales de Supabase.
+
+| Variable | Descripción |
+|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | URL del proyecto Supabase |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave anónima de Supabase |
+| `NEXT_PUBLIC_SITE_URL` | URL del sitio (para Open Graph al compartir) |
+| `NEXT_PUBLIC_DEMO_MODE` | `true` para forzar modo demo en producción |
+
+## Documentación
+
+- [English](README.en.md)

@@ -170,6 +170,24 @@ export function useMarcadoresActions({
     [isDemoMode, supabase, setCtxFolders, fetchData]
   );
 
+  const handleRenameFolder = useCallback(
+    async (folderId: string, newName: string) => {
+      const name = newName.trim();
+      if (!name) return;
+      if (isDemoMode()) {
+        setFolders((prev) => {
+          const next = prev.map((f) => (f.id === folderId ? { ...f, name } : f));
+          setCtxFolders(buildFolderTree(next));
+          return next;
+        });
+      } else {
+        await supabase.from("folders").update({ name }).eq("id", folderId);
+        await fetchData();
+      }
+    },
+    [isDemoMode, supabase, setCtxFolders, fetchData]
+  );
+
   const handlePasteLink = useCallback(
     async (bookmarkId: string, destFolderId: string | null) => {
       if (isDemoMode()) {
@@ -186,6 +204,7 @@ export function useMarcadoresActions({
 
   return {
     handleCreateFolder,
+    handleRenameFolder,
     handleModalSubmit,
     handleDelete,
     handleBookmarkUpdate,

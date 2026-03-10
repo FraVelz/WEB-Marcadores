@@ -31,6 +31,7 @@ type DashboardContextType = {
   setViewMode: (m: ViewMode) => void;
   setMainKeyDown: (handler: ((e: React.KeyboardEvent) => void) | null) => void;
   mainKeyDownRef: React.MutableRefObject<((e: React.KeyboardEvent) => void) | null>;
+  editFolderRef: React.MutableRefObject<((id: string, name: string) => void) | null>;
   selectedFolderId: string | null;
   setSelectedFolderId: (id: string | null) => void;
   folders: Folder[];
@@ -52,6 +53,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [folders, setFolders] = useState<Folder[]>([]);
   const mainKeyDownRef = useRef<((e: React.KeyboardEvent) => void) | null>(null);
+  const editFolderRef = useRef<((id: string, name: string) => void) | null>(null);
 
   const refreshTags = useCallback(async () => {
     if (isDemoMode()) {
@@ -128,6 +130,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         setViewMode,
         setMainKeyDown,
         mainKeyDownRef,
+        editFolderRef,
         selectedFolderId,
         setSelectedFolderId,
         folders,
