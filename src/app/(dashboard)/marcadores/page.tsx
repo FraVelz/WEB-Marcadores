@@ -12,6 +12,8 @@ import MarcadoresToolbar from "@/features/marcadores/components/MarcadoresToolba
 import MarcadoresBreadcrumb from "@/features/marcadores/components/MarcadoresBreadcrumb";
 import BookmarkGrid from "@/features/marcadores/components/BookmarkGrid";
 import PasteErrorBanner from "@/features/marcadores/components/PasteErrorBanner";
+import DemoBanner from "@/features/marcadores/components/DemoBanner";
+import { isDemoMode } from "@/lib/supabase/client";
 import MarcadoresFooter from "@/features/marcadores/components/MarcadoresFooter";
 import type { Bookmark, GridItem, CutItem } from "@/features/marcadores/types";
 
@@ -32,11 +34,8 @@ export default function MarcadoresPage() {
   const [cutItem, setCutItem] = useState<CutItem | null>(null);
   const [pasteError, setPasteError] = useState<string | null>(null);
   const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map());
-  const filterRef = useRef<HTMLInputElement>(null);
 
   const {
-    filterValue,
-    setFilterValue,
     searchValue,
     setSearchValue,
     selectedFolderId,
@@ -52,13 +51,7 @@ export default function MarcadoresPage() {
   } = useDashboard();
 
   const { bookmarks, setBookmarks, folders, setFolders, loading, fetchData, flatList, breadcrumb } =
-    useMarcadoresData(
-      filterValue,
-      searchValue,
-      selectedFolderId,
-      setCtxFolders,
-      refreshFolders
-    );
+    useMarcadoresData(searchValue, selectedFolderId, setCtxFolders, refreshFolders);
 
   const {
     handleCreateFolder,
@@ -130,7 +123,6 @@ export default function MarcadoresPage() {
   }, [editFolderRef]);
 
   useMarcadoresEffects({
-    filterValue,
     searchValue,
     selectedFolderId,
     selectedIndex,
@@ -146,7 +138,6 @@ export default function MarcadoresPage() {
     setMainKeyDown,
     handleKeyDown,
     itemRefs,
-    filterRef,
     searchRef,
   });
 
@@ -219,14 +210,9 @@ export default function MarcadoresPage() {
       <MarcadoresToolbar
         showSearch={showSearch}
         setShowSearch={setShowSearch}
-        filterValue={filterValue}
-        setFilterValue={setFilterValue}
         searchValue={searchValue}
         setSearchValue={setSearchValue}
-        allTags={allTags}
-        focusMain={focusMain}
         searchRef={searchRef}
-        filterRef={filterRef}
         showNewFolder={showNewFolder}
         setShowNewFolder={setShowNewFolder}
         newFolderName={newFolderName}
@@ -253,6 +239,7 @@ export default function MarcadoresPage() {
       />
 
       {pasteError && <PasteErrorBanner message={pasteError} />}
+      {isDemoMode() && <DemoBanner />}
 
       <MarcadoresBreadcrumb breadcrumb={breadcrumb} onSelect={setSelectedFolderId} />
 

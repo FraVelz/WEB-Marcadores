@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 
 type Params<T> = {
-  filterValue: string;
   searchValue: string;
   selectedFolderId: string | null;
   selectedIndex: number;
@@ -19,13 +18,11 @@ type Params<T> = {
   setMainKeyDown: (h: ((e: React.KeyboardEvent) => void) | null) => void;
   handleKeyDown: (e: React.KeyboardEvent) => void;
   itemRefs: React.MutableRefObject<Map<number, HTMLDivElement>>;
-  filterRef: React.RefObject<HTMLInputElement | null>;
   searchRef: React.RefObject<HTMLInputElement | null>;
 };
 
 export function useMarcadoresEffects<T>(params: Params<T>) {
   const {
-    filterValue,
     searchValue,
     selectedFolderId,
     selectedIndex,
@@ -41,11 +38,10 @@ export function useMarcadoresEffects<T>(params: Params<T>) {
     setMainKeyDown,
     handleKeyDown,
     itemRefs,
-    filterRef,
     searchRef,
   } = params;
 
-  useEffect(() => setSelectedIndex(0), [filterValue, searchValue, selectedFolderId, setSelectedIndex]);
+  useEffect(() => setSelectedIndex(0), [searchValue, selectedFolderId, setSelectedIndex]);
   useEffect(() => {
     itemRefs.current.get(selectedIndex)?.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }, [selectedIndex, itemRefs]);
@@ -78,12 +74,7 @@ export function useMarcadoresEffects<T>(params: Params<T>) {
   }, [pasteError, setPasteError]);
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === "f") {
-        e.preventDefault();
-        setShowSearch(true);
-        setTimeout(() => filterRef.current?.focus(), 0);
-      }
-      if (e.ctrlKey && e.key === "k") {
+      if (e.ctrlKey && (e.key === "f" || e.key === "k")) {
         e.preventDefault();
         setShowSearch(true);
         setTimeout(() => searchRef.current?.focus(), 0);
@@ -91,5 +82,5 @@ export function useMarcadoresEffects<T>(params: Params<T>) {
     };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
-  }, [setShowSearch, filterRef, searchRef]);
+  }, [setShowSearch, searchRef]);
 }
