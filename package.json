@@ -7,13 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "classify:ai": "dotenv -e .env.local -- tsx scripts/classify-bookmarks-ai.ts",
-    "classify:apply": "dotenv -e .env.local -- tsx scripts/apply-classification.ts",
     "fetch:bookmarks": "dotenv -e .env.local -- tsx scripts/fetch-bookmarks.ts",
     "db:create-table": "dotenv -e .env.local -- tsx scripts/create-bookmarks-table.ts",
     "db:sql": "tsx scripts/print-bookmarks-sql.ts",
-    "db:sql:section": "tsx scripts/print-bookmarks-sql.ts --section",
-    "db:sql:theme": "tsx scripts/print-bookmarks-sql.ts --theme"
+    "descriptions:generate": "dotenv -e .env.local -- tsx scripts/generate-descriptions.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.9.0",

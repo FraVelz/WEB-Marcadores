@@ -4,6 +4,7 @@ import type { GridItem } from "../types";
 import ToolbarNavigationButtons from "./ToolbarNavigationButtons";
 import ToolbarSearchSection from "./ToolbarSearchSection";
 import ToolbarNewFolderSection from "./ToolbarNewFolderSection";
+import ToolbarRenameFolderSection from "./ToolbarRenameFolderSection";
 import ToolbarSelectActions from "./ToolbarSelectActions";
 
 type Props = {
@@ -21,6 +22,11 @@ type Props = {
   setShowNewFolder: (v: boolean) => void;
   newFolderName: string;
   setNewFolderName: (v: string) => void;
+  editingFolder: { id: string; name: string } | null;
+  setEditingFolder: (v: { id: string; name: string } | null) => void;
+  renameFolderName: string;
+  setRenameFolderName: (v: string) => void;
+  onRenameFolder: () => void;
   onNavigateUp: () => void;
   onAddBookmark: () => void;
   onCreateFolder: () => void;
@@ -79,6 +85,14 @@ export default function MarcadoresToolbar(props: Props) {
           setNewFolderName={props.setNewFolderName}
           onCreateFolder={props.onCreateFolder}
           onCancel={() => props.setShowNewFolder(false)}
+        />
+      )}
+      {props.editingFolder && (
+        <ToolbarRenameFolderSection
+          folderName={props.renameFolderName}
+          setFolderName={props.setRenameFolderName}
+          onRename={props.onRenameFolder}
+          onCancel={() => props.setEditingFolder(null)}
         />
       )}
       <ToolbarSelectActions
