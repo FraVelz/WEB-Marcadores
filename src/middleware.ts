@@ -10,8 +10,22 @@ function isDemoMode(): boolean {
   return !url || !key || url === "" || key === "";
 }
 
+const DEMO_COOKIE = "demo_session";
+
 export async function middleware(request: NextRequest) {
+  // Siempre permitir /demo: redirigir a marcadores con cookie para modo demo
+  if (request.nextUrl.pathname === "/demo") {
+    const res = NextResponse.redirect(new URL("/marcadores", request.url));
+    res.cookies.set(DEMO_COOKIE, "true", { path: "/", maxAge: 60 * 60 * 24 });
+    return res;
+  }
+
   if (isDemoMode()) {
+    return NextResponse.next({ request });
+  }
+
+  // Si hay cookie demo_session, permitir acceso al dashboard sin auth
+  if (request.cookies.get(DEMO_COOKIE)?.value === "true") {
     return NextResponse.next({ request });
   }
   let response = NextResponse.next({ request });

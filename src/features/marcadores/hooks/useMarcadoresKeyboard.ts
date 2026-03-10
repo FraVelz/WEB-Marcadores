@@ -3,8 +3,10 @@
 import { useCallback } from "react";
 import { isFolderDescendant } from "../utils";
 import type { Bookmark, GridItem, CutItem, FlatFolder } from "../types";
+import type { BreadcrumbPart } from "../types";
 
 type Params = {
+  breadcrumb: BreadcrumbPart[];
   flatList: GridItem[];
   selectedIndex: number;
   totalCount: number;
@@ -30,6 +32,7 @@ type Params = {
 
 export function useMarcadoresKeyboard(params: Params) {
   const {
+    breadcrumb,
     flatList,
     selectedIndex,
     totalCount,
@@ -193,8 +196,17 @@ export function useMarcadoresKeyboard(params: Params) {
         setSelectedIndex((i) => Math.max(i - 1, 0));
         return;
       }
+      if (e.key === "z" && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        if (breadcrumb.length > 1) {
+          const parent = breadcrumb[breadcrumb.length - 2];
+          setSelectedFolderId(parent.id);
+        }
+        return;
+      }
     },
     [
+      breadcrumb,
       flatList,
       selectedIndex,
       totalCount,
