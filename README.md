@@ -11,7 +11,7 @@ Puedes probar la aplicación **sin iniciar sesión**:
 - **Local:** ejecuta `pnpm dev` sin configurar `.env.local` — verás el botón "Probar demo" en la página de login.
 - **En línea:** accede a `/demo` para ir directamente a la interfaz principal (requiere `NEXT_PUBLIC_DEMO_MODE=true` en el despliegue).
 
-La demo muestra carpetas de ejemplo (Aprendizaje, Compras, Desarrollo, Diseño, etc.) y marcadores. Los cambios se guardan en memoria durante la sesión.
+La demo muestra carpetas de ejemplo (Documentación, Frameworks, Herramientas) con enlaces genéricos de desarrollo web (MDN, React, Next.js, etc.). Los cambios se guardan en memoria durante la sesión.
 
 ## Uso
 

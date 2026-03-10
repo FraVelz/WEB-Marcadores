@@ -7,7 +7,6 @@ import { buildFolderTree, getFolderPath } from "../utils";
 import type { Bookmark, GridItem, FlatFolder } from "../types";
 
 export function useMarcadoresData(
-  filterValue: string,
   searchValue: string,
   selectedFolderId: string | null,
   setCtxFolders: (folders: import("@/contexts/DashboardContext").Folder[]) => void,
@@ -44,18 +43,23 @@ export function useMarcadoresData(
   }, [folders, isDemoMode, setCtxFolders]);
 
   const filteredBookmarks = useMemo(() => {
-    let list = bookmarks;
-    const f = filterValue.trim().toLowerCase();
-    const s = searchValue.trim().toLowerCase();
-    if (f) list = list.filter((b) => b.title.toLowerCase().includes(f));
-    if (s) list = list.filter((b) => b.tags?.some((tag) => tag.toLowerCase().includes(s)));
-    return list;
-  }, [bookmarks, filterValue, searchValue]);
+    const q = searchValue.trim().toLowerCase();
+    if (!q) return bookmarks;
+    return bookmarks.filter((b) => {
+      const matchTitle = b.title?.toLowerCase().includes(q);
+      const matchDesc = b.description?.toLowerCase().includes(q);
+      const matchUrl = b.url?.toLowerCase().includes(q);
+      const matchTags = b.tags?.some((tag) => tag.toLowerCase().includes(q));
+      return matchTitle || matchDesc || matchUrl || matchTags;
+    });
+  }, [bookmarks, searchValue]);
 
   const flatList = useMemo((): GridItem[] => {
     const parentId = selectedFolderId;
+    const q = searchValue.trim().toLowerCase();
     const subfolders = folders
       .filter((f) => (f.parent_id || null) === parentId)
+      .filter((f) => !q || f.name.toLowerCase().includes(q))
       .sort((a, b) => a.sort_order - b.sort_order)
       .map((f) => ({ type: "folder" as const, id: f.id, folderId: f.id, label: f.name }));
     const links = filteredBookmarks
@@ -63,7 +67,7 @@ export function useMarcadoresData(
       .sort((a, b) => (a.title || "").localeCompare(b.title || ""))
       .map((b) => ({ type: "link" as const, bookmark: b }));
     return [...subfolders, ...links];
-  }, [filteredBookmarks, folders, selectedFolderId]);
+  }, [filteredBookmarks, folders, selectedFolderId, searchValue]);
 
   const breadcrumb = useMemo(() => getFolderPath(folders, selectedFolderId), [folders, selectedFolderId]);
 
