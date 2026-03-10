@@ -25,6 +25,7 @@ type Params = {
   handlePasteLink: (bookmarkId: string, destFolderId: string | null) => Promise<void>;
   onAddBookmark: () => void;
   onNewFolder: () => void;
+  onEditItem: (item: GridItem) => void;
 };
 
 export function useMarcadoresKeyboard(params: Params) {
@@ -49,6 +50,7 @@ export function useMarcadoresKeyboard(params: Params) {
     handlePasteLink,
     onAddBookmark,
     onNewFolder,
+    onEditItem,
   } = params;
 
   return useCallback(
@@ -70,6 +72,14 @@ export function useMarcadoresKeyboard(params: Params) {
       if (e.ctrlKey && e.key === "a") {
         e.preventDefault();
         onNewFolder();
+        return;
+      }
+      if ((e.key === "r" || e.key === "R") && !e.ctrlKey) {
+        e.preventDefault();
+        if (totalCount > 0) {
+          const item = flatList[selectedIndex];
+          if (item) onEditItem(item);
+        }
         return;
       }
 
@@ -205,6 +215,7 @@ export function useMarcadoresKeyboard(params: Params) {
       handlePasteLink,
       onAddBookmark,
       onNewFolder,
+      onEditItem,
     ]
   );
 }
