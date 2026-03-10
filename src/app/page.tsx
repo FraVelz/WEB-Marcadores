@@ -54,7 +54,7 @@ export default function LoginPage() {
           <div className="mb-4 rounded-lg border border-amber-600/50 bg-amber-900/20 p-3 text-sm text-amber-200">
             <p className="font-medium">Modo demo</p>
             <p className="mt-1 text-amber-300/90">
-              Sin credenciales Supabase. Configura .env.local para usar la app con tu cuenta.
+              Prueba la interfaz sin iniciar sesión. Explora marcadores, carpetas y atajos.
             </p>
             <button
               type="button"
@@ -63,6 +63,12 @@ export default function LoginPage() {
             >
               Probar demo
             </button>
+            <a
+              href="/demo"
+              className="mt-2 block text-center text-xs text-amber-400/90 hover:text-amber-300"
+            >
+              Enlace directo: /demo
+            </a>
           </div>
         )}
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
