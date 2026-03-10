@@ -1,12 +1,17 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { isFolderDescendant } from "../utils";
 import type { Bookmark, GridItem, CutItem, FlatFolder } from "../types";
 import type { BreadcrumbPart } from "../types";
 
+const DD_TIMEOUT_MS = 400;
+
 type Params = {
   breadcrumb: BreadcrumbPart[];
+  deleteConfirmItem: GridItem | null;
+  setDeleteConfirmItem: React.Dispatch<React.SetStateAction<GridItem | null>>;
+  onConfirmDelete: (item: GridItem) => void;
   flatList: GridItem[];
   selectedIndex: number;
   totalCount: number;
@@ -31,8 +36,13 @@ type Params = {
 };
 
 export function useMarcadoresKeyboard(params: Params) {
+  const lastKeyRef = useRef<{ key: string; time: number } | null>(null);
+
   const {
     breadcrumb,
+    deleteConfirmItem,
+    setDeleteConfirmItem,
+    onConfirmDelete,
     flatList,
     selectedIndex,
     totalCount,
@@ -66,6 +76,35 @@ export function useMarcadoresKeyboard(params: Params) {
           (active as HTMLElement).closest?.('[role="dialog"]'))
       )
         return;
+
+      if (deleteConfirmItem) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          onConfirmDelete(deleteConfirmItem);
+          setDeleteConfirmItem(null);
+        }
+        if (e.key === "Escape") {
+          e.preventDefault();
+          setDeleteConfirmItem(null);
+        }
+        return;
+      }
+
+      if (e.key === "d" && !e.ctrlKey && !e.metaKey && !e.altKey && totalCount > 0) {
+        const item = flatList[selectedIndex];
+        const now = Date.now();
+        const prev = lastKeyRef.current;
+        if (prev?.key === "d" && now - prev.time < DD_TIMEOUT_MS && item) {
+          e.preventDefault();
+          lastKeyRef.current = null;
+          setDeleteConfirmItem(item);
+          return;
+        }
+        e.preventDefault();
+        lastKeyRef.current = { key: "d", time: now };
+        return;
+      }
+      lastKeyRef.current = null;
 
       if (e.key === "a" && !e.ctrlKey) {
         e.preventDefault();
@@ -207,6 +246,9 @@ export function useMarcadoresKeyboard(params: Params) {
     },
     [
       breadcrumb,
+      deleteConfirmItem,
+      setDeleteConfirmItem,
+      onConfirmDelete,
       flatList,
       selectedIndex,
       totalCount,

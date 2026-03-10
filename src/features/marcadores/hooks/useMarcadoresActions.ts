@@ -138,6 +138,35 @@ export function useMarcadoresActions({
     [supabase, setBookmarks]
   );
 
+  const handleDeleteFolder = useCallback(
+    async (folderId: string) => {
+      const parentId = folders.find((f) => f.id === folderId)?.parent_id ?? null;
+      const descendantIds = new Set<string>();
+      const collect = (id: string) => {
+        descendantIds.add(id);
+        folders.filter((f) => f.parent_id === id).forEach((f) => collect(f.id));
+      };
+      collect(folderId);
+
+      if (isDemoMode()) {
+        setBookmarks((prev) =>
+          prev.map((b) => (b.folder_id && descendantIds.has(b.folder_id) ? { ...b, folder_id: parentId } : b))
+        );
+        setFolders((prev) => {
+          const next = prev.filter((f) => !descendantIds.has(f.id));
+          setCtxFolders(buildFolderTree(next));
+          return next;
+        });
+        refreshFolders();
+        return;
+      }
+      await supabase.from("bookmarks").update({ folder_id: parentId }).in("folder_id", Array.from(descendantIds));
+      await supabase.from("folders").delete().in("id", Array.from(descendantIds));
+      await fetchData();
+    },
+    [folders, supabase, setBookmarks, setFolders, setCtxFolders, refreshFolders, fetchData]
+  );
+
   const handleBookmarkUpdate = useCallback(
     async (id: string, updates: Partial<Bookmark>, detailBookmark: Bookmark | null) => {
       if (isDemoMode()) {
@@ -207,6 +236,7 @@ export function useMarcadoresActions({
     handleRenameFolder,
     handleModalSubmit,
     handleDelete,
+    handleDeleteFolder,
     handleBookmarkUpdate,
     handlePasteFolder,
     handlePasteLink,

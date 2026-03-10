@@ -24,6 +24,7 @@ type Props = {
   onRenameFolder: () => void;
   onNavigateUp: () => void;
   onAddBookmark: () => void;
+  onDeleteFocused?: () => void;
   onCreateFolder: () => void;
   selectMode: boolean;
   setSelectMode: (v: boolean | ((prev: boolean) => boolean)) => void;
@@ -57,6 +58,8 @@ export default function MarcadoresToolbar(props: Props) {
         onNavigateUp={props.onNavigateUp}
         onAddBookmark={props.onAddBookmark}
         onNewFolder={() => props.setShowNewFolder(true)}
+        onDeleteFocused={props.onDeleteFocused}
+        hasFocusedItem={!!item && flatList.length > 0}
         infoPanelEnabled={props.infoPanelEnabled}
         onToggleInfoPanel={handleToggleInfoPanel}
         showSearch={props.showSearch}
