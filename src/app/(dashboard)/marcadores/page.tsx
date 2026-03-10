@@ -27,6 +27,8 @@ export default function MarcadoresPage() {
   const [gridCols, setGridCols] = useState(3);
   const [newFolderName, setNewFolderName] = useState("");
   const [showNewFolder, setShowNewFolder] = useState(false);
+  const [editingFolder, setEditingFolder] = useState<{ id: string; name: string } | null>(null);
+  const [renameFolderName, setRenameFolderName] = useState("");
   const [cutItem, setCutItem] = useState<CutItem | null>(null);
   const [pasteError, setPasteError] = useState<string | null>(null);
   const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map());
@@ -46,6 +48,7 @@ export default function MarcadoresPage() {
     setMainKeyDown,
     searchRef,
     focusMain,
+    editFolderRef,
   } = useDashboard();
 
   const { bookmarks, setBookmarks, folders, setFolders, loading, fetchData, flatList, breadcrumb } =
@@ -59,6 +62,7 @@ export default function MarcadoresPage() {
 
   const {
     handleCreateFolder,
+    handleRenameFolder,
     handleModalSubmit,
     handleDelete,
     handleBookmarkUpdate,
@@ -103,7 +107,26 @@ export default function MarcadoresPage() {
     handlePasteLink,
     onAddBookmark: handleAdd,
     onNewFolder: () => setShowNewFolder(true),
+    onEditItem: (item) => {
+      if (item.type === "link") {
+        setEditingBookmark(item.bookmark);
+        setModalOpen(true);
+      } else {
+        setEditingFolder({ id: item.id, name: item.label });
+        setRenameFolderName(item.label);
+      }
+    },
   });
+
+  useEffect(() => {
+    editFolderRef.current = (id: string, name: string) => {
+      setEditingFolder({ id, name });
+      setRenameFolderName(name);
+    };
+    return () => {
+      editFolderRef.current = null;
+    };
+  }, [editFolderRef]);
 
   useMarcadoresEffects({
     filterValue,
@@ -172,6 +195,13 @@ export default function MarcadoresPage() {
     });
   }, []);
 
+  const onRenameFolder = useCallback(async () => {
+    if (!editingFolder || !renameFolderName.trim()) return;
+    await handleRenameFolder(editingFolder.id, renameFolderName);
+    setEditingFolder(null);
+    setRenameFolderName("");
+  }, [editingFolder, renameFolderName, handleRenameFolder]);
+
   const handleDoubleClick = useCallback(
     (item: GridItem) => {
       if (selectMode) return;
@@ -200,6 +230,11 @@ export default function MarcadoresPage() {
         setShowNewFolder={setShowNewFolder}
         newFolderName={newFolderName}
         setNewFolderName={setNewFolderName}
+        editingFolder={editingFolder}
+        setEditingFolder={setEditingFolder}
+        renameFolderName={renameFolderName}
+        setRenameFolderName={setRenameFolderName}
+        onRenameFolder={onRenameFolder}
         onNavigateUp={() => setSelectedFolderId(null)}
         onAddBookmark={handleAdd}
         onCreateFolder={onCreateFolder}

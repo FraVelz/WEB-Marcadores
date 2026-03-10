@@ -1,6 +1,6 @@
 /**
- * Exporta marcadores de Supabase a bookmarks-export.json
- * Uso: pnpm exec dotenv -e .env.local -- tsx scripts/fetch-bookmarks.ts > bookmarks-export.json
+ * Exporta marcadores de Supabase a JSON (stdout).
+ * Uso: pnpm run fetch:bookmarks > bookmarks.json
  */
 import { createClient } from "@supabase/supabase-js";
 

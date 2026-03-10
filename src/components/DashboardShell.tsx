@@ -52,6 +52,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
     focusMain,
     focusSidebar,
     mainKeyDownRef,
+    editFolderRef,
     selectedFolderId,
     setSelectedFolderId,
     folders,
@@ -129,6 +130,15 @@ export default function DashboardShell({ children }: { children: React.ReactNode
         }
         return;
       }
+      if ((e.key === "r" || e.key === "R") && !e.ctrlKey) {
+        e.preventDefault();
+        const id = flatSidebarItems[currentIdx];
+        if (id) {
+          const folder = folders.find((f) => f.id === id) ?? findFolderInTree(folders, id);
+          if (folder) editFolderRef.current?.(folder.id, folder.name);
+        }
+        return;
+      }
     },
     [
       flatSidebarItems,
@@ -137,6 +147,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
       folders,
       collapsedIds,
       focusMain,
+      editFolderRef,
     ]
   );
 
