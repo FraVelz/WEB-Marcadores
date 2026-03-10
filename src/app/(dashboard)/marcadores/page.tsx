@@ -87,6 +87,7 @@ export default function MarcadoresPage() {
   }, []);
 
   const handleKeyDown = useMarcadoresKeyboard({
+    breadcrumb,
     flatList,
     selectedIndex,
     totalCount: flatList.length,

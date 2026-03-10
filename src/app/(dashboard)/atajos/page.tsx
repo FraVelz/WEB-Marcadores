@@ -10,6 +10,7 @@ export default function AtajosPage() {
     { keys: "↑ / k", desc: "Marcador anterior" },
     { keys: "↓ / j", desc: "Marcador siguiente" },
     { keys: "Enter", desc: "Abrir enlace o entrar en carpeta" },
+    { keys: "z", desc: "Subir una carpeta (volver atrás en la jerarquía)" },
     { keys: "a", desc: "Crear nuevo enlace" },
     { keys: "Ctrl+A", desc: "Crear nueva carpeta" },
     { keys: "Ctrl+X", desc: "Cortar carpeta o enlace (mover)" },
