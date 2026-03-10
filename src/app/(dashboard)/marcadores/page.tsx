@@ -13,6 +13,7 @@ import MarcadoresBreadcrumb from "@/features/marcadores/components/MarcadoresBre
 import BookmarkGrid from "@/features/marcadores/components/BookmarkGrid";
 import PasteErrorBanner from "@/features/marcadores/components/PasteErrorBanner";
 import DemoBanner from "@/features/marcadores/components/DemoBanner";
+import DeleteConfirmBanner from "@/features/marcadores/components/DeleteConfirmBanner";
 import { isDemoMode } from "@/lib/supabase/client";
 import MarcadoresFooter from "@/features/marcadores/components/MarcadoresFooter";
 import type { Bookmark, GridItem, CutItem } from "@/features/marcadores/types";
@@ -33,6 +34,7 @@ export default function MarcadoresPage() {
   const [renameFolderName, setRenameFolderName] = useState("");
   const [cutItem, setCutItem] = useState<CutItem | null>(null);
   const [pasteError, setPasteError] = useState<string | null>(null);
+  const [deleteConfirmItem, setDeleteConfirmItem] = useState<GridItem | null>(null);
   const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map());
 
   const {
@@ -58,6 +60,7 @@ export default function MarcadoresPage() {
     handleRenameFolder,
     handleModalSubmit,
     handleDelete,
+    handleDeleteFolder,
     handleBookmarkUpdate,
     handlePasteFolder,
     handlePasteLink,
@@ -79,8 +82,23 @@ export default function MarcadoresPage() {
     setModalOpen(true);
   }, []);
 
+  const onConfirmDelete = useCallback(
+    async (item: GridItem) => {
+      if (item.type === "folder") {
+        await handleDeleteFolder(item.id);
+      } else {
+        await handleDelete(new Set([item.bookmark.id]), setSelectedIds, setSelectMode);
+      }
+      setSelectedIndex(0);
+    },
+    [handleDelete, handleDeleteFolder]
+  );
+
   const handleKeyDown = useMarcadoresKeyboard({
     breadcrumb,
+    deleteConfirmItem,
+    setDeleteConfirmItem,
+    onConfirmDelete,
     flatList,
     selectedIndex,
     totalCount: flatList.length,
@@ -224,6 +242,10 @@ export default function MarcadoresPage() {
         onRenameFolder={onRenameFolder}
         onNavigateUp={() => setSelectedFolderId(null)}
         onAddBookmark={handleAdd}
+        onDeleteFocused={() => {
+          const item = flatList[selectedIndex];
+          if (item) setDeleteConfirmItem(item);
+        }}
         onCreateFolder={onCreateFolder}
         selectMode={selectMode}
         setSelectMode={setSelectMode}
@@ -239,6 +261,13 @@ export default function MarcadoresPage() {
       />
 
       {pasteError && <PasteErrorBanner message={pasteError} />}
+      {deleteConfirmItem && (
+        <DeleteConfirmBanner
+          item={deleteConfirmItem}
+          onConfirm={() => onConfirmDelete(deleteConfirmItem)}
+          onCancel={() => setDeleteConfirmItem(null)}
+        />
+      )}
       {isDemoMode() && <DemoBanner />}
 
       <MarcadoresBreadcrumb breadcrumb={breadcrumb} onSelect={setSelectedFolderId} />
