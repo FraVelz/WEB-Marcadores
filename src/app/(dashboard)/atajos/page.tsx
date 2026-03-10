@@ -4,6 +4,7 @@ export default function AtajosPage() {
     { keys: "Ctrl+2", desc: "Ir a Atajos" },
     { keys: "Ctrl+3", desc: "Ir a Perfil" },
     { keys: "n", desc: "Enfocar sidebar / marcadores (alternar)" },
+    { keys: "Ctrl+F / Ctrl+K", desc: "Abrir búsqueda (título, descripción, URL, tags)" },
     { keys: "j / k (sidebar)", desc: "Navegar carpetas arriba/abajo" },
     { keys: "h / l (sidebar)", desc: "Colapsar / expandir carpeta" },
     { keys: "Enter (sidebar)", desc: "Abrir carpeta y ver enlaces" },

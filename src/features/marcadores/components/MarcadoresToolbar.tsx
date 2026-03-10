@@ -10,14 +10,9 @@ import ToolbarSelectActions from "./ToolbarSelectActions";
 type Props = {
   showSearch: boolean;
   setShowSearch: (v: boolean | ((prev: boolean) => boolean)) => void;
-  filterValue: string;
-  setFilterValue: (v: string) => void;
   searchValue: string;
   setSearchValue: (v: string) => void;
-  allTags: string[];
-  focusMain: () => void;
   searchRef: React.RefObject<HTMLInputElement | null>;
-  filterRef: React.RefObject<HTMLInputElement | null>;
   showNewFolder: boolean;
   setShowNewFolder: (v: boolean) => void;
   newFolderName: string;
@@ -69,14 +64,9 @@ export default function MarcadoresToolbar(props: Props) {
       />
       {props.showSearch && (
         <ToolbarSearchSection
-          filterValue={props.filterValue}
-          setFilterValue={props.setFilterValue}
           searchValue={props.searchValue}
           setSearchValue={props.setSearchValue}
-          allTags={props.allTags}
-          focusMain={props.focusMain}
           searchRef={props.searchRef}
-          filterRef={props.filterRef}
         />
       )}
       {props.showNewFolder && (

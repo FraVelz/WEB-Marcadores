@@ -11,7 +11,7 @@ You can try the app **without signing in**:
 - **Local:** run `pnpm dev` without configuring `.env.local` — you'll see the "Try demo" button on the login page.
 - **Online:** visit `/demo` to go directly to the main interface (requires `NEXT_PUBLIC_DEMO_MODE=true` in deployment).
 
-The demo shows sample folders (Learning, Shopping, Development, Design, etc.) and bookmarks. Changes are stored in memory during the session.
+The demo shows sample folders (Documentation, Frameworks, Tools) with generic web development links (MDN, React, Next.js, etc.). Changes are stored in memory during the session.
 
 ## Usage
 
