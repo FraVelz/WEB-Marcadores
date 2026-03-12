@@ -35,11 +35,11 @@ export default function MarcadoresPage() {
   const [cutItem, setCutItem] = useState<CutItem | null>(null);
   const [pasteError, setPasteError] = useState<string | null>(null);
   const [deleteConfirmItem, setDeleteConfirmItem] = useState<GridItem | null>(null);
+  const [searchValue, setSearchValue] = useState("");
   const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+  const searchRef = useRef<HTMLInputElement>(null);
 
   const {
-    searchValue,
-    setSearchValue,
     selectedFolderId,
     setSelectedFolderId,
     setFolders: setCtxFolders,
@@ -47,7 +47,6 @@ export default function MarcadoresPage() {
     allTags,
     refreshTags,
     setMainKeyDown,
-    searchRef,
     focusMain,
     editFolderRef,
   } = useDashboard();
@@ -231,6 +230,7 @@ export default function MarcadoresPage() {
         searchValue={searchValue}
         setSearchValue={setSearchValue}
         searchRef={searchRef}
+        focusMain={focusMain}
         showNewFolder={showNewFolder}
         setShowNewFolder={setShowNewFolder}
         newFolderName={newFolderName}
@@ -310,6 +310,7 @@ export default function MarcadoresPage() {
         onClose={() => {
           setModalOpen(false);
           setEditingBookmark(null);
+          requestAnimationFrame(() => focusMain());
         }}
         onSubmit={onModalSubmit}
         initialData={

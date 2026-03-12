@@ -56,10 +56,8 @@ export function useMarcadoresData(
 
   const flatList = useMemo((): GridItem[] => {
     const parentId = selectedFolderId;
-    const q = searchValue.trim().toLowerCase();
     const subfolders = folders
       .filter((f) => (f.parent_id || null) === parentId)
-      .filter((f) => !q || f.name.toLowerCase().includes(q))
       .sort((a, b) => a.sort_order - b.sort_order)
       .map((f) => ({ type: "folder" as const, id: f.id, folderId: f.id, label: f.name }));
     const links = filteredBookmarks
@@ -67,7 +65,7 @@ export function useMarcadoresData(
       .sort((a, b) => (a.title || "").localeCompare(b.title || ""))
       .map((b) => ({ type: "link" as const, bookmark: b }));
     return [...subfolders, ...links];
-  }, [filteredBookmarks, folders, selectedFolderId, searchValue]);
+  }, [filteredBookmarks, folders, selectedFolderId]);
 
   const breadcrumb = useMemo(() => getFolderPath(folders, selectedFolderId), [folders, selectedFolderId]);
 

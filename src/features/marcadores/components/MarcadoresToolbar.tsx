@@ -13,6 +13,7 @@ type Props = {
   searchValue: string;
   setSearchValue: (v: string) => void;
   searchRef: React.RefObject<HTMLInputElement | null>;
+  focusMain?: () => void;
   showNewFolder: boolean;
   setShowNewFolder: (v: boolean) => void;
   newFolderName: string;
@@ -70,6 +71,7 @@ export default function MarcadoresToolbar(props: Props) {
           searchValue={props.searchValue}
           setSearchValue={props.setSearchValue}
           searchRef={props.searchRef}
+          onEnter={props.focusMain}
         />
       )}
       {props.showNewFolder && (

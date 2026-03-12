@@ -15,13 +15,10 @@ export type Folder = {
 };
 
 type DashboardContextType = {
-  searchRef: React.RefObject<HTMLInputElement | null>;
   mainRef: React.RefObject<HTMLElement | null>;
   sidebarRef: React.RefObject<HTMLDivElement | null>;
   focusMain: () => void;
   focusSidebar: () => void;
-  searchValue: string;
-  setSearchValue: (v: string) => void;
   allTags: string[];
   refreshTags: () => void;
   viewMode: ViewMode;
@@ -39,10 +36,8 @@ type DashboardContextType = {
 const DashboardContext = createContext<DashboardContextType | null>(null);
 
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
-  const searchRef = useRef<HTMLInputElement>(null);
   const mainRef = useRef<HTMLElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const [searchValue, setSearchValue] = useState("");
   const [allTags, setAllTags] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("hierarchical");
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
@@ -109,13 +104,10 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   return (
     <DashboardContext.Provider
       value={{
-        searchRef,
         mainRef,
         sidebarRef,
         focusMain,
         focusSidebar,
-        searchValue,
-        setSearchValue,
         allTags,
         refreshTags,
         viewMode,
