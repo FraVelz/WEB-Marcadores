@@ -4,12 +4,14 @@ type Props = {
   searchValue: string;
   setSearchValue: (v: string) => void;
   searchRef: React.RefObject<HTMLInputElement | null>;
+  onEnter?: () => void;
 };
 
 export default function ToolbarSearchSection({
   searchValue,
   setSearchValue,
   searchRef,
+  onEnter,
 }: Props) {
   return (
     <div className="ml-2 flex flex-1 items-center gap-2">
@@ -20,6 +22,12 @@ export default function ToolbarSearchSection({
         data-no-vim
         value={searchValue}
         onChange={(e) => setSearchValue(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            onEnter?.();
+          }
+        }}
         className="flex-1 rounded border border-zinc-600 bg-zinc-800 px-2 py-1 text-sm text-white placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
       />
     </div>

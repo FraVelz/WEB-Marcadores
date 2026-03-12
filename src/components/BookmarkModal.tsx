@@ -50,6 +50,7 @@ export default function BookmarkModal({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
   const modalContentRef = useRef<HTMLDivElement>(null);
+  const tagInputRef = useRef<string>("");
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -64,6 +65,7 @@ export default function BookmarkModal({
       setTagsValue(initialData?.tags ?? data.tags);
       setFolderId(initialData?.folder_id ?? currentFolderId ?? "");
       setSubmitError(null);
+      tagInputRef.current = "";
       requestAnimationFrame(() => firstInputRef.current?.focus());
     }
   }, [isOpen, initialData?.tags, initialData?.folder_id, currentFolderId]);
@@ -103,12 +105,16 @@ export default function BookmarkModal({
     setSubmitError(null);
     setSubmitting(true);
     const form = e.currentTarget;
+    const pendingTag = tagInputRef.current?.trim();
+    const finalTags = pendingTag
+      ? [...tagsValue.split(",").map((t) => t.trim()).filter(Boolean), pendingTag].join(", ")
+      : tagsValue;
     const formData: BookmarkFormData = {
       title: (form.elements.namedItem("title") as HTMLInputElement).value,
       url: (form.elements.namedItem("url") as HTMLInputElement).value,
       description: (form.elements.namedItem("description") as HTMLInputElement).value,
       folder_id: folderId || "",
-      tags: tagsValue,
+      tags: finalTags,
     };
     try {
       await onSubmit(formData);
@@ -157,6 +163,7 @@ export default function BookmarkModal({
               const current = tagsValue.split(",").map((t) => t.trim()).filter(Boolean);
               if (!current.includes(tag)) setTagsValue([...current, tag].join(", "));
             }}
+            tagInputRef={tagInputRef}
           />
           {submitError && (
             <p className="rounded-lg border border-red-600/50 bg-red-900/20 px-3 py-2 text-sm text-red-400">
