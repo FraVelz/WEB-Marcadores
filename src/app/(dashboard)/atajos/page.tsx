@@ -19,6 +19,7 @@ export default function AtajosPage() {
     { keys: "Ctrl+A", desc: "Crear nueva carpeta" },
     { keys: "Ctrl+X", desc: "Cortar carpeta o enlace (mover)" },
     { keys: "Ctrl+V", desc: "Pegar en la carpeta actual" },
+    { keys: "Arrastrar y soltar", desc: "Mover carpetas y enlaces entre carpetas" },
     { keys: "dd", desc: "Eliminar elemento enfocado (pide confirmación)" },
     { keys: "Enter (confirmación)", desc: "Confirmar eliminación" },
     { keys: "Esc (confirmación)", desc: "Cancelar eliminación" },

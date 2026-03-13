@@ -1,7 +1,9 @@
 "use client";
 
-import BookmarkGridItem from "./BookmarkGridItem";
 import type { GridItem, CutItem } from "../types";
+import BookmarkGridItem from "./BookmarkGridItem";
+
+const DRAG_TYPE = "application/x-bookmark-item";
 
 type Props = {
   flatList: GridItem[];
@@ -12,6 +14,7 @@ type Props = {
   onSelectIndex: (idx: number) => void;
   onToggleSelect: (id: string) => void;
   onDoubleClick: (item: GridItem) => void;
+  onDrop?: (sourceItem: GridItem, targetFolderId: string | null) => void;
   onAddBookmark: () => void;
   onNewFolder: () => void;
   itemRefs: React.MutableRefObject<Map<number, HTMLDivElement>>;
@@ -26,12 +29,31 @@ export default function BookmarkGrid({
   onSelectIndex,
   onToggleSelect,
   onDoubleClick,
+  onDrop,
   onAddBookmark,
   onNewFolder,
   itemRefs,
 }: Props) {
   return (
-    <div className="flex-1 overflow-auto p-4">
+    <div
+      className="flex-1 overflow-auto p-4"
+      onDragOver={onDrop ? (e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; } : undefined}
+      onDrop={onDrop ? (e) => {
+        e.preventDefault();
+        const raw = e.dataTransfer.getData(DRAG_TYPE);
+        if (!raw) return;
+        try {
+          const payload = JSON.parse(raw);
+          const sourceItem: GridItem =
+            payload.type === "folder"
+              ? { type: "folder", id: payload.id, folderId: payload.id, label: payload.name }
+              : { type: "link", bookmark: { id: payload.bookmark.id, title: "", url: payload.bookmark.url, folder_id: null } };
+          onDrop(sourceItem, null);
+        } catch {
+          // ignore
+        }
+      } : undefined}
+    >
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {flatList.map((item, idx) => {
           const isFolder = item.type === "folder";
@@ -54,6 +76,7 @@ export default function BookmarkGrid({
               onSelect={onSelectIndex}
               onToggleSelect={onToggleSelect}
               onDoubleClick={onDoubleClick}
+              onDrop={onDrop}
             />
           );
         })}
