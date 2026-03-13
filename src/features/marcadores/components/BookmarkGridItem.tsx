@@ -3,6 +3,8 @@
 import { getFavicon } from "../utils";
 import type { Bookmark, GridItem } from "../types";
 
+const DRAG_TYPE = "application/x-bookmark-item";
+
 type Props = {
   item: GridItem;
   idx: number;
@@ -14,6 +16,7 @@ type Props = {
   onSelect: (idx: number) => void;
   onToggleSelect: (id: string) => void;
   onDoubleClick: (item: GridItem) => void;
+  onDrop?: (sourceItem: GridItem, targetFolderId: string | null) => void;
 };
 
 export default function BookmarkGridItem({
@@ -27,8 +30,41 @@ export default function BookmarkGridItem({
   onSelect,
   onToggleSelect,
   onDoubleClick,
+  onDrop,
 }: Props) {
   const isFolder = item.type === "folder";
+  const targetFolderId = isFolder ? item.id : (item.bookmark.folder_id ?? null);
+
+  const handleDragStart = (e: React.DragEvent) => {
+    const payload = isFolder
+      ? { type: "folder" as const, id: item.id, name: item.label }
+      : { type: "link" as const, bookmark: { id: item.bookmark.id, url: item.bookmark.url } };
+    e.dataTransfer.setData(DRAG_TYPE, JSON.stringify(payload));
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", isFolder ? item.label : item.bookmark.title);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const raw = e.dataTransfer.getData(DRAG_TYPE);
+    if (!raw || !onDrop) return;
+    try {
+      const payload = JSON.parse(raw);
+      const sourceItem: GridItem =
+        payload.type === "folder"
+          ? { type: "folder", id: payload.id, folderId: payload.id, label: payload.name }
+          : { type: "link", bookmark: { id: payload.bookmark.id, title: "", url: payload.bookmark.url, folder_id: null } };
+      onDrop(sourceItem, targetFolderId);
+    } catch {
+      // ignore
+    }
+  };
+
   const baseClass = `relative flex items-center gap-3 rounded-lg border px-4 py-3 transition-colors ${
     isCut ? "border-dashed border-amber-500/70 bg-amber-900/20 opacity-60" : ""
   } ${
@@ -42,12 +78,16 @@ export default function BookmarkGridItem({
     <div
       key={isFolder ? item.id : item.bookmark.id}
       ref={itemRef}
-      className={baseClass}
+      draggable
+      className={`${baseClass} cursor-grab active:cursor-grabbing`}
       onClick={() => {
         if (selectMode && !isFolder) onToggleSelect(item.bookmark.id);
         else onSelect(idx);
       }}
       onDoubleClick={() => onDoubleClick(item)}
+      onDragStart={handleDragStart}
+      onDragOver={onDrop ? handleDragOver : undefined}
+      onDrop={onDrop ? handleDrop : undefined}
     >
       {selectMode && !isFolder && (
         <div

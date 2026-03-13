@@ -16,6 +16,7 @@ import DemoBanner from "@/features/marcadores/components/DemoBanner";
 import DeleteConfirmBanner from "@/features/marcadores/components/DeleteConfirmBanner";
 import { isDemoMode } from "@/lib/supabase/client";
 import MarcadoresFooter from "@/features/marcadores/components/MarcadoresFooter";
+import { isFolderDescendant } from "@/features/marcadores/utils";
 import type { Bookmark, GridItem, CutItem } from "@/features/marcadores/types";
 
 export default function MarcadoresPage() {
@@ -220,6 +221,44 @@ export default function MarcadoresPage() {
     [selectMode, setSelectedFolderId]
   );
 
+  const handleDrop = useCallback(
+    (sourceItem: GridItem, targetFolderId: string | null) => {
+      const destId = targetFolderId ?? selectedFolderId;
+      setPasteError(null);
+      if (sourceItem.type === "folder") {
+        if (destId === sourceItem.id) return;
+        const sameName = folders.some(
+          (f) =>
+            (f.parent_id || null) === destId &&
+            f.name.toLowerCase() === sourceItem.label.toLowerCase() &&
+            f.id !== sourceItem.id
+        );
+        if (sameName) {
+          setPasteError("Ya existe una carpeta con ese nombre en el destino");
+          return;
+        }
+        if (destId === sourceItem.id || (destId && isFolderDescendant(folders, destId, sourceItem.id))) {
+          setPasteError("No se puede mover una carpeta dentro de sí misma o de sus subcarpetas");
+          return;
+        }
+        handlePasteFolder(sourceItem.id, destId);
+      } else {
+        const sameUrl = bookmarks.some(
+          (b) =>
+            (b.folder_id || null) === destId &&
+            b.url === sourceItem.bookmark.url &&
+            b.id !== sourceItem.bookmark.id
+        );
+        if (sameUrl) {
+          setPasteError("Ya existe un enlace con esa URL en el destino");
+          return;
+        }
+        handlePasteLink(sourceItem.bookmark.id, destId);
+      }
+    },
+    [selectedFolderId, folders, bookmarks, handlePasteFolder, handlePasteLink, setPasteError]
+  );
+
   if (loading) return <div className="flex flex-1 items-center justify-center text-zinc-500">Cargando...</div>;
 
   return (
@@ -282,6 +321,7 @@ export default function MarcadoresPage() {
           onSelectIndex={setSelectedIndex}
           onToggleSelect={toggleSelect}
           onDoubleClick={handleDoubleClick}
+          onDrop={handleDrop}
           onAddBookmark={handleAdd}
           onNewFolder={() => setShowNewFolder(true)}
           itemRefs={itemRefs}
