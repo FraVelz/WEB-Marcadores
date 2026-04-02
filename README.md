@@ -36,6 +36,8 @@ Sin `.env.local` o sin credenciales Supabase: usa modo demo (datos en memoria).
 - `src/components/` — BookmarkModal, TagAutocomplete, DashboardShell, etc.
 - `src/lib/demo-data.ts` — Datos de ejemplo para modo demo
 
+**Documentación detallada** (estructura de carpetas, archivos, hooks, middleware, scripts): [docs/DOCUMENTACION.md](docs/DOCUMENTACION.md).
+
 ## Variables de entorno
 
 Copia `.env.example` a `.env.local` y rellena las credenciales de Supabase.
@@ -49,4 +51,5 @@ Copia `.env.example` a `.env.local` y rellena las credenciales de Supabase.
 
 ## Documentación
 
+- [Documentación del proyecto (estructura y archivos)](docs/DOCUMENTACION.md)
 - [English](README.en.md)
