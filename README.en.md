@@ -42,12 +42,12 @@ Without `.env.local` or Supabase credentials: uses demo mode (in-memory data).
 
 Copy `.env.example` to `.env.local` and fill in Supabase credentials.
 
-| Variable | Description |
-|----------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key |
-| `NEXT_PUBLIC_SITE_URL` | Site URL (for Open Graph when sharing) |
-| `NEXT_PUBLIC_DEMO_MODE` | `true` to force demo mode in production |
+| Variable                        | Description                             |
+| ------------------------------- | --------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL                    |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key                  |
+| `NEXT_PUBLIC_SITE_URL`          | Site URL (for Open Graph when sharing)  |
+| `NEXT_PUBLIC_DEMO_MODE`         | `true` to force demo mode in production |
 
 ## Documentation
 

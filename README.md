@@ -42,12 +42,12 @@ Sin `.env.local` o sin credenciales Supabase: usa modo demo (datos en memoria).
 
 Copia `.env.example` a `.env.local` y rellena las credenciales de Supabase.
 
-| Variable | Descripción |
-|----------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | URL del proyecto Supabase |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave anónima de Supabase |
-| `NEXT_PUBLIC_SITE_URL` | URL del sitio (para Open Graph al compartir) |
-| `NEXT_PUBLIC_DEMO_MODE` | `true` para forzar modo demo en producción |
+| Variable                        | Descripción                                  |
+| ------------------------------- | -------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | URL del proyecto Supabase                    |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave anónima de Supabase                    |
+| `NEXT_PUBLIC_SITE_URL`          | URL del sitio (para Open Graph al compartir) |
+| `NEXT_PUBLIC_DEMO_MODE`         | `true` para forzar modo demo en producción   |
 
 ## Documentación
 

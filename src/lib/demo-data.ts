@@ -5,21 +5,21 @@
  */
 
 export type DemoFolder = {
-  id: string;
-  parent_id: string | null;
-  name: string;
-  sort_order: number;
-};
+  id: string
+  parent_id: string | null
+  name: string
+  sort_order: number
+}
 
 export type DemoBookmark = {
-  id: string;
-  title: string;
-  url: string;
-  description?: string;
-  folder_id: string | null;
-  tags?: string[];
-  created_at?: string;
-};
+  id: string
+  title: string
+  url: string
+  description?: string
+  folder_id: string | null
+  tags?: string[]
+  created_at?: string
+}
 
 export const DEMO_FOLDERS: DemoFolder[] = [
   // Pocas carpetas de ejemplo — datos genéricos de desarrollo web
@@ -28,7 +28,7 @@ export const DEMO_FOLDERS: DemoFolder[] = [
   { id: "f3", parent_id: null, name: "Herramientas", sort_order: 2 },
   { id: "f4", parent_id: "f2", name: "Frontend", sort_order: 0 },
   { id: "f5", parent_id: "f2", name: "Backend", sort_order: 1 },
-];
+]
 
 export const DEMO_BOOKMARKS: DemoBookmark[] = [
   {
@@ -85,16 +85,29 @@ export const DEMO_BOOKMARKS: DemoBookmark[] = [
     tags: ["git", "herramientas"],
     created_at: new Date().toISOString(),
   },
-];
+]
 
-export const DEMO_TAGS = ["documentación", "web", "react", "frontend", "javascript", "framework", "css", "backend", "database", "auth", "git", "herramientas"];
+export const DEMO_TAGS = [
+  "documentación",
+  "web",
+  "react",
+  "frontend",
+  "javascript",
+  "framework",
+  "css",
+  "backend",
+  "database",
+  "auth",
+  "git",
+  "herramientas",
+]
 
 export function isDemoMode(): boolean {
-  if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") return true;
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key || url === "" || key === "") return true;
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") return true
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!url || !key || url === "" || key === "") return true
   // Con Supabase configurado: si el usuario eligió demo (cookie), usar modo demo
-  if (typeof document !== "undefined" && document.cookie.includes("demo_session=true")) return true;
-  return false;
+  if (typeof document !== "undefined" && document.cookie.includes("demo_session=true")) return true
+  return false
 }

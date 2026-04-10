@@ -1,11 +1,11 @@
-"use client";
+"use client"
 
-import type { BreadcrumbPart } from "../types";
+import type { BreadcrumbPart } from "../types"
 
 type Props = {
-  breadcrumb: BreadcrumbPart[];
-  onSelect: (id: string | null) => void;
-};
+  breadcrumb: BreadcrumbPart[]
+  onSelect: (id: string | null) => void
+}
 
 export default function MarcadoresBreadcrumb({ breadcrumb, onSelect }: Props) {
   return (
@@ -23,5 +23,5 @@ export default function MarcadoresBreadcrumb({ breadcrumb, onSelect }: Props) {
         </span>
       ))}
     </div>
-  );
+  )
 }
