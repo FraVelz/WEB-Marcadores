@@ -1,16 +1,17 @@
-"use client";
+"use client"
 
-import TagAutocomplete from "@/components/TagAutocomplete";
+import TagAutocomplete from "@/components/TagAutocomplete"
+import { cn } from "@/lib/utils"
 
 type Props = {
-  tags: string[];
-  newTag: string;
-  onNewTagChange: (v: string) => void;
-  onAddTag: (tag: string) => void;
-  onRemoveTag: (tag: string) => void;
-  allTags: string[];
-  saving: boolean;
-};
+  tags: string[]
+  newTag: string
+  onNewTagChange: (v: string) => void
+  onAddTag: (tag: string) => void
+  onRemoveTag: (tag: string) => void
+  allTags: string[]
+  saving: boolean
+}
 
 export default function BookmarkDetailTagsSection({
   tags,
@@ -51,9 +52,12 @@ export default function BookmarkDetailTagsSection({
           onSelectTag={(tag) => onAddTag(tag)}
           onEnter={() => newTag.trim() && onAddTag(newTag)}
           placeholder="Añadir tag..."
-          className="w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
+          className={cn(
+            "w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-sm text-white",
+            "placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
+          )}
         />
       </div>
     </div>
-  );
+  )
 }

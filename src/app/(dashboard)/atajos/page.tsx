@@ -28,7 +28,7 @@ export default function AtajosPage() {
     { keys: "Enter (modo selección)", desc: "Seleccionar/deseleccionar enlace" },
     { keys: "Esc", desc: "Cerrar modal, panel de detalle o cancelar" },
     { keys: "Doble clic", desc: "Abrir marcador en nueva pestaña" },
-  ];
+  ]
 
   return (
     <div className="overflow-auto p-6">
@@ -39,13 +39,11 @@ export default function AtajosPage() {
             key={`${s.keys}-${i}`}
             className="flex items-center gap-4 rounded-lg border border-zinc-800 bg-zinc-900 p-3"
           >
-            <kbd className="rounded bg-zinc-700 px-2 py-1 font-mono text-sm text-white">
-              {s.keys}
-            </kbd>
+            <kbd className="rounded bg-zinc-700 px-2 py-1 font-mono text-sm text-white">{s.keys}</kbd>
             <span className="text-zinc-300">{s.desc}</span>
           </div>
         ))}
       </div>
     </div>
-  );
+  )
 }

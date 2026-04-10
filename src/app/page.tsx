@@ -1,51 +1,52 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { createClient, isDemoMode } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+import { useState } from "react"
+import { cn } from "@/lib/utils"
+import { createClient, isDemoMode } from "@/lib/supabase/client"
+import { useRouter } from "next/navigation"
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
-  const supabase = createClient();
-  const demo = isDemoMode();
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
+  const supabase = createClient()
+  const demo = isDemoMode()
 
   const handleDemo = () => {
     // /demo setea cookie y redirige a marcadores; si ya hay demo, ir directo
-    router.push(demo ? "/marcadores" : "/demo");
-    router.refresh();
-  };
+    router.push(demo ? "/marcadores" : "/demo")
+    router.refresh()
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    setLoading(false)
     if (error) {
-      setError(error.message);
-      return;
+      setError(error.message)
+      return
     }
-    router.push("/marcadores");
-    router.refresh();
-  };
+    router.push("/marcadores")
+    router.refresh()
+  }
 
   const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    const { error } = await supabase.auth.signUp({ email, password });
-    setLoading(false);
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    const { error } = await supabase.auth.signUp({ email, password })
+    setLoading(false)
     if (error) {
-      setError(error.message);
-      return;
+      setError(error.message)
+      return
     }
-    router.push("/marcadores");
-    router.refresh();
-  };
+    router.push("/marcadores")
+    router.refresh()
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-950 p-4">
@@ -63,10 +64,7 @@ export default function LoginPage() {
           >
             Probar demo
           </button>
-          <a
-            href="/demo"
-            className="mt-2 block text-center text-xs text-amber-400/90 hover:text-amber-300"
-          >
+          <a href="/demo" className="mt-2 block text-center text-xs text-amber-400/90 hover:text-amber-300">
             Enlace directo: /demo
           </a>
         </div>
@@ -77,7 +75,10 @@ export default function LoginPage() {
             value={email}
             data-no-vim
             onChange={(e) => setEmail(e.target.value)}
-            className="rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-white placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
+            className={cn(
+              "rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-white",
+              "placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
+            )}
             required
           />
           <input
@@ -86,7 +87,10 @@ export default function LoginPage() {
             value={password}
             data-no-vim
             onChange={(e) => setPassword(e.target.value)}
-            className="rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-white placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
+            className={cn(
+              "rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-white",
+              "placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
+            )}
             required
           />
           {error && <p className="text-sm text-red-400">{error}</p>}
@@ -94,7 +98,10 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+              className={cn(
+                "flex-1 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white",
+                "hover:bg-blue-700 disabled:opacity-50"
+              )}
             >
               {loading ? "..." : "Entrar"}
             </button>
@@ -102,7 +109,10 @@ export default function LoginPage() {
               type="button"
               onClick={handleSignUp}
               disabled={loading}
-              className="rounded-lg border border-zinc-600 px-4 py-2 text-zinc-300 hover:bg-zinc-800 disabled:opacity-50"
+              className={cn(
+                "rounded-lg border border-zinc-600 px-4 py-2 text-zinc-300",
+                "hover:bg-zinc-800 disabled:opacity-50"
+              )}
             >
               Registrarse
             </button>
@@ -115,5 +125,5 @@ export default function LoginPage() {
         )}
       </main>
     </div>
-  );
+  )
 }

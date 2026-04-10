@@ -1,23 +1,23 @@
-"use client";
+"use client"
 
-import { getFavicon } from "../utils";
-import type { Bookmark, GridItem } from "../types";
+import { getFavicon } from "../utils"
+import type { Bookmark, GridItem } from "../types"
 
-const DRAG_TYPE = "application/x-bookmark-item";
+const DRAG_TYPE = "application/x-bookmark-item"
 
 type Props = {
-  item: GridItem;
-  idx: number;
-  isSelected: boolean;
-  isCut: boolean;
-  selectMode: boolean;
-  isChecked: boolean;
-  itemRef: (el: HTMLDivElement | null) => void;
-  onSelect: (idx: number) => void;
-  onToggleSelect: (id: string) => void;
-  onDoubleClick: (item: GridItem) => void;
-  onDrop?: (sourceItem: GridItem, targetFolderId: string | null) => void;
-};
+  item: GridItem
+  idx: number
+  isSelected: boolean
+  isCut: boolean
+  selectMode: boolean
+  isChecked: boolean
+  itemRef: (el: HTMLDivElement | null) => void
+  onSelect: (idx: number) => void
+  onToggleSelect: (id: string) => void
+  onDoubleClick: (item: GridItem) => void
+  onDrop?: (sourceItem: GridItem, targetFolderId: string | null) => void
+}
 
 export default function BookmarkGridItem({
   item,
@@ -32,38 +32,46 @@ export default function BookmarkGridItem({
   onDoubleClick,
   onDrop,
 }: Props) {
-  const isFolder = item.type === "folder";
-  const targetFolderId = isFolder ? item.id : (item.bookmark.folder_id ?? null);
+  const isFolder = item.type === "folder"
+  const targetFolderId = isFolder ? item.id : (item.bookmark.folder_id ?? null)
 
   const handleDragStart = (e: React.DragEvent) => {
     const payload = isFolder
       ? { type: "folder" as const, id: item.id, name: item.label }
-      : { type: "link" as const, bookmark: { id: item.bookmark.id, url: item.bookmark.url } };
-    e.dataTransfer.setData(DRAG_TYPE, JSON.stringify(payload));
-    e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("text/plain", isFolder ? item.label : item.bookmark.title);
-  };
+      : { type: "link" as const, bookmark: { id: item.bookmark.id, url: item.bookmark.url } }
+    e.dataTransfer.setData(DRAG_TYPE, JSON.stringify(payload))
+    e.dataTransfer.effectAllowed = "move"
+    e.dataTransfer.setData("text/plain", isFolder ? item.label : item.bookmark.title)
+  }
 
   const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-  };
+    e.preventDefault()
+    e.dataTransfer.dropEffect = "move"
+  }
 
   const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const raw = e.dataTransfer.getData(DRAG_TYPE);
-    if (!raw || !onDrop) return;
+    e.preventDefault()
+    const raw = e.dataTransfer.getData(DRAG_TYPE)
+    if (!raw || !onDrop) return
     try {
-      const payload = JSON.parse(raw);
+      const payload = JSON.parse(raw)
       const sourceItem: GridItem =
         payload.type === "folder"
           ? { type: "folder", id: payload.id, folderId: payload.id, label: payload.name }
-          : { type: "link", bookmark: { id: payload.bookmark.id, title: "", url: payload.bookmark.url, folder_id: null } };
-      onDrop(sourceItem, targetFolderId);
+          : {
+              type: "link",
+              bookmark: {
+                id: payload.bookmark.id,
+                title: "",
+                url: payload.bookmark.url,
+                folder_id: null,
+              },
+            }
+      onDrop(sourceItem, targetFolderId)
     } catch {
       // ignore
     }
-  };
+  }
 
   const baseClass = `relative flex items-center gap-3 rounded-lg border px-4 py-3 transition-colors ${
     isCut ? "border-dashed border-amber-500/70 bg-amber-900/20 opacity-60" : ""
@@ -72,7 +80,7 @@ export default function BookmarkGridItem({
     (isSelected
       ? "border-blue-500 bg-blue-600/20 ring-2 ring-blue-500"
       : "border-zinc-800 bg-zinc-900/80 hover:border-zinc-600 hover:bg-zinc-800/50")
-  } ${selectMode && !isFolder ? "cursor-pointer" : ""}`;
+  } ${selectMode && !isFolder ? "cursor-pointer" : ""}`
 
   return (
     <div
@@ -81,8 +89,8 @@ export default function BookmarkGridItem({
       draggable
       className={`${baseClass} cursor-grab active:cursor-grabbing`}
       onClick={() => {
-        if (selectMode && !isFolder) onToggleSelect(item.bookmark.id);
-        else onSelect(idx);
+        if (selectMode && !isFolder) onToggleSelect(item.bookmark.id)
+        else onSelect(idx)
       }}
       onDoubleClick={() => onDoubleClick(item)}
       onDragStart={handleDragStart}
@@ -91,10 +99,10 @@ export default function BookmarkGridItem({
     >
       {selectMode && !isFolder && (
         <div
-          className="absolute left-3 top-3 z-10"
+          className="absolute top-3 left-3 z-10"
           onClick={(e) => {
-            e.stopPropagation();
-            onToggleSelect(item.bookmark.id);
+            e.stopPropagation()
+            onToggleSelect(item.bookmark.id)
           }}
         >
           <input
@@ -105,13 +113,9 @@ export default function BookmarkGridItem({
           />
         </div>
       )}
-      {isFolder ? (
-        <FolderContent label={item.label} />
-      ) : (
-        <LinkContent bookmark={item.bookmark} />
-      )}
+      {isFolder ? <FolderContent label={item.label} /> : <LinkContent bookmark={item.bookmark} />}
     </div>
-  );
+  )
 }
 
 function FolderContent({ label }: { label: string }) {
@@ -127,28 +131,29 @@ function FolderContent({ label }: { label: string }) {
         <p className="text-xs text-zinc-500">Carpeta</p>
       </div>
     </>
-  );
+  )
 }
 
 function LinkContent({ bookmark }: { bookmark: Bookmark }) {
-  const favicon = getFavicon(bookmark.url);
+  const favicon = getFavicon(bookmark.url)
   const hostname = (() => {
     try {
-      return new URL(bookmark.url).hostname.replace(/^www\./, "");
+      return new URL(bookmark.url).hostname.replace(/^www\./, "")
     } catch {
-      return bookmark.url;
+      return bookmark.url
     }
-  })();
+  })()
 
   return (
     <>
       {favicon ? (
+        // eslint-disable-next-line @next/next/no-img-element -- favicons dinámicos de terceros
         <img
           src={favicon}
           alt=""
           className="h-8 w-8 flex-shrink-0 rounded"
           onError={(e) => {
-            (e.target as HTMLImageElement).style.display = "none";
+            ;(e.target as HTMLImageElement).style.display = "none"
           }}
         />
       ) : (
@@ -163,5 +168,5 @@ function LinkContent({ bookmark }: { bookmark: Bookmark }) {
         <p className="truncate text-xs text-zinc-500">{hostname}</p>
       </div>
     </>
-  );
+  )
 }

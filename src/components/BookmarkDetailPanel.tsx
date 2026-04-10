@@ -1,95 +1,78 @@
-"use client";
+"use client"
 
-import { useState, useRef, useEffect } from "react";
-import { buildFolderOptions, getFaviconUrl, getFolderPathLabel } from "@/lib/bookmark-utils";
-import BookmarkDetailFolderSection from "./bookmark/BookmarkDetailFolderSection";
-import BookmarkDetailTagsSection from "./bookmark/BookmarkDetailTagsSection";
+import { useState, useRef, useEffect } from "react"
+import { buildFolderOptions, getFaviconUrl, getFolderPathLabel } from "@/lib/bookmark-utils"
+import BookmarkDetailFolderSection from "./bookmark/BookmarkDetailFolderSection"
+import BookmarkDetailTagsSection from "./bookmark/BookmarkDetailTagsSection"
 
 type Bookmark = {
-  id: string;
-  title: string;
-  url: string;
-  description?: string;
-  folder_id?: string | null;
-  tags?: string[];
-  created_at?: string;
-};
+  id: string
+  title: string
+  url: string
+  description?: string
+  folder_id?: string | null
+  tags?: string[]
+  created_at?: string
+}
 
-type Folder = { id: string; parent_id: string | null; name: string; sort_order: number };
+type Folder = { id: string; parent_id: string | null; name: string; sort_order: number }
 
 type Props = {
-  bookmark: Bookmark | null;
-  onClose: () => void;
-  onUpdate: (id: string, updates: Partial<Bookmark>) => Promise<void>;
-  allTags: string[];
-  folders: Folder[];
-  embedded?: boolean;
-};
+  bookmark: Bookmark | null
+  onClose: () => void
+  onUpdate: (id: string, updates: Partial<Bookmark>) => Promise<void>
+  allTags: string[]
+  folders: Folder[]
+  embedded?: boolean
+}
 
-export default function BookmarkDetailPanel({
+function BookmarkDetailPanelInner({
   bookmark,
   onClose,
   onUpdate,
   allTags,
   folders,
   embedded = false,
-}: Props) {
-  const [newTag, setNewTag] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [moveFolderId, setMoveFolderId] = useState<string>("");
-  const panelRef = useRef<HTMLDivElement>(null);
+}: Props & { bookmark: NonNullable<Props["bookmark"]> }) {
+  const [newTag, setNewTag] = useState("")
+  const [saving, setSaving] = useState(false)
+  const [moveFolderId, setMoveFolderId] = useState(bookmark.folder_id || "")
+  const panelRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      // No cerrar si hay un modal abierto (p. ej. crear/editar enlace) - que el modal lo maneje
-      if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
-      onClose();
-    };
-    if (bookmark) window.addEventListener("keydown", handleEscape);
-    return () => window.removeEventListener("keydown", handleEscape);
-  }, [bookmark, onClose]);
-
-  useEffect(() => {
-    if (bookmark) setMoveFolderId(bookmark.folder_id || "");
-  }, [bookmark?.folder_id]);
-
-  if (!bookmark) return null;
-
-  const tags = bookmark.tags || [];
-  const favicon = getFaviconUrl(bookmark.url);
+  const tags = bookmark.tags || []
+  const favicon = getFaviconUrl(bookmark.url)
   const created = bookmark.created_at
     ? new Date(bookmark.created_at).toLocaleDateString("es", {
         day: "numeric",
         month: "short",
         year: "numeric",
       })
-    : null;
-  const folderOptions = buildFolderOptions(folders);
-  const currentFolderPath = getFolderPathLabel(folders, bookmark.folder_id || null);
+    : null
+  const folderOptions = buildFolderOptions(folders)
+  const currentFolderPath = getFolderPathLabel(folders, bookmark.folder_id || null)
 
   const handleAddTag = async (tag: string) => {
-    const t = tag.trim();
-    if (!t || tags.includes(t)) return;
-    setSaving(true);
-    await onUpdate(bookmark.id, { tags: [...tags, t] });
-    setSaving(false);
-    setNewTag("");
-  };
+    const t = tag.trim()
+    if (!t || tags.includes(t)) return
+    setSaving(true)
+    await onUpdate(bookmark.id, { tags: [...tags, t] })
+    setSaving(false)
+    setNewTag("")
+  }
 
   const handleRemoveTag = async (tag: string) => {
-    setSaving(true);
-    await onUpdate(bookmark.id, { tags: tags.filter((t) => t !== tag) });
-    setSaving(false);
-  };
+    setSaving(true)
+    await onUpdate(bookmark.id, { tags: tags.filter((t) => t !== tag) })
+    setSaving(false)
+  }
 
   const handleMoveFolder = async () => {
-    const targetId = moveFolderId || null;
-    if (targetId === (bookmark.folder_id || null)) return;
-    setSaving(true);
-    await onUpdate(bookmark.id, { folder_id: targetId });
-    setSaving(false);
-  };
+    const targetId = moveFolderId || null
+    if (targetId === (bookmark.folder_id || null)) return
+    setSaving(true)
+    await onUpdate(bookmark.id, { folder_id: targetId })
+    setSaving(false)
+  }
 
   const panelContent = (
     <div
@@ -101,13 +84,13 @@ export default function BookmarkDetailPanel({
       onKeyDown={(e) => e.stopPropagation()}
       className={
         embedded
-          ? "flex h-full min-w-[280px] max-w-[320px] flex-col border-l border-zinc-700 bg-[#252526]"
-          : "fixed right-0 top-0 z-50 h-full w-80 border-l border-zinc-800 bg-zinc-900 shadow-xl"
+          ? "flex h-full max-w-[320px] min-w-[280px] flex-col border-l border-zinc-700 bg-[#252526]"
+          : "fixed top-0 right-0 z-50 h-full w-80 border-l border-zinc-800 bg-zinc-900 shadow-xl"
       }
     >
       <div className="flex h-full flex-col p-4">
         <div className="mb-4 flex items-center justify-between border-b border-zinc-700 pb-2">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+          <h3 className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
             {embedded ? "Propiedades" : "Detalle"}
           </h3>
           <button
@@ -122,12 +105,14 @@ export default function BookmarkDetailPanel({
         <div className="flex flex-1 flex-col gap-4 overflow-y-auto">
           <div className="flex items-start gap-3">
             {favicon && (
+              // Favicons externos dinámicos; next/image requeriría dominios en remotePatterns
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={favicon}
                 alt=""
                 className="h-10 w-10 flex-shrink-0 rounded"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = "none";
+                  ;(e.target as HTMLImageElement).style.display = "none"
                 }}
               />
             )}
@@ -186,14 +171,47 @@ export default function BookmarkDetailPanel({
         </div>
       </div>
     </div>
-  );
+  )
 
-  if (embedded) return panelContent;
+  if (embedded) return panelContent
 
   return (
     <>
       <div className="fixed inset-0 z-40 bg-black/40" onClick={onClose} aria-hidden />
       {panelContent}
     </>
-  );
+  )
+}
+
+export default function BookmarkDetailPanel({
+  bookmark,
+  onClose,
+  onUpdate,
+  allTags,
+  folders,
+  embedded = false,
+}: Props) {
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return
+      if (document.querySelector('[role="dialog"][aria-modal="true"]')) return
+      onClose()
+    }
+    if (bookmark) window.addEventListener("keydown", handleEscape)
+    return () => window.removeEventListener("keydown", handleEscape)
+  }, [bookmark, onClose])
+
+  if (!bookmark) return null
+
+  return (
+    <BookmarkDetailPanelInner
+      key={bookmark.id}
+      bookmark={bookmark}
+      onClose={onClose}
+      onUpdate={onUpdate}
+      allTags={allTags}
+      folders={folders}
+      embedded={embedded}
+    />
+  )
 }

@@ -1,16 +1,16 @@
-"use client";
+"use client"
 
 type Props = {
-  onNavigateUp: () => void;
-  onAddBookmark: () => void;
-  onNewFolder: () => void;
-  onDeleteFocused?: () => void;
-  hasFocusedItem: boolean;
-  infoPanelEnabled: boolean;
-  onToggleInfoPanel: () => void;
-  showSearch: boolean;
-  onToggleSearch: () => void;
-};
+  onNavigateUp: () => void
+  onAddBookmark: () => void
+  onNewFolder: () => void
+  onDeleteFocused?: () => void
+  hasFocusedItem: boolean
+  infoPanelEnabled: boolean
+  onToggleInfoPanel: () => void
+  showSearch: boolean
+  onToggleSearch: () => void
+}
 
 export default function ToolbarNavigationButtons({
   onNavigateUp,
@@ -94,5 +94,5 @@ export default function ToolbarNavigationButtons({
         </svg>
       </button>
     </>
-  );
+  )
 }

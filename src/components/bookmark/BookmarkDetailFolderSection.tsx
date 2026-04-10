@@ -1,16 +1,18 @@
-"use client";
+"use client"
 
-type FolderOption = { id: string; label: string };
+import { cn } from "@/lib/utils"
+
+type FolderOption = { id: string; label: string }
 
 type Props = {
-  currentFolderPath: string;
-  folderOptions: FolderOption[];
-  moveFolderId: string;
-  onMoveFolderIdChange: (id: string) => void;
-  onMove: () => void;
-  saving: boolean;
-  bookmarkFolderId: string | null;
-};
+  currentFolderPath: string
+  folderOptions: FolderOption[]
+  moveFolderId: string
+  onMoveFolderIdChange: (id: string) => void
+  onMove: () => void
+  saving: boolean
+  bookmarkFolderId: string | null
+}
 
 export default function BookmarkDetailFolderSection({
   currentFolderPath,
@@ -30,7 +32,10 @@ export default function BookmarkDetailFolderSection({
           <select
             value={moveFolderId}
             onChange={(e) => onMoveFolderIdChange(e.target.value)}
-            className="flex-1 rounded border border-zinc-600 bg-zinc-800 px-2 py-1 text-sm text-white focus:border-blue-500 focus:outline-none"
+            className={cn(
+              "flex-1 rounded border border-zinc-600 bg-zinc-800 px-2 py-1 text-sm text-white",
+              "focus:border-blue-500 focus:outline-none"
+            )}
           >
             <option value="">Raíz</option>
             {folderOptions.map((opt) => (
@@ -50,5 +55,5 @@ export default function BookmarkDetailFolderSection({
         </div>
       )}
     </div>
-  );
+  )
 }

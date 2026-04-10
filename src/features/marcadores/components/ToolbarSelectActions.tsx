@@ -1,13 +1,13 @@
-"use client";
+"use client"
 
 type Props = {
-  selectMode: boolean;
-  setSelectMode: (v: boolean | ((prev: boolean) => boolean)) => void;
-  selectedIds: Set<string>;
-  setSelectedIds: React.Dispatch<React.SetStateAction<Set<string>>>;
-  onEdit: () => void;
-  onDelete: () => void;
-};
+  selectMode: boolean
+  setSelectMode: (v: boolean | ((prev: boolean) => boolean)) => void
+  selectedIds: Set<string>
+  setSelectedIds: React.Dispatch<React.SetStateAction<Set<string>>>
+  onEdit: () => void
+  onDelete: () => void
+}
 
 export default function ToolbarSelectActions({
   selectMode,
@@ -21,8 +21,8 @@ export default function ToolbarSelectActions({
     <div className="ml-auto flex items-center gap-1">
       <button
         onClick={() => {
-          setSelectMode((m) => !m);
-          if (selectMode) setSelectedIds(new Set());
+          setSelectMode((m) => !m)
+          if (selectMode) setSelectedIds(new Set())
         }}
         className={`rounded px-2 py-1 text-xs ${
           selectMode ? "bg-zinc-600 text-white" : "text-zinc-400 hover:bg-zinc-600 hover:text-white"
@@ -39,14 +39,11 @@ export default function ToolbarSelectActions({
           >
             Editar
           </button>
-          <button
-            onClick={onDelete}
-            className="rounded px-2 py-1 text-xs text-red-400 hover:bg-red-600/20"
-          >
+          <button onClick={onDelete} className="rounded px-2 py-1 text-xs text-red-400 hover:bg-red-600/20">
             Eliminar ({selectedIds.size})
           </button>
         </>
       )}
     </div>
-  );
+  )
 }
