@@ -135,7 +135,7 @@ export default function BookmarkModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+      className="bg-app-overlay fixed inset-0 z-50 flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
@@ -147,10 +147,10 @@ export default function BookmarkModal({
         ref={modalContentRef}
         className={cn(
           "relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl",
-          "border border-zinc-700 bg-zinc-900 p-6 shadow-xl"
+          "border-app-border bg-app-raised border p-6 shadow-xl"
         )}
       >
-        <h2 id="modal-title" className="mb-4 text-xl font-bold text-white">
+        <h2 id="modal-title" className="text-app-fg mb-4 text-xl font-bold">
           {initialData ? "Editar marcador" : "Agregar marcador"}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -168,7 +168,7 @@ export default function BookmarkModal({
             tagInputRef={tagInputRef}
           />
           {submitError && (
-            <p className="rounded-lg border border-red-600/50 bg-red-900/20 px-3 py-2 text-sm text-red-400">
+            <p className="border-app-danger-border bg-app-danger-surface text-app-danger-fg rounded-lg border px-3 py-2 text-sm">
               {submitError}
             </p>
           )}
@@ -178,8 +178,8 @@ export default function BookmarkModal({
               onClick={onClose}
               disabled={submitting}
               className={cn(
-                "rounded-lg border border-zinc-600 px-4 py-2 text-zinc-300",
-                "hover:bg-zinc-800 disabled:opacity-50"
+                "border-app-input-border text-app-fg-secondary rounded-lg border px-4 py-2",
+                "hover:bg-app-raised-muted disabled:opacity-50"
               )}
             >
               Cancelar
@@ -187,7 +187,7 @@ export default function BookmarkModal({
             <button
               type="submit"
               disabled={submitting}
-              className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+              className="bg-app-primary hover:bg-app-primary-hover rounded-lg px-4 py-2 font-medium text-white disabled:opacity-50"
             >
               {submitting ? "Guardando..." : initialData ? "Guardar" : "Agregar"}
             </button>

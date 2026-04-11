@@ -26,8 +26,8 @@ export default function ToolbarSearchSection({ searchValue, setSearchValue, sear
           }
         }}
         className={cn(
-          "flex-1 rounded border border-zinc-600 bg-zinc-800 px-2 py-1 text-sm text-white",
-          "placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
+          "border-app-input-border bg-app-raised-muted text-app-fg flex-1 rounded border px-2 py-1 text-sm",
+          "placeholder-app-fg-label focus:border-app-focus focus:outline-none"
         )}
       />
     </div>

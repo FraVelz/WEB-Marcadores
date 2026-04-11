@@ -1,6 +1,6 @@
 "use client"
 
-import type { GridItem } from "../types"
+import type { GridItem } from "../utils/types"
 import ToolbarNavigationButtons from "./ToolbarNavigationButtons"
 import ToolbarSearchSection from "./ToolbarSearchSection"
 import ToolbarNewFolderSection from "./ToolbarNewFolderSection"
@@ -37,7 +37,7 @@ type Props = {
   setInfoPanelEnabled: (v: boolean | ((prev: boolean) => boolean)) => void
   flatList: GridItem[]
   selectedIndex: number
-  setDetailBookmark: (v: import("../types").Bookmark | null) => void
+  setDetailBookmark: (v: import("../utils/types").Bookmark | null) => void
 }
 
 export default function MarcadoresToolbar(props: Props) {
@@ -54,7 +54,7 @@ export default function MarcadoresToolbar(props: Props) {
   }
 
   return (
-    <div className="flex items-center gap-1 border-b border-zinc-700 bg-[#2d2d30] px-2 py-1">
+    <div className="border-app-border bg-app-toolbar flex items-center gap-1 border-b px-2 py-1">
       <ToolbarNavigationButtons
         onNavigateUp={props.onNavigateUp}
         onAddBookmark={props.onAddBookmark}

@@ -22,15 +22,18 @@ export default function ToolbarNewFolderSection({ newFolderName, setNewFolderNam
           if (e.key === "Escape") onCancel()
         }}
         className={cn(
-          "rounded border border-zinc-600 bg-zinc-800 px-2 py-1 text-sm text-white",
-          "placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
+          "border-app-input-border bg-app-raised-muted text-app-fg rounded border px-2 py-1 text-sm",
+          "placeholder-app-fg-label focus:border-app-focus focus:outline-none"
         )}
         autoFocus
       />
-      <button onClick={onCreateFolder} className="rounded bg-blue-600 px-2 py-1 text-sm text-white hover:bg-blue-700">
+      <button
+        onClick={onCreateFolder}
+        className="bg-app-primary hover:bg-app-primary-hover rounded px-2 py-1 text-sm text-white"
+      >
         Crear
       </button>
-      <button onClick={onCancel} className="rounded px-2 py-1 text-sm text-zinc-400 hover:bg-zinc-600">
+      <button onClick={onCancel} className="text-app-fg-muted hover:bg-app-active rounded px-2 py-1 text-sm">
         Cancelar
       </button>
     </div>

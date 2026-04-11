@@ -102,12 +102,29 @@ export const DEMO_TAGS = [
   "herramientas",
 ]
 
-export function isDemoMode(): boolean {
+/** Serializa cookies de `cookies()` (App Router) para pasarlas a `isDemoMode`. */
+export function cookieHeaderFromRequestCookies(cookieStore: { getAll(): { name: string; value: string }[] }): string {
+  return cookieStore
+    .getAll()
+    .map((c) => `${c.name}=${c.value}`)
+    .join("; ")
+}
+
+/**
+ * Modo demo: env forzado, Supabase ausente, o cookie `demo_session=true`.
+ * En Server Components, pasa `cookieHeaderFromRequestCookies(await cookies())`.
+ * Sin argumento en el servidor: la rama de cookie es false (no hay `document`).
+ */
+export function isDemoMode(cookieHeader?: string): boolean {
   if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") return true
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   if (!url || !key || url === "" || key === "") return true
-  // Con Supabase configurado: si el usuario eligió demo (cookie), usar modo demo
-  if (typeof document !== "undefined" && document.cookie.includes("demo_session=true")) return true
+  if (cookieHeader !== undefined) {
+    return cookieHeader.includes("demo_session=true")
+  }
+  if (typeof document !== "undefined") {
+    return document.cookie.includes("demo_session=true")
+  }
   return false
 }

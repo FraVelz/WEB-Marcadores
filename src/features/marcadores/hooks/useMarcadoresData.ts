@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useCallback, useMemo, useEffect } from "react"
-import { createClient, isDemoMode } from "@/lib/supabase/client"
+import { useDashboard } from "@/contexts/DashboardContext"
+import { createClient } from "@/lib/supabase/client"
 import { DEMO_BOOKMARKS, DEMO_FOLDERS } from "@/lib/demo-data"
-import { buildFolderTree, getFolderPath } from "../utils"
-import type { Bookmark, GridItem, FlatFolder } from "../types"
+import { buildFolderTree, getFolderPath } from "../utils/utils"
+import type { Bookmark, GridItem, FlatFolder } from "../utils/types"
 
 export function useMarcadoresData(
   searchValue: string,
@@ -12,13 +13,14 @@ export function useMarcadoresData(
   setCtxFolders: (folders: import("@/contexts/DashboardContext").Folder[]) => void,
   refreshFolders: () => void
 ) {
+  const { demoMode } = useDashboard()
   const supabase = createClient()
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([])
   const [folders, setFolders] = useState<FlatFolder[]>([])
   const [loading, setLoading] = useState(true)
 
   const fetchData = useCallback(async () => {
-    if (isDemoMode()) {
+    if (demoMode) {
       setBookmarks(DEMO_BOOKMARKS as Bookmark[])
       setFolders(DEMO_FOLDERS)
       setCtxFolders(buildFolderTree(DEMO_FOLDERS))
@@ -30,7 +32,7 @@ export function useMarcadoresData(
       refreshFolders()
     }
     setLoading(false)
-  }, [supabase, setCtxFolders, refreshFolders])
+  }, [demoMode, supabase, setCtxFolders, refreshFolders])
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -39,10 +41,10 @@ export function useMarcadoresData(
   }, [fetchData])
 
   useEffect(() => {
-    if (isDemoMode()) {
+    if (demoMode) {
       setCtxFolders(buildFolderTree(folders))
     }
-  }, [folders, setCtxFolders])
+  }, [demoMode, folders, setCtxFolders])
 
   const filteredBookmarks = useMemo(() => {
     const q = searchValue.trim().toLowerCase()

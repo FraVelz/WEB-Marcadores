@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useRef, useCallback, useState, useEffect } from "react"
-import { createClient, isDemoMode } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { DEMO_TAGS } from "@/lib/demo-data"
 
 export type ViewMode = "grid" | "hierarchical"
@@ -15,6 +15,8 @@ export type Folder = {
 }
 
 type DashboardContextType = {
+  /** Modo demo alineado con SSR (cookie + env). */
+  demoMode: boolean
   mainRef: React.RefObject<HTMLElement | null>
   sidebarRef: React.RefObject<HTMLDivElement | null>
   focusMain: () => void
@@ -35,7 +37,7 @@ type DashboardContextType = {
 
 const DashboardContext = createContext<DashboardContextType | null>(null)
 
-export function DashboardProvider({ children }: { children: React.ReactNode }) {
+export function DashboardProvider({ children, demoMode }: { children: React.ReactNode; demoMode: boolean }) {
   const mainRef = useRef<HTMLElement>(null)
   const sidebarRef = useRef<HTMLDivElement>(null)
   const [allTags, setAllTags] = useState<string[]>([])
@@ -46,7 +48,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const editFolderRef = useRef<((id: string, name: string) => void) | null>(null)
 
   const refreshTags = useCallback(async () => {
-    if (isDemoMode()) {
+    if (demoMode) {
       setAllTags(DEMO_TAGS)
       return
     }
@@ -59,10 +61,10 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       }
     }
     setAllTags(Array.from(tags).sort())
-  }, [])
+  }, [demoMode])
 
   const refreshFolders = useCallback(async () => {
-    if (isDemoMode()) return
+    if (demoMode) return
     const supabase = createClient()
     const { data } = await supabase.from("folders").select("*").order("sort_order")
     if (!data) return
@@ -77,7 +79,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       return list.sort((a, b) => a.sort_order - b.sort_order).map((f) => ({ ...f, children: buildTree(f.id) }))
     }
     setFolders(buildTree("root"))
-  }, [])
+  }, [demoMode])
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -106,6 +108,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   return (
     <DashboardContext.Provider
       value={{
+        demoMode,
         mainRef,
         sidebarRef,
         focusMain,

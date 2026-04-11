@@ -1,9 +1,10 @@
 "use client"
 
 import { useCallback } from "react"
-import { createClient, isDemoMode } from "@/lib/supabase/client"
-import { buildFolderTree } from "../utils"
-import type { Bookmark, FlatFolder } from "../types"
+import { useDashboard } from "@/contexts/DashboardContext"
+import { createClient } from "@/lib/supabase/client"
+import { buildFolderTree } from "../utils/utils"
+import type { Bookmark, FlatFolder } from "../utils/types"
 import type { BookmarkFormData } from "@/components/BookmarkModal"
 
 type UseMarcadoresActionsParams = {
@@ -32,13 +33,14 @@ export function useMarcadoresActions({
   setDetailBookmark,
 }: UseMarcadoresActionsParams) {
   void bookmarks
+  const { demoMode } = useDashboard()
   const supabase = createClient()
 
   const handleCreateFolder = useCallback(
     async (newFolderName: string) => {
       const name = newFolderName.trim()
       if (!name) return
-      if (isDemoMode()) {
+      if (demoMode) {
         const id = `f-${Date.now()}`
         setFolders((prev) => [...prev, { id, parent_id: selectedFolderId, name, sort_order: prev.length }])
         setCtxFolders(
@@ -65,7 +67,7 @@ export function useMarcadoresActions({
         }
       }
     },
-    [folders, selectedFolderId, supabase, setCtxFolders, refreshFolders, setFolders]
+    [demoMode, folders, selectedFolderId, supabase, setCtxFolders, refreshFolders, setFolders]
   )
 
   const handleModalSubmit = useCallback(
@@ -78,7 +80,7 @@ export function useMarcadoresActions({
         : []
       const folder_id = data.folder_id || null
 
-      if (isDemoMode()) {
+      if (demoMode) {
         if (editingBookmark) {
           setBookmarks((prev) =>
             prev.map((b) =>
@@ -150,13 +152,13 @@ export function useMarcadoresActions({
       await fetchData()
       refreshTags()
     },
-    [supabase, setBookmarks, setDetailBookmark, refreshTags, fetchData]
+    [demoMode, supabase, setBookmarks, setDetailBookmark, refreshTags, fetchData]
   )
 
   const handleDelete = useCallback(
     async (selectedIds: Set<string>, setSelectedIds: (v: Set<string>) => void, setSelectMode: (v: boolean) => void) => {
       if (selectedIds.size === 0) return
-      if (isDemoMode()) {
+      if (demoMode) {
         setBookmarks((prev) => prev.filter((b) => !selectedIds.has(b.id)))
         setSelectedIds(new Set())
         setSelectMode(false)
@@ -167,7 +169,7 @@ export function useMarcadoresActions({
       setSelectedIds(new Set())
       setSelectMode(false)
     },
-    [supabase, setBookmarks]
+    [demoMode, supabase, setBookmarks]
   )
 
   const handleDeleteFolder = useCallback(
@@ -180,7 +182,7 @@ export function useMarcadoresActions({
       }
       collect(folderId)
 
-      if (isDemoMode()) {
+      if (demoMode) {
         setBookmarks((prev) =>
           prev.map((b) => (b.folder_id && descendantIds.has(b.folder_id) ? { ...b, folder_id: parentId } : b))
         )
@@ -196,12 +198,12 @@ export function useMarcadoresActions({
       await supabase.from("folders").delete().in("id", Array.from(descendantIds))
       await fetchData()
     },
-    [folders, supabase, setBookmarks, setFolders, setCtxFolders, refreshFolders, fetchData]
+    [demoMode, folders, supabase, setBookmarks, setFolders, setCtxFolders, refreshFolders, fetchData]
   )
 
   const handleBookmarkUpdate = useCallback(
     async (id: string, updates: Partial<Bookmark>, detailBookmark: Bookmark | null) => {
-      if (isDemoMode()) {
+      if (demoMode) {
         setBookmarks((prev) => prev.map((b) => (b.id === id ? { ...b, ...updates } : b)))
         if (detailBookmark?.id === id) setDetailBookmark((prev) => (prev ? { ...prev, ...updates } : null))
         refreshTags()
@@ -212,12 +214,12 @@ export function useMarcadoresActions({
       if (detailBookmark?.id === id) setDetailBookmark((prev) => (prev ? { ...prev, ...updates } : null))
       refreshTags()
     },
-    [supabase, setBookmarks, setDetailBookmark, refreshTags]
+    [demoMode, supabase, setBookmarks, setDetailBookmark, refreshTags]
   )
 
   const handlePasteFolder = useCallback(
     async (folderId: string, destParentId: string | null) => {
-      if (isDemoMode()) {
+      if (demoMode) {
         setFolders((prev) => {
           const next = prev.map((f) => (f.id === folderId ? { ...f, parent_id: destParentId } : f))
           setCtxFolders(buildFolderTree(next))
@@ -228,14 +230,14 @@ export function useMarcadoresActions({
         await fetchData()
       }
     },
-    [supabase, setCtxFolders, fetchData, setFolders]
+    [demoMode, supabase, setCtxFolders, fetchData, setFolders]
   )
 
   const handleRenameFolder = useCallback(
     async (folderId: string, newName: string) => {
       const name = newName.trim()
       if (!name) return
-      if (isDemoMode()) {
+      if (demoMode) {
         setFolders((prev) => {
           const next = prev.map((f) => (f.id === folderId ? { ...f, name } : f))
           setCtxFolders(buildFolderTree(next))
@@ -246,19 +248,19 @@ export function useMarcadoresActions({
         await fetchData()
       }
     },
-    [supabase, setCtxFolders, fetchData, setFolders]
+    [demoMode, supabase, setCtxFolders, fetchData, setFolders]
   )
 
   const handlePasteLink = useCallback(
     async (bookmarkId: string, destFolderId: string | null) => {
-      if (isDemoMode()) {
+      if (demoMode) {
         setBookmarks((prev) => prev.map((b) => (b.id === bookmarkId ? { ...b, folder_id: destFolderId } : b)))
       } else {
         await supabase.from("bookmarks").update({ folder_id: destFolderId }).eq("id", bookmarkId)
         await fetchData()
       }
     },
-    [supabase, setBookmarks, fetchData]
+    [demoMode, supabase, setBookmarks, fetchData]
   )
 
   return {

@@ -8,8 +8,8 @@ export default function PasteErrorBanner({ message }: Props) {
   return (
     <div
       className={cn(
-        "flex items-center justify-center gap-2 border-b border-red-500/50",
-        "bg-red-900/30 px-3 py-2 text-sm text-red-200"
+        "border-app-danger-border flex items-center justify-center gap-2 border-b",
+        "bg-app-danger-surface text-app-danger-banner-fg px-3 py-2 text-sm"
       )}
     >
       <svg className="h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">

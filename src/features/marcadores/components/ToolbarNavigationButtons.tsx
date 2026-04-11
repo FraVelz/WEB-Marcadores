@@ -28,18 +28,18 @@ export default function ToolbarNavigationButtons({
       <button
         type="button"
         onClick={onNavigateUp}
-        className="rounded p-1.5 text-zinc-400 hover:bg-zinc-600 hover:text-white"
+        className="text-app-fg-muted hover:bg-app-active hover:text-app-fg rounded p-1.5"
         title="Subir"
       >
         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z" />
         </svg>
       </button>
-      <div className="mx-1 h-5 w-px bg-zinc-600" />
+      <div className="bg-app-active mx-1 h-5 w-px" />
       <button
         type="button"
         onClick={onAddBookmark}
-        className="rounded p-1.5 text-zinc-400 hover:bg-zinc-600 hover:text-white"
+        className="text-app-fg-muted hover:bg-app-active hover:text-app-fg rounded p-1.5"
         title="Nuevo marcador"
       >
         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
@@ -49,7 +49,7 @@ export default function ToolbarNavigationButtons({
       <button
         type="button"
         onClick={onNewFolder}
-        className="rounded p-1.5 text-zinc-400 hover:bg-zinc-600 hover:text-white"
+        className="text-app-fg-muted hover:bg-app-active hover:text-app-fg rounded p-1.5"
         title="Nueva carpeta"
       >
         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
@@ -60,7 +60,7 @@ export default function ToolbarNavigationButtons({
         <button
           type="button"
           onClick={onDeleteFocused}
-          className="rounded p-1.5 text-zinc-400 hover:bg-red-600/20 hover:text-red-400"
+          className="text-app-fg-muted hover:bg-app-danger/15 hover:text-app-danger-fg rounded p-1.5"
           title="Eliminar (dd)"
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
@@ -72,7 +72,7 @@ export default function ToolbarNavigationButtons({
         type="button"
         onClick={onToggleInfoPanel}
         className={`rounded p-1.5 ${
-          infoPanelEnabled ? "bg-zinc-600 text-white" : "text-zinc-400 hover:bg-zinc-600 hover:text-white"
+          infoPanelEnabled ? "bg-app-active text-app-fg" : "text-app-fg-muted hover:bg-app-active hover:text-app-fg"
         }`}
         title="Modo información (i)"
       >
@@ -80,12 +80,12 @@ export default function ToolbarNavigationButtons({
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-4h-2V7h2v2z" />
         </svg>
       </button>
-      <div className="mx-1 h-5 w-px bg-zinc-600" />
+      <div className="bg-app-active mx-1 h-5 w-px" />
       <button
         type="button"
         onClick={onToggleSearch}
         className={`rounded p-1.5 ${
-          showSearch ? "bg-zinc-600 text-white" : "text-zinc-400 hover:bg-zinc-600 hover:text-white"
+          showSearch ? "bg-app-active text-app-fg" : "text-app-fg-muted hover:bg-app-active hover:text-app-fg"
         }`}
         title="Buscar (Ctrl+F)"
       >
