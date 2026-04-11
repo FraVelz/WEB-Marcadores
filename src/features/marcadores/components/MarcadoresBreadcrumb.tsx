@@ -1,6 +1,6 @@
 "use client"
 
-import type { BreadcrumbPart } from "../types"
+import type { BreadcrumbPart } from "../utils/types"
 
 type Props = {
   breadcrumb: BreadcrumbPart[]
@@ -9,14 +9,14 @@ type Props = {
 
 export default function MarcadoresBreadcrumb({ breadcrumb, onSelect }: Props) {
   return (
-    <div className="flex items-center gap-1 border-b border-zinc-700 bg-[#252526] px-3 py-1.5">
+    <div className="border-app-border bg-app-sidebar flex items-center gap-1 border-b px-3 py-1.5">
       {breadcrumb.map((part, i) => (
         <span key={part.id ?? "root"} className="flex items-center gap-1">
-          {i > 0 && <span className="text-zinc-600">›</span>}
+          {i > 0 && <span className="text-app-fg-icon">›</span>}
           <button
             type="button"
             onClick={() => onSelect(part.id)}
-            className="rounded px-1.5 py-0.5 text-sm text-zinc-300 hover:bg-zinc-600 hover:text-white"
+            className="text-app-fg-secondary hover:bg-app-active hover:text-app-fg rounded px-1.5 py-0.5 text-sm"
           >
             {part.label}
           </button>

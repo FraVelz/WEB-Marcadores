@@ -12,9 +12,9 @@ type Props = {
 export default function BookmarkFormBasicInfo({ title, url, description, firstInputRef }: Props) {
   return (
     <section className="space-y-4">
-      <h3 className="text-sm font-medium text-zinc-400">Información básica</h3>
+      <h3 className="text-app-fg-muted text-sm font-medium">Información básica</h3>
       <div>
-        <label className="mb-1 block text-xs text-zinc-500">Título *</label>
+        <label className="text-app-fg-label mb-1 block text-xs">Título *</label>
         <input
           ref={firstInputRef}
           name="title"
@@ -23,13 +23,13 @@ export default function BookmarkFormBasicInfo({ title, url, description, firstIn
           autoComplete="off"
           data-no-vim
           className={cn(
-            "w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-white",
-            "focus:border-blue-500 focus:outline-none"
+            "border-app-input-border bg-app-raised-muted text-app-fg w-full rounded-lg border px-3 py-2",
+            "focus:border-app-focus focus:outline-none"
           )}
         />
       </div>
       <div>
-        <label className="mb-1 block text-xs text-zinc-500">URL *</label>
+        <label className="text-app-fg-label mb-1 block text-xs">URL *</label>
         <input
           name="url"
           type="url"
@@ -37,20 +37,20 @@ export default function BookmarkFormBasicInfo({ title, url, description, firstIn
           required
           data-no-vim
           className={cn(
-            "w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-white",
-            "focus:border-blue-500 focus:outline-none"
+            "border-app-input-border bg-app-raised-muted text-app-fg w-full rounded-lg border px-3 py-2",
+            "focus:border-app-focus focus:outline-none"
           )}
         />
       </div>
       <div>
-        <label className="mb-1 block text-xs text-zinc-500">Descripción</label>
+        <label className="text-app-fg-label mb-1 block text-xs">Descripción</label>
         <input
           name="description"
           defaultValue={description}
           data-no-vim
           className={cn(
-            "w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-white",
-            "placeholder-zinc-500 focus:border-blue-500 focus:outline-none"
+            "border-app-input-border bg-app-raised-muted text-app-fg w-full rounded-lg border px-3 py-2",
+            "placeholder-app-fg-label focus:border-app-focus focus:outline-none"
           )}
         />
       </div>

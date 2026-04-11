@@ -1,6 +1,6 @@
 "use client"
 
-import type { GridItem, CutItem } from "../types"
+import type { GridItem, CutItem } from "../utils/types"
 import BookmarkGridItem from "./BookmarkGridItem"
 
 const DRAG_TYPE = "application/x-bookmark-item"
@@ -107,20 +107,20 @@ export default function BookmarkGrid({
 
 function EmptyState({ onAddBookmark, onNewFolder }: { onAddBookmark: () => void; onNewFolder: () => void }) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 text-zinc-500">
-      <svg className="mb-4 h-16 w-16 text-zinc-600" viewBox="0 0 24 24" fill="currentColor">
+    <div className="text-app-fg-label flex flex-col items-center justify-center py-16">
+      <svg className="text-app-empty-icon mb-4 h-16 w-16" viewBox="0 0 24 24" fill="currentColor">
         <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
       </svg>
       <p className="text-sm">Esta carpeta está vacía</p>
       <button
         onClick={onAddBookmark}
-        className="mt-2 rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+        className="bg-app-primary hover:bg-app-primary-hover mt-2 rounded px-4 py-2 text-sm text-white"
       >
         Agregar marcador
       </button>
       <button
         onClick={onNewFolder}
-        className="mt-2 rounded border border-zinc-600 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800"
+        className="border-app-input-border text-app-fg-secondary hover:bg-app-raised-muted mt-2 rounded border px-4 py-2 text-sm"
       >
         Nueva carpeta
       </button>

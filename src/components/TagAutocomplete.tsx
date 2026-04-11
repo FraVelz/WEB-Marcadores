@@ -136,7 +136,7 @@ export default function TagAutocomplete({
           role="listbox"
           className={cn(
             "absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-lg",
-            "border border-zinc-600 bg-zinc-800 py-1 shadow-lg"
+            "border-app-input-border bg-app-raised-muted border py-1 shadow-lg"
           )}
         >
           {filtered.map((tag, i) => (
@@ -146,7 +146,7 @@ export default function TagAutocomplete({
               role="option"
               aria-selected={i === effectiveIndex}
               className={`cursor-pointer px-3 py-2 text-sm ${
-                i === effectiveIndex ? "bg-zinc-700 text-white" : "text-zinc-300 hover:bg-zinc-700"
+                i === effectiveIndex ? "bg-app-hover text-app-fg" : "text-app-fg-secondary hover:bg-app-hover"
               }`}
               onMouseEnter={() => setHighlightedIndex(i)}
               onMouseDown={(e) => {

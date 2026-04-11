@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import type { GridItem } from "../types"
+import type { GridItem } from "../utils/types"
 
 type Props = {
   flatList: GridItem[]
@@ -13,8 +13,8 @@ export default function MarcadoresFooter({ flatList, selectedIndex }: Props) {
   return (
     <div
       className={cn(
-        "flex items-center justify-between border-t border-zinc-700",
-        "bg-[#252526] px-3 py-1 text-xs text-zinc-500"
+        "border-app-border flex items-center justify-between border-t",
+        "bg-app-sidebar text-app-fg-label px-3 py-1 text-xs"
       )}
     >
       <span>

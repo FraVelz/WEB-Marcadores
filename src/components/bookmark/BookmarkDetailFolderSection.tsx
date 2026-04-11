@@ -25,16 +25,16 @@ export default function BookmarkDetailFolderSection({
 }: Props) {
   return (
     <div>
-      <label className="mb-1 block text-xs text-zinc-500">Carpeta actual</label>
-      <p className="text-sm text-zinc-300">{currentFolderPath}</p>
+      <label className="text-app-fg-label mb-1 block text-xs">Carpeta actual</label>
+      <p className="text-app-fg-secondary text-sm">{currentFolderPath}</p>
       {folderOptions.length > 0 && (
         <div className="mt-2 flex gap-2">
           <select
             value={moveFolderId}
             onChange={(e) => onMoveFolderIdChange(e.target.value)}
             className={cn(
-              "flex-1 rounded border border-zinc-600 bg-zinc-800 px-2 py-1 text-sm text-white",
-              "focus:border-blue-500 focus:outline-none"
+              "border-app-input-border bg-app-raised-muted text-app-fg flex-1 rounded border px-2 py-1 text-sm",
+              "focus:border-app-focus focus:outline-none"
             )}
           >
             <option value="">Raíz</option>
@@ -48,7 +48,7 @@ export default function BookmarkDetailFolderSection({
             type="button"
             onClick={onMove}
             disabled={saving || moveFolderId === (bookmarkFolderId || "")}
-            className="rounded bg-zinc-700 px-2 py-1 text-xs text-white hover:bg-zinc-600 disabled:opacity-50"
+            className="bg-app-hover text-app-fg hover:bg-app-active rounded px-2 py-1 text-xs disabled:opacity-50"
           >
             Mover
           </button>

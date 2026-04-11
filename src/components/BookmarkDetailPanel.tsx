@@ -84,18 +84,18 @@ function BookmarkDetailPanelInner({
       onKeyDown={(e) => e.stopPropagation()}
       className={
         embedded
-          ? "flex h-full max-w-[320px] min-w-[280px] flex-col border-l border-zinc-700 bg-[#252526]"
-          : "fixed top-0 right-0 z-50 h-full w-80 border-l border-zinc-800 bg-zinc-900 shadow-xl"
+          ? "border-app-border bg-app-sidebar flex h-full max-w-[320px] min-w-[280px] flex-col border-l"
+          : "border-app-border-muted bg-app-raised fixed top-0 right-0 z-50 h-full w-80 border-l shadow-xl"
       }
     >
       <div className="flex h-full flex-col p-4">
-        <div className="mb-4 flex items-center justify-between border-b border-zinc-700 pb-2">
-          <h3 className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
+        <div className="border-app-border mb-4 flex items-center justify-between border-b pb-2">
+          <h3 className="text-app-fg-label text-xs font-semibold tracking-wider uppercase">
             {embedded ? "Propiedades" : "Detalle"}
           </h3>
           <button
             onClick={onClose}
-            className="rounded p-1 text-zinc-500 hover:bg-zinc-700 hover:text-white"
+            className="text-app-fg-label hover:bg-app-hover hover:text-app-fg rounded p-1"
             aria-label="Cerrar"
           >
             ✕
@@ -117,12 +117,12 @@ function BookmarkDetailPanelInner({
               />
             )}
             <div className="min-w-0 flex-1">
-              <h2 className="font-semibold text-white">{bookmark.title}</h2>
+              <h2 className="text-app-fg font-semibold">{bookmark.title}</h2>
               <a
                 href={bookmark.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-1 block truncate text-xs text-blue-400 hover:underline"
+                className="text-app-link mt-1 block truncate text-xs hover:underline"
               >
                 {bookmark.url}
               </a>
@@ -141,12 +141,12 @@ function BookmarkDetailPanelInner({
 
           {bookmark.description && (
             <div>
-              <label className="mb-1 block text-xs text-zinc-500">Descripción</label>
-              <p className="text-sm text-zinc-300">{bookmark.description}</p>
+              <label className="text-app-fg-label mb-1 block text-xs">Descripción</label>
+              <p className="text-app-fg-secondary text-sm">{bookmark.description}</p>
             </div>
           )}
 
-          {created && <p className="text-xs text-zinc-500">Añadido: {created}</p>}
+          {created && <p className="text-app-fg-label text-xs">Añadido: {created}</p>}
 
           <BookmarkDetailTagsSection
             tags={tags}
@@ -159,12 +159,12 @@ function BookmarkDetailPanelInner({
           />
         </div>
 
-        <div className="mt-4 flex gap-2 border-t border-zinc-800 pt-4">
+        <div className="border-app-border-muted mt-4 flex gap-2 border-t pt-4">
           <a
             href={bookmark.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 rounded-lg bg-blue-600 py-2 text-center text-sm font-medium text-white hover:bg-blue-700"
+            className="bg-app-primary hover:bg-app-primary-hover flex-1 rounded-lg py-2 text-center text-sm font-medium text-white"
           >
             Abrir
           </a>
@@ -177,7 +177,7 @@ function BookmarkDetailPanelInner({
 
   return (
     <>
-      <div className="fixed inset-0 z-40 bg-black/40" onClick={onClose} aria-hidden />
+      <div className="bg-app-overlay-strong fixed inset-0 z-40" onClick={onClose} aria-hidden />
       {panelContent}
     </>
   )

@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import type { GridItem } from "../types"
+import type { GridItem } from "../utils/types"
 
 type Props = {
   item: GridItem
@@ -16,18 +16,26 @@ export default function DeleteConfirmBanner({ item, onConfirm, onCancel }: Props
   return (
     <div
       className={cn(
-        "flex items-center justify-between gap-4 border-b border-red-500/50",
-        "bg-red-900/30 px-3 py-2 text-sm text-red-200"
+        "border-app-danger-border flex items-center justify-between gap-4 border-b",
+        "bg-app-danger-surface text-app-danger-banner-fg px-3 py-2 text-sm"
       )}
     >
       <span>
         ¿Eliminar {typeLabel} &quot;{label}&quot;? Enter para confirmar, Esc para cancelar
       </span>
       <div className="flex gap-2">
-        <button type="button" onClick={onConfirm} className="rounded bg-red-600 px-3 py-1 font-medium hover:bg-red-700">
+        <button
+          type="button"
+          onClick={onConfirm}
+          className="bg-app-danger hover:bg-app-danger-hover rounded px-3 py-1 font-medium text-white"
+        >
           Eliminar
         </button>
-        <button type="button" onClick={onCancel} className="rounded border border-zinc-600 px-3 py-1 hover:bg-zinc-700">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="border-app-input-border hover:bg-app-hover rounded border px-3 py-1"
+        >
           Cancelar
         </button>
       </div>

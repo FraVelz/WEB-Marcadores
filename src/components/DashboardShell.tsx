@@ -181,24 +181,24 @@ export default function DashboardShell({ children }: { children: React.ReactNode
   }, [pathname, focusMain, focusSidebar, sidebarRef, router])
 
   return (
-    <div className="flex min-h-screen bg-[#1e1e1e]">
+    <div className="bg-app-canvas flex min-h-screen">
       {/* Panel izquierdo - Árbol de carpetas (estilo Explorer) */}
-      <aside className="flex h-screen w-56 flex-col border-r border-zinc-700 bg-[#252526]">
-        <div className="border-b border-zinc-700 px-3 py-2">
-          <span className="text-xs font-medium tracking-wider text-zinc-500 uppercase">Explorador</span>
+      <aside className="border-app-border bg-app-sidebar flex h-screen w-56 flex-col border-r">
+        <div className="border-app-border border-b px-3 py-2">
+          <span className="text-app-fg-label text-xs font-medium tracking-wider uppercase">Explorador</span>
         </div>
-        <nav className="flex flex-col gap-0.5 border-b border-zinc-700 p-2">
+        <nav className="border-app-border flex flex-col gap-0.5 border-b p-2">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               className={`flex items-center gap-2 rounded px-2 py-1.5 text-sm transition-colors ${
                 pathname === item.href
-                  ? "bg-zinc-600/80 text-white"
-                  : "text-zinc-300 hover:bg-zinc-700 hover:text-white"
+                  ? "bg-app-nav-active text-app-fg"
+                  : "text-app-fg-secondary hover:bg-app-hover hover:text-app-fg"
               }`}
             >
-              <svg className="h-4 w-4 flex-shrink-0 text-zinc-500" viewBox="0 0 24 24" fill="currentColor">
+              <svg className="text-app-fg-icon h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
               </svg>
               {item.label}
@@ -226,7 +226,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
       <main
         ref={mainRef}
         tabIndex={0}
-        className="flex flex-1 flex-col overflow-hidden bg-[#1e1e1e] outline-none focus:ring-0"
+        className="bg-app-canvas flex flex-1 flex-col overflow-hidden outline-none focus:ring-0"
         onKeyDown={(e) => mainKeyDownRef.current?.(e)}
       >
         {children}

@@ -1,9 +1,9 @@
 "use client"
 
 import { useCallback, useRef } from "react"
-import { isFolderDescendant } from "../utils"
-import type { Bookmark, GridItem, CutItem, FlatFolder } from "../types"
-import type { BreadcrumbPart } from "../types"
+import { isFolderDescendant } from "../utils/utils"
+import type { Bookmark, GridItem, CutItem, FlatFolder } from "../utils/types"
+import type { BreadcrumbPart } from "../utils/types"
 
 const DD_TIMEOUT_MS = 400
 
