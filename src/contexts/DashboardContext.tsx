@@ -1,8 +1,9 @@
 "use client"
 
-import { createContext, useContext, useRef, useCallback, useState, useEffect } from "react"
+import { createContext, use, useRef, useCallback, useState, useEffect, useEffectEvent } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { DEMO_TAGS } from "@/lib/demo-data"
+import { sortedUniqueTagsFromRows } from "@/lib/bookmark-tags"
 
 export type ViewMode = "grid" | "hierarchical"
 
@@ -23,6 +24,8 @@ type DashboardContextType = {
   focusSidebar: () => void
   allTags: string[]
   refreshTags: () => void
+  /** Sincroniza etiquetas desde filas ya cargadas (ej. tras `select("*")` en Marcadores); evita una petición extra al arrancar en modo normal. */
+  setAllTagsFromBookmarks: (rows: { tags?: string[] | null }[]) => void
   viewMode: ViewMode
   setViewMode: (m: ViewMode) => void
   setMainKeyDown: (handler: ((e: React.KeyboardEvent) => void) | null) => void
@@ -54,14 +57,12 @@ export function DashboardProvider({ children, demoMode }: { children: React.Reac
     }
     const supabase = createClient()
     const { data } = await supabase.from("bookmarks").select("tags")
-    const tags = new Set<string>()
-    for (const row of data || []) {
-      for (const t of row.tags || []) {
-        if (t?.trim()) tags.add(t.trim())
-      }
-    }
-    setAllTags(Array.from(tags).sort())
+    setAllTags(sortedUniqueTagsFromRows(data || []))
   }, [demoMode])
+
+  const setAllTagsFromBookmarks = useCallback((rows: { tags?: string[] | null }[]) => {
+    setAllTags(sortedUniqueTagsFromRows(rows))
+  }, [])
 
   const refreshFolders = useCallback(async () => {
     if (demoMode) return
@@ -81,17 +82,26 @@ export function DashboardProvider({ children, demoMode }: { children: React.Reac
     setFolders(buildTree("root"))
   }, [demoMode])
 
+  const refreshTagsEffect = useEffectEvent(() => {
+    void refreshTags()
+  })
+
   useEffect(() => {
+    if (!demoMode) return
     queueMicrotask(() => {
-      void refreshTags()
+      refreshTagsEffect()
     })
-  }, [refreshTags])
+  }, [demoMode])
+
+  const refreshFoldersEffect = useEffectEvent(() => {
+    void refreshFolders()
+  })
 
   useEffect(() => {
     queueMicrotask(() => {
-      void refreshFolders()
+      refreshFoldersEffect()
     })
-  }, [refreshFolders])
+  }, [demoMode])
 
   const setMainKeyDown = useCallback((handler: ((e: React.KeyboardEvent) => void) | null) => {
     mainKeyDownRef.current = handler
@@ -115,6 +125,7 @@ export function DashboardProvider({ children, demoMode }: { children: React.Reac
         focusSidebar,
         allTags,
         refreshTags,
+        setAllTagsFromBookmarks,
         viewMode,
         setViewMode,
         setMainKeyDown,
@@ -133,7 +144,8 @@ export function DashboardProvider({ children, demoMode }: { children: React.Reac
 }
 
 export function useDashboard() {
-  const ctx = useContext(DashboardContext)
+  const ctx = use(DashboardContext)
   if (!ctx) throw new Error("useDashboard must be used within DashboardProvider")
+
   return ctx
 }

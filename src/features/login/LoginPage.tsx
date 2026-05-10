@@ -58,7 +58,10 @@ export function LoginPage({ demo }: { demo: boolean }) {
 
             <button
               type="button"
-              onClick={handleSignUp}
+              onClick={(e) => {
+                e.preventDefault()
+                handleSignUp()
+              }}
               disabled={loading}
               className={cn(
                 "border-app-input-border text-app-fg-secondary rounded-lg border px-4 py-2",
@@ -79,7 +82,10 @@ export function LoginPage({ demo }: { demo: boolean }) {
 
           <button
             type="button"
-            onClick={handleDemo}
+            onClick={(e) => {
+              e.preventDefault()
+              handleDemo()
+            }}
             className={cn(
               "bg-app-login-demo-btn mt-3 w-full cursor-pointer rounded-lg py-2 font-medium text-white",
               "hover:bg-app-login-demo-btn-hover"
