@@ -12,7 +12,7 @@ function isDemoMode(): boolean {
 
 const DEMO_COOKIE = "demo_session"
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Siempre permitir /demo: redirigir a marcadores con cookie para modo demo
   if (request.nextUrl.pathname === "/demo") {
     const res = NextResponse.redirect(new URL("/marcadores", request.url))
@@ -57,7 +57,7 @@ export async function middleware(request: NextRequest) {
     }
   } catch {
     // NetworkError o fallo de conexión: permitir acceso (modo demo implícito)
-    // Evita que el middleware bloquee la app si Supabase no responde
+    // Evita que el proxy bloquee la app si Supabase no responde
   }
   return response
 }

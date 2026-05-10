@@ -2,6 +2,8 @@
 
 import type { Folder } from "@/contexts/DashboardContext"
 
+import { cn } from "@/lib/utils"
+
 type Props = {
   folders: Folder[]
   selectedFolderId: string | null
@@ -33,11 +35,12 @@ function TreeLevel({ folders, selectedFolderId, onSelect, collapsedIds, onToggle
                 if (hasChildren) onToggle(folder.id)
                 onSelect(folder.id)
               }}
-              className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm transition-colors ${
+              className={cn(
+                "flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm transition-colors",
                 isSelected
                   ? "bg-app-list-selected text-app-fg"
                   : "text-app-fg-secondary hover:bg-app-hover hover:text-app-fg"
-              }`}
+              )}
               style={{ paddingLeft: `${8 + depth * 12}px` }}
             >
               <span className="text-app-fg-label w-4 flex-shrink-0">
@@ -69,14 +72,20 @@ export default function ExplorerTree({ folders, selectedFolderId, onSelect, coll
       <button
         type="button"
         onClick={() => onSelect(null)}
-        className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm transition-colors ${
+        className={cn(
+          "flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm transition-colors",
           !selectedFolderId
             ? "bg-app-list-selected text-app-fg"
             : "text-app-fg-secondary hover:bg-app-hover hover:text-app-fg"
-        }`}
+        )}
       >
         <svg className="text-app-accent h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M3 3h8v2H3V3zm0 4h8v2H3V7zm0 4h8v2H3v-2zm0 4h8v2H3v-2zm10-8h8v2h-8V3zm0 4h8v2h-8V7zm0 4h8v2h-8v-2zm0 4h8v2h-8v-2z" />
+          <path
+            d={
+              "M3 3h8v2H3V3zm0 4h8v2H3V7zm0 4h8v2H3v-2zm0 4h8v2H3v-2z" +
+              "m10-8h8v2h-8V3zm0 4h8v2h-8V7zm0 4h8v2h-8v-2zm0 4h8v2h-8v-2z"
+            }
+          />
         </svg>
         <span>Marcadores</span>
       </button>

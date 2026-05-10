@@ -75,7 +75,10 @@ export default function BookmarkModal({
     if (!isOpen || !modalContentRef.current) return
     const el = modalContentRef.current
     const focusables = el.querySelectorAll<HTMLElement>(
-      'input:not([disabled]), textarea:not([disabled]), button:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      [
+        "input:not([disabled]), textarea:not([disabled]), button:not([disabled]),",
+        "select:not([disabled]), [tabindex]:not([tabindex='-1'])",
+      ].join(" ")
     )
     const first = focusables[0]
     const last = focusables[focusables.length - 1]
@@ -168,7 +171,12 @@ export default function BookmarkModal({
             tagInputRef={tagInputRef}
           />
           {submitError && (
-            <p className="border-app-danger-border bg-app-danger-surface text-app-danger-fg rounded-lg border px-3 py-2 text-sm">
+            <p
+              className={cn(
+                "border-app-danger-border bg-app-danger-surface text-app-danger-fg rounded-lg border px-3 py-2",
+                "text-sm"
+              )}
+            >
               {submitError}
             </p>
           )}
@@ -187,7 +195,10 @@ export default function BookmarkModal({
             <button
               type="submit"
               disabled={submitting}
-              className="bg-app-primary hover:bg-app-primary-hover rounded-lg px-4 py-2 font-medium text-white disabled:opacity-50"
+              className={cn(
+                "bg-app-primary rounded-lg px-4 py-2 font-medium text-white disabled:opacity-50",
+                "hover:bg-app-primary-hover"
+              )}
             >
               {submitting ? "Guardando..." : initialData ? "Guardar" : "Agregar"}
             </button>

@@ -1,5 +1,7 @@
 "use client"
 
+import { cn } from "@/lib/utils"
+
 type Props = {
   selectMode: boolean
   setSelectMode: (v: boolean | ((prev: boolean) => boolean)) => void
@@ -24,9 +26,10 @@ export default function ToolbarSelectActions({
           setSelectMode((m) => !m)
           if (selectMode) setSelectedIds(new Set())
         }}
-        className={`rounded px-2 py-1 text-xs ${
+        className={cn(
+          "rounded px-2 py-1 text-xs",
           selectMode ? "bg-app-active text-app-fg" : "text-app-fg-muted hover:bg-app-active hover:text-app-fg"
-        }`}
+        )}
       >
         Seleccionar
       </button>
@@ -35,11 +38,17 @@ export default function ToolbarSelectActions({
           <button
             onClick={onEdit}
             disabled={selectedIds.size !== 1}
-            className="text-app-fg-muted hover:bg-app-active hover:text-app-fg rounded px-2 py-1 text-xs disabled:opacity-50"
+            className={cn(
+              "text-app-fg-muted rounded px-2 py-1 text-xs disabled:opacity-50",
+              "hover:bg-app-active hover:text-app-fg"
+            )}
           >
             Editar
           </button>
-          <button onClick={onDelete} className="text-app-danger-fg hover:bg-app-danger/20 rounded px-2 py-1 text-xs">
+          <button
+            onClick={onDelete}
+            className={cn("text-app-danger-fg rounded px-2 py-1 text-xs", "hover:bg-app-danger/20")}
+          >
             Eliminar ({selectedIds.size})
           </button>
         </>

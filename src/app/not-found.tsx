@@ -9,7 +9,12 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <div className="bg-app-login-canvas flex min-h-screen items-center justify-center p-4">
-      <main className="border-app-login-border bg-app-login-card w-full max-w-md rounded-xl border p-8 text-center shadow-xl">
+      <main
+        className={cn(
+          "border-app-login-border bg-app-login-card w-full max-w-md rounded-xl border p-8",
+          "text-center shadow-xl"
+        )}
+      >
         <p className="text-app-fg font-mono text-6xl font-bold">
           <span className="text-app-primary">4</span>
           <span className="text-app-fg">0</span>

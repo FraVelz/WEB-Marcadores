@@ -1,5 +1,6 @@
 "use client"
 
+import { cn } from "@/lib/utils"
 import { getFavicon } from "../utils/utils"
 import type { Bookmark, GridItem } from "../utils/types"
 
@@ -87,7 +88,7 @@ export default function BookmarkGridItem({
       key={isFolder ? item.id : item.bookmark.id}
       ref={itemRef}
       draggable
-      className={`${baseClass} cursor-grab active:cursor-grabbing`}
+      className={cn(baseClass, "cursor-grab active:cursor-grabbing")}
       onClick={() => {
         if (selectMode && !isFolder) onToggleSelect(item.bookmark.id)
         else onSelect(idx)
@@ -159,7 +160,15 @@ function LinkContent({ bookmark }: { bookmark: Bookmark }) {
       ) : (
         <div className="bg-app-hover flex h-8 w-8 flex-shrink-0 items-center justify-center rounded">
           <svg className="text-app-accent h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z" />
+            <path
+              d={
+                "M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 " +
+                "5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1z" +
+                "M8 13h8v-2H8v2z" +
+                "m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 " +
+                "3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"
+              }
+            />
           </svg>
         </div>
       )}
