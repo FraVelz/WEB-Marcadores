@@ -7,6 +7,7 @@ function isDemoMode(): boolean {
   if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") return true
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
   return !url || !key || url === "" || key === ""
 }
 
@@ -28,7 +29,9 @@ export async function proxy(request: NextRequest) {
   if (request.cookies.get(DEMO_COOKIE)?.value === "true") {
     return NextResponse.next({ request })
   }
+
   const response = NextResponse.next({ request })
+
   try {
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -44,14 +47,17 @@ export async function proxy(request: NextRequest) {
         },
       }
     )
+
     const {
       data: { user },
     } = await supabase.auth.getUser()
+
     const isDashboard = dashboardPaths.some((p) => request.nextUrl.pathname.startsWith(p))
 
     if (user && request.nextUrl.pathname === "/") {
       return NextResponse.redirect(new URL("/marcadores", request.url))
     }
+
     if (!user && isDashboard) {
       return NextResponse.redirect(new URL("/", request.url))
     }
@@ -59,6 +65,7 @@ export async function proxy(request: NextRequest) {
     // NetworkError o fallo de conexión: permitir acceso (modo demo implícito)
     // Evita que el proxy bloquee la app si Supabase no responde
   }
+
   return response
 }
 

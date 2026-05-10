@@ -8,11 +8,18 @@ export function useChangePassword(demoMode: boolean) {
   const [message, setMessage] = useState("")
 
   const handleSubmit = async (e: FormEvent) => {
-    if (demoMode) return
     e.preventDefault()
 
     if (!newPassword || newPassword.length < 6) {
       setMessage("La contraseña debe tener al menos 6 caracteres.")
+      return
+    }
+
+    if (demoMode) {
+      setMessage(
+        "Contraseña actualizada correctamente (solo demostración; no se guarda en el servidor)."
+      )
+      setNewPassword("")
       return
     }
 

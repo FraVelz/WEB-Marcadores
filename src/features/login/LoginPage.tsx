@@ -12,24 +12,8 @@ export function LoginPage({ demo }: { demo: boolean }) {
 
   return (
     <div className="bg-app-login-canvas flex min-h-screen items-center justify-center p-4">
-      <main className="border-app-login-border bg-app-login-card w-full max-w-md rounded-xl border p-8 shadow-xl">
-        <h1 className="text-app-fg mb-6 text-2xl font-bold">Marcadores</h1>
-        <div className="border-app-warn-border bg-app-warn-surface text-app-warn-fg mb-4 rounded-lg border p-3 text-sm">
-          <p className="font-medium">Modo demo</p>
-          <p className="text-app-warn-fg-accent mt-1">
-            Prueba la interfaz sin iniciar sesión. Explora marcadores, carpetas y atajos.
-          </p>
-          <button
-            type="button"
-            onClick={handleDemo}
-            className={cn(
-              "bg-app-login-demo-btn mt-3 w-full cursor-pointer rounded-lg py-2 font-medium text-white",
-              "hover:bg-app-login-demo-btn-hover"
-            )}
-          >
-            Probar demo
-          </button>
-        </div>
+      <main className="border-app-login-border bg-app-login-card w-full max-w-md rounded-xl border px-5 py-6 shadow-xl sm:p-8">
+        <h1 className="text-app-fg mb-5 text-xl font-bold sm:mb-6 sm:text-2xl">Marcadores</h1>
 
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <input
@@ -44,6 +28,7 @@ export function LoginPage({ demo }: { demo: boolean }) {
             )}
             required
           />
+
           <input
             type="password"
             placeholder="Contraseña"
@@ -56,6 +41,7 @@ export function LoginPage({ demo }: { demo: boolean }) {
             )}
             required
           />
+
           {error && <p className="text-app-danger-fg text-sm">{error}</p>}
 
           <div className="flex gap-2">
@@ -83,11 +69,25 @@ export function LoginPage({ demo }: { demo: boolean }) {
             </button>
           </div>
         </form>
-        {demo && (
-          <p className="text-app-fg-label mt-4 text-center text-xs">
-            Los formularios de login/registro no funcionan en modo demo.
+
+        <div className="border-app-warn-border bg-app-warn-surface text-app-warn-fg mt-10 rounded-lg border p-3 text-sm">
+          <p className="font-medium">Modo demo</p>
+
+          <p className="text-app-warn-fg-accent mt-1">
+            Prueba la interfaz sin iniciar sesión. Explora marcadores, carpetas y atajos.
           </p>
-        )}
+
+          <button
+            type="button"
+            onClick={handleDemo}
+            className={cn(
+              "bg-app-login-demo-btn mt-3 w-full cursor-pointer rounded-lg py-2 font-medium text-white",
+              "hover:bg-app-login-demo-btn-hover"
+            )}
+          >
+            Probar demo
+          </button>
+        </div>
       </main>
     </div>
   )

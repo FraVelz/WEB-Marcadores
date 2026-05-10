@@ -1,7 +1,5 @@
 import { useState } from "react"
-
 import { createClient } from "@/lib/supabase/client"
-
 import { useRouter } from "next/navigation"
 import type { LoginType } from "./types"
 
@@ -10,41 +8,44 @@ export function useLogin(demo: boolean): LoginType {
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
   const router = useRouter()
   const supabase = createClient()
 
   const handleDemo = () => {
-    // /demo setea cookie y redirige a marcadores; si ya hay demo, ir directo
     router.push(demo ? "/marcadores" : "/demo")
-    router.refresh()
   }
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const authenticate = async (type: "login" | "signup", e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
-    setError(null)
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    setLoading(false)
-    if (error) {
-      setError(error.message)
-      return
-    }
-    router.push("/marcadores")
-    router.refresh()
-  }
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
-    const { error } = await supabase.auth.signUp({ email, password })
-    setLoading(false)
-    if (error) {
-      setError(error.message)
+    if (!email || !password) {
+      setError("Completa todos los campos")
       return
     }
-    router.push("/marcadores")
-    router.refresh()
+
+    try {
+      setLoading(true)
+      setError(null)
+
+      const action =
+        type === "login"
+          ? supabase.auth.signInWithPassword({ email, password })
+          : supabase.auth.signUp({ email, password })
+
+      const { error } = await action
+
+      if (error) {
+        setError(type === "login" ? "Correo o contraseña incorrectos" : error.message)
+        return
+      }
+
+      router.push("/marcadores")
+    } catch {
+      setError("Ocurrió un error inesperado")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return {
@@ -55,7 +56,7 @@ export function useLogin(demo: boolean): LoginType {
     setEmail,
     setPassword,
     handleDemo,
-    handleLogin,
-    handleSignUp,
+    handleLogin: (e) => authenticate("login", e),
+    handleSignUp: (e) => authenticate("signup", e),
   }
 }

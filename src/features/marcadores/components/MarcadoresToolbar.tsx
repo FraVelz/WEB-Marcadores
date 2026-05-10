@@ -54,50 +54,58 @@ export default function MarcadoresToolbar(props: Props) {
   }
 
   return (
-    <div className="border-app-border bg-app-toolbar flex items-center gap-1 border-b px-2 py-1">
-      <ToolbarNavigationButtons
-        onNavigateUp={props.onNavigateUp}
-        onAddBookmark={props.onAddBookmark}
-        onNewFolder={() => props.setShowNewFolder(true)}
-        onDeleteFocused={props.onDeleteFocused}
-        hasFocusedItem={!!item && flatList.length > 0}
-        infoPanelEnabled={props.infoPanelEnabled}
-        onToggleInfoPanel={handleToggleInfoPanel}
-        showSearch={props.showSearch}
-        onToggleSearch={() => props.setShowSearch((s) => !s)}
-      />
-      {props.showSearch && (
-        <ToolbarSearchSection
-          searchValue={props.searchValue}
-          setSearchValue={props.setSearchValue}
-          searchRef={props.searchRef}
-          onEnter={props.focusMain}
+    <div className="border-app-border bg-app-toolbar flex flex-col gap-2 border-b px-2 py-1.5 md:flex-row md:flex-wrap md:items-center md:gap-x-1 md:gap-y-2 md:py-1">
+      <div className="flex min-w-0 flex-wrap items-center gap-1 md:flex-nowrap">
+        <ToolbarNavigationButtons
+          onNavigateUp={props.onNavigateUp}
+          onAddBookmark={props.onAddBookmark}
+          onNewFolder={() => props.setShowNewFolder(true)}
+          onDeleteFocused={props.onDeleteFocused}
+          hasFocusedItem={!!item && flatList.length > 0}
+          infoPanelEnabled={props.infoPanelEnabled}
+          onToggleInfoPanel={handleToggleInfoPanel}
+          showSearch={props.showSearch}
+          onToggleSearch={() => props.setShowSearch((s) => !s)}
         />
+        <ToolbarSelectActions
+          selectMode={props.selectMode}
+          setSelectMode={props.setSelectMode}
+          selectedIds={props.selectedIds}
+          setSelectedIds={props.setSelectedIds}
+          onEdit={props.onEdit}
+          onDelete={props.onDelete}
+        />
+      </div>
+      {props.showSearch && (
+        <div className="min-w-0 w-full shrink-0 border-app-border-muted border-t pt-2 md:min-w-[12rem] md:flex-1 md:border-t-0 md:pt-0">
+          <ToolbarSearchSection
+            searchValue={props.searchValue}
+            setSearchValue={props.setSearchValue}
+            searchRef={props.searchRef}
+            onEnter={props.focusMain}
+          />
+        </div>
       )}
       {props.showNewFolder && (
-        <ToolbarNewFolderSection
-          newFolderName={props.newFolderName}
-          setNewFolderName={props.setNewFolderName}
-          onCreateFolder={props.onCreateFolder}
-          onCancel={() => props.setShowNewFolder(false)}
-        />
+        <div className="border-app-border-muted w-full min-w-0 shrink-0 border-t pt-2 md:border-t-0 md:pt-0">
+          <ToolbarNewFolderSection
+            newFolderName={props.newFolderName}
+            setNewFolderName={props.setNewFolderName}
+            onCreateFolder={props.onCreateFolder}
+            onCancel={() => props.setShowNewFolder(false)}
+          />
+        </div>
       )}
       {props.editingFolder && (
-        <ToolbarRenameFolderSection
-          folderName={props.renameFolderName}
-          setFolderName={props.setRenameFolderName}
-          onRename={props.onRenameFolder}
-          onCancel={() => props.setEditingFolder(null)}
-        />
+        <div className="border-app-border-muted w-full min-w-0 shrink-0 border-t pt-2 md:border-t-0 md:pt-0">
+          <ToolbarRenameFolderSection
+            folderName={props.renameFolderName}
+            setFolderName={props.setRenameFolderName}
+            onRename={props.onRenameFolder}
+            onCancel={() => props.setEditingFolder(null)}
+          />
+        </div>
       )}
-      <ToolbarSelectActions
-        selectMode={props.selectMode}
-        setSelectMode={props.setSelectMode}
-        selectedIds={props.selectedIds}
-        setSelectedIds={props.setSelectedIds}
-        onEdit={props.onEdit}
-        onDelete={props.onDelete}
-      />
     </div>
   )
 }
