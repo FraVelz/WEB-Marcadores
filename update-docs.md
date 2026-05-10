@@ -36,7 +36,7 @@ Respetar **este orden y estos encabezados** (los títulos con emoji deben manten
 6. `## ✨ Características` / `## ✨ Features`
 7. `## 🛠️ Tecnologías` / `## 🛠️ Stack`
 8. `## 🚀 Desarrollo local` / `## 🚀 Local development`
-9. `## 📁 Estructura del proyecto` / `## 📁 Project layout` (bloque `text` con el árbol); **sin** párrafo adicional tras el bloque
+9. `## 📁 Estructura del proyecto` / `## 📁 Project layout` — bloque `text` con un **árbol resumido** (no hace falta listar todos los archivos). Donde ayude a orientarse, incluir **algunas subcarpetas y sub-archivos representativos** (p. ej. bajo `src/app/(dashboard)/`, `src/features/*/`, `src/components/bookmark/`, `src/lib/supabase/`) con la jerarquía en árbol (`│`, `├──`, `└──`). Tras las entradas relevantes, comentario `#` (o guión largo `—` en el texto si encaja) con **mini resumen** en el idioma de ese README; no inventar rutas. Priorizar lo que entiende alguien nuevo; **sin** párrafo narrativo adicional tras el bloque
 10. `## 🎯 Áreas de contenido` / `## 🎯 Content areas` (rutas del App Router coherentes con `src/app/`)
 11. `## 📝 Información` / `## 📝 Details` (variables de entorno, enlaces de autor/repo si aplica)
 12. `## 🙏 Contribuciones` / `## 🙏 Contributing`
@@ -74,7 +74,7 @@ Al actualizar, contrastar contra el código y la config cuando sea relevante:
 - `src/proxy.ts` — demo, cookies, rutas protegidas (si el README menciona comportamiento de auth/demo)
 - `src/lib/supabase/` y variables en `.env.example`
 - `vercel.json` si aplica
-- Estructura de carpetas en el bloque `text` (sin inventar archivos que no existan)
+- Bloque de estructura (`text`): rutas **relevantes** + **algunos hijos** (subcarpetas y archivos clave) cuando aclaren el mapa del código; con comentario `#` donde convenga; contrastar con el repo — **sin** exhaustividad y **sin** afirmar archivos que no existan (ambos README deben mantener la misma jerarquía de ejemplo)
 
 Si algo del README deja de ser cierto, corregirlo en **ambos** idiomas de forma paralela.
 
