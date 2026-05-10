@@ -11,7 +11,7 @@ export default function NotFound() {
     <div className="bg-app-login-canvas flex min-h-screen items-center justify-center p-4">
       <main
         className={cn(
-          "border-app-login-border bg-app-login-card w-full max-w-md rounded-xl border p-8",
+          "border-app-login-border bg-app-login-card w-full max-w-md rounded-xl border px-5 py-8 sm:p-8",
           "text-center shadow-xl"
         )}
       >

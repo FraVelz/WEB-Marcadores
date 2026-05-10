@@ -11,7 +11,7 @@ type Props = {
 
 export default function ToolbarSearchSection({ searchValue, setSearchValue, searchRef, onEnter }: Props) {
   return (
-    <div className="ml-2 flex flex-1 items-center gap-2">
+    <div className="flex w-full min-w-0 flex-1 items-center gap-2 md:ml-0">
       <input
         ref={searchRef}
         type="text"

@@ -6,6 +6,7 @@ import Link from "next/link"
 import { useDashboard } from "@/contexts/DashboardContext"
 import type { Folder } from "@/contexts/DashboardContext"
 import ExplorerTree from "@/components/ExplorerTree"
+import { cn } from "@/lib/utils"
 
 function findFolderInTree(folders: Folder[], id: string): Folder | undefined {
   for (const f of folders) {
@@ -43,9 +44,15 @@ const navItems = [
   { href: "/perfil", label: "Perfil" },
 ]
 
+function mobileTitle(pathname: string): string {
+  const hit = navItems.find((n) => pathname === n.href || pathname.startsWith(`${n.href}/`))
+  return hit?.label ?? "Marcadores"
+}
+
 export default function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const {
     mainRef,
     sidebarRef,
@@ -180,18 +187,57 @@ export default function DashboardShell({ children }: { children: React.ReactNode
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [pathname, focusMain, focusSidebar, sidebarRef, router])
 
+  useEffect(() => {
+    setMobileSidebarOpen(false)
+  }, [pathname])
+
+  useEffect(() => {
+    if (!mobileSidebarOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [mobileSidebarOpen])
+
   return (
-    <div className="bg-app-canvas flex min-h-screen">
+    <div className="bg-app-canvas flex min-h-dvh md:min-h-screen">
+      {/* Sombra: solo mientras el drawer móvil está abierto */}
+      <button
+        type="button"
+        aria-hidden={!mobileSidebarOpen}
+        className={cn(
+          "bg-app-overlay fixed inset-0 z-30 transition-opacity md:hidden",
+          mobileSidebarOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+        )}
+        tabIndex={-1}
+        onClick={() => setMobileSidebarOpen(false)}
+      />
       {/* Panel izquierdo - Árbol de carpetas (estilo Explorer) */}
-      <aside className="border-app-border bg-app-sidebar flex h-screen w-56 flex-col border-r">
-        <div className="border-app-border border-b px-3 py-2">
+      <aside
+        className={cn(
+          "border-app-border bg-app-sidebar flex w-56 flex-col border-r",
+          "fixed inset-y-0 left-0 z-40 h-dvh transition-transform duration-200 ease-out md:relative md:z-auto md:h-screen md:translate-x-0",
+          mobileSidebarOpen ? "translate-x-0 shadow-xl" : "-translate-x-full md:translate-x-0 md:shadow-none"
+        )}
+      >
+        <div className="border-app-border flex items-center justify-between border-b px-3 py-2">
           <span className="text-app-fg-label text-xs font-medium tracking-wider uppercase">Explorador</span>
+          <button
+            type="button"
+            className="text-app-fg-muted hover:bg-app-hover hover:text-app-fg rounded p-1 md:hidden"
+            aria-label="Cerrar menú"
+            onClick={() => setMobileSidebarOpen(false)}
+          >
+            ✕
+          </button>
         </div>
         <nav className="border-app-border flex flex-col gap-0.5 border-b p-2">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => setMobileSidebarOpen(false)}
               className={`flex items-center gap-2 rounded px-2 py-1.5 text-sm transition-colors ${
                 pathname === item.href
                   ? "bg-app-nav-active text-app-fg"
@@ -222,15 +268,31 @@ export default function DashboardShell({ children }: { children: React.ReactNode
           </div>
         )}
       </aside>
-      {/* Área principal */}
-      <main
-        ref={mainRef}
-        tabIndex={0}
-        className="bg-app-canvas flex flex-1 flex-col overflow-hidden outline-none focus:ring-0"
-        onKeyDown={(e) => mainKeyDownRef.current?.(e)}
-      >
-        {children}
-      </main>
+      <div className="flex min-h-0 w-full flex-1 flex-col md:min-h-screen">
+        <header className="border-app-border bg-app-toolbar sticky top-0 z-20 flex shrink-0 items-center gap-2 border-b px-3 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] md:hidden">
+          <button
+            type="button"
+            className="text-app-fg-secondary hover:bg-app-active hover:text-app-fg rounded p-2"
+            aria-label="Abrir menú"
+            aria-expanded={mobileSidebarOpen}
+            onClick={() => setMobileSidebarOpen(true)}
+          >
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
+            </svg>
+          </button>
+          <span className="text-app-fg truncate text-sm font-medium">{mobileTitle(pathname)}</span>
+        </header>
+        {/* Área principal */}
+        <main
+          ref={mainRef}
+          tabIndex={0}
+          className="bg-app-canvas flex min-h-0 flex-1 flex-col overflow-hidden outline-none focus:ring-0"
+          onKeyDown={(e) => mainKeyDownRef.current?.(e)}
+        >
+          {children}
+        </main>
+      </div>
     </div>
   )
 }

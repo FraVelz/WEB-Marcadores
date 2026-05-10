@@ -11,7 +11,7 @@ type Props = {
 
 export default function ToolbarRenameFolderSection({ folderName, setFolderName, onRename, onCancel }: Props) {
   return (
-    <div className="ml-2 flex items-center gap-2">
+    <div className="flex min-w-0 flex-wrap items-center gap-2 md:ml-2">
       <input
         type="text"
         placeholder="Nuevo nombre"
@@ -22,8 +22,8 @@ export default function ToolbarRenameFolderSection({ folderName, setFolderName, 
           if (e.key === "Escape") onCancel()
         }}
         className={cn(
-          "border-app-input-border bg-app-raised-muted text-app-fg rounded border px-2 py-1 text-sm",
-          "placeholder-app-fg-label focus:border-app-focus focus:outline-none"
+          "border-app-input-border bg-app-raised-muted text-app-fg min-w-0 flex-1 rounded border px-2 py-1 text-sm",
+          "placeholder-app-fg-label focus:border-app-focus focus:outline-none md:max-w-xs"
         )}
         autoFocus
       />

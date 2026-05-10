@@ -37,7 +37,7 @@ export default function BookmarkGrid({
 }: Props) {
   return (
     <div
-      className="flex-1 overflow-auto p-4"
+      className="min-h-0 flex-1 overflow-auto p-3 sm:p-4"
       onDragOver={
         onDrop
           ? (e) => {
@@ -74,7 +74,7 @@ export default function BookmarkGrid({
           : undefined
       }
     >
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {flatList.map((item, idx) => {
           const isFolder = item.type === "folder"
           const isCut =

@@ -85,11 +85,18 @@ function BookmarkDetailPanelInner({
       onKeyDown={(e) => e.stopPropagation()}
       className={
         embedded
-          ? "border-app-border bg-app-sidebar flex h-full max-w-[320px] min-w-[280px] flex-col border-l"
-          : "border-app-border-muted bg-app-raised fixed top-0 right-0 z-50 h-full w-80 border-l shadow-xl"
+          ? cn(
+              "border-app-border bg-app-sidebar flex max-h-none min-h-0 flex-col overflow-hidden",
+              "fixed inset-0 z-[45] h-dvh shadow-none md:relative md:inset-auto md:z-auto",
+              "md:h-full md:max-h-full md:min-h-0 md:max-w-[320px] md:min-w-[280px] md:border-l md:shadow-none"
+            )
+          : cn(
+              "border-app-border-muted bg-app-raised fixed top-0 right-0 z-50 h-full max-h-dvh w-full max-w-full border-l shadow-xl",
+              "sm:left-auto sm:max-w-80"
+            )
       }
     >
-      <div className="flex h-full flex-col p-4">
+      <div className="flex h-full min-h-0 flex-col p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] md:pt-4 md:pb-4">
         <div className="border-app-border mb-4 flex items-center justify-between border-b pb-2">
           <h3 className="text-app-fg-label text-xs font-semibold tracking-wider uppercase">
             {embedded ? "Propiedades" : "Detalle"}
