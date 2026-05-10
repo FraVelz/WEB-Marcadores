@@ -44,50 +44,46 @@ Without a valid `.env.local` or Supabase credentials, the app runs in demo mode 
 
 ```text
 .
-├── public/
+├── public/                          # static assets
 │   ├── favicon.svg
-│   └── screenshot.png
-├── src/
-│   ├── app/
-│   │   ├── (dashboard)/
-│   │   │   ├── atajos/page.tsx
-│   │   │   ├── layout.tsx
-│   │   │   ├── marcadores/page.tsx
-│   │   │   └── perfil/page.tsx
-│   │   ├── demo/page.tsx
-│   │   ├── globals.css
-│   │   ├── layout.tsx
-│   │   ├── not-found.tsx
-│   │   └── page.tsx
-│   ├── components/
-│   │   ├── bookmark/
-│   │   ├── BookmarkDetailPanel.tsx
-│   │   ├── BookmarkModal.tsx
-│   │   ├── DashboardShell.tsx
-│   │   ├── ExplorerTree.tsx
-│   │   └── TagAutocomplete.tsx
-│   ├── contexts/
-│   │   └── DashboardContext.tsx
-│   ├── features/
-│   │   ├── atajos/
-│   │   ├── login/
-│   │   ├── marcadores/
-│   │   └── perfil/
-│   ├── lib/
-│   │   ├── bookmark-tags.ts
-│   │   ├── bookmark-utils.ts
-│   │   ├── demo-data.ts
-│   │   ├── supabase/client.ts
-│   │   └── utils.ts
-│   └── proxy.ts
+│   └── screenshot.png               # README image
+├── src/app/                         # App Router
+│   ├── page.tsx                     # / login
+│   ├── layout.tsx
+│   ├── globals.css
+│   ├── demo/page.tsx                # /demo → redirect with cookie
+│   └── (dashboard)/                 # dashboard shell routes
+│       ├── layout.tsx
+│       ├── marcadores/page.tsx
+│       ├── atajos/page.tsx
+│       └── perfil/page.tsx
+├── src/features/                    # domain UI — login, bookmarks, shortcuts, profile
+│   ├── login/                       # LoginPage, useLogin, types
+│   ├── marcadores/                  # main page, hooks, toolbar, grid…
+│   ├── atajos/                      # AtajosPage, shortcut data
+│   └── perfil/                      # PerfilPage, user & auth hooks
+├── src/components/                  # shared pieces
+│   ├── bookmark/                    # bookmark form & detail sections
+│   ├── DashboardShell.tsx
+│   ├── BookmarkModal.tsx
+│   ├── ExplorerTree.tsx
+│   └── TagAutocomplete.tsx
+├── src/lib/
+│   ├── supabase/client.ts           # browser client
+│   ├── demo-data.ts
+│   ├── bookmark-utils.ts
+│   └── bookmark-tags.ts
+├── src/contexts/
+│   └── DashboardContext.tsx
+├── src/proxy.ts                     # demo cookies, protected routes, Supabase SSR
 ├── .env.example
-├── eslint.config.mjs
-├── next.config.ts
 ├── package.json
-├── postcss.config.mjs
-├── tsconfig.json
+├── next.config.ts
 ├── vercel.json
-└── README.EN.md
+├── tsconfig.json
+├── eslint.config.mjs
+├── postcss.config.mjs
+└── .prettierrc.mjs
 ```
 
 ## 🎯 Content areas

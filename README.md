@@ -44,50 +44,46 @@ Sin `.env.local` o sin credenciales Supabase válidas se activa el modo demo (da
 
 ```text
 .
-├── public/
+├── public/                          # assets estáticos
 │   ├── favicon.svg
-│   └── screenshot.png
-├── src/
-│   ├── app/
-│   │   ├── (dashboard)/
-│   │   │   ├── atajos/page.tsx
-│   │   │   ├── layout.tsx
-│   │   │   ├── marcadores/page.tsx
-│   │   │   └── perfil/page.tsx
-│   │   ├── demo/page.tsx
-│   │   ├── globals.css
-│   │   ├── layout.tsx
-│   │   ├── not-found.tsx
-│   │   └── page.tsx
-│   ├── components/
-│   │   ├── bookmark/
-│   │   ├── BookmarkDetailPanel.tsx
-│   │   ├── BookmarkModal.tsx
-│   │   ├── DashboardShell.tsx
-│   │   ├── ExplorerTree.tsx
-│   │   └── TagAutocomplete.tsx
-│   ├── contexts/
-│   │   └── DashboardContext.tsx
-│   ├── features/
-│   │   ├── atajos/
-│   │   ├── login/
-│   │   ├── marcadores/
-│   │   └── perfil/
-│   ├── lib/
-│   │   ├── bookmark-tags.ts
-│   │   ├── bookmark-utils.ts
-│   │   ├── demo-data.ts
-│   │   ├── supabase/client.ts
-│   │   └── utils.ts
-│   └── proxy.ts
+│   └── screenshot.png               # imagen del README
+├── src/app/                         # App Router
+│   ├── page.tsx                     # / login
+│   ├── layout.tsx
+│   ├── globals.css
+│   ├── demo/page.tsx                # entrada /demo → redirección con cookie
+│   └── (dashboard)/                 # rutas bajo shell del dashboard
+│       ├── layout.tsx
+│       ├── marcadores/page.tsx
+│       ├── atajos/page.tsx
+│       └── perfil/page.tsx
+├── src/features/                    # UI por dominio — login, marcadores, atajos, perfil
+│   ├── login/                       # LoginPage, useLogin, types
+│   ├── marcadores/                  # página principal, hooks, toolbar, grid…
+│   ├── atajos/                      # AtajosPage, data de atajos
+│   └── perfil/                      # PerfilPage, hooks de usuario y auth
+├── src/components/                  # piezas reutilizables
+│   ├── bookmark/                    # secciones del formulario y detalle de marcador
+│   ├── DashboardShell.tsx
+│   ├── BookmarkModal.tsx
+│   ├── ExplorerTree.tsx
+│   └── TagAutocomplete.tsx
+├── src/lib/
+│   ├── supabase/client.ts           # cliente browser
+│   ├── demo-data.ts
+│   ├── bookmark-utils.ts
+│   └── bookmark-tags.ts
+├── src/contexts/
+│   └── DashboardContext.tsx
+├── src/proxy.ts                     # demo (cookies), rutas protegidas, Supabase SSR
 ├── .env.example
-├── eslint.config.mjs
-├── next.config.ts
 ├── package.json
-├── postcss.config.mjs
-├── tsconfig.json
+├── next.config.ts
 ├── vercel.json
-└── README.EN.md
+├── tsconfig.json
+├── eslint.config.mjs
+├── postcss.config.mjs
+└── .prettierrc.mjs
 ```
 
 ## 🎯 Áreas de contenido
