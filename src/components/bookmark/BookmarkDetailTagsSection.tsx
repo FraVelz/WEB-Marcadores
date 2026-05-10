@@ -29,7 +29,10 @@ export default function BookmarkDetailTagsSection({
         {tags.map((tag) => (
           <span
             key={tag}
-            className="group bg-app-hover text-app-fg-secondary inline-flex items-center gap-1 rounded px-2 py-1 text-xs"
+            className={cn(
+              "group inline-flex items-center gap-1 rounded px-2 py-1 text-xs",
+              "bg-app-hover text-app-fg-secondary"
+            )}
           >
             {tag}
             <button

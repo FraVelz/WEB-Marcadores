@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import { buildFolderOptions, getFaviconUrl, getFolderPathLabel } from "@/lib/bookmark-utils"
+import { cn } from "@/lib/utils"
 import BookmarkDetailFolderSection from "./bookmark/BookmarkDetailFolderSection"
 import BookmarkDetailTagsSection from "./bookmark/BookmarkDetailTagsSection"
 
@@ -164,7 +165,10 @@ function BookmarkDetailPanelInner({
             href={bookmark.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-app-primary hover:bg-app-primary-hover flex-1 rounded-lg py-2 text-center text-sm font-medium text-white"
+            className={cn(
+              "bg-app-primary flex-1 rounded-lg py-2 text-center text-sm font-medium text-white",
+              "hover:bg-app-primary-hover"
+            )}
           >
             Abrir
           </a>

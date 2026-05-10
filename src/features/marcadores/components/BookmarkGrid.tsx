@@ -1,5 +1,6 @@
 "use client"
 
+import { cn } from "@/lib/utils"
 import type { GridItem, CutItem } from "../utils/types"
 import BookmarkGridItem from "./BookmarkGridItem"
 
@@ -109,7 +110,12 @@ function EmptyState({ onAddBookmark, onNewFolder }: { onAddBookmark: () => void;
   return (
     <div className="text-app-fg-label flex flex-col items-center justify-center py-16">
       <svg className="text-app-empty-icon mb-4 h-16 w-16" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
+        <path
+          d={
+            "M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2" +
+            "zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"
+          }
+        />
       </svg>
       <p className="text-sm">Esta carpeta está vacía</p>
       <button
@@ -120,7 +126,10 @@ function EmptyState({ onAddBookmark, onNewFolder }: { onAddBookmark: () => void;
       </button>
       <button
         onClick={onNewFolder}
-        className="border-app-input-border text-app-fg-secondary hover:bg-app-raised-muted mt-2 rounded border px-4 py-2 text-sm"
+        className={cn(
+          "border-app-input-border text-app-fg-secondary mt-2 rounded border px-4 py-2 text-sm",
+          "hover:bg-app-raised-muted"
+        )}
       >
         Nueva carpeta
       </button>

@@ -22,7 +22,10 @@ export function LoginPage({ demo }: { demo: boolean }) {
           <button
             type="button"
             onClick={handleDemo}
-            className="bg-app-login-demo-btn hover:bg-app-login-demo-btn-hover mt-3 w-full cursor-pointer rounded-lg py-2 font-medium text-white"
+            className={cn(
+              "bg-app-login-demo-btn mt-3 w-full cursor-pointer rounded-lg py-2 font-medium text-white",
+              "hover:bg-app-login-demo-btn-hover"
+            )}
           >
             Probar demo
           </button>

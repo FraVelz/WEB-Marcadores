@@ -30,7 +30,10 @@ export function PerfilPage() {
               <button
                 type="button"
                 onClick={() => void signOut()}
-                className="border-app-input-border text-app-fg-secondary hover:bg-app-raised-muted mt-4 rounded-lg border px-4 py-2"
+                className={cn(
+                  "border-app-input-border text-app-fg-secondary mt-4 rounded-lg border px-4 py-2",
+                  "hover:bg-app-raised-muted"
+                )}
               >
                 Cerrar sesión
               </button>
@@ -69,7 +72,10 @@ export function PerfilPage() {
             </button>
             {message && (
               <p
-                className={`mt-2 text-sm ${message.includes("correctamente") ? "text-app-success-fg" : "text-app-danger-fg"}`}
+                className={cn(
+                  "mt-2 text-sm",
+                  message.includes("correctamente") ? "text-app-success-fg" : "text-app-danger-fg"
+                )}
               >
                 {message}
               </p>

@@ -23,7 +23,8 @@ export const metadata: Metadata = {
     template: "%s | Marcadores",
   },
   description:
-    "Organiza tus marcadores en carpetas, usa atajos y explora tu colección. Interfaz oscura tipo explorador. Prueba el demo sin iniciar sesión.",
+    "Organiza tus marcadores en carpetas, usa atajos y explora tu colección. " +
+    "Interfaz oscura tipo explorador. Prueba el demo sin iniciar sesión.",
   keywords: ["marcadores", "favoritos", "bookmarks", "organización", "carpetas"],
   authors: [{ name: "Marcadores" }],
   openGraph: {
@@ -34,7 +35,8 @@ export const metadata: Metadata = {
     siteName: "Marcadores",
     title: "Marcadores | Gestor de favoritos y carpetas",
     description:
-      "Organiza tus marcadores en carpetas, usa atajos y explora tu colección. Interfaz oscura tipo explorador. Prueba el demo sin iniciar sesión.",
+      "Organiza tus marcadores en carpetas, usa atajos y explora tu colección. " +
+      "Interfaz oscura tipo explorador. Prueba el demo sin iniciar sesión.",
     images: [
       {
         url: "/screenshot.png",
