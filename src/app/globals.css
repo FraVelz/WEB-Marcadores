@@ -6,17 +6,18 @@
  */
 
 :root {
-  --app-canvas: #f4f4f5;
-  --app-sidebar: #e4e4e7;
-  --app-toolbar: #d4d4d8;
+  /* Misma base cromática que login / 404 (zinc claro) */
+  --app-canvas: #fafafa;
+  --app-sidebar: #f4f4f5;
+  --app-toolbar: #e4e4e7;
   --app-raised: #ffffff;
   --app-raised-muted: #f4f4f5;
   --app-hover: #e4e4e7;
   --app-hover-strong: #d4d4d8;
   --app-active: #a1a1aa;
-  --app-border: #d4d4d8;
-  --app-border-muted: #e4e4e7;
-  --app-input-border: #d4d4d8;
+  --app-border: #e4e4e7;
+  --app-border-muted: #f4f4f5;
+  --app-input-border: #e4e4e7;
 
   --app-fg: #18181b;
   --app-fg-secondary: #52525b;
@@ -53,9 +54,9 @@
   --app-cut-border: rgb(217 119 6 / 0.65);
   --app-cut-surface: rgb(254 243 199 / 0.6);
 
-  --app-login-canvas: #fafafa;
-  --app-login-card: #ffffff;
-  --app-login-border: #e4e4e7;
+  --app-login-canvas: var(--app-canvas);
+  --app-login-card: var(--app-raised);
+  --app-login-border: var(--app-border);
   --app-login-demo-btn: #d97706;
   --app-login-demo-btn-hover: #b45309;
 
@@ -71,17 +72,18 @@
 html.dark {
   color-scheme: dark;
 
-  --app-canvas: #1e1e1e;
-  --app-sidebar: #252526;
-  --app-toolbar: #2d2d30;
+  /* Misma base que login / 404 (zinc 950 → 900) */
+  --app-canvas: #09090b;
+  --app-sidebar: #18181b;
+  --app-toolbar: #18181b;
   --app-raised: #18181b;
   --app-raised-muted: #27272a;
-  --app-hover: #3f3f46;
-  --app-hover-strong: #52525b;
-  --app-active: #52525b;
-  --app-border: #3f3f46;
-  --app-border-muted: #27272a;
-  --app-input-border: #52525b;
+  --app-hover: #27272a;
+  --app-hover-strong: #3f3f46;
+  --app-active: #3f3f46;
+  --app-border: #27272a;
+  --app-border-muted: #18181b;
+  --app-input-border: #3f3f46;
 
   --app-fg: #fafafa;
   --app-fg-secondary: #d4d4d8;
@@ -109,9 +111,9 @@ html.dark {
 
   --app-cut-surface: rgb(120 53 15 / 0.2);
 
-  --app-login-canvas: #09090b;
-  --app-login-card: #18181b;
-  --app-login-border: #27272a;
+  --app-login-canvas: var(--app-canvas);
+  --app-login-card: var(--app-raised);
+  --app-login-border: var(--app-border);
 
   --app-kbd-bg: #3f3f46;
   --app-empty-icon: #52525b;

@@ -16,9 +16,7 @@ export function useLogin(demo: boolean): LoginType {
     router.push(demo ? "/marcadores" : "/demo")
   }
 
-  const authenticate = async (type: "login" | "signup", e: React.FormEvent) => {
-    e.preventDefault()
-
+  const authenticate = async (type: "login" | "signup") => {
     if (!email || !password) {
       setError("Completa todos los campos")
       return
@@ -56,7 +54,7 @@ export function useLogin(demo: boolean): LoginType {
     setEmail,
     setPassword,
     handleDemo,
-    handleLogin: (e) => authenticate("login", e),
-    handleSignUp: (e) => authenticate("signup", e),
+    handleLogin: () => authenticate("login"),
+    handleSignUp: () => authenticate("signup"),
   }
 }

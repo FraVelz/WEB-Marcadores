@@ -13,8 +13,7 @@ export function useMarcadoresData(
   setCtxFolders: (folders: import("@/contexts/DashboardContext").Folder[]) => void,
   refreshFolders: () => void
 ) {
-  const { demoMode } = useDashboard()
-  const supabase = createClient()
+  const { demoMode, setAllTagsFromBookmarks } = useDashboard()
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([])
   const [folders, setFolders] = useState<FlatFolder[]>([])
   const [loading, setLoading] = useState(true)
@@ -25,14 +24,16 @@ export function useMarcadoresData(
       setFolders(DEMO_FOLDERS)
       setCtxFolders(buildFolderTree(DEMO_FOLDERS))
     } else {
+      const supabase = createClient()
       const { data: bData } = await supabase.from("bookmarks").select("*").order("title")
       setBookmarks(bData || [])
+      setAllTagsFromBookmarks(bData || [])
       const { data: fData } = await supabase.from("folders").select("*").order("sort_order")
       setFolders(fData || [])
       refreshFolders()
     }
     setLoading(false)
-  }, [demoMode, supabase, setCtxFolders, refreshFolders])
+  }, [demoMode, setCtxFolders, refreshFolders, setAllTagsFromBookmarks])
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -82,6 +83,5 @@ export function useMarcadoresData(
     fetchData,
     flatList,
     breadcrumb,
-    supabase,
   }
 }

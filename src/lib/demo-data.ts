@@ -117,14 +117,18 @@ export function cookieHeaderFromRequestCookies(cookieStore: { getAll(): { name: 
  */
 export function isDemoMode(cookieHeader?: string): boolean {
   if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") return true
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
   if (!url || !key || url === "" || key === "") return true
   if (cookieHeader !== undefined) {
     return cookieHeader.includes("demo_session=true")
   }
+
   if (typeof document !== "undefined") {
     return document.cookie.includes("demo_session=true")
   }
+
   return false
 }

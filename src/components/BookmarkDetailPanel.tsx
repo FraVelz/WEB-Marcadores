@@ -1,10 +1,12 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+
 import { buildFolderOptions, getFaviconUrl, getFolderPathLabel } from "@/lib/bookmark-utils"
-import { cn } from "@/lib/utils"
 import BookmarkDetailFolderSection from "./bookmark/BookmarkDetailFolderSection"
 import BookmarkDetailTagsSection from "./bookmark/BookmarkDetailTagsSection"
+
+import { cn } from "@/lib/utils"
 
 type Bookmark = {
   id: string

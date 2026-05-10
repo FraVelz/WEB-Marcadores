@@ -25,10 +25,9 @@ Without `.env.local` or Supabase credentials: uses demo mode (in-memory data).
 ## Scripts
 
 - `pnpm run dev` — Development server
-- `pnpm run fetch:bookmarks` — Export bookmarks to stdout (e.g. `> bookmarks.json`)
-- `pnpm run descriptions:generate` — Generate descriptions and tags with OpenAI for bookmarks without description
-- `pnpm run db:create-table` — Create table in Supabase (requires migration)
-- `pnpm run db:sql` — Print SQL to create table
+- `pnpm run build` / `pnpm run start` — Production build and server
+- `pnpm run lint` / `pnpm run lint:fix` — ESLint
+- `pnpm run format` / `pnpm run format:check` — Prettier
 
 ## Structure
 

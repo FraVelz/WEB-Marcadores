@@ -8,6 +8,6 @@ export type LoginType = {
   setEmail: Dispatch<SetStateAction<string>>
   setPassword: Dispatch<SetStateAction<string>>
   handleDemo: () => void
-  handleLogin: (e: React.FormEvent) => Promise<void>
-  handleSignUp: (e: React.FormEvent) => Promise<void>
+  handleLogin: () => Promise<void>
+  handleSignUp: () => Promise<void>
 }
