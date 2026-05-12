@@ -13,7 +13,7 @@ export function LoginPage({ demo }: { demo: boolean }) {
   return (
     <div className="bg-app-login-canvas flex min-h-screen items-center justify-center p-4">
       <main className="border-app-login-border bg-app-login-card w-full max-w-md rounded-xl border px-5 py-6 shadow-xl sm:p-8">
-        <h1 className="text-app-fg mb-5 text-xl font-bold sm:mb-6 sm:text-2xl">Marcadores</h1>
+        <h1 className="text-app-fg mb-5 text-xl font-semibold sm:mb-6 sm:text-2xl">Marcadores</h1>
 
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <input
@@ -53,7 +53,7 @@ export function LoginPage({ demo }: { demo: boolean }) {
                 "hover:bg-app-primary-hover cursor-pointer disabled:opacity-50"
               )}
             >
-              {loading ? "..." : "Entrar"}
+              {loading ? "…" : "Entrar"}
             </button>
 
             <button

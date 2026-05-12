@@ -14,8 +14,11 @@ export default function BookmarkFormBasicInfo({ title, url, description, firstIn
     <section className="space-y-4">
       <h3 className="text-app-fg-muted text-sm font-medium">Información básica</h3>
       <div>
-        <label className="text-app-fg-label mb-1 block text-xs">Título *</label>
+        <label htmlFor="bm-modal-title" className="text-app-fg-label mb-1 block text-xs">
+          Título *
+        </label>
         <input
+          id="bm-modal-title"
           ref={firstInputRef}
           name="title"
           defaultValue={title}
@@ -29,8 +32,11 @@ export default function BookmarkFormBasicInfo({ title, url, description, firstIn
         />
       </div>
       <div>
-        <label className="text-app-fg-label mb-1 block text-xs">URL *</label>
+        <label htmlFor="bm-modal-url" className="text-app-fg-label mb-1 block text-xs">
+          URL *
+        </label>
         <input
+          id="bm-modal-url"
           name="url"
           type="url"
           defaultValue={url}
@@ -43,8 +49,11 @@ export default function BookmarkFormBasicInfo({ title, url, description, firstIn
         />
       </div>
       <div>
-        <label className="text-app-fg-label mb-1 block text-xs">Descripción</label>
+        <label htmlFor="bm-modal-description" className="text-app-fg-label mb-1 block text-xs">
+          Descripción
+        </label>
         <input
+          id="bm-modal-description"
           name="description"
           defaultValue={description}
           data-no-vim

@@ -26,5 +26,3 @@ export type CutItem =
   | { type: "link"; bookmark: Bookmark; sourceFolderId: string | null }
 
 export type BreadcrumbPart = { id: string | null; label: string }
-
-export { type Folder }

@@ -8,6 +8,8 @@
 
 Bookmark manager built with Next.js and Supabase. Organize links in folders, use shortcuts, and browse your collection with a dark explorer-style interface. You can use **demo mode** without configuring Supabase.
 
+With this folder as the Cursor workspace root, the `/update-readme` slash command and the full rules live in [`.cursor/commands/update-readme.md`](.cursor/commands/update-readme.md) to keep bilingual READMEs aligned.
+
 ## ✨ Features
 
 - Nested folders, bookmark grid, and a detail panel with metadata and tags

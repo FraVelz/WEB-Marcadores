@@ -25,7 +25,6 @@ export default function ToolbarRenameFolderSection({ folderName, setFolderName, 
           "border-app-input-border bg-app-raised-muted text-app-fg min-w-0 flex-1 rounded border px-2 py-1 text-sm",
           "placeholder-app-fg-label focus:border-app-focus focus:outline-none md:max-w-xs"
         )}
-        autoFocus
       />
       <button
         onClick={onRename}

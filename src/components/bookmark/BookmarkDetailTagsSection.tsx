@@ -24,7 +24,9 @@ export default function BookmarkDetailTagsSection({
 }: Props) {
   return (
     <div>
-      <label className="text-app-fg-label mb-2 block text-xs">Tags</label>
+      <label htmlFor="bookmark-detail-tags-input" className="text-app-fg-label mb-2 block text-xs">
+        Tags
+      </label>
       <div className="flex flex-wrap gap-1">
         {tags.map((tag) => (
           <span
@@ -49,6 +51,7 @@ export default function BookmarkDetailTagsSection({
       </div>
       <div className="mt-2">
         <TagAutocomplete
+          id="bookmark-detail-tags-input"
           value={newTag}
           onChange={onNewTagChange}
           options={allTags.filter((t) => !tags.includes(t))}
@@ -56,7 +59,7 @@ export default function BookmarkDetailTagsSection({
           onEnter={() => newTag.trim() && onAddTag(newTag)}
           placeholder="Añadir tag..."
           className={cn(
-            "border-app-input-border bg-app-raised-muted text-app-fg w-full rounded-lg border px-3 py-2 text-sm",
+            "border-app-input-border bg-app-raised-muted text-app-fg w-full rounded-lg border py-2 pr-3 pl-3 text-sm",
             "placeholder-app-fg-label focus:border-app-focus focus:outline-none"
           )}
         />

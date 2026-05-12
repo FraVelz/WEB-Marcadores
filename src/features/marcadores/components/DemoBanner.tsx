@@ -11,7 +11,7 @@ export default function DemoBanner() {
       )}
     >
       <span className="font-medium">Modo demo</span>
-      <span className="text-app-warn-fg-accent">— Datos de ejemplo. No son tus marcadores.</span>
+      <span className="text-app-warn-fg-accent">Datos de ejemplo: no son tus marcadores.</span>
     </div>
   )
 }

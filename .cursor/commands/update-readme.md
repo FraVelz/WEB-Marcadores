@@ -1,6 +1,6 @@
 # Instrucciones para actualizar la documentación del repo (`README`)
 
-Cuando el usuario **adjunta o menciona este archivo** (`update-docs.md`) en el chat, el asistente debe aplicar las reglas siguientes antes de responder.
+Cuando el usuario **invoca el comando `/update-readme`**, **adjunta** `.cursor/commands/update-readme.md` **o menciona** esta instrucción en el chat, el asistente debe aplicar las reglas siguientes antes de responder.
 
 ## Objetivo
 

@@ -1,10 +1,11 @@
 "use client"
 
+import { useId, useState } from "react"
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { getFavicon } from "../utils/utils"
 import type { Bookmark, GridItem } from "../utils/types"
-
-const DRAG_TYPE = "application/x-bookmark-item"
+import { BOOKMARK_DRAG_MIME_TYPE, parseBookmarkDragPayload } from "../utils/parseDragPayload"
 
 type Props = {
   item: GridItem
@@ -33,6 +34,7 @@ export default function BookmarkGridItem({
   onDoubleClick,
   onDrop,
 }: Props) {
+  const selectControlId = useId()
   const isFolder = item.type === "folder"
   const targetFolderId = isFolder ? item.id : (item.bookmark.folder_id ?? null)
 
@@ -40,7 +42,7 @@ export default function BookmarkGridItem({
     const payload = isFolder
       ? { type: "folder" as const, id: item.id, name: item.label }
       : { type: "link" as const, bookmark: { id: item.bookmark.id, url: item.bookmark.url } }
-    e.dataTransfer.setData(DRAG_TYPE, JSON.stringify(payload))
+    e.dataTransfer.setData(BOOKMARK_DRAG_MIME_TYPE, JSON.stringify(payload))
     e.dataTransfer.effectAllowed = "move"
     e.dataTransfer.setData("text/plain", isFolder ? item.label : item.bookmark.title)
   }
@@ -52,25 +54,18 @@ export default function BookmarkGridItem({
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
-    const raw = e.dataTransfer.getData(DRAG_TYPE)
+    const raw = e.dataTransfer.getData(BOOKMARK_DRAG_MIME_TYPE)
     if (!raw || !onDrop) return
-    try {
-      const payload = JSON.parse(raw)
-      const sourceItem: GridItem =
-        payload.type === "folder"
-          ? { type: "folder", id: payload.id, folderId: payload.id, label: payload.name }
-          : {
-              type: "link",
-              bookmark: {
-                id: payload.bookmark.id,
-                title: "",
-                url: payload.bookmark.url,
-                folder_id: null,
-              },
-            }
-      onDrop(sourceItem, targetFolderId)
-    } catch {
-      // ignore
+    const sourceItem = parseBookmarkDragPayload(raw)
+    if (sourceItem) onDrop(sourceItem, targetFolderId)
+  }
+
+  const activateFromKeyboard = (e: React.KeyboardEvent) => {
+    if (e.target !== e.currentTarget) return
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault()
+      if (selectMode && !isFolder) onToggleSelect(item.bookmark.id)
+      else onSelect(idx)
     }
   }
 
@@ -85,34 +80,41 @@ export default function BookmarkGridItem({
 
   return (
     <div
-      key={isFolder ? item.id : item.bookmark.id}
       ref={itemRef}
       draggable
+      role="button"
+      tabIndex={0}
+      aria-pressed={selectMode && !isFolder ? isChecked : undefined}
       className={cn(baseClass, "cursor-grab active:cursor-grabbing")}
       onClick={() => {
         if (selectMode && !isFolder) onToggleSelect(item.bookmark.id)
         else onSelect(idx)
       }}
+      onKeyDown={activateFromKeyboard}
       onDoubleClick={() => onDoubleClick(item)}
       onDragStart={handleDragStart}
       onDragOver={onDrop ? handleDragOver : undefined}
       onDrop={onDrop ? handleDrop : undefined}
     >
       {selectMode && !isFolder && (
-        <div
+        <label
           className="absolute top-3 left-3 z-10"
-          onClick={(e) => {
-            e.stopPropagation()
-            onToggleSelect(item.bookmark.id)
-          }}
+          htmlFor={selectControlId}
+          onClick={(e) => e.stopPropagation()}
         >
+          <span className="sr-only">Seleccionar {item.bookmark.title}</span>
           <input
+            id={selectControlId}
             type="checkbox"
             checked={isChecked}
             readOnly
-            className="border-app-input-border bg-app-raised-muted accent-app-primary h-4 w-4 rounded"
+            className="border-app-input-border bg-app-raised-muted accent-app-primary size-4 rounded"
+            onClick={(e) => {
+              e.stopPropagation()
+              onToggleSelect(item.bookmark.id)
+            }}
           />
-        </div>
+        </label>
       )}
       {isFolder ? <FolderContent label={item.label} /> : <LinkContent bookmark={item.bookmark} />}
     </div>
@@ -122,8 +124,8 @@ export default function BookmarkGridItem({
 function FolderContent({ label }: { label: string }) {
   return (
     <>
-      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded">
-        <svg className="text-app-folder h-10 w-10" viewBox="0 0 24 24" fill="currentColor">
+      <div className="flex size-10 shrink-0 items-center justify-center rounded">
+        <svg className="text-app-folder size-10" viewBox="0 0 24 24" fill="currentColor">
           <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
         </svg>
       </div>
@@ -137,6 +139,7 @@ function FolderContent({ label }: { label: string }) {
 
 function LinkContent({ bookmark }: { bookmark: Bookmark }) {
   const favicon = getFavicon(bookmark.url)
+  const [faviconError, setFaviconError] = useState(false)
   const hostname = (() => {
     try {
       return new URL(bookmark.url).hostname.replace(/^www\./, "")
@@ -147,19 +150,19 @@ function LinkContent({ bookmark }: { bookmark: Bookmark }) {
 
   return (
     <>
-      {favicon ? (
-        // eslint-disable-next-line @next/next/no-img-element -- favicons dinámicos de terceros
-        <img
+      {favicon && !faviconError ? (
+        <Image
           src={favicon}
           alt=""
-          className="h-8 w-8 flex-shrink-0 rounded"
-          onError={(e) => {
-            ;(e.target as HTMLImageElement).style.display = "none"
-          }}
+          width={32}
+          height={32}
+          className="size-8 shrink-0 rounded"
+          unoptimized
+          onError={() => setFaviconError(true)}
         />
       ) : (
-        <div className="bg-app-hover flex h-8 w-8 flex-shrink-0 items-center justify-center rounded">
-          <svg className="text-app-accent h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+        <div className="bg-app-hover flex size-8 shrink-0 items-center justify-center rounded">
+          <svg className="text-app-accent size-5" viewBox="0 0 24 24" fill="currentColor">
             <path
               d={
                 "M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 " +

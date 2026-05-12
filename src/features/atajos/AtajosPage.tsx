@@ -1,7 +1,8 @@
+import type { ReactNode } from "react"
 import { shortcutSections } from "./data"
 import { cn } from "@/lib/utils"
 
-function Kbd({ className, children }: { className?: string; children: React.ReactNode }) {
+function Kbd({ className, children }: { className?: string; children: ReactNode }) {
   return (
     <kbd
       className={cn(
@@ -17,40 +18,44 @@ function Kbd({ className, children }: { className?: string; children: React.Reac
 }
 
 function KeyCombo({ keys }: { keys: string }) {
-  const parts = keys
-    .split(/\s*\/\s*/)
-    .map((p) => p.trim())
-    .filter(Boolean)
+  const parts = keys.split(/\s*\/\s*/).flatMap((p) => {
+    const t = p.trim()
+    return t ? [t] : []
+  })
 
   if (parts.length < 2) {
     return <Kbd>{keys}</Kbd>
   }
 
-  return (
-    <span className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
-      {parts.map((part, i) => (
-        <span key={`${part}-${i}`} className="flex items-center gap-2">
-          {i > 0 ? (
-            <span
-              className="text-app-fg-muted text-[11px] font-medium tracking-wider uppercase select-none"
-              aria-hidden
-            >
-              o
-            </span>
-          ) : null}
-
-          <Kbd>{part}</Kbd>
+  const nodes: ReactNode[] = []
+  let seq = 0
+  for (const part of parts) {
+    if (nodes.length > 0) {
+      nodes.push(
+        <span
+          key={`keycombo-or-${keys}-${seq++}`}
+          className="text-app-fg-muted text-[11px] font-medium tracking-wider uppercase select-none"
+          aria-hidden
+        >
+          o
         </span>
-      ))}
-    </span>
-  )
+      )
+    }
+    nodes.push(
+      <span key={`keycombo-wrap-${keys}-${seq++}`} className="flex items-center gap-2">
+        <Kbd>{part}</Kbd>
+      </span>
+    )
+  }
+
+  return <span className="flex flex-wrap items-center gap-x-2 gap-y-1.5">{nodes}</span>
 }
 
 export function AtajosPage() {
   return (
     <div className="overflow-auto p-4 pb-12 sm:p-6">
       <header className="mb-6 max-w-3xl sm:mb-8">
-        <h1 className="text-app-fg text-xl font-bold tracking-tight sm:text-2xl">Atajos de teclado</h1>
+        <h1 className="text-app-fg text-xl font-semibold tracking-tight sm:text-2xl">Atajos de teclado</h1>
 
         <p className="text-app-fg-secondary mt-2 text-sm leading-relaxed">
           Referencia rápida de combinaciones. Las alternativas equivalentes se muestran como teclas separadas.
@@ -72,9 +77,9 @@ export function AtajosPage() {
               className="border-app-border-muted divide-app-border-muted bg-app-raised divide-y rounded-xl border"
               role="list"
             >
-              {section.rows.map((row, i) => (
+              {section.rows.map((row) => (
                 <li
-                  key={`${section.title}-${row.keys}-${i}`}
+                  key={`${section.title}::${row.keys}::${row.desc}`}
                   className="flex flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-center sm:gap-6 sm:py-3"
                 >
                   <div className="sm:w-[min(42%,14rem)] sm:flex-shrink-0">

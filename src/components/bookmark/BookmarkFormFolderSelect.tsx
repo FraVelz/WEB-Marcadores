@@ -15,8 +15,11 @@ export default function BookmarkFormFolderSelect({ folderId, folderOptions, onCh
     <section className="space-y-4">
       <h3 className="text-app-fg-muted text-sm font-medium">Carpeta</h3>
       <div>
-        <label className="text-app-fg-label mb-1 block text-xs">Ubicación</label>
+        <label htmlFor="bm-modal-folder" className="text-app-fg-label mb-1 block text-xs">
+          Ubicación
+        </label>
         <select
+          id="bm-modal-folder"
           value={folderId}
           onChange={(e) => onChange(e.target.value)}
           data-no-vim
