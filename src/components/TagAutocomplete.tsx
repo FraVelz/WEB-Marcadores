@@ -12,6 +12,7 @@ type Props = {
   inputRef?: React.RefObject<HTMLInputElement | null>
   placeholder?: string
   className?: string
+  id?: string
 }
 
 export default function TagAutocomplete({
@@ -23,6 +24,7 @@ export default function TagAutocomplete({
   inputRef: externalRef,
   placeholder = "Etiqueta...",
   className = "",
+  id,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(0)
@@ -109,6 +111,7 @@ export default function TagAutocomplete({
     <div className="relative">
       <input
         ref={inputRef as React.RefObject<HTMLInputElement>}
+        id={id}
         type="text"
         role="combobox"
         value={value}

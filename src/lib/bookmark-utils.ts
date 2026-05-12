@@ -33,11 +33,12 @@ export function getFolderPathLabel(folders: FlatFolder[], folderId: string | nul
   if (!folderId) return "Raíz"
 
   const path: string[] = []
-  let current = folders.find((f) => f.id === folderId)
+  const byId = new Map(folders.map((f) => [f.id, f]))
+  let current = byId.get(folderId)
 
   while (current) {
     path.unshift(current.name)
-    current = current.parent_id ? folders.find((f) => f.id === current!.parent_id) : undefined
+    current = current.parent_id ? (byId.get(current.parent_id) ?? undefined) : undefined
   }
 
   return path.join(" › ") || "Raíz"

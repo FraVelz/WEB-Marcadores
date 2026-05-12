@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useEffectEvent } from "react"
+import Image from "next/image"
 
 import { buildFolderOptions, getFaviconUrl, getFolderPathLabel } from "@/lib/bookmark-utils"
 import BookmarkDetailFolderSection from "./bookmark/BookmarkDetailFolderSection"
@@ -40,6 +41,7 @@ function BookmarkDetailPanelInner({
   const [newTag, setNewTag] = useState("")
   const [saving, setSaving] = useState(false)
   const [moveFolderId, setMoveFolderId] = useState(bookmark.folder_id || "")
+  const [faviconBroken, setFaviconBroken] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
 
   const tags = bookmark.tags || []
@@ -80,9 +82,9 @@ function BookmarkDetailPanelInner({
   const panelContent = (
     <div
       ref={panelRef}
-      role={embedded ? undefined : "dialog"}
-      aria-modal={embedded ? undefined : "true"}
-      aria-label={embedded ? undefined : "Detalle del marcador"}
+      role="dialog"
+      aria-modal={embedded ? false : true}
+      aria-label={embedded ? "Propiedades del marcador" : "Detalle del marcador"}
       data-no-vim
       onKeyDown={(e) => e.stopPropagation()}
       className={
@@ -104,6 +106,7 @@ function BookmarkDetailPanelInner({
             {embedded ? "Propiedades" : "Detalle"}
           </h3>
           <button
+            type="button"
             onClick={onClose}
             className="text-app-fg-label hover:bg-app-hover hover:text-app-fg rounded p-1"
             aria-label="Cerrar"
@@ -114,17 +117,20 @@ function BookmarkDetailPanelInner({
 
         <div className="flex flex-1 flex-col gap-4 overflow-y-auto">
           <div className="flex items-start gap-3">
-            {favicon && (
-              // Favicons externos dinámicos; next/image requeriría dominios en remotePatterns
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+            {favicon && !faviconBroken ? (
+              <Image
                 src={favicon}
                 alt=""
-                className="h-10 w-10 flex-shrink-0 rounded"
-                onError={(e) => {
-                  ;(e.target as HTMLImageElement).style.display = "none"
-                }}
+                width={40}
+                height={40}
+                className="size-10 shrink-0 rounded"
+                unoptimized
+                onError={() => setFaviconBroken(true)}
               />
+            ) : (
+              <div className="bg-app-hover flex size-10 shrink-0 items-center justify-center rounded">
+                <span className="text-app-fg-muted text-xs">⋯</span>
+              </div>
             )}
             <div className="min-w-0 flex-1">
               <h2 className="text-app-fg font-semibold">{bookmark.title}</h2>
@@ -149,12 +155,12 @@ function BookmarkDetailPanelInner({
             bookmarkFolderId={bookmark.folder_id || null}
           />
 
-          {bookmark.description && (
+          {bookmark.description ? (
             <div>
-              <label className="text-app-fg-label mb-1 block text-xs">Descripción</label>
+              <div className="text-app-fg-label mb-1 text-xs font-medium">Descripción</div>
               <p className="text-app-fg-secondary text-sm">{bookmark.description}</p>
             </div>
-          )}
+          ) : null}
 
           {created && <p className="text-app-fg-label text-xs">Añadido: {created}</p>}
 
@@ -190,8 +196,13 @@ function BookmarkDetailPanelInner({
 
   return (
     <>
-      <div className="bg-app-overlay-strong fixed inset-0 z-40" onClick={onClose} aria-hidden />
-      {panelContent}
+      <button
+        type="button"
+        className="bg-app-overlay-strong fixed inset-0 z-40 cursor-default border-0"
+        aria-label="Cerrar panel de detalle"
+        onClick={onClose}
+      />
+      <div className="relative z-50">{panelContent}</div>
     </>
   )
 }
@@ -204,15 +215,17 @@ export default function BookmarkDetailPanel({
   folders,
   embedded = false,
 }: Props) {
+  const onCloseEvent = useEffectEvent(onClose)
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return
       if (document.querySelector('[role="dialog"][aria-modal="true"]')) return
-      onClose()
+      onCloseEvent()
     }
     if (bookmark) window.addEventListener("keydown", handleEscape)
     return () => window.removeEventListener("keydown", handleEscape)
-  }, [bookmark, onClose])
+  }, [bookmark])
 
   if (!bookmark) return null
 

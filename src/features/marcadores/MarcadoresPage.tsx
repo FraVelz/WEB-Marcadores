@@ -36,6 +36,7 @@ export function MarcadoresPage() {
   const [pasteError, setPasteError] = useState<string | null>(null)
   const [deleteConfirmItem, setDeleteConfirmItem] = useState<GridItem | null>(null)
   const [searchValue, setSearchValue] = useState("")
+  const [bookmarkModalNonce, setBookmarkModalNonce] = useState(0)
   const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map())
   const searchRef = useRef<HTMLInputElement>(null)
 
@@ -82,6 +83,7 @@ export function MarcadoresPage() {
   })
 
   const handleAdd = useCallback(() => {
+    setBookmarkModalNonce((n) => n + 1)
     setEditingBookmark(null)
     setModalOpen(true)
   }, [])
@@ -261,7 +263,7 @@ export function MarcadoresPage() {
     [selectedFolderId, folders, bookmarks, handlePasteFolder, handlePasteLink, setPasteError]
   )
 
-  if (loading) return <div className="text-app-fg-label flex flex-1 items-center justify-center">Cargando...</div>
+  if (loading) return <div className="text-app-fg-label flex flex-1 items-center justify-center">Cargando…</div>
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
@@ -346,30 +348,31 @@ export function MarcadoresPage() {
 
       <MarcadoresFooter flatList={flatList} selectedIndex={selectedIndex} />
 
-      <BookmarkModal
-        key={editingBookmark?.id ?? "new"}
-        isOpen={modalOpen}
-        onClose={() => {
-          setModalOpen(false)
-          setEditingBookmark(null)
-          requestAnimationFrame(() => focusMain())
-        }}
-        onSubmit={onModalSubmit}
-        initialData={
-          editingBookmark
-            ? {
-                title: editingBookmark.title,
-                url: editingBookmark.url,
-                description: editingBookmark.description || "",
-                folder_id: editingBookmark.folder_id || "",
-                tags: editingBookmark.tags?.join(", ") || "",
-              }
-            : null
-        }
-        allTags={allTags}
-        folders={folders}
-        currentFolderId={selectedFolderId}
-      />
+      {modalOpen && (
+        <BookmarkModal
+          key={editingBookmark?.id ?? `new-${bookmarkModalNonce}`}
+          onClose={() => {
+            setModalOpen(false)
+            setEditingBookmark(null)
+            requestAnimationFrame(() => focusMain())
+          }}
+          onSubmit={onModalSubmit}
+          initialData={
+            editingBookmark
+              ? {
+                  title: editingBookmark.title,
+                  url: editingBookmark.url,
+                  description: editingBookmark.description || "",
+                  folder_id: editingBookmark.folder_id || "",
+                  tags: editingBookmark.tags?.join(", ") || "",
+                }
+              : null
+          }
+          allTags={allTags}
+          folders={folders}
+          currentFolderId={selectedFolderId}
+        />
+      )}
     </div>
   )
 }

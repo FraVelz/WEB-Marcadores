@@ -27,11 +27,12 @@ export function getFolderPath(
 ): { id: string | null; label: string }[] {
   const path: { id: string | null; label: string }[] = [{ id: null, label: "Marcadores" }]
   if (!selectedFolderId) return path
-  let current = folders.find((f) => f.id === selectedFolderId)
+  const byId = new Map(folders.map((f) => [f.id, f]))
+  let current = byId.get(selectedFolderId)
   const chain: { id: string; label: string }[] = []
   while (current) {
     chain.unshift({ id: current.id, label: current.name })
-    current = current.parent_id ? folders.find((f) => f.id === current!.parent_id) : undefined
+    current = current.parent_id ? (byId.get(current.parent_id) ?? undefined) : undefined
   }
   return [...path, ...chain]
 }

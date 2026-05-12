@@ -10,7 +10,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "react:doctor": "react-doctor ."
+    "react:doctor": "react-doctor . --verbose --full"
   },
   "dependencies": {
     "@supabase/ssr": "^0.9.0",

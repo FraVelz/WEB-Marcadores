@@ -8,6 +8,8 @@
 
 Gestor de marcadores y favoritos con Next.js y Supabase. Organiza enlaces en carpetas, usa atajos y recorre la colección con una interfaz oscura tipo explorador. Puedes usar **modo demo** sin configurar Supabase.
 
+Con esta carpeta como raíz del workspace en Cursor, el comando `/update-readme` y las reglas completas están en [`.cursor/commands/update-readme.md`](.cursor/commands/update-readme.md) para mantener README bilingüe.
+
 ## ✨ Características
 
 - Carpetas anidadas, cuadrícula de marcadores y panel de detalle con metadatos y etiquetas

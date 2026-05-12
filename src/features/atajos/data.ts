@@ -1,4 +1,4 @@
-export type ShortcutRow = { keys: string; desc: string }
+type ShortcutRow = { keys: string; desc: string }
 
 export type ShortcutSection = { title: string; hint?: string; rows: ShortcutRow[] }
 

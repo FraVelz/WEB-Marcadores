@@ -25,30 +25,36 @@ export default function BookmarkDetailFolderSection({
 }: Props) {
   return (
     <div>
-      <label className="text-app-fg-label mb-1 block text-xs">Carpeta actual</label>
+      <div className="text-app-fg-label mb-1 text-xs font-medium">Carpeta actual</div>
       <p className="text-app-fg-secondary text-sm">{currentFolderPath}</p>
       {folderOptions.length > 0 && (
-        <div className="mt-2 flex gap-2">
-          <select
-            value={moveFolderId}
-            onChange={(e) => onMoveFolderIdChange(e.target.value)}
-            className={cn(
-              "border-app-input-border bg-app-raised-muted text-app-fg flex-1 rounded border px-2 py-1 text-sm",
-              "focus:border-app-focus focus:outline-none"
-            )}
-          >
-            <option value="">Raíz</option>
-            {folderOptions.map((opt) => (
-              <option key={opt.id} value={opt.id}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <div className="min-w-0 flex-1">
+            <label htmlFor="bookmark-detail-move-folder" className="sr-only">
+              Elegir carpeta de destino
+            </label>
+            <select
+              id="bookmark-detail-move-folder"
+              value={moveFolderId}
+              onChange={(e) => onMoveFolderIdChange(e.target.value)}
+              className={cn(
+                "border-app-input-border bg-app-raised-muted text-app-fg w-full rounded border px-2 py-1 text-sm",
+                "focus:border-app-focus focus:outline-none"
+              )}
+            >
+              <option value="">Raíz</option>
+              {folderOptions.map((opt) => (
+                <option key={opt.id} value={opt.id}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
           <button
             type="button"
             onClick={onMove}
             disabled={saving || moveFolderId === (bookmarkFolderId || "")}
-            className="bg-app-hover text-app-fg hover:bg-app-active rounded px-2 py-1 text-xs disabled:opacity-50"
+            className="bg-app-hover text-app-fg hover:bg-app-active shrink-0 rounded px-2 py-1 text-xs disabled:opacity-50"
           >
             Mover
           </button>

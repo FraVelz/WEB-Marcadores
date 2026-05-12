@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import { DEMO_TAGS } from "@/lib/demo-data"
 import { sortedUniqueTagsFromRows } from "@/lib/bookmark-tags"
 
-export type ViewMode = "grid" | "hierarchical"
+type ViewMode = "grid" | "hierarchical"
 
 export type Folder = {
   id: string

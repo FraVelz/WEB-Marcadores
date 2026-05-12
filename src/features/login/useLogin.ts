@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
+import { authenticateWithEmailPassword } from "./authenticate-email"
 import type { LoginType } from "./types"
 
 export function useLogin(demo: boolean): LoginType {
@@ -22,28 +23,23 @@ export function useLogin(demo: boolean): LoginType {
       return
     }
 
-    try {
-      setLoading(true)
-      setError(null)
+    setLoading(true)
+    setError(null)
 
-      const action =
-        type === "login"
-          ? supabase.auth.signInWithPassword({ email, password })
-          : supabase.auth.signUp({ email, password })
+    const result = await authenticateWithEmailPassword({ supabase, type, email, password })
 
-      const { error } = await action
-
-      if (error) {
-        setError(type === "login" ? "Correo o contraseña incorrectos" : error.message)
-        return
+    if (!result.ok) {
+      if (result.kind === "auth") {
+        setError(type === "login" ? "Correo o contraseña incorrectos" : result.message)
+      } else {
+        setError("Ocurrió un error inesperado")
       }
-
-      router.push("/marcadores")
-    } catch {
-      setError("Ocurrió un error inesperado")
-    } finally {
       setLoading(false)
+      return
     }
+
+    router.push("/marcadores")
+    setLoading(false)
   }
 
   return {

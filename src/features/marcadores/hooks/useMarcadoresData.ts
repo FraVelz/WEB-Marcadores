@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useMemo, useEffect } from "react"
+import { useState, useCallback, useMemo, useEffect, startTransition } from "react"
 import { useDashboard } from "@/contexts/DashboardContext"
 import { createClient } from "@/lib/supabase/client"
 import { DEMO_BOOKMARKS, DEMO_FOLDERS } from "@/lib/demo-data"
@@ -36,16 +36,10 @@ export function useMarcadoresData(
   }, [demoMode, setCtxFolders, refreshFolders, setAllTagsFromBookmarks])
 
   useEffect(() => {
-    queueMicrotask(() => {
+    startTransition(() => {
       void fetchData()
     })
   }, [fetchData])
-
-  useEffect(() => {
-    if (demoMode) {
-      setCtxFolders(buildFolderTree(folders))
-    }
-  }, [demoMode, folders, setCtxFolders])
 
   const filteredBookmarks = useMemo(() => {
     const q = searchValue.trim().toLowerCase()

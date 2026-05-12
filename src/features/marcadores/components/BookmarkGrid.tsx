@@ -2,9 +2,8 @@
 
 import { cn } from "@/lib/utils"
 import type { GridItem, CutItem } from "../utils/types"
+import { BOOKMARK_DRAG_MIME_TYPE, parseBookmarkDragPayload } from "../utils/parseDragPayload"
 import BookmarkGridItem from "./BookmarkGridItem"
-
-const DRAG_TYPE = "application/x-bookmark-item"
 
 type Props = {
   flatList: GridItem[]
@@ -50,26 +49,10 @@ export default function BookmarkGrid({
         onDrop
           ? (e) => {
               e.preventDefault()
-              const raw = e.dataTransfer.getData(DRAG_TYPE)
+              const raw = e.dataTransfer.getData(BOOKMARK_DRAG_MIME_TYPE)
               if (!raw) return
-              try {
-                const payload = JSON.parse(raw)
-                const sourceItem: GridItem =
-                  payload.type === "folder"
-                    ? { type: "folder", id: payload.id, folderId: payload.id, label: payload.name }
-                    : {
-                        type: "link",
-                        bookmark: {
-                          id: payload.bookmark.id,
-                          title: "",
-                          url: payload.bookmark.url,
-                          folder_id: null,
-                        },
-                      }
-                onDrop(sourceItem, null)
-              } catch {
-                // ignore
-              }
+              const sourceItem = parseBookmarkDragPayload(raw)
+              if (sourceItem) onDrop(sourceItem, null)
             }
           : undefined
       }
@@ -109,7 +92,7 @@ export default function BookmarkGrid({
 function EmptyState({ onAddBookmark, onNewFolder }: { onAddBookmark: () => void; onNewFolder: () => void }) {
   return (
     <div className="text-app-fg-label flex flex-col items-center justify-center py-16">
-      <svg className="text-app-empty-icon mb-4 h-16 w-16" viewBox="0 0 24 24" fill="currentColor">
+      <svg className="text-app-empty-icon mb-4 size-16" viewBox="0 0 24 24" fill="currentColor">
         <path
           d={
             "M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2" +

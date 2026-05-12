@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useEffectEvent } from "react"
 
 type Params<T> = {
   searchValue: string
@@ -41,6 +41,15 @@ export function useMarcadoresEffects<T>(params: Params<T>) {
     searchRef,
   } = params
 
+  const focusSearchShortcut = useEffectEvent(() => {
+    setShowSearch(true)
+    setTimeout(() => searchRef.current?.focus(), 0)
+  })
+
+  const clearPasteError = useEffectEvent(() => {
+    setPasteError(null)
+  })
+
   useEffect(() => setSelectedIndex(0), [searchValue, selectedFolderId, setSelectedIndex])
   useEffect(() => {
     itemRefs.current.get(selectedIndex)?.scrollIntoView({ block: "nearest", behavior: "smooth" })
@@ -58,29 +67,28 @@ export function useMarcadoresEffects<T>(params: Params<T>) {
   }, [setGridCols])
   useEffect(() => {
     const item = flatList[selectedIndex]
-    if (infoPanelEnabled) setDetailBookmark((item?.type === "link" ? (item.bookmark ?? null) : null) as T | null)
-    else setDetailBookmark(null)
+    const next =
+      infoPanelEnabled && item?.type === "link" ? ((item.bookmark ?? null) as T | null) : null
+    setDetailBookmark(next)
   }, [flatList, selectedIndex, infoPanelEnabled, setDetailBookmark])
   useEffect(() => {
-    if (modalOpen) setMainKeyDown(null)
-    else setMainKeyDown(handleKeyDown)
+    const nextHandler = modalOpen ? null : handleKeyDown
+    setMainKeyDown(nextHandler)
     return () => setMainKeyDown(null)
-  }, [setMainKeyDown, handleKeyDown, modalOpen])
+  }, [modalOpen, handleKeyDown, setMainKeyDown])
   useEffect(() => {
-    if (pasteError) {
-      const t = setTimeout(() => setPasteError(null), 4000)
-      return () => clearTimeout(t)
-    }
-  }, [pasteError, setPasteError])
+    if (!pasteError) return
+    const t = setTimeout(() => clearPasteError(), 4000)
+    return () => clearTimeout(t)
+  }, [pasteError, clearPasteError])
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
       if (e.ctrlKey && (e.key === "f" || e.key === "k")) {
         e.preventDefault()
-        setShowSearch(true)
-        setTimeout(() => searchRef.current?.focus(), 0)
+        focusSearchShortcut()
       }
     }
     window.addEventListener("keydown", h)
     return () => window.removeEventListener("keydown", h)
-  }, [setShowSearch, searchRef])
+  }, [focusSearchShortcut])
 }

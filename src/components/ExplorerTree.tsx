@@ -14,7 +14,7 @@ type Props = {
 
 function FolderIcon() {
   return (
-    <svg className="text-app-folder h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+    <svg className="text-app-folder size-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
       <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
     </svg>
   )
@@ -79,7 +79,7 @@ export default function ExplorerTree({ folders, selectedFolderId, onSelect, coll
             : "text-app-fg-secondary hover:bg-app-hover hover:text-app-fg"
         )}
       >
-        <svg className="text-app-accent h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+        <svg className="text-app-accent size-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
           <path
             d={
               "M3 3h8v2H3V3zm0 4h8v2H3V7zm0 4h8v2H3v-2zm0 4h8v2H3v-2z" +

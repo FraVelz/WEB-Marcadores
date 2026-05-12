@@ -4,6 +4,7 @@ import { useCallback } from "react"
 import { useDashboard } from "@/contexts/DashboardContext"
 import { createClient } from "@/lib/supabase/client"
 import { buildFolderTree } from "../utils/utils"
+import { splitCommaTags } from "@/lib/comma-tags"
 import type { Bookmark, FlatFolder } from "../utils/types"
 import type { BookmarkFormData } from "@/components/BookmarkModal"
 
@@ -72,12 +73,7 @@ export function useMarcadoresActions({
 
   const handleModalSubmit = useCallback(
     async (data: BookmarkFormData, editingBookmark: Bookmark | null) => {
-      const tags = data.tags
-        ? data.tags
-            .split(",")
-            .map((t) => t.trim())
-            .filter(Boolean)
-        : []
+      const tags = data.tags ? splitCommaTags(data.tags) : []
       const folder_id = data.folder_id || null
 
       if (demoMode) {
@@ -136,12 +132,7 @@ export function useMarcadoresActions({
         url: data.url,
         description: data.description || null,
         folder_id,
-        tags: data.tags
-          ? data.tags
-              .split(",")
-              .map((t) => t.trim())
-              .filter(Boolean)
-          : [],
+        tags: data.tags ? splitCommaTags(data.tags) : [],
       }
 
       if (editingBookmark) {
@@ -176,11 +167,14 @@ export function useMarcadoresActions({
     async (folderId: string) => {
       const parentId = folders.find((f) => f.id === folderId)?.parent_id ?? null
       const descendantIds = new Set<string>()
-      const collect = (id: string) => {
+      const stack = [folderId]
+      while (stack.length > 0) {
+        const id = stack.pop()!
         descendantIds.add(id)
-        folders.filter((f) => f.parent_id === id).forEach((f) => collect(f.id))
+        for (const f of folders) {
+          if ((f.parent_id || null) === id) stack.push(f.id)
+        }
       }
-      collect(folderId)
 
       if (demoMode) {
         setBookmarks((prev) =>
@@ -194,8 +188,10 @@ export function useMarcadoresActions({
         refreshFolders()
         return
       }
-      await supabase.from("bookmarks").update({ folder_id: parentId }).in("folder_id", Array.from(descendantIds))
-      await supabase.from("folders").delete().in("id", Array.from(descendantIds))
+      await Promise.all([
+        supabase.from("bookmarks").update({ folder_id: parentId }).in("folder_id", Array.from(descendantIds)),
+        supabase.from("folders").delete().in("id", Array.from(descendantIds)),
+      ])
       await fetchData()
     },
     [demoMode, folders, supabase, setBookmarks, setFolders, setCtxFolders, refreshFolders, fetchData]

@@ -1,5 +1,4 @@
 import { createBrowserClient } from "@supabase/ssr"
-import { isDemoMode } from "@/lib/demo-data"
 
 const DEMO_URL = "https://demo.supabase.co"
 const DEMO_KEY =
@@ -24,5 +23,3 @@ export function createClient(): BrowserClient {
 
   return browserClient
 }
-
-export { isDemoMode }

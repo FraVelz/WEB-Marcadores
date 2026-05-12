@@ -1,5 +1,10 @@
 import { redirect } from "next/navigation"
 
+export const metadata = {
+  title: "Demo Marcadores",
+  description: "Entrada directa a la interfaz en modo demo (sin credenciales), si el proyecto tiene demo habilitado.",
+}
+
 function isDemoMode(): boolean {
   if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") return true
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL

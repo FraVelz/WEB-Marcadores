@@ -1,8 +1,9 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef, useEffectEvent, useMemo } from "react"
 import { buildFolderOptions } from "@/lib/bookmark-utils"
 import { cn } from "@/lib/utils"
+import { splitCommaTags } from "@/lib/comma-tags"
 import BookmarkFormBasicInfo from "./bookmark/BookmarkFormBasicInfo"
 import BookmarkFormFolderSelect from "./bookmark/BookmarkFormFolderSelect"
 import BookmarkFormTagsSection from "./bookmark/BookmarkFormTagsSection"
@@ -18,7 +19,6 @@ export type BookmarkFormData = {
 type Folder = { id: string; parent_id: string | null; name: string; sort_order: number }
 
 type Props = {
-  isOpen: boolean
   onClose: () => void
   onSubmit: (data: BookmarkFormData) => void | Promise<void>
   initialData?: Partial<BookmarkFormData> | null
@@ -36,7 +36,6 @@ const emptyForm: BookmarkFormData = {
 }
 
 export default function BookmarkModal({
-  isOpen,
   onClose,
   onSubmit,
   initialData,
@@ -44,36 +43,39 @@ export default function BookmarkModal({
   folders,
   currentFolderId,
 }: Props) {
-  const data = { ...emptyForm, folder_id: currentFolderId || "", ...initialData }
-  const [tagsValue, setTagsValue] = useState(data.tags)
-  const [folderId, setFolderId] = useState(data.folder_id)
+  const merged = useMemo(
+    () => ({
+      ...emptyForm,
+      folder_id: currentFolderId || "",
+      ...initialData,
+    }),
+    [initialData, currentFolderId]
+  )
+  const [tagsValue, setTagsValue] = useState(merged.tags)
+  const [folderId, setFolderId] = useState(merged.folder_id)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const firstInputRef = useRef<HTMLInputElement>(null)
   const modalContentRef = useRef<HTMLDivElement>(null)
   const tagInputRef = useRef<string>("")
 
+  const onCloseEvent = useEffectEvent(onClose)
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose()
+      if (e.key === "Escape") onCloseEvent()
     }
-    if (isOpen) window.addEventListener("keydown", handleEscape)
+    window.addEventListener("keydown", handleEscape)
     return () => window.removeEventListener("keydown", handleEscape)
-  }, [isOpen, onClose])
+  }, [])
 
   useEffect(() => {
-    if (isOpen) {
-      setTagsValue(initialData?.tags ?? data.tags)
-      setFolderId(initialData?.folder_id ?? currentFolderId ?? "")
-      setSubmitError(null)
-      tagInputRef.current = ""
-      requestAnimationFrame(() => firstInputRef.current?.focus())
-    }
-  }, [isOpen, initialData?.tags, initialData?.folder_id, currentFolderId, data.tags])
+    requestAnimationFrame(() => firstInputRef.current?.focus())
+  }, [])
 
   useEffect(() => {
-    if (!isOpen || !modalContentRef.current) return
     const el = modalContentRef.current
+    if (!el) return
     const focusables = el.querySelectorAll<HTMLElement>(
       [
         "input:not([disabled]), textarea:not([disabled]), button:not([disabled]),",
@@ -98,9 +100,7 @@ export default function BookmarkModal({
     }
     el.addEventListener("keydown", handleKeyDown)
     return () => el.removeEventListener("keydown", handleKeyDown)
-  }, [isOpen])
-
-  if (!isOpen) return null
+  }, [])
 
   const folderOptions = buildFolderOptions(folders)
 
@@ -109,15 +109,9 @@ export default function BookmarkModal({
     setSubmitError(null)
     setSubmitting(true)
     const form = e.currentTarget
-    const pendingTag = tagInputRef.current?.trim()
-    const finalTags = pendingTag
-      ? [
-          ...tagsValue
-            .split(",")
-            .map((t) => t.trim())
-            .filter(Boolean),
-          pendingTag,
-        ].join(", ")
+    const trimmedPending = tagInputRef.current?.trim() ?? ""
+    const finalTags = trimmedPending
+      ? [...splitCommaTags(tagsValue), trimmedPending].join(", ")
       : tagsValue
     const formData: BookmarkFormData = {
       title: (form.elements.namedItem("title") as HTMLInputElement).value,
@@ -128,12 +122,12 @@ export default function BookmarkModal({
     }
     try {
       await onSubmit(formData)
-      onClose()
+      onCloseEvent()
+      return
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Error al guardar")
-    } finally {
-      setSubmitting(false)
     }
+    setSubmitting(false)
   }
 
   return (
@@ -145,22 +139,27 @@ export default function BookmarkModal({
       data-no-vim
       onKeyDown={(e) => e.stopPropagation()}
     >
-      <div className="absolute inset-0" onClick={onClose} aria-hidden />
+      <button
+        type="button"
+        className="absolute inset-0 z-0 cursor-default border-none bg-transparent p-0"
+        aria-label="Cerrar modal"
+        onClick={onClose}
+      />
       <div
         ref={modalContentRef}
         className={cn(
-          "relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl",
+          "relative z-10 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl",
           "border-app-border bg-app-raised border p-6 shadow-xl"
         )}
       >
-        <h2 id="modal-title" className="text-app-fg mb-4 text-xl font-bold">
+        <h2 id="modal-title" className="text-app-fg mb-4 text-xl font-semibold">
           {initialData ? "Editar marcador" : "Agregar marcador"}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <BookmarkFormBasicInfo
-            title={data.title}
-            url={data.url}
-            description={data.description}
+            title={merged.title}
+            url={merged.url}
+            description={merged.description}
             firstInputRef={firstInputRef}
           />
           <BookmarkFormFolderSelect folderId={folderId} folderOptions={folderOptions} onChange={setFolderId} />
@@ -200,7 +199,7 @@ export default function BookmarkModal({
                 "hover:bg-app-primary-hover"
               )}
             >
-              {submitting ? "Guardando..." : initialData ? "Guardar" : "Agregar"}
+              {submitting ? "Guardando…" : initialData ? "Guardar" : "Agregar"}
             </button>
           </div>
         </form>

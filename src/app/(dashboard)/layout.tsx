@@ -2,8 +2,9 @@ export const dynamic = "force-dynamic"
 
 import { cookies } from "next/headers"
 
-import DashboardShell from "@/components/DashboardShell"
+import DashboardShell from "@/layouts/dashboard/DashboardShell"
 import { DashboardProvider } from "@/contexts/DashboardContext"
+
 import { cookieHeaderFromRequestCookies, isDemoMode } from "@/lib/demo-data"
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {

@@ -33,7 +33,7 @@ export default function ToolbarNavigationButtons({
         className="text-app-fg-muted hover:bg-app-active hover:text-app-fg rounded p-1.5"
         title="Subir"
       >
-        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+        <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z" />
         </svg>
       </button>
@@ -44,7 +44,7 @@ export default function ToolbarNavigationButtons({
         className="text-app-fg-muted hover:bg-app-active hover:text-app-fg rounded p-1.5"
         title="Nuevo marcador"
       >
-        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+        <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
           <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
         </svg>
       </button>
@@ -54,7 +54,7 @@ export default function ToolbarNavigationButtons({
         className="text-app-fg-muted hover:bg-app-active hover:text-app-fg rounded p-1.5"
         title="Nueva carpeta"
       >
-        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+        <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
           <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
         </svg>
       </button>
@@ -65,7 +65,7 @@ export default function ToolbarNavigationButtons({
           className="text-app-fg-muted hover:bg-app-danger/15 hover:text-app-danger-fg rounded p-1.5"
           title="Eliminar (dd)"
         >
-          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+          <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
             <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
           </svg>
         </button>
@@ -79,7 +79,7 @@ export default function ToolbarNavigationButtons({
         )}
         title="Modo información (i)"
       >
-        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+        <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-4h-2V7h2v2z" />
         </svg>
       </button>
@@ -93,7 +93,7 @@ export default function ToolbarNavigationButtons({
         )}
         title="Buscar (Ctrl+F)"
       >
-        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+        <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
           <path
             d={
               "M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 " +
