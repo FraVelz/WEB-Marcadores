@@ -37,6 +37,31 @@ const defaultOpts: UseMarcadoresDataOpts = {
   activeViewAst: null,
 }
 
+/** Lista de elementos (grid) para una carpeta concreta; comparte reglas con `useMarcadoresData`. */
+export function buildMarcadoresFlatList(
+  folders: FlatFolder[],
+  viewFilteredBookmarks: Bookmark[],
+  selectedFolderId: string | null,
+  browseMode: BrowseMode
+): GridItem[] {
+  if (browseMode === "filter") {
+    return viewFilteredBookmarks
+      .slice()
+      .sort((a, b) => (a.title || "").localeCompare(b.title || ""))
+      .map((b) => ({ type: "link" as const, bookmark: b }))
+  }
+  const parentId = selectedFolderId
+  const subfolders = folders
+    .filter((f) => (f.parent_id || null) === parentId)
+    .sort((a, b) => a.sort_order - b.sort_order)
+    .map((f) => ({ type: "folder" as const, id: f.id, folderId: f.id, label: f.name }))
+  const links = viewFilteredBookmarks
+    .filter((b) => (b.folder_id || null) === parentId)
+    .sort((a, b) => (a.title || "").localeCompare(b.title || ""))
+    .map((b) => ({ type: "link" as const, bookmark: b }))
+  return [...subfolders, ...links]
+}
+
 export function useMarcadoresData(
   searchValue: string,
   selectedFolderId: string | null,
@@ -99,25 +124,10 @@ export function useMarcadoresData(
     return filteredBySearch.filter((b) => compiledView.match(b, deriveBookmarkFields(b)))
   }, [browseMode, compiledView, filteredBySearch])
 
-  const flatList = useMemo((): GridItem[] => {
-    if (browseMode === "filter") {
-      return filteredBookmarks
-        .slice()
-        .sort((a, b) => (a.title || "").localeCompare(b.title || ""))
-        .map((b) => ({ type: "link" as const, bookmark: b }))
-    }
-
-    const parentId = selectedFolderId
-    const subfolders = folders
-      .filter((f) => (f.parent_id || null) === parentId)
-      .sort((a, b) => a.sort_order - b.sort_order)
-      .map((f) => ({ type: "folder" as const, id: f.id, folderId: f.id, label: f.name }))
-    const links = filteredBookmarks
-      .filter((b) => (b.folder_id || null) === parentId)
-      .sort((a, b) => (a.title || "").localeCompare(b.title || ""))
-      .map((b) => ({ type: "link" as const, bookmark: b }))
-    return [...subfolders, ...links]
-  }, [browseMode, filteredBookmarks, folders, selectedFolderId])
+  const flatList = useMemo(
+    (): GridItem[] => buildMarcadoresFlatList(folders, filteredBookmarks, selectedFolderId, browseMode),
+    [browseMode, filteredBookmarks, folders, selectedFolderId]
+  )
 
   const breadcrumb = useMemo(() => getFolderPath(folders, selectedFolderId), [folders, selectedFolderId])
 

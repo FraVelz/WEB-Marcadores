@@ -86,6 +86,8 @@ export type MarcadoresDesktopLibraryPaneProps = {
   currentLocationLabel: string
   /** En modo escritorio multi-ventana: solo la ventana enfocada enlaza atajos del árbol. */
   registerExplorerFocus?: boolean
+  explorerFolderId: string | null
+  setExplorerFolderId: (id: string | null) => void
 }
 
 export function MarcadoresDesktopLibraryPane(props: MarcadoresDesktopLibraryPaneProps) {
@@ -153,7 +155,10 @@ export function MarcadoresDesktopLibraryPane(props: MarcadoresDesktopLibraryPane
       <MarcadoresBreadcrumb breadcrumb={props.breadcrumb} onSelect={props.onSelectBreadcrumb} />
 
       <div className="flex min-h-0 flex-1 flex-row overflow-hidden">
-        <MarcadoresExplorerRail registerGlobalExplorerRef={props.registerExplorerFocus ?? true} />
+        <MarcadoresExplorerRail
+          registerGlobalExplorerRef={props.registerExplorerFocus ?? true}
+          folderSelection={{ folderId: props.explorerFolderId, onFolderChange: props.setExplorerFolderId }}
+        />
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           {props.primaryViewMode === "grid" ? (
             <BookmarkGrid

@@ -59,21 +59,38 @@ function applyResize(orig: WindowBounds, edge: ResizeEdge, dx: number, dy: numbe
 }
 
 function clampBounds(b: WindowBounds, cw: number, ch: number): WindowBounds {
-  const maxW = Math.max(MIN_W, cw - DESKTOP_MARGIN * 2)
-  const maxH = Math.max(MIN_H, ch - DESKTOP_MARGIN * 2)
-  const w = Math.min(Math.max(MIN_W, b.w), maxW)
-  const h = Math.min(Math.max(MIN_H, b.h), maxH)
-  const x = Math.min(Math.max(DESKTOP_MARGIN, b.x), cw - DESKTOP_MARGIN - w)
-  const y = Math.min(Math.max(DESKTOP_MARGIN, b.y), ch - DESKTOP_MARGIN - h)
+  if (!Number.isFinite(cw) || !Number.isFinite(ch) || cw <= 0 || ch <= 0) {
+    return {
+      x: DESKTOP_MARGIN,
+      y: DESKTOP_MARGIN,
+      w: Math.max(MIN_W, b.w),
+      h: Math.max(MIN_H, b.h),
+    }
+  }
+
+  const capW = Math.max(1, cw - DESKTOP_MARGIN * 2)
+  const capH = Math.max(1, ch - DESKTOP_MARGIN * 2)
+  const w = Math.min(Math.max(MIN_W, b.w), capW)
+  const h = Math.min(Math.max(MIN_H, b.h), capH)
+
+  const minX = DESKTOP_MARGIN
+  const minY = DESKTOP_MARGIN
+  const maxX = cw - DESKTOP_MARGIN - w
+  const maxY = ch - DESKTOP_MARGIN - h
+  const x = Math.min(Math.max(minX, b.x), Math.max(minX, maxX))
+  const y = Math.min(Math.max(minY, b.y), Math.max(minY, maxY))
   return { x, y, w, h }
 }
 
 function maxInset(cw: number, ch: number): WindowBounds {
+  if (!Number.isFinite(cw) || !Number.isFinite(ch) || cw <= 0 || ch <= 0) {
+    return { x: DESKTOP_MARGIN, y: DESKTOP_MARGIN, w: MIN_W, h: MIN_H }
+  }
   return {
     x: DESKTOP_MARGIN,
     y: DESKTOP_MARGIN,
-    w: cw - DESKTOP_MARGIN * 2,
-    h: ch - DESKTOP_MARGIN * 2,
+    w: Math.max(1, cw - DESKTOP_MARGIN * 2),
+    h: Math.max(1, ch - DESKTOP_MARGIN * 2),
   }
 }
 

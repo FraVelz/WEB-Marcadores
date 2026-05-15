@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, use, useRef, useCallback, useState, useEffect, useEffectEvent } from "react"
+import type { ReactNode } from "react"
 
 import { createClient } from "@/lib/supabase/client"
 
@@ -9,6 +10,7 @@ import { SINGLE_LAYOUT_PAYLOAD } from "@/features/marcadores/workspaces/workspac
 import type { WorkspaceRow } from "@/features/marcadores/workspaces/workspaceTypes"
 import { DEMO_TAGS, DEMO_WORKSPACES } from "@/lib/demo-data"
 import { sortedUniqueTagsFromRows } from "@/lib/bookmark-tags"
+import { readTabScopedItem, writeTabScopedItem } from "@/lib/tabScopedStorage"
 import { useSidebarTreeCollapse } from "@/layouts/dashboard/hooks/useSidebarTreeCollapse"
 
 export type Folder = {
@@ -74,11 +76,19 @@ type DashboardContextType = {
    * Pantalla completa del escritorio lo usa para mantener visible la barra superior de la app.
    */
   dashboardFullscreenHostRef: React.RefObject<HTMLDivElement | null>
+
+  /**
+   * Contenido opcional alineado a la derecha de la cabecera «Explorador» (viewport ancho),
+   * p. ej. acciones del escritorio de Marcadores en una sola fila.
+   */
+  explorerWideHeaderEndSlot: ReactNode | null
+  registerExplorerWideHeaderEnd: (node: ReactNode | null) => void
 }
 
 const DashboardContext = createContext<DashboardContextType | null>(null)
 
-function layoutStorageKey(workspaceId: string, demoMode: boolean) {
+/** Clave base sin scope de pestaña (`readTabScopedItem` / `writeTabScopedItem`). */
+function layoutStorageKeyBase(workspaceId: string, demoMode: boolean) {
   if (demoMode) return `${DEMO_LAYOUT_PREFIX}${workspaceId}`
   return ACTIVE_WS_KEY + ".layout." + workspaceId
 }
@@ -109,10 +119,17 @@ export function DashboardProvider({ children, demoMode }: { children: React.Reac
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
 
   const [marcadoresPalette, setMarcadoresPalette] = useState<MarcadoresRuntimeSnap | null>(null)
+  const [explorerWideHeaderEndSlot, setExplorerWideHeaderEndSlot] = useState<ReactNode | null>(null)
 
   const registerMarcadoresRuntime = useCallback((snapshot: MarcadoresRuntimeSnap | null) => {
     queueMicrotask(() => {
       setMarcadoresPalette(snapshot)
+    })
+  }, [])
+
+  const registerExplorerWideHeaderEnd = useCallback((node: ReactNode | null) => {
+    queueMicrotask(() => {
+      setExplorerWideHeaderEndSlot(node)
     })
   }, [])
 
@@ -121,7 +138,7 @@ export function DashboardProvider({ children, demoMode }: { children: React.Reac
       setActiveWorkspaceIdState(id)
       if (typeof window === "undefined" || id === null) return
       try {
-        localStorage.setItem(ACTIVE_WS_KEY, id)
+        writeTabScopedItem(ACTIVE_WS_KEY, id)
       } catch {
         /* ignore quota */
       }
@@ -133,7 +150,7 @@ export function DashboardProvider({ children, demoMode }: { children: React.Reac
     async (workspaceId: string) => {
       if (demoMode) {
         try {
-          const raw = localStorage.getItem(layoutStorageKey(workspaceId, true))
+          const raw = readTabScopedItem(layoutStorageKeyBase(workspaceId, true))
           if (raw) setWorkspaceLayout(JSON.parse(raw) as WorkspaceLayoutPayload)
           else setWorkspaceLayout(SINGLE_LAYOUT_PAYLOAD)
         } catch {
@@ -159,7 +176,7 @@ export function DashboardProvider({ children, demoMode }: { children: React.Reac
       if (demoMode) {
         const rows = DEMO_WORKSPACES.map((w) => ({ id: w.id, name: w.name, sort_order: w.sort_order }))
         setWorkspaces(rows)
-        const stored = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_WS_KEY) : null
+        const stored = typeof window !== "undefined" ? readTabScopedItem(ACTIVE_WS_KEY) : null
         const pick = (stored && rows.some((x) => x.id === stored) ? stored : null) ?? rows[0]?.id ?? null
         setActiveWorkspaceId(pick)
         return
@@ -198,7 +215,7 @@ export function DashboardProvider({ children, demoMode }: { children: React.Reac
 
       const normalized = rows || []
 
-      const stored = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_WS_KEY) : null
+      const stored = typeof window !== "undefined" ? readTabScopedItem(ACTIVE_WS_KEY) : null
       const pick =
         (stored && normalized.some((x: WorkspaceRow) => x.id === stored) ? stored : null) ?? normalized[0]?.id ?? null
 
@@ -220,7 +237,7 @@ export function DashboardProvider({ children, demoMode }: { children: React.Reac
 
       if (demoMode) {
         try {
-          localStorage.setItem(layoutStorageKey(activeWorkspaceId, true), JSON.stringify(payload))
+          writeTabScopedItem(layoutStorageKeyBase(activeWorkspaceId, true), JSON.stringify(payload))
         } catch {
           /* ignore */
         }
@@ -357,6 +374,9 @@ export function DashboardProvider({ children, demoMode }: { children: React.Reac
         explorerFlatSidebarItems,
         marcadoresExplorerPanelRef,
         dashboardFullscreenHostRef,
+
+        explorerWideHeaderEndSlot,
+        registerExplorerWideHeaderEnd,
       }}
     >
       {children}

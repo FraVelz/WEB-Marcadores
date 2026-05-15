@@ -4,13 +4,27 @@ import { Geist, Geist_Mono } from "next/font/google"
 
 import { AppAppearanceProvider } from "@/contexts/AppAppearanceContext"
 import { APP_APPEARANCE_STORAGE_KEY } from "@/lib/appAppearance"
+import { TAB_SCOPE_FALLBACK_ID, TAB_SCOPE_SESSION_KEY } from "@/lib/tabScopedStorage"
 
 import "./globals.css"
 
 const APPEARANCE_INIT_SCRIPT = `try{
-var k=${JSON.stringify(APP_APPEARANCE_STORAGE_KEY)};
+var SK=${JSON.stringify(TAB_SCOPE_SESSION_KEY)};
+var FB=${JSON.stringify(TAB_SCOPE_FALLBACK_ID)};
+var BK=${JSON.stringify(APP_APPEARANCE_STORAGE_KEY)};
+var sid=null;
+try{
+sid=sessionStorage.getItem(SK);
+if(!sid){sid=crypto.randomUUID();sessionStorage.setItem(SK,sid)}
+}catch(__){sid=FB}
+var k=sid+'::'+BK;
+var raw=null;
+try{
+raw=localStorage.getItem(k);
+if(raw==null)raw=localStorage.getItem(BK)
+}catch(__){}
 var d=null;
-try{d=JSON.parse(localStorage.getItem(k)||'null')}catch(__){}
+try{if(raw)d=JSON.parse(raw)}catch(__){}
 if(!d||typeof d!=='object'){
 document.documentElement.classList.add('dark');
 }else{

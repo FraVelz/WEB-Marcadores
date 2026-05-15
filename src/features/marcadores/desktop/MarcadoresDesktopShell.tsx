@@ -6,24 +6,28 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { DesktopShortcut } from "@/features/marcadores/desktop/DesktopShortcut"
 import { DesktopWindowFrame, clampBounds, DESKTOP_MARGIN } from "@/features/marcadores/desktop/DesktopWindowFrame"
 import { MarcadoresDesktopLayoutBar } from "@/features/marcadores/desktop/MarcadoresDesktopLayoutBar"
+import { MarcadoresDesktopTaskStrip } from "@/features/marcadores/desktop/MarcadoresDesktopTaskStrip"
 import { isBookmarkDragTransfer } from "@/features/marcadores/utils/parseDragPayload"
 import { useDashboard } from "@/contexts/DashboardContext"
 import type {
+  DesktopSurfaceTask,
+  DesktopWmExtras,
   MarcadoresDesktopLayoutV1,
   MarcadoresDesktopLayoutV2,
   PersistedDesktopWindowV2,
   WindowBounds,
 } from "@/features/marcadores/desktop/windowTypes"
+import { DESKTOP_DETAIL_WINDOW_ID } from "@/features/marcadores/desktop/windowTypes"
 
 import { cn } from "@/lib/utils"
+import { readTabScopedItem, writeTabScopedItem } from "@/lib/tabScopedStorage"
 
 const MIN_CANVAS = 64
-const DETAIL_FRAME_ID = "__desk_detail__"
 const CASCADE = 26
 /** Hueco entre ventanas al usar «Dos columnas». */
 const TILE_COLUMN_GAP = 8
 
-function storageKey(workspaceId: string | null) {
+function desktopWmStorageKeyBase(workspaceId: string | null) {
   return `marcadores_wm_${workspaceId ?? "default"}`
 }
 
@@ -117,7 +121,7 @@ export function MarcadoresDesktopShell({
   onCloseDetail,
   onRequestCloseLibraryWindow,
 }: MarcadoresDesktopShellProps) {
-  const { dashboardFullscreenHostRef } = useDashboard()
+  const { registerExplorerWideHeaderEnd } = useDashboard()
   const hostRef = useRef<HTMLDivElement>(null)
   const [canvas, setCanvas] = useState({ w: 0, h: 0 })
 
@@ -144,7 +148,37 @@ export function MarcadoresDesktopShell({
   const [zLib, setZLib] = useState<Record<string, number>>({})
   const [zDetail, setZDetail] = useState(115)
 
-  const key = useMemo(() => storageKey(workspaceId), [workspaceId])
+  type FocusedSurface = { kind: "library"; id: string } | { kind: "detail" }
+  const [focusedSurface, setFocusedSurface] = useState<FocusedSurface>(() => ({
+    kind: "library",
+    id: libraryWindowIds[0] ?? "",
+  }))
+
+  useEffect(() => {
+    setFocusedSurface((prev) => {
+      if (prev.kind === "detail") return prev
+      if (prev.kind === "library" && libraryWindowIds.includes(prev.id)) return prev
+      return { kind: "library", id: libraryWindowIds[0] ?? "" }
+    })
+  }, [libraryWindowIds])
+
+  useEffect(() => {
+    if (!detailOpen) {
+      setFocusedSurface((prev) => (prev.kind === "detail" ? { kind: "library", id: libraryWindowIds[0] ?? "" } : prev))
+    }
+  }, [detailOpen, libraryWindowIds])
+
+  useEffect(() => {
+    setFocusedSurface((prev) => {
+      if (prev.kind === "detail") return prev
+      const id = focusedLibraryPaneId
+      if (!id) return prev
+      if (prev.kind === "library" && prev.id === id) return prev
+      return { kind: "library", id }
+    })
+  }, [focusedLibraryPaneId])
+
+  const key = useMemo(() => desktopWmStorageKeyBase(workspaceId), [workspaceId])
   const hydratedRef = useRef(false)
   const [deskReady, setDeskReady] = useState(false)
   const [deskCanvasDropHighlight, setDeskCanvasDropHighlight] = useState(false)
@@ -177,7 +211,7 @@ export function MarcadoresDesktopShell({
         }
         if (detailFrame) {
           wins.push({
-            id: DETAIL_FRAME_ID,
+            id: DESKTOP_DETAIL_WINDOW_ID,
             kind: "detail",
             ...detailFrame.bounds,
             minimized: detailFrame.minimized,
@@ -189,7 +223,7 @@ export function MarcadoresDesktopShell({
           libraryWindowIds: [...libraryWindowIds],
           windows: wins,
         }
-        localStorage.setItem(key, JSON.stringify(payload))
+        writeTabScopedItem(key, JSON.stringify(payload))
       } catch {
         /* ignore */
       }
@@ -207,7 +241,7 @@ export function MarcadoresDesktopShell({
     const el = hostRef.current
     if (!el) return
 
-    const lsKey = storageKey(workspaceId)
+    const lsKey = desktopWmStorageKeyBase(workspaceId)
     hydratedRef.current = false
     const apply = () => {
       const r = el.getBoundingClientRect()
@@ -224,7 +258,7 @@ export function MarcadoresDesktopShell({
         let loadedLibIds: string[] | null = null
 
         try {
-          const raw = typeof window !== "undefined" ? localStorage.getItem(lsKey) : null
+          const raw = typeof window !== "undefined" ? readTabScopedItem(lsKey) : null
           if (raw) {
             const parsed = JSON.parse(raw) as MarcadoresDesktopLayoutV2 | MarcadoresDesktopLayoutV1
             if (parsed && typeof parsed === "object" && "v" in parsed && parsed.v === 2) {
@@ -237,7 +271,7 @@ export function MarcadoresDesktopShell({
                     minimized: !!win.minimized,
                     maximized: !!win.maximized,
                   }
-                } else if (win.kind === "detail" && win.id === DETAIL_FRAME_ID) {
+                } else if (win.kind === "detail" && win.id === DESKTOP_DETAIL_WINDOW_ID) {
                   nextDetail = {
                     bounds: clampBounds(toWindowBounds(win), w, h),
                     minimized: !!win.minimized,
@@ -384,19 +418,185 @@ export function MarcadoresDesktopShell({
     })
   }, [canvas.w, canvas.h, libraryWindowIds])
 
+  const focusTask = useCallback(
+    (id: string) => {
+      if (id === DESKTOP_DETAIL_WINDOW_ID) {
+        zSeq.current += 1
+        setZDetail(zSeq.current)
+        setFocusedSurface({ kind: "detail" })
+        return
+      }
+      zSeq.current += 1
+      setZLib((z) => ({ ...z, [id]: zSeq.current }))
+      setFocusedSurface({ kind: "library", id })
+      onFocusLibraryPane(id)
+    },
+    [onFocusLibraryPane]
+  )
+
+  const minimizeAllWindows = useCallback(() => {
+    setLibFrames((prev) => {
+      const next = { ...prev }
+      for (const wid of libraryWindowIds) {
+        const cur = next[wid]
+        if (cur) next[wid] = { ...cur, minimized: true }
+      }
+      return next
+    })
+    setDetailFrame((prev) => (prev ? { ...prev, minimized: true } : prev))
+  }, [libraryWindowIds])
+
+  const restoreMinimizedWindows = useCallback(() => {
+    setLibFrames((prev) => {
+      const next = { ...prev }
+      for (const wid of libraryWindowIds) {
+        const cur = next[wid]
+        if (cur) next[wid] = { ...cur, minimized: false }
+      }
+      return next
+    })
+    setDetailFrame((prev) => (prev ? { ...prev, minimized: false } : prev))
+  }, [libraryWindowIds])
+
+  const maximizeAllWindows = useCallback(() => {
+    const { w: cw, h: ch } = canvas
+    if (cw < MIN_CANVAS || ch < MIN_CANVAS) return
+    setLibFrames((prev) => {
+      const next = { ...prev }
+      for (const wid of libraryWindowIds) {
+        const cur = next[wid]
+        if (!cur) continue
+        const refBox = libraryPreMaxMap.get(wid)
+        if (!cur.maximized && refBox) refBox.current = { ...clampBounds(cur.bounds, cw, ch) }
+        next[wid] = { ...cur, minimized: false, maximized: true }
+      }
+      return next
+    })
+    setDetailFrame((prev) => {
+      if (!prev) return prev
+      if (!prev.maximized) preMaxDetail.current = { ...clampBounds(prev.bounds, cw, ch) }
+      return { ...prev, minimized: false, maximized: true }
+    })
+  }, [canvas, libraryWindowIds, libraryPreMaxMap])
+
+  const restoreWindowSizes = useCallback(() => {
+    const { w: cw, h: ch } = canvas
+    if (cw < MIN_CANVAS || ch < MIN_CANVAS) return
+    setLibFrames((prev) => {
+      const next = { ...prev }
+      for (const wid of libraryWindowIds) {
+        const cur = next[wid]
+        if (!cur) continue
+        const refBox = libraryPreMaxMap.get(wid)
+        let bounds = cur.bounds
+        if (cur.maximized && refBox?.current) bounds = clampBounds(refBox.current, cw, ch)
+        else bounds = clampBounds(cur.bounds, cw, ch)
+        if (refBox) refBox.current = null
+        next[wid] = { ...cur, maximized: false, bounds }
+      }
+      return next
+    })
+    setDetailFrame((prev) => {
+      if (!prev) return prev
+      let bounds = prev.bounds
+      if (prev.maximized && preMaxDetail.current) bounds = clampBounds(preMaxDetail.current, cw, ch)
+      preMaxDetail.current = null
+      return { ...prev, maximized: false, bounds }
+    })
+  }, [canvas, libraryWindowIds, libraryPreMaxMap])
+
+  const desktopWm = useMemo((): DesktopWmExtras => {
+    const tasks: DesktopSurfaceTask[] = libraryWindowIds.map((wid, idx) => {
+      const f = libFrames[wid]
+      return {
+        id: wid,
+        title: "Marcadores",
+        subtitle: libraryWindowIds.length > 1 ? `#${idx + 1}` : undefined,
+        minimized: f?.minimized ?? false,
+        maximized: f?.maximized ?? false,
+        isFocused: focusedSurface.kind === "library" && focusedSurface.id === wid,
+        kind: "library",
+      }
+    })
+    if (detailOpen && detailFrame) {
+      tasks.push({
+        id: DESKTOP_DETAIL_WINDOW_ID,
+        title: "Propiedades",
+        subtitle: detailTitle,
+        minimized: detailFrame.minimized,
+        maximized: detailFrame.maximized,
+        isFocused: focusedSurface.kind === "detail",
+        kind: "detail",
+      })
+    }
+    return {
+      tasks,
+      focusTask,
+      minimizeAll: minimizeAllWindows,
+      restoreMinimized: restoreMinimizedWindows,
+      maximizeAll: maximizeAllWindows,
+      restoreWindowSizes,
+    }
+  }, [
+    detailFrame,
+    detailOpen,
+    detailTitle,
+    focusTask,
+    focusedSurface,
+    libFrames,
+    libraryWindowIds,
+    maximizeAllWindows,
+    minimizeAllWindows,
+    restoreMinimizedWindows,
+    restoreWindowSizes,
+  ])
+
   const canCloseLibrary = libraryWindowIds.length > 1
+  const deskSurfaceReady = deskReady && canvas.w >= MIN_CANVAS && canvas.h >= MIN_CANVAS
+
+  const canTileTwoColumns = libraryWindowIds.length === 2
+  const explorerHeaderDeskToolbar = useMemo(() => {
+    const headerDeskTasks = desktopWm.tasks
+    const headerFocusDeskTask = desktopWm.focusTask
+    return (
+      <div className="flex min-w-0 items-center gap-2">
+        <MarcadoresDesktopTaskStrip surfaces={headerDeskTasks} onFocusTask={headerFocusDeskTask} />
+        <MarcadoresDesktopLayoutBar
+          canTileTwoColumns={canTileTwoColumns}
+          onTileTwoColumns={tileTwoColumns}
+          deskSurfaceReady={deskSurfaceReady}
+          onMinimizeAll={minimizeAllWindows}
+          onRestoreMinimized={restoreMinimizedWindows}
+          onMaximizeAll={maximizeAllWindows}
+          onRestoreWindowSizes={restoreWindowSizes}
+          inlineInExplorerHeader
+        />
+      </div>
+    )
+  }, [
+    desktopWm,
+    canTileTwoColumns,
+    tileTwoColumns,
+    deskSurfaceReady,
+    minimizeAllWindows,
+    restoreMinimizedWindows,
+    maximizeAllWindows,
+    restoreWindowSizes,
+  ])
+
+  useEffect(() => {
+    registerExplorerWideHeaderEnd(explorerHeaderDeskToolbar)
+    return () => {
+      registerExplorerWideHeaderEnd(null)
+    }
+  }, [explorerHeaderDeskToolbar, registerExplorerWideHeaderEnd])
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-      <MarcadoresDesktopLayoutBar
-        fullscreenTargetRef={dashboardFullscreenHostRef}
-        canTileTwoColumns={libraryWindowIds.length === 2}
-        onTileTwoColumns={tileTwoColumns}
-      />
       <div
         ref={hostRef}
         className={cn(
-          "bg-app-desktop relative isolate min-h-0 flex-1 overflow-hidden rounded-b-md",
+          "bg-app-desktop relative isolate min-h-0 flex-1 overflow-hidden rounded-t-md rounded-b-md",
           "bg-[radial-gradient(circle,rgb(0_0_0/0.05)_1px,transparent_1px)]",
           "dark:bg-[radial-gradient(circle,rgb(255_255_255/0.06)_1px,transparent_1px)]"
         )}
@@ -449,6 +649,7 @@ export function MarcadoresDesktopShell({
 
         {canvas.w > 0 && canvas.h > 0 ? (
           <>
+            {}
             {libraryWindowIds.map((winId, idx) => {
               const frame = libFrames[winId]
               if (!frame) return null
@@ -480,6 +681,7 @@ export function MarcadoresDesktopShell({
                   onActivate={() => {
                     zSeq.current += 1
                     setZLib((z) => ({ ...z, [winId]: zSeq.current }))
+                    setFocusedSurface({ kind: "library", id: winId })
                     onFocusLibraryPane(winId)
                   }}
                   showClose={canCloseLibrary}
@@ -498,6 +700,7 @@ export function MarcadoresDesktopShell({
                     onPointerDownCapture={() => {
                       zSeq.current += 1
                       setZLib((z) => ({ ...z, [winId]: zSeq.current }))
+                      setFocusedSurface({ kind: "library", id: winId })
                       onFocusLibraryPane(winId)
                     }}
                   >
@@ -506,6 +709,7 @@ export function MarcadoresDesktopShell({
                 </DesktopWindowFrame>
               )
             })}
+            {}
 
             {detailOpen && detailContent && detailFrame ? (
               <DesktopWindowFrame
@@ -523,6 +727,7 @@ export function MarcadoresDesktopShell({
                 onActivate={() => {
                   zSeq.current += 1
                   setZDetail(zSeq.current)
+                  setFocusedSurface({ kind: "detail" })
                 }}
                 showClose
                 onClose={onCloseDetail}
