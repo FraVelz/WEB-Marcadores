@@ -4,6 +4,7 @@ import { useId } from "react"
 
 import { cn, cnLines } from "@/lib/utils"
 
+import { applyBookmarkDragPreview } from "../../utils/bookmarkDragPreview"
 import { BOOKMARK_DRAG_MIME_TYPE, parseBookmarkDragPayload } from "../../utils/parseDragPayload"
 import type { Bookmark, FlatFolder, GridItem } from "../../utils/types"
 import { TreeFolderRowContent } from "./TreeFolderRowContent"
@@ -64,6 +65,7 @@ export function TreeRow({
     e.dataTransfer.setData(BOOKMARK_DRAG_MIME_TYPE, JSON.stringify(payload))
     e.dataTransfer.effectAllowed = "move"
     e.dataTransfer.setData("text/plain", isFolder ? item.label : item.bookmark.title)
+    applyBookmarkDragPreview(e)
   }
 
   const handleDragEnter = (e: React.DragEvent) => {

@@ -9,6 +9,7 @@ type Canvas = { w: number; h: number }
 type PreMaxBox = React.MutableRefObject<WindowBounds | null>
 
 export type MarcadoresDesktopShellCanvasProps = {
+  workspaceId: string | null
   hostRef: React.RefObject<HTMLDivElement | null>
   canvas: Canvas
   deskCanvasDropHighlight: boolean

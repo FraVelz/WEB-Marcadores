@@ -1,7 +1,5 @@
 import type { MutableRefObject, Dispatch, SetStateAction, RefObject } from "react"
 
-import type { BrowseMode } from "@/features/marcadores/hooks/useMarcadoresData"
-import type { ViewAst } from "@/features/marcadores/views/viewTypes"
 import type { TreeFlatRow } from "@/features/marcadores/components/marcadoresTree/treeTypes"
 import type { Bookmark, CutItem, FlatFolder, GridItem } from "@/features/marcadores/utils/types"
 
@@ -50,11 +48,8 @@ export type MarcadoresDesktopLibraryPaneProps = {
   onToggleTreeView?: () => void
   treeToggleDisabled?: boolean
 
-  browseMode: BrowseMode
-  setBrowseMode: Dispatch<SetStateAction<BrowseMode>>
-  activeViewAst: ViewAst | null
-  setActiveViewAst: Dispatch<SetStateAction<ViewAst | null>>
-  duplicateClusterCount: number
+  searchLibraryWide: boolean
+  setSearchLibraryWide: Dispatch<SetStateAction<boolean>>
 
   breadcrumb: { id: string | null; label: string }[]
   onSelectBreadcrumb: (id: string | null) => void

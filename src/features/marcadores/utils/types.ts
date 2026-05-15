@@ -22,7 +22,7 @@ export type FlatFolder = {
 
 export type GridItem =
   | { type: "folder"; id: string; folderId: string; label: string }
-  | { type: "link"; bookmark: Bookmark }
+  | { type: "link"; bookmark: Bookmark; locationLabel?: string }
 
 export type CutItem =
   | { type: "folder"; id: string; name: string; sourceParentId: string | null }

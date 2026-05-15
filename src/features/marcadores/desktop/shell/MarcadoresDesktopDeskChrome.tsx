@@ -1,13 +1,18 @@
 "use client"
 
 import type { ReactNode } from "react"
+import { useMemo, useState } from "react"
 
-import { DesktopShortcut } from "@/features/marcadores/desktop/DesktopShortcut"
+import { useAppAppearance } from "@/contexts/AppAppearanceContext"
+
+import { DesktopDraggableLibraryShortcut } from "@/features/marcadores/desktop/DesktopDraggableLibraryShortcut"
+import { useDeskDecorMarquee } from "@/features/marcadores/desktop/useDeskDecorMarquee"
 import { isBookmarkDragTransfer } from "@/features/marcadores/utils/parseDragPayload"
 
 import { cn } from "@/lib/utils"
 
 export type MarcadoresDesktopDeskChromeProps = {
+  workspaceId: string | null
   hostRef: React.RefObject<HTMLDivElement | null>
   deskCanvasDropHighlight: boolean
   setDeskCanvasDropHighlight: (v: boolean) => void
@@ -17,6 +22,7 @@ export type MarcadoresDesktopDeskChromeProps = {
 }
 
 export function MarcadoresDesktopDeskChrome({
+  workspaceId,
   hostRef,
   deskCanvasDropHighlight,
   setDeskCanvasDropHighlight,
@@ -24,15 +30,36 @@ export function MarcadoresDesktopDeskChrome({
   onAddLibraryWindow,
   children,
 }: MarcadoresDesktopDeskChromeProps) {
+  const { appearance } = useAppAppearance()
+  const wallpaperActive = Boolean(appearance.wallpaperDataUrl)
+
+  const [libraryShortcutSelected, setLibraryShortcutSelected] = useState(false)
+  const shortcutStorageKey = useMemo(
+    () => `marcadores.deskLibraryShortcut.v1:${workspaceId ?? "default"}`,
+    [workspaceId]
+  )
+
+  const { marquee, marqueePointerHandlers } = useDeskDecorMarquee()
+  const mqLeft = marquee ? Math.min(marquee.x0, marquee.x1) : 0
+  const mqTop = marquee ? Math.min(marquee.y0, marquee.y1) : 0
+  const mqW = marquee ? Math.abs(marquee.x1 - marquee.x0) : 0
+  const mqH = marquee ? Math.abs(marquee.y1 - marquee.y0) : 0
+
   return (
     <div
       ref={hostRef}
       className={cn(
-        "bg-app-desktop relative isolate min-h-0 flex-1 overflow-hidden rounded-t-md rounded-b-md",
+        "relative isolate min-h-0 flex-1 overflow-hidden rounded-t-md rounded-b-md",
+        wallpaperActive ? "bg-transparent" : "bg-app-desktop",
         "bg-[radial-gradient(circle,rgb(0_0_0/0.05)_1px,transparent_1px)]",
         "dark:bg-[radial-gradient(circle,rgb(255_255_255/0.06)_1px,transparent_1px)]"
       )}
       aria-label="Escritorio con ventanas"
+      {...marqueePointerHandlers}
+      onPointerDown={(e) => {
+        if (e.target === e.currentTarget) setLibraryShortcutSelected(false)
+        marqueePointerHandlers.onPointerDown(e)
+      }}
       onDragEnter={(e) => {
         if (!isBookmarkDragTransfer(e.dataTransfer)) return
         setDeskCanvasDropHighlight(true)
@@ -52,11 +79,27 @@ export function MarcadoresDesktopDeskChrome({
         e.preventDefault()
       }}
     >
-      <div className="pointer-events-none absolute inset-0 z-0">
-        <div className="pointer-events-auto absolute top-3 left-3 flex flex-col gap-3">
-          <DesktopShortcut label="Marcadores" icon={<span aria-hidden>📚</span>} onDoubleClick={onAddLibraryWindow} />
-        </div>
+      <div className="pointer-events-none absolute inset-0">
+        <DesktopDraggableLibraryShortcut
+          hostRef={hostRef}
+          storageKey={shortcutStorageKey}
+          selected={libraryShortcutSelected}
+          onSelect={() => setLibraryShortcutSelected(true)}
+          onOpen={onAddLibraryWindow}
+        />
       </div>
+
+      {marquee ? (
+        <div
+          className={cn(
+            "pointer-events-none absolute z-[6] rounded-md",
+            "border border-dashed border-sky-500/40 bg-sky-400/[0.07]",
+            "dark:border-amber-300/35 dark:bg-amber-400/[0.06]"
+          )}
+          style={{ left: mqLeft, top: mqTop, width: mqW, height: mqH }}
+          aria-hidden
+        />
+      ) : null}
 
       {floatingOverlays ? (
         <div className="pointer-events-none absolute top-0 right-0 left-0 z-[80] flex flex-col items-center gap-2 p-2">

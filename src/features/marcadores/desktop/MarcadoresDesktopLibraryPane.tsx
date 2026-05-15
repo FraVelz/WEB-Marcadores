@@ -69,11 +69,9 @@ export function MarcadoresDesktopLibraryPane(props: MarcadoresDesktopLibraryPane
       />
 
       <MarcadoresBrowseControls
-        browseMode={props.browseMode}
-        setBrowseMode={props.setBrowseMode}
-        activeViewAst={props.activeViewAst}
-        setActiveViewAst={props.setActiveViewAst}
-        duplicateClusterCount={props.duplicateClusterCount}
+        variant="desk"
+        searchLibraryWide={props.searchLibraryWide}
+        setSearchLibraryWide={props.setSearchLibraryWide}
       />
 
       <MarcadoresBreadcrumb breadcrumb={props.breadcrumb} onSelect={props.onSelectBreadcrumb} />
@@ -98,6 +96,8 @@ export function MarcadoresDesktopLibraryPane(props: MarcadoresDesktopLibraryPane
               onAddBookmark={props.onAddBookmark}
               onNewFolder={() => props.setShowNewFolder(true)}
               itemRefs={gridRefs}
+              setSelectedIds={props.setSelectedIds}
+              setSelectMode={props.setSelectMode}
             />
           ) : (
             <MarcadoresTreeView

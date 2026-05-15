@@ -81,16 +81,22 @@ export function AppearanceSettings() {
     resetCustomColors,
     setWallpaper,
     setWallpaperVeil,
+    setDeskWindowTransparency,
+    setTextSelection,
     resetAllAppearance,
   } = useAppAppearance()
 
   const systemDark = usePrefersSystemDarkLive()
   const paletteKey = resolvePaletteKey(appearance.theme, systemDark)
   const fallbacks = PRESET_FALLBACK_HEX[paletteKey]
+  /** Base del resaltado por defecto (alineado con --app-accent del tema). */
+  const selectionFallback = paletteKey === "dark" ? "#60a5fa" : "#2563eb"
 
   const [wallpaperMessage, setWallpaperMessage] = useState<string | null>(null)
   const customPaletteCheckboxId = useId()
+  const textSelectionColorId = useId()
   const veilRangeId = useId()
+  const deskWindowGlassRangeId = useId()
 
   const onPickWallpaper = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWallpaperMessage(null)
@@ -115,7 +121,7 @@ export function AppearanceSettings() {
     <div className="border-app-border-muted bg-app-raised rounded-lg border p-6">
       <h2 className="text-app-fg mb-1 text-lg font-semibold">Apariencia</h2>
       <p className="text-app-fg-secondary mb-6 text-sm">
-        Tema, colores y fondo se guardan en el navegador (localmente, por pestaña); cada pestaña puede lucir distinto.
+        Tema, colores y fondo se guardan en este navegador (localStorage) y se comparten entre todas las pestañas.
       </p>
 
       <div className="space-y-6">
@@ -141,6 +147,48 @@ export function AppearanceSettings() {
         </div>
 
         <div className="border-app-border-muted border-t pt-5">
+          <p className="text-app-fg-label mb-2 text-xs font-medium tracking-wide uppercase">Selección de texto</p>
+          <p className="text-app-fg-secondary mb-3 text-xs">
+            Color del resaltado al marcar texto en cualquier pantalla. Es independiente del tono de las listas y botones
+            seleccionados.
+          </p>
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
+            <span className="text-app-fg-secondary w-full min-w-[10rem] text-sm sm:w-48">Color de resaltado</span>
+            <div className="flex flex-1 flex-wrap items-center gap-2">
+              <input
+                id={textSelectionColorId}
+                type="color"
+                aria-label="Color de selección de texto"
+                className="border-app-input-border h-9 w-12 cursor-pointer rounded border bg-transparent p-0.5"
+                value={sanitizeHexColor(appearance.textSelection ?? undefined) ?? selectionFallback}
+                onChange={(e) => setTextSelection(e.target.value)}
+              />
+              <input
+                type="text"
+                spellCheck={false}
+                value={appearance.textSelection ?? ""}
+                placeholder={selectionFallback}
+                onChange={(e) => setTextSelection(e.target.value || null)}
+                className={cn(
+                  "border-app-input-border bg-app-raised-muted text-app-fg min-w-[7rem] flex-1 rounded border px-2 py-1.5 font-mono text-xs sm:max-w-[11rem]",
+                  "placeholder-app-fg-label focus:border-app-focus focus:outline-none"
+                )}
+              />
+              <button
+                type="button"
+                className="text-app-fg-muted hover:bg-app-hover hover:text-app-fg rounded-lg px-2 py-1.5 text-xs"
+                onClick={() => setTextSelection(null)}
+              >
+                Usar tema
+              </button>
+            </div>
+          </div>
+          <p className="text-app-fg-secondary border-app-border-muted mt-3 rounded-md border border-dashed px-3 py-2 text-xs select-all">
+            Prueba: selecciona este párrafo para ver el resaltado.
+          </p>
+        </div>
+
+        <div className="border-app-border-muted border-t pt-5">
           <label htmlFor={customPaletteCheckboxId} className="flex cursor-pointer items-start gap-3">
             <input
               id={customPaletteCheckboxId}
@@ -151,9 +199,10 @@ export function AppearanceSettings() {
               onChange={(e) => setUseCustomPalette(e.target.checked)}
             />
             <span>
-              <span className="text-app-fg block text-sm font-medium">Personalizar colores</span>
+              <span className="text-app-fg block text-sm font-medium">Personalizar estilo</span>
               <span className="text-app-fg-secondary mt-0.5 block text-xs">
-                Sustituye sólo los tonos que elijas; el resto sigue el tema claro/oscuro.
+                Sustituye los colores base del tema (superficies, texto y acento). Lo que no cambies sigue el modo claro /
+                oscuro.
               </span>
             </span>
           </label>
@@ -251,6 +300,26 @@ export function AppearanceSettings() {
             />
           </label>
           {wallpaperMessage ? <p className="text-app-danger-fg mt-2 text-sm">{wallpaperMessage}</p> : null}
+        </div>
+
+        <div className="border-app-border-muted border-t pt-5">
+          <p className="text-app-fg-label mb-2 text-xs font-medium tracking-wide uppercase">Ventanas del escritorio</p>
+          <p className="text-app-fg-secondary mb-3 text-xs">
+            Solo afecta a las ventanas de Marcadores en modo escritorio (marco y barra de título). A más
+            transparencia, se ve más el fondo detrás.
+          </p>
+          <label htmlFor={deskWindowGlassRangeId} className="text-app-fg-secondary block text-sm">
+            Transparencia tipo cristal: {Math.round(appearance.deskWindowTransparency * 100)}%
+            <input
+              id={deskWindowGlassRangeId}
+              type="range"
+              min={0}
+              max={100}
+              value={Math.round(appearance.deskWindowTransparency * 100)}
+              onChange={(e) => setDeskWindowTransparency(Number(e.target.value) / 100)}
+              className="accent-app-primary mt-2 block w-full max-w-sm"
+            />
+          </label>
         </div>
 
         <div className="border-app-border-muted flex flex-wrap gap-2 border-t pt-5">

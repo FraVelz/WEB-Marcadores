@@ -27,7 +27,9 @@
 
   --app-nav-active: rgb(161 161 170 / 0.9);
   --app-list-selected: rgb(37 99 235 / 0.22);
-  --app-selection: rgb(37 99 235 / 0.2);
+  --app-selection: rgb(37 99 235 / 0.22);
+  /** Color del texto sobre el resaltado (::selection); `currentColor` conserva el tono del texto seleccionado */
+  --app-selection-text: currentColor;
 
   --app-primary: #2563eb;
   --app-primary-hover: #1d4ed8;
@@ -68,6 +70,8 @@
   /* Escritorio / ventanas (Marcadores escritorio tipo Windows) */
   --app-desktop: #cdd6e4;
   --app-window-chrome: #eef1f8;
+  /** Opacidad del color sólido en ventanas escritorio (`color-mix` con transparente) */
+  --app-desk-window-solid-pct: 100%;
 
   --app-surface-canvas: var(--app-canvas);
   --app-text-primary: var(--app-fg);
@@ -97,7 +101,8 @@ html.dark {
 
   --app-nav-active: rgb(82 82 91 / 0.85);
   --app-list-selected: rgb(37 99 235 / 0.3);
-  --app-selection: rgb(37 99 235 / 0.2);
+  --app-selection: rgb(37 99 235 / 0.26);
+  --app-selection-text: currentColor;
 
   --app-accent: #60a5fa;
   --app-link: #60a5fa;
@@ -126,6 +131,7 @@ html.dark {
 
   --app-desktop: #27272f;
   --app-window-chrome: #3f3f4a;
+  --app-desk-window-solid-pct: 100%;
 
   --app-surface-canvas: var(--app-canvas);
   --app-text-primary: var(--app-fg);
@@ -206,4 +212,15 @@ body {
   background: var(--app-canvas);
   color: var(--app-fg);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+::selection {
+  background-color: var(--app-text-selection-bg, var(--app-selection));
+  color: var(--app-text-selection-text, var(--app-selection-text));
+}
+
+@layer base {
+  button:enabled {
+    cursor: pointer;
+  }
 }

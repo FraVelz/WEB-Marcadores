@@ -1,4 +1,4 @@
-import { readTabScopedItem, writeTabScopedItem } from "@/lib/tabScopedStorage"
+import { readTabScopedItem } from "@/lib/tabScopedStorage"
 
 export const APP_APPEARANCE_STORAGE_KEY = "marcadores_app_appearance_v1"
 
@@ -31,6 +31,15 @@ export type AppAppearanceState = {
   wallpaperDataUrl: string | null
   /** Velo sobre la imagen: 0 = imagen muy visible, 1 = apenas se ve */
   wallpaperVeil: number
+  /**
+   * Transparencia tipo vidrio de las ventanas del escritorio (Marcadores).
+   * 0 = opacas; 1 = máximo cristal (con piso de legibilidad).
+   */
+  deskWindowTransparency: number
+  /**
+   * Hex (#rrggbb) para el resaltado al seleccionar texto. `null` = usar el valor del tema.
+   */
+  textSelection: string | null
 }
 
 export const defaultAppAppearanceState: AppAppearanceState = {
@@ -39,6 +48,8 @@ export const defaultAppAppearanceState: AppAppearanceState = {
   customColors: {},
   wallpaperDataUrl: null,
   wallpaperVeil: 0.72,
+  deskWindowTransparency: 0,
+  textSelection: null,
 }
 
 const HEX_RE = /^#?[0-9a-f]{6}$/i
@@ -82,19 +93,52 @@ function sanitizeAppAppearanceState(raw: unknown): AppAppearanceState {
     Math.max(0, Number.isFinite(veilRaw) ? veilRaw : defaultAppAppearanceState.wallpaperVeil)
   )
 
+  const deskTRaw =
+    typeof o.deskWindowTransparency === "number"
+      ? o.deskWindowTransparency
+      : defaultAppAppearanceState.deskWindowTransparency
+  const deskWindowTransparency = Math.min(
+    1,
+    Math.max(0, Number.isFinite(deskTRaw) ? deskTRaw : defaultAppAppearanceState.deskWindowTransparency)
+  )
+
+  const textSelectionRaw = o.textSelection
+  const textSelection =
+    textSelectionRaw === null || textSelectionRaw === ""
+      ? null
+      : typeof textSelectionRaw === "string"
+        ? sanitizeHexColor(textSelectionRaw)
+        : null
+
   return {
     theme,
     useCustomPalette,
     customColors,
     wallpaperDataUrl,
     wallpaperVeil,
+    deskWindowTransparency,
+    textSelection,
   }
 }
 
+/**
+ * Tema y tapiz deben ser los mismos en todas las pestañas: usamos una clave global.
+ * Se migra una vez desde la clave con scope por pestaña (legacy).
+ */
 export function loadAppAppearanceFromStorage(): AppAppearanceState {
   if (typeof window === "undefined") return { ...defaultAppAppearanceState }
   try {
-    const raw = readTabScopedItem(APP_APPEARANCE_STORAGE_KEY)
+    let raw = localStorage.getItem(APP_APPEARANCE_STORAGE_KEY)
+    if (!raw) {
+      raw = readTabScopedItem(APP_APPEARANCE_STORAGE_KEY)
+      if (raw) {
+        try {
+          localStorage.setItem(APP_APPEARANCE_STORAGE_KEY, raw)
+        } catch {
+          /* quota u otro — seguimos con raw en memoria */
+        }
+      }
+    }
     if (!raw) return { ...defaultAppAppearanceState }
     return sanitizeAppAppearanceState(JSON.parse(raw) as unknown)
   } catch {
@@ -105,7 +149,8 @@ export function loadAppAppearanceFromStorage(): AppAppearanceState {
 export function saveAppAppearanceToStorage(state: AppAppearanceState): void {
   if (typeof window === "undefined") return
   try {
-    writeTabScopedItem(APP_APPEARANCE_STORAGE_KEY, JSON.stringify(state))
+    const json = JSON.stringify(state)
+    localStorage.setItem(APP_APPEARANCE_STORAGE_KEY, json)
   } catch {
     /* espacio localStorage insuficiente u otro — ignoramos */
   }
@@ -120,6 +165,39 @@ export function resolveDarkClass(theme: AppThemePreset): boolean {
   if (theme === "dark") return true
   if (theme === "light") return false
   return getSystemDarkMode()
+}
+
+/** Parte sólida del color de ventana (100% = opaco; bajar = más cristal). */
+export function applyDeskWindowGlass(state: Pick<AppAppearanceState, "deskWindowTransparency">): void {
+  if (typeof document === "undefined") return
+  const t = Number.isFinite(state.deskWindowTransparency) ? state.deskWindowTransparency : 0
+  const clamped = Math.min(1, Math.max(0, t))
+  const solidPct = 100 - clamped * 62
+  document.documentElement.style.setProperty("--app-desk-window-solid-pct", `${solidPct}%`)
+}
+
+/** Resaltado al seleccionar texto (`::selection`). No altera `--app-selection` (listas / chips). */
+export function applyTextSelectionHighlight(state: Pick<AppAppearanceState, "textSelection">): void {
+  if (typeof document === "undefined") return
+  const root = document.documentElement
+  const hex = sanitizeHexColor(state.textSelection ?? undefined)
+  if (!hex) {
+    root.style.removeProperty("--app-text-selection-bg")
+    root.style.removeProperty("--app-text-selection-text")
+    return
+  }
+  root.style.setProperty("--app-text-selection-bg", `color-mix(in srgb, ${hex} 30%, transparent)`)
+  const tri = hexToRgbTriplet(hex)
+  const L = tri ? relativeLuminance(tri[0], tri[1], tri[2]) : 0.5
+  root.style.setProperty("--app-text-selection-text", L > 0.55 ? "#0a0a0a" : "#fafafa")
+}
+
+function relativeLuminance(r: number, g: number, b: number): number {
+  const lin = (v: number) => {
+    const x = v / 255
+    return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4)
+  }
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
 }
 
 /** Aplica sólo variables personalizadas (deja el resto al CSS del preset claro/oscuro). */
@@ -161,34 +239,86 @@ function hexToRgbTriplet(hex: string): [number, number, number] | null {
   return [(num >> 16) & 255, (num >> 8) & 255, num & 255]
 }
 
-/** Lee `--app-canvas` computado tras preset (clave + alpha para velo sobre tapiz). */
-export function applyWallpaperToBody(state: Pick<AppAppearanceState, "wallpaperDataUrl" | "wallpaperVeil">): void {
-  if (typeof document === "undefined") return
-  const el = document.body
-  const veil = Number.isFinite(state.wallpaperVeil) ? state.wallpaperVeil : defaultAppAppearanceState.wallpaperVeil
-
-  if (!state.wallpaperDataUrl) {
-    el.style.cssText = ""
-    return
-  }
-
-  const canvasRgb = resolveCanvasRgbForWallpaperOverlay()
-  const a = Math.min(0.98, Math.max(0, veil))
-  const [r, g, b] = canvasRgb ?? [24, 24, 27]
-  el.style.cssText = [
-    "background-color: transparent",
-    `background-image: linear-gradient(rgba(${r},${g},${b},${a}),rgba(${r},${g},${b},${a})),url(${state.wallpaperDataUrl})`,
-    "background-size: cover,cover",
-    "background-attachment: fixed",
-    "background-repeat: no-repeat",
-  ].join(";")
-}
-
 function resolveCanvasRgbForWallpaperOverlay(): [number, number, number] | null {
   if (typeof document === "undefined") return null
   const raw = getComputedStyle(document.documentElement).getPropertyValue("--app-canvas").trim()
   const tri = hexToRgbTriplet(raw)
   return tri ?? null
+}
+
+function buildWallpaperLayerStyle(
+  state: Pick<AppAppearanceState, "wallpaperDataUrl" | "wallpaperVeil">
+): {
+  backgroundColor: string
+  backgroundImage: string
+  backgroundSize: string
+  backgroundAttachment: string
+  backgroundRepeat: string
+} | null {
+  if (!state.wallpaperDataUrl) return null
+
+  const veil = Number.isFinite(state.wallpaperVeil) ? state.wallpaperVeil : defaultAppAppearanceState.wallpaperVeil
+  const canvasRgb = resolveCanvasRgbForWallpaperOverlay()
+  const a = Math.min(0.98, Math.max(0, veil))
+  const [r, g, b] = canvasRgb ?? [24, 24, 27]
+  return {
+    backgroundColor: "transparent",
+    backgroundImage: `linear-gradient(rgba(${r},${g},${b},${a}),rgba(${r},${g},${b},${a})),url(${state.wallpaperDataUrl})`,
+    backgroundSize: "cover,cover",
+    backgroundAttachment: "fixed",
+    backgroundRepeat: "no-repeat",
+  }
+}
+
+/**
+ * Misma capa que el `body` para nodos promovidos con Fullscreen API: el tapiz del body no llega al stack
+ * detrás del elemento en pantalla completa (p. ej. host de explorador + escritorio en /marcadores).
+ */
+export function applyWallpaperToHTMLElement(
+  el: HTMLElement | null,
+  state: Pick<AppAppearanceState, "wallpaperDataUrl" | "wallpaperVeil">
+): void {
+  if (!el) return
+  const layer = buildWallpaperLayerStyle(state)
+  if (!layer) {
+    el.style.removeProperty("background-color")
+    el.style.removeProperty("background-image")
+    el.style.removeProperty("background-size")
+    el.style.removeProperty("background-attachment")
+    el.style.removeProperty("background-repeat")
+    return
+  }
+  el.style.backgroundColor = layer.backgroundColor
+  el.style.backgroundImage = layer.backgroundImage
+  el.style.backgroundSize = layer.backgroundSize
+  el.style.backgroundAttachment = layer.backgroundAttachment
+  el.style.backgroundRepeat = layer.backgroundRepeat
+}
+
+function clearWallpaperInlineFromBody(): void {
+  if (typeof document === "undefined") return
+  const el = document.body
+  el.style.removeProperty("background-color")
+  el.style.removeProperty("background-image")
+  el.style.removeProperty("background-size")
+  el.style.removeProperty("background-attachment")
+  el.style.removeProperty("background-repeat")
+}
+
+/** Aplica tapiz al `body` (capa + velo según tema). Sin tapiz, solo quita estilos inline de fondo. */
+export function applyWallpaperToBody(state: Pick<AppAppearanceState, "wallpaperDataUrl" | "wallpaperVeil">): void {
+  if (typeof document === "undefined") return
+  const el = document.body
+  const layer = buildWallpaperLayerStyle(state)
+  if (!layer) {
+    clearWallpaperInlineFromBody()
+    return
+  }
+  el.style.backgroundColor = layer.backgroundColor
+  el.style.backgroundImage = layer.backgroundImage
+  el.style.backgroundSize = layer.backgroundSize
+  el.style.backgroundAttachment = layer.backgroundAttachment
+  el.style.backgroundRepeat = layer.backgroundRepeat
 }
 
 const MAX_IMG_BYTES = 2_500_000

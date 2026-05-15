@@ -1,92 +1,99 @@
 "use client"
 
-import type { Folder } from "@/contexts/DashboardContext"
+import { useEffect, useMemo } from "react"
+
+import type { FlatFolder } from "@/features/marcadores/utils/types"
 
 import { MarcadoresDesktopLibraryPane } from "@/features/marcadores/desktop/MarcadoresDesktopLibraryPane"
-import type { TreeFlatRow } from "@/features/marcadores/components/MarcadoresTreeView"
-import type { BrowseMode } from "@/features/marcadores/hooks/useMarcadoresData"
+import { createDefaultDeskWindowUi, type DeskWindowUiState } from "@/features/marcadores/page/deskWindowUiState"
+import { createDeskUiBindings } from "@/features/marcadores/page/deskUiBindings"
+import type { DesktopPaneDerivedEntry } from "@/features/marcadores/page/useMarcadoresPageBookmarksBootstrap"
 import type { Bookmark, CutItem, GridItem } from "@/features/marcadores/utils/types"
-import type { ViewAst } from "@/features/marcadores/views/viewTypes"
 
 type BreadcrumbSeg = { id: string | null; label: string }
-
-type PaneDerived = { flatList: GridItem[]; breadcrumb: BreadcrumbSeg[] } | undefined
 
 export type MarcadoresDesktopLibraryPaneBodyProps = {
   winId: string
   focused: boolean
-  desktopPaneDerived: Record<string, { flatList: GridItem[]; breadcrumb: BreadcrumbSeg[] }> | null
+  desktopPaneDerived: Record<string, DesktopPaneDerivedEntry> | null
   flatListFallback: GridItem[]
   listForDeleteFallback: GridItem[]
   breadcrumbFallback: BreadcrumbSeg[]
   deskFolderByWin: Record<string, string | null>
   setDeskFolderByWin: React.Dispatch<React.SetStateAction<Record<string, string | null>>>
   resolvedDeskLibPaneId: string | null
-  itemRefs: React.MutableRefObject<Map<number, HTMLDivElement>>
+  deskUiByWin: Record<string, DeskWindowUiState>
+  updateDeskUi: (winId: string, recipe: (s: DeskWindowUiState) => DeskWindowUiState) => void
+  toggleDeskTreeFolderCollapse: (winId: string, folderId: string) => void
+  getDeskItemRefs: (winId: string) => React.MutableRefObject<Map<number, HTMLDivElement>>
+  getDeskSearchRef: (winId: string) => React.RefObject<HTMLInputElement | null>
   focusDeskLibraryPane: (id: string) => void
-  showSearch: boolean
-  setShowSearch: React.Dispatch<React.SetStateAction<boolean>>
-  searchValue: string
-  setSearchValue: React.Dispatch<React.SetStateAction<string>>
-  searchRef: React.RefObject<HTMLInputElement | null>
+  treeToggleDisabledGlobal: boolean
   focusMain: () => void
-  showNewFolder: boolean
-  setShowNewFolder: React.Dispatch<React.SetStateAction<boolean>>
-  newFolderName: string
-  setNewFolderName: React.Dispatch<React.SetStateAction<string>>
-  editingFolder: { id: string; name: string } | null
-  setEditingFolder: React.Dispatch<React.SetStateAction<{ id: string; name: string } | null>>
-  renameFolderName: string
-  setRenameFolderName: React.Dispatch<React.SetStateAction<string>>
   onRenameFolder: () => Promise<void>
   handleAdd: () => void
   onCreateFolder: () => Promise<void>
-  selectMode: boolean
-  setSelectMode: React.Dispatch<React.SetStateAction<boolean>>
-  selectedIds: Set<string>
-  setSelectedIds: React.Dispatch<React.SetStateAction<Set<string>>>
   handleEdit: () => void
   onDelete: () => Promise<void>
-  infoPanelEnabled: boolean
-  setInfoPanelEnabled: React.Dispatch<React.SetStateAction<boolean>>
-  selectedIndex: number
-  setSelectedIndex: React.Dispatch<React.SetStateAction<number>>
-  setDetailBookmark: React.Dispatch<React.SetStateAction<Bookmark | null>>
-  treeViewGrid: boolean
-  treeToggleDisabled: boolean
-  toggleTreeMainView: () => void
-  browseMode: BrowseMode
-  setBrowseMode: React.Dispatch<React.SetStateAction<BrowseMode>>
-  activeViewAst: ViewAst | null
-  setActiveViewAst: React.Dispatch<React.SetStateAction<ViewAst | null>>
-  duplicateClusterCount: number
-  primaryViewMode: "grid" | "tree"
-  treeFlatRows: TreeFlatRow[]
-  folders: Folder[]
-  filteredBookmarks: Bookmark[]
-  cutItem: CutItem | null
-  toggleSelect: (id: string) => void
+  folders: FlatFolder[]
   makeDeskPaneDoubleClick: (winId: string) => (item: GridItem) => void
   makeDeskPaneDrop: (winId: string, deskMap: Record<string, string | null>) => (s: GridItem, t?: string | null) => void
-  toggleTreeFolderCollapse: (folderId: string) => void
-  treeCollapsedIds: Set<string>
   setDeleteConfirmItem: React.Dispatch<React.SetStateAction<GridItem | null>>
 }
 
 export type MarcadoresDesktopLibraryPaneShareProps = Omit<MarcadoresDesktopLibraryPaneBodyProps, "winId" | "focused">
 
 export function MarcadoresDesktopLibraryPaneBody(props: MarcadoresDesktopLibraryPaneBodyProps) {
-  const pane: PaneDerived = props.desktopPaneDerived?.[props.winId]
+  const pane = props.desktopPaneDerived?.[props.winId]
+  const ui = props.deskUiByWin[props.winId] ?? createDefaultDeskWindowUi()
+  const b = useMemo(() => createDeskUiBindings(props.winId, props.updateDeskUi), [props.winId, props.updateDeskUi])
+
   const paneFlatList = pane?.flatList ?? props.flatListFallback
   const paneBreadcrumb = pane?.breadcrumb ?? props.breadcrumbFallback
+  const paneFiltered = pane?.filteredBookmarks ?? []
+  const paneTreeRows = pane?.treeFlatRows ?? []
+  const panePrimaryMode = pane?.primaryViewMode ?? "grid"
+  const focusFlatList = pane?.focusFlatList ?? paneFlatList
+
   const paneFolderId = props.deskFolderByWin[props.winId] ?? null
   const setPaneFolder = (id: string | null) => {
     props.setDeskFolderByWin((prev) => ({ ...prev, [props.winId]: id }))
   }
-  const listForDelete =
-    props.resolvedDeskLibPaneId && props.desktopPaneDerived?.[props.resolvedDeskLibPaneId]
-      ? props.desktopPaneDerived[props.resolvedDeskLibPaneId]!.flatList
-      : props.listForDeleteFallback
+
+  const listForDelete = focusFlatList
+
+  useEffect(() => {
+    if (!ui.searchValue.trim()) return
+    props.updateDeskUi(props.winId, (s) => ({ ...s, treeCollapsedIds: new Set() }))
+  }, [ui.searchValue, props.winId, props.updateDeskUi])
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      props.getDeskItemRefs(props.winId).current.clear()
+      props.updateDeskUi(props.winId, (s) => ({ ...s, selectedIndex: 0 }))
+    })
+  }, [ui.viewMode, props.winId, props.getDeskItemRefs, props.updateDeskUi])
+
+  useEffect(() => {
+    if (panePrimaryMode !== "tree") return
+    queueMicrotask(() => {
+      props.updateDeskUi(props.winId, (s) => {
+        const max = Math.max(0, paneTreeRows.length - 1)
+        return {
+          ...s,
+          selectedIndex: Math.min(Math.max(0, s.selectedIndex), max),
+        }
+      })
+    })
+  }, [panePrimaryMode, paneTreeRows.length, props.winId, props.updateDeskUi])
+
+  const globalResultsActive = ui.searchLibraryWide && ui.searchValue.trim() !== ""
+
+  const toggleTreeMainView = () => {
+    b.setViewMode((m) => (m === "grid" ? "tree" : "grid"))
+  }
+
+  const treeToggleDisabled = props.treeToggleDisabledGlobal || globalResultsActive
 
   return (
     <MarcadoresDesktopLibraryPane
@@ -94,64 +101,69 @@ export function MarcadoresDesktopLibraryPaneBody(props: MarcadoresDesktopLibrary
       focused={props.focused}
       explorerFolderId={paneFolderId}
       setExplorerFolderId={setPaneFolder}
-      parentItemRefs={props.itemRefs}
+      parentItemRefs={props.getDeskItemRefs(props.winId)}
       onRequestFocusPane={props.focusDeskLibraryPane}
-      showSearch={props.showSearch}
-      setShowSearch={props.setShowSearch}
-      searchValue={props.searchValue}
-      setSearchValue={props.setSearchValue}
-      searchRef={props.searchRef}
+      showSearch={ui.showSearch}
+      setShowSearch={b.setShowSearch}
+      searchValue={ui.searchValue}
+      setSearchValue={b.setSearchValue}
+      searchRef={props.getDeskSearchRef(props.winId)}
       focusMain={props.focusMain}
-      showNewFolder={props.showNewFolder}
-      setShowNewFolder={props.setShowNewFolder}
-      newFolderName={props.newFolderName}
-      setNewFolderName={props.setNewFolderName}
-      editingFolder={props.editingFolder}
-      setEditingFolder={props.setEditingFolder}
-      renameFolderName={props.renameFolderName}
-      setRenameFolderName={props.setRenameFolderName}
+      showNewFolder={ui.showNewFolder}
+      setShowNewFolder={b.setShowNewFolder}
+      newFolderName={ui.newFolderName}
+      setNewFolderName={b.setNewFolderName}
+      editingFolder={ui.editingFolder}
+      setEditingFolder={b.setEditingFolder}
+      renameFolderName={ui.renameFolderName}
+      setRenameFolderName={b.setRenameFolderName}
       onRenameFolder={props.onRenameFolder}
       onNavigateUp={() => setPaneFolder(null)}
       onAddBookmark={props.handleAdd}
       onDeleteFocused={() => {
-        const item = listForDelete[props.selectedIndex]
+        const item = listForDelete[ui.selectedIndex]
         if (item) props.setDeleteConfirmItem(item)
       }}
       onCreateFolder={props.onCreateFolder}
-      selectMode={props.selectMode}
-      setSelectMode={props.setSelectMode}
-      selectedIds={props.selectedIds}
-      setSelectedIds={props.setSelectedIds}
+      selectMode={ui.selectMode}
+      setSelectMode={b.setSelectMode}
+      selectedIds={ui.selectedIds}
+      setSelectedIds={b.setSelectedIds}
       onEdit={props.handleEdit}
       onDelete={props.onDelete}
-      infoPanelEnabled={props.infoPanelEnabled}
-      setInfoPanelEnabled={props.setInfoPanelEnabled}
+      infoPanelEnabled={ui.infoPanelEnabled}
+      setInfoPanelEnabled={b.setInfoPanelEnabled}
       flatList={paneFlatList}
-      selectedIndex={props.selectedIndex}
-      setDetailBookmark={props.setDetailBookmark}
-      treeView={props.treeViewGrid}
-      onToggleTreeView={props.treeToggleDisabled ? undefined : props.toggleTreeMainView}
-      treeToggleDisabled={props.treeToggleDisabled}
-      browseMode={props.browseMode}
-      setBrowseMode={props.setBrowseMode}
-      activeViewAst={props.activeViewAst}
-      setActiveViewAst={props.setActiveViewAst}
-      duplicateClusterCount={props.duplicateClusterCount}
+      selectedIndex={ui.selectedIndex}
+      setDetailBookmark={b.setDetailBookmark}
+      treeView={ui.viewMode === "tree"}
+      onToggleTreeView={treeToggleDisabled ? undefined : toggleTreeMainView}
+      treeToggleDisabled={treeToggleDisabled}
+      searchLibraryWide={ui.searchLibraryWide}
+      setSearchLibraryWide={b.setSearchLibraryWide}
       breadcrumb={paneBreadcrumb}
       onSelectBreadcrumb={setPaneFolder}
-      primaryViewMode={props.primaryViewMode}
+      primaryViewMode={panePrimaryMode}
       flatListGrid={paneFlatList}
-      treeFlatRows={props.treeFlatRows}
+      treeFlatRows={paneTreeRows}
       folders={props.folders}
-      filteredBookmarks={props.filteredBookmarks}
-      selectedIndexGrid={props.selectedIndex}
-      onSelectIndex={props.setSelectedIndex}
-      cutItem={props.cutItem}
-      onToggleSelect={props.toggleSelect}
+      filteredBookmarks={paneFiltered}
+      selectedIndexGrid={ui.selectedIndex}
+      onSelectIndex={b.setSelectedIndex}
+      cutItem={ui.cutItem}
+      onToggleSelect={(id) => {
+        const toggle = (prev: Set<string>) => {
+          const next = new Set(prev)
+          if (next.has(id)) next.delete(id)
+          else next.add(id)
+          return next
+        }
+        b.setSelectedIds(toggle)
+      }}
       onDoubleClick={props.makeDeskPaneDoubleClick(props.winId)}
       onDrop={props.makeDeskPaneDrop(props.winId, props.deskFolderByWin)}
-      onToggleFolderCollapse={props.toggleTreeFolderCollapse}
-      treeCollapsedIds={props.treeCollapsedIds}
+      onToggleFolderCollapse={(folderId) => props.toggleDeskTreeFolderCollapse(props.winId, folderId)}
+      treeCollapsedIds={ui.treeCollapsedIds}
       currentLocationLabel={paneBreadcrumb.map((p) => p.label).join(" › ")}
       registerExplorerFocus={props.focused}
     />

@@ -74,19 +74,29 @@ export function AtajosPage() {
             </div>
 
             <ul
-              className="border-app-border-muted divide-app-border-muted bg-app-raised divide-y rounded-xl border"
+              className="border-app-border-muted divide-app-border-muted bg-app-raised divide-y overflow-hidden rounded-xl border"
               role="list"
             >
               {section.rows.map((row) => (
                 <li
                   key={`${section.title}::${row.keys}::${row.desc}`}
-                  className="flex flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-center sm:gap-6 sm:py-3"
+                  className="group relative"
                 >
-                  <div className="sm:w-[min(42%,14rem)] sm:flex-shrink-0">
-                    <KeyCombo keys={row.keys} />
-                  </div>
+                  <div
+                    aria-hidden
+                    className={cn(
+                      "pointer-events-none absolute inset-y-0 left-0 z-0 w-0 bg-gradient-to-r from-app-hover from-55% to-transparent",
+                      "motion-safe:transition-[width] motion-safe:duration-300 motion-safe:ease-out",
+                      "group-hover:w-full"
+                    )}
+                  />
+                  <div className="relative z-[1] flex flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-center sm:gap-6 sm:py-3">
+                    <div className="sm:w-[min(42%,14rem)] sm:flex-shrink-0">
+                      <KeyCombo keys={row.keys} />
+                    </div>
 
-                  <p className="text-app-fg-secondary text-sm leading-snug sm:min-w-0 sm:flex-1">{row.desc}</p>
+                    <p className="text-app-fg-secondary text-sm leading-snug sm:min-w-0 sm:flex-1">{row.desc}</p>
+                  </div>
                 </li>
               ))}
             </ul>

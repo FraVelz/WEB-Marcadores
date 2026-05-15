@@ -26,6 +26,8 @@ type Props = {
   focusedLibraryPaneId: string | null
   libraryPaneShareProps: MarcadoresDesktopLibraryPaneShareProps
   setDeskCanvasDropHighlight: (v: boolean) => void
+  /** Al minimizar ventana: devolver foco al área principal (cabecera del explorer). */
+  onWillBecomeMinimized?: () => void
 }
 
 export function DesktopLibraryWindowStack(props: Props) {
@@ -46,6 +48,7 @@ export function DesktopLibraryWindowStack(props: Props) {
     focusedLibraryPaneId,
     libraryPaneShareProps,
     setDeskCanvasDropHighlight,
+    onWillBecomeMinimized,
   } = props
 
   return (
@@ -88,6 +91,7 @@ export function DesktopLibraryWindowStack(props: Props) {
             onClose={canCloseLibrary ? () => onRequestCloseLibraryWindow(winId) : undefined}
             isolateBookmarkDragBubble
             onDismissDesktopDropHighlight={() => setDeskCanvasDropHighlight(false)}
+            onWillBecomeMinimized={onWillBecomeMinimized}
           >
             <div
               className="bg-app-sidebar flex min-h-0 flex-1 flex-col overflow-hidden"
