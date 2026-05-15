@@ -5,7 +5,8 @@ import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { getFavicon, getFolderPath } from "../utils/utils"
 import type { Bookmark, CutItem, FlatFolder, GridItem } from "../utils/types"
-import { BOOKMARK_DRAG_MIME_TYPE, parseBookmarkDragPayload } from "../utils/parseDragPayload"
+import { APP_DROP_PANEL_OVERLAY_CLASS } from "../utils/dragDropUi"
+import { BOOKMARK_DRAG_MIME_TYPE, isBookmarkDragTransfer, parseBookmarkDragPayload } from "../utils/parseDragPayload"
 
 export type TreeFlatRow = { item: GridItem; depth: number }
 
@@ -82,6 +83,7 @@ export default function MarcadoresTreeView({
   const handlePanelDragOver = useCallback(
     (e: React.DragEvent) => {
       if (!onDrop) return
+      if (!isBookmarkDragTransfer(e.dataTransfer)) return
       if (e.target !== e.currentTarget) return
       e.preventDefault()
       e.dataTransfer.dropEffect = "move"
@@ -96,6 +98,7 @@ export default function MarcadoresTreeView({
   const handlePanelDrop = useCallback(
     (e: React.DragEvent) => {
       if (!onDrop) return
+      if (!isBookmarkDragTransfer(e.dataTransfer)) return
       if (e.target !== e.currentTarget) return
       e.preventDefault()
       clearDropPreview()
@@ -110,7 +113,7 @@ export default function MarcadoresTreeView({
   return (
     <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
       <div
-        className="min-h-0 flex-1 overflow-auto p-3 sm:p-4"
+        className="relative min-h-0 flex-1 overflow-auto p-3 sm:p-4"
         onDragLeave={(e) => {
           if (!onDrop) return
           const rt = e.relatedTarget as Node | null
@@ -120,8 +123,11 @@ export default function MarcadoresTreeView({
         onDragOver={onDrop ? handlePanelDragOver : undefined}
         onDrop={onDrop ? handlePanelDrop : undefined}
       >
+        {onDrop && dropPreview?.targetKey === TREE_DROP_PANEL_KEY ? (
+          <div className={APP_DROP_PANEL_OVERLAY_CLASS} aria-hidden />
+        ) : null}
         <div
-          className="mx-auto min-h-[120px] max-w-4xl space-y-0.5"
+          className="relative mx-auto min-h-[120px] max-w-4xl space-y-0.5"
           onDragOver={onDrop ? handlePanelDragOver : undefined}
           onDrop={onDrop ? handlePanelDrop : undefined}
         >
@@ -253,7 +259,7 @@ function TreeRootDropRow({
       className={cn(
         "mb-2 flex w-full items-center gap-2 rounded-lg border border-dashed px-3 py-2 text-left text-sm transition-colors",
         dropActive
-          ? "border-app-focus bg-app-selection ring-app-focus ring-2"
+          ? "border-app-accent bg-app-accent/[0.08] text-app-fg outline-app-accent/80 ring-app-accent/25 dark:bg-app-accent/[0.11] ring-2 outline outline-2 outline-offset-[-2px] outline-dashed"
           : "border-app-border-muted bg-app-raised-muted/40 text-app-fg-secondary hover:border-app-input-border hover:bg-app-hover-strong/40"
       )}
       onDragEnter={handleDragEnter}
@@ -380,7 +386,9 @@ function TreeRow({
       (isSelected
         ? "border-app-focus bg-app-selection ring-app-focus ring-2"
         : "border-app-border-muted bg-app-raised/80 hover:border-app-input-border hover:bg-app-hover-strong/50"),
-    dropActive && !isCut && "border-app-focus bg-app-selection ring-app-focus ring-2",
+    !isCut &&
+      dropActive &&
+      "border-app-accent bg-app-accent/[0.08] outline-app-accent/85 ring-app-accent/25 dark:bg-app-accent/[0.11] ring-2 outline outline-2 outline-offset-[-2px] outline-dashed",
     selectMode && !isFolder ? "cursor-pointer" : "",
     "cursor-grab active:cursor-grabbing"
   )

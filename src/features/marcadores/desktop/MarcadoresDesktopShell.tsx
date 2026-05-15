@@ -4,7 +4,10 @@ import type { ReactNode } from "react"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { DesktopShortcut } from "@/features/marcadores/desktop/DesktopShortcut"
-import { DesktopWindowFrame, clampBounds } from "@/features/marcadores/desktop/DesktopWindowFrame"
+import { DesktopWindowFrame, clampBounds, DESKTOP_MARGIN } from "@/features/marcadores/desktop/DesktopWindowFrame"
+import { MarcadoresDesktopLayoutBar } from "@/features/marcadores/desktop/MarcadoresDesktopLayoutBar"
+import { isBookmarkDragTransfer } from "@/features/marcadores/utils/parseDragPayload"
+import { useDashboard } from "@/contexts/DashboardContext"
 import type {
   MarcadoresDesktopLayoutV1,
   MarcadoresDesktopLayoutV2,
@@ -17,6 +20,8 @@ import { cn } from "@/lib/utils"
 const MIN_CANVAS = 64
 const DETAIL_FRAME_ID = "__desk_detail__"
 const CASCADE = 26
+/** Hueco entre ventanas al usar «Dos columnas». */
+const TILE_COLUMN_GAP = 8
 
 function storageKey(workspaceId: string | null) {
   return `marcadores_wm_${workspaceId ?? "default"}`
@@ -112,6 +117,7 @@ export function MarcadoresDesktopShell({
   onCloseDetail,
   onRequestCloseLibraryWindow,
 }: MarcadoresDesktopShellProps) {
+  const { dashboardFullscreenHostRef } = useDashboard()
   const hostRef = useRef<HTMLDivElement>(null)
   const [canvas, setCanvas] = useState({ w: 0, h: 0 })
 
@@ -141,6 +147,13 @@ export function MarcadoresDesktopShell({
   const key = useMemo(() => storageKey(workspaceId), [workspaceId])
   const hydratedRef = useRef(false)
   const [deskReady, setDeskReady] = useState(false)
+  const [deskCanvasDropHighlight, setDeskCanvasDropHighlight] = useState(false)
+
+  useEffect(() => {
+    const clear = () => setDeskCanvasDropHighlight(false)
+    window.addEventListener("dragend", clear)
+    return () => window.removeEventListener("dragend", clear)
+  }, [])
 
   const persistTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -345,113 +358,183 @@ export function MarcadoresDesktopShell({
     setDetailFrame((prev) => (prev ? { ...prev, bounds: b } : prev))
   }
 
+  const tileTwoColumns = useCallback(() => {
+    if (libraryWindowIds.length !== 2) return
+    const cw = canvas.w
+    const ch = canvas.h
+    if (cw < MIN_CANVAS || ch < MIN_CANVAS) return
+    const [leftId, rightId] = libraryWindowIds
+    const g = DESKTOP_MARGIN
+    const usableW = cw - g * 2 - TILE_COLUMN_GAP
+    const wLeft = Math.floor(usableW / 2)
+    const wRight = usableW - wLeft
+    const h = ch - g * 2
+    const leftBounds = clampBounds({ x: g, y: g, w: wLeft, h }, cw, ch)
+    const rightBounds = clampBounds({ x: g + wLeft + TILE_COLUMN_GAP, y: g, w: wRight, h }, cw, ch)
+
+    setLibFrames((prev) => {
+      const a = prev[leftId]
+      const b = prev[rightId]
+      if (!a || !b) return prev
+      return {
+        ...prev,
+        [leftId]: { ...a, bounds: leftBounds, maximized: false, minimized: false },
+        [rightId]: { ...b, bounds: rightBounds, maximized: false, minimized: false },
+      }
+    })
+  }, [canvas.w, canvas.h, libraryWindowIds])
+
   const canCloseLibrary = libraryWindowIds.length > 1
 
   return (
-    <div
-      ref={hostRef}
-      className={cn(
-        "bg-app-desktop relative isolate min-h-0 flex-1 overflow-hidden rounded-md",
-        "bg-[radial-gradient(circle,rgb(0_0_0/0.05)_1px,transparent_1px)]",
-        "dark:bg-[radial-gradient(circle,rgb(255_255_255/0.06)_1px,transparent_1px)]"
-      )}
-      aria-label="Escritorio con ventanas"
-    >
-      <div className="pointer-events-none absolute inset-0 z-0">
-        <div className="pointer-events-auto absolute top-3 left-3 flex flex-col gap-3">
-          <DesktopShortcut label="Marcadores" icon={<span aria-hidden>📚</span>} onDoubleClick={onAddLibraryWindow} />
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <MarcadoresDesktopLayoutBar
+        fullscreenTargetRef={dashboardFullscreenHostRef}
+        canTileTwoColumns={libraryWindowIds.length === 2}
+        onTileTwoColumns={tileTwoColumns}
+      />
+      <div
+        ref={hostRef}
+        className={cn(
+          "bg-app-desktop relative isolate min-h-0 flex-1 overflow-hidden rounded-b-md",
+          "bg-[radial-gradient(circle,rgb(0_0_0/0.05)_1px,transparent_1px)]",
+          "dark:bg-[radial-gradient(circle,rgb(255_255_255/0.06)_1px,transparent_1px)]"
+        )}
+        aria-label="Escritorio con ventanas"
+        onDragEnter={(e) => {
+          if (!isBookmarkDragTransfer(e.dataTransfer)) return
+          setDeskCanvasDropHighlight(true)
+        }}
+        onDragOver={(e) => {
+          if (!isBookmarkDragTransfer(e.dataTransfer)) return
+          e.preventDefault()
+          setDeskCanvasDropHighlight(true)
+        }}
+        onDragLeave={(e) => {
+          const rt = e.relatedTarget as Node | null
+          if (rt && hostRef.current?.contains(rt)) return
+          setDeskCanvasDropHighlight(false)
+        }}
+        onDrop={(e) => {
+          setDeskCanvasDropHighlight(false)
+          e.preventDefault()
+        }}
+      >
+        <div className="pointer-events-none absolute inset-0 z-0">
+          <div className="pointer-events-auto absolute top-3 left-3 flex flex-col gap-3">
+            <DesktopShortcut label="Marcadores" icon={<span aria-hidden>📚</span>} onDoubleClick={onAddLibraryWindow} />
+          </div>
         </div>
-      </div>
 
-      {floatingOverlays ? (
-        <div className="pointer-events-none absolute top-0 right-0 left-0 z-[80] flex flex-col items-center gap-2 p-2">
-          <div className="pointer-events-auto flex w-full max-w-lg flex-col items-center gap-2">{floatingOverlays}</div>
-        </div>
-      ) : null}
+        {floatingOverlays ? (
+          <div className="pointer-events-none absolute top-0 right-0 left-0 z-[80] flex flex-col items-center gap-2 p-2">
+            <div className="pointer-events-auto flex w-full max-w-lg flex-col items-center gap-2">
+              {floatingOverlays}
+            </div>
+          </div>
+        ) : null}
 
-      {canvas.w > 0 && canvas.h > 0 ? (
-        <>
-          {libraryWindowIds.map((winId, idx) => {
-            const frame = libFrames[winId]
-            if (!frame) return null
-            const subtitle = libraryWindowIds.length > 1 ? `#${idx + 1}` : undefined
-            return (
-              <DesktopWindowFrame
-                key={winId}
-                title="Marcadores"
-                subtitle={subtitle}
-                canvasSize={canvas}
-                bounds={frame.bounds}
-                onBoundsChange={(b) => setLibBounds(winId, b)}
-                minimized={frame.minimized}
-                maximized={frame.maximized}
-                onToggleMinimize={() =>
-                  setLibFrames((p) => ({
-                    ...p,
-                    [winId]: { ...p[winId], minimized: !p[winId].minimized },
-                  }))
-                }
-                onToggleMaximize={() =>
-                  setLibFrames((p) => ({
-                    ...p,
-                    [winId]: { ...p[winId], maximized: !p[winId].maximized },
-                  }))
-                }
-                preMaxBoundsRef={libraryPreMaxMap.get(winId)!}
-                zIndex={zLib[winId] ?? 10 + idx}
-                onActivate={() => {
-                  zSeq.current += 1
-                  setZLib((z) => ({ ...z, [winId]: zSeq.current }))
-                  onFocusLibraryPane(winId)
-                }}
-                showClose={canCloseLibrary}
-                onClose={
-                  canCloseLibrary
-                    ? () => {
-                        onRequestCloseLibraryWindow(winId)
-                      }
-                    : undefined
-                }
-              >
-                <div
-                  className="bg-app-sidebar flex min-h-0 flex-1 flex-col overflow-hidden"
-                  onPointerDownCapture={() => {
+        {deskCanvasDropHighlight ? (
+          <div
+            className={cn(
+              "pointer-events-none absolute inset-4 z-[14] rounded-xl",
+              "border-2 border-dashed border-sky-500/55 bg-sky-400/[0.06]",
+              "shadow-[inset_0_0_14px_rgb(56_189_248_/_0.09)]",
+              "dark:border-amber-300/45 dark:bg-amber-400/[0.07]",
+              "dark:shadow-[inset_0_0_14px_rgb(251_191_36_/_0.07)]"
+            )}
+            aria-hidden
+          />
+        ) : null}
+
+        {canvas.w > 0 && canvas.h > 0 ? (
+          <>
+            {libraryWindowIds.map((winId, idx) => {
+              const frame = libFrames[winId]
+              if (!frame) return null
+              const subtitle = libraryWindowIds.length > 1 ? `#${idx + 1}` : undefined
+              return (
+                <DesktopWindowFrame
+                  key={winId}
+                  title="Marcadores"
+                  subtitle={subtitle}
+                  canvasSize={canvas}
+                  bounds={frame.bounds}
+                  onBoundsChange={(b) => setLibBounds(winId, b)}
+                  minimized={frame.minimized}
+                  maximized={frame.maximized}
+                  onToggleMinimize={() =>
+                    setLibFrames((p) => ({
+                      ...p,
+                      [winId]: { ...p[winId], minimized: !p[winId].minimized },
+                    }))
+                  }
+                  onToggleMaximize={() =>
+                    setLibFrames((p) => ({
+                      ...p,
+                      [winId]: { ...p[winId], maximized: !p[winId].maximized },
+                    }))
+                  }
+                  preMaxBoundsRef={libraryPreMaxMap.get(winId)!}
+                  zIndex={zLib[winId] ?? 10 + idx}
+                  onActivate={() => {
                     zSeq.current += 1
                     setZLib((z) => ({ ...z, [winId]: zSeq.current }))
                     onFocusLibraryPane(winId)
                   }}
+                  showClose={canCloseLibrary}
+                  onClose={
+                    canCloseLibrary
+                      ? () => {
+                          onRequestCloseLibraryWindow(winId)
+                        }
+                      : undefined
+                  }
+                  isolateBookmarkDragBubble
+                  onDismissDesktopDropHighlight={() => setDeskCanvasDropHighlight(false)}
                 >
-                  {renderLibraryPane(winId, focusedLibraryPaneId === winId)}
-                </div>
-              </DesktopWindowFrame>
-            )
-          })}
+                  <div
+                    className="bg-app-sidebar flex min-h-0 flex-1 flex-col overflow-hidden"
+                    onPointerDownCapture={() => {
+                      zSeq.current += 1
+                      setZLib((z) => ({ ...z, [winId]: zSeq.current }))
+                      onFocusLibraryPane(winId)
+                    }}
+                  >
+                    {renderLibraryPane(winId, focusedLibraryPaneId === winId)}
+                  </div>
+                </DesktopWindowFrame>
+              )
+            })}
 
-          {detailOpen && detailContent && detailFrame ? (
-            <DesktopWindowFrame
-              title="Propiedades"
-              subtitle={detailTitle}
-              canvasSize={canvas}
-              bounds={detailFrame.bounds}
-              onBoundsChange={setDetailBounds}
-              minimized={detailFrame.minimized}
-              maximized={detailFrame.maximized}
-              onToggleMinimize={() => setDetailFrame((p) => (p ? { ...p, minimized: !p.minimized } : p))}
-              onToggleMaximize={() => setDetailFrame((p) => (p ? { ...p, maximized: !p.maximized } : p))}
-              preMaxBoundsRef={preMaxDetail}
-              zIndex={zDetail}
-              onActivate={() => {
-                zSeq.current += 1
-                setZDetail(zSeq.current)
-              }}
-              showClose
-              onClose={onCloseDetail}
-            >
-              <div className="bg-app-sidebar flex min-h-0 flex-1 flex-col overflow-hidden">{detailContent}</div>
-            </DesktopWindowFrame>
-          ) : null}
-        </>
-      ) : null}
+            {detailOpen && detailContent && detailFrame ? (
+              <DesktopWindowFrame
+                title="Propiedades"
+                subtitle={detailTitle}
+                canvasSize={canvas}
+                bounds={detailFrame.bounds}
+                onBoundsChange={setDetailBounds}
+                minimized={detailFrame.minimized}
+                maximized={detailFrame.maximized}
+                onToggleMinimize={() => setDetailFrame((p) => (p ? { ...p, minimized: !p.minimized } : p))}
+                onToggleMaximize={() => setDetailFrame((p) => (p ? { ...p, maximized: !p.maximized } : p))}
+                preMaxBoundsRef={preMaxDetail}
+                zIndex={zDetail}
+                onActivate={() => {
+                  zSeq.current += 1
+                  setZDetail(zSeq.current)
+                }}
+                showClose
+                onClose={onCloseDetail}
+                isolateBookmarkDragBubble
+                onDismissDesktopDropHighlight={() => setDeskCanvasDropHighlight(false)}
+              >
+                <div className="bg-app-sidebar flex min-h-0 flex-1 flex-col overflow-hidden">{detailContent}</div>
+              </DesktopWindowFrame>
+            ) : null}
+          </>
+        ) : null}
+      </div>
     </div>
   )
 }

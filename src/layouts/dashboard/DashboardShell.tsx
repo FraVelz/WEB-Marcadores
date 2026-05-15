@@ -3,9 +3,7 @@
 import { usePathname, useRouter } from "next/navigation"
 
 import { useDashboardGlobalShortcuts } from "./hooks/useDashboardGlobalShortcuts"
-import { useDashboardSidebarKeyboard } from "./hooks/useDashboardSidebarKeyboard"
 import { useFocusMainOnMarcadoresRoute } from "./hooks/useFocusMainOnMarcadoresRoute"
-import { useSidebarTreeCollapse } from "./hooks/useSidebarTreeCollapse"
 
 import { useDashboard } from "@/contexts/DashboardContext"
 
@@ -23,31 +21,16 @@ export default function DashboardShell({ children }: { children: React.ReactNode
     focusMain,
     focusSidebar,
     mainKeyDownRef,
-    editFolderRef,
-    selectedFolderId,
-    setSelectedFolderId,
-    folders,
     setCommandPaletteOpen,
+    marcadoresExplorerPanelRef,
   } = useDashboard()
 
-  const { collapsedIds, setCollapsedIds, flatSidebarItems, toggleCollapsed } = useSidebarTreeCollapse(folders)
-
   useFocusMainOnMarcadoresRoute(pathname, mainRef)
-
-  const handleSidebarKeyDown = useDashboardSidebarKeyboard({
-    flatSidebarItems,
-    selectedFolderId,
-    setSelectedFolderId,
-    folders,
-    collapsedIds,
-    setCollapsedIds,
-    focusMain,
-    editFolderRef,
-  })
 
   useDashboardGlobalShortcuts({
     pathname,
     sidebarRef,
+    marcadoresExplorerPanelRef,
     focusMain,
     focusSidebar,
     push,
@@ -56,17 +39,10 @@ export default function DashboardShell({ children }: { children: React.ReactNode
 
   return (
     <>
-      <div className="bg-app-canvas flex min-h-dvh md:min-h-screen">
+      <div className="bg-app-canvas flex min-h-dvh flex-col md:min-h-screen">
         <DashboardMobileLayout
-          key={pathname}
           pathname={pathname}
-          collapsedIds={collapsedIds}
-          toggleCollapsed={toggleCollapsed}
           sidebarRef={sidebarRef}
-          folders={folders}
-          selectedFolderId={selectedFolderId}
-          setSelectedFolderId={setSelectedFolderId}
-          handleSidebarKeyDown={handleSidebarKeyDown}
           mainRef={mainRef}
           mainKeyDownRef={mainKeyDownRef}
         >

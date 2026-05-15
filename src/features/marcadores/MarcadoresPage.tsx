@@ -12,6 +12,7 @@ import DemoBanner from "@/features/marcadores/components/DemoBanner"
 import DeleteConfirmBanner from "@/features/marcadores/components/DeleteConfirmBanner"
 import MarcadoresBreadcrumb from "@/features/marcadores/components/MarcadoresBreadcrumb"
 import MarcadoresBrowseControls from "@/features/marcadores/components/MarcadoresBrowseControls"
+import { MarcadoresExplorerRail } from "@/features/marcadores/components/MarcadoresExplorerRail"
 import MarcadoresFooter from "@/features/marcadores/components/MarcadoresFooter"
 import MarcadoresToolbar from "@/features/marcadores/components/MarcadoresToolbar"
 import MarcadoresTreeView, { type TreeFlatRow } from "@/features/marcadores/components/MarcadoresTreeView"
@@ -662,59 +663,63 @@ export function MarcadoresPage() {
                 onToggleFolderCollapse={toggleTreeFolderCollapse}
                 treeCollapsedIds={treeCollapsedIds}
                 currentLocationLabel={breadcrumb.map((p) => p.label).join(" › ")}
+                registerExplorerFocus={focused}
               />
             )}
           />
         ) : (
-          <>
-            {primaryViewMode === "grid" ? (
-              <BookmarkGrid
-                flatList={flatList}
-                selectedIndex={selectedIndex}
-                selectMode={selectMode}
-                selectedIds={selectedIds}
-                cutItem={cutItem}
-                onSelectIndex={setSelectedIndex}
-                onToggleSelect={toggleSelect}
-                onDoubleClick={handleDoubleClick}
-                onDrop={handleDrop}
-                onAddBookmark={handleAdd}
-                onNewFolder={() => setShowNewFolder(true)}
-                itemRefs={itemRefs}
-              />
-            ) : (
-              <MarcadoresTreeView
-                folders={folders}
-                bookmarks={filteredBookmarks}
-                rows={treeFlatRows}
-                selectedIndex={selectedIndex}
-                selectMode={selectMode}
-                selectedIds={selectedIds}
-                cutItem={cutItem}
-                onSelectIndex={setSelectedIndex}
-                onToggleSelect={toggleSelect}
-                onDoubleClick={handleDoubleClick}
-                onDrop={handleDrop}
-                onToggleFolderCollapse={toggleTreeFolderCollapse}
-                collapsedIds={treeCollapsedIds}
-                onAddBookmark={handleAdd}
-                onNewFolder={() => setShowNewFolder(true)}
-                itemRefs={itemRefs}
-                currentLocationLabel={breadcrumb.map((p) => p.label).join(" › ")}
-              />
-            )}
-            {detailBookmark ? (
-              <BookmarkDetailPanel
-                bookmark={detailBookmark}
-                onClose={closeBookmarkDetailPanel}
-                onTelemetryOpen={recordBookmarkOpened}
-                onUpdate={onBookmarkUpdate}
-                allTags={allTags}
-                folders={folders}
-                embedded
-              />
-            ) : null}
-          </>
+          <div className="flex min-h-0 min-w-0 flex-1 flex-row overflow-hidden">
+            <MarcadoresExplorerRail />
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden md:flex-row">
+              {primaryViewMode === "grid" ? (
+                <BookmarkGrid
+                  flatList={flatList}
+                  selectedIndex={selectedIndex}
+                  selectMode={selectMode}
+                  selectedIds={selectedIds}
+                  cutItem={cutItem}
+                  onSelectIndex={setSelectedIndex}
+                  onToggleSelect={toggleSelect}
+                  onDoubleClick={handleDoubleClick}
+                  onDrop={handleDrop}
+                  onAddBookmark={handleAdd}
+                  onNewFolder={() => setShowNewFolder(true)}
+                  itemRefs={itemRefs}
+                />
+              ) : (
+                <MarcadoresTreeView
+                  folders={folders}
+                  bookmarks={filteredBookmarks}
+                  rows={treeFlatRows}
+                  selectedIndex={selectedIndex}
+                  selectMode={selectMode}
+                  selectedIds={selectedIds}
+                  cutItem={cutItem}
+                  onSelectIndex={setSelectedIndex}
+                  onToggleSelect={toggleSelect}
+                  onDoubleClick={handleDoubleClick}
+                  onDrop={handleDrop}
+                  onToggleFolderCollapse={toggleTreeFolderCollapse}
+                  collapsedIds={treeCollapsedIds}
+                  onAddBookmark={handleAdd}
+                  onNewFolder={() => setShowNewFolder(true)}
+                  itemRefs={itemRefs}
+                  currentLocationLabel={breadcrumb.map((p) => p.label).join(" › ")}
+                />
+              )}
+              {detailBookmark ? (
+                <BookmarkDetailPanel
+                  bookmark={detailBookmark}
+                  onClose={closeBookmarkDetailPanel}
+                  onTelemetryOpen={recordBookmarkOpened}
+                  onUpdate={onBookmarkUpdate}
+                  allTags={allTags}
+                  folders={folders}
+                  embedded
+                />
+              ) : null}
+            </div>
+          </div>
         )}
       </div>
 

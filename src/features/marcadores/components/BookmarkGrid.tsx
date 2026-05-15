@@ -1,8 +1,11 @@
 "use client"
 
+import { useEffect, useState } from "react"
+
 import { cn } from "@/lib/utils"
 import type { GridItem, CutItem } from "../utils/types"
-import { BOOKMARK_DRAG_MIME_TYPE, parseBookmarkDragPayload } from "../utils/parseDragPayload"
+import { APP_DROP_PANEL_OVERLAY_CLASS } from "../utils/dragDropUi"
+import { BOOKMARK_DRAG_MIME_TYPE, isBookmarkDragTransfer, parseBookmarkDragPayload } from "../utils/parseDragPayload"
 import BookmarkGridItem from "./BookmarkGridItem"
 
 type Props = {
@@ -34,12 +37,37 @@ export default function BookmarkGrid({
   onNewFolder,
   itemRefs,
 }: Props) {
+  const [dropPanelSlot, setDropPanelSlot] = useState(false)
+  const [dropItemIdx, setDropItemIdx] = useState<number | null>(null)
+
+  const clearDropUi = () => {
+    setDropPanelSlot(false)
+    setDropItemIdx(null)
+  }
+
+  useEffect(() => {
+    window.addEventListener("dragend", clearDropUi)
+    return () => window.removeEventListener("dragend", clearDropUi)
+  }, [])
+
   const panelDragOver =
     onDrop &&
     ((e: React.DragEvent) => {
+      if (!isBookmarkDragTransfer(e.dataTransfer)) return
       if (e.target !== e.currentTarget) return
       e.preventDefault()
       e.dataTransfer.dropEffect = "move"
+      setDropPanelSlot(true)
+      setDropItemIdx(null)
+    })
+
+  const panelDragLeave =
+    onDrop &&
+    ((e: React.DragEvent) => {
+      const rt = e.relatedTarget as Node | null
+      if (rt && e.currentTarget.contains(rt)) return
+      setDropPanelSlot(false)
+      setDropItemIdx(null)
     })
 
   const panelDrop =
@@ -47,20 +75,26 @@ export default function BookmarkGrid({
     ((e: React.DragEvent) => {
       if (e.target !== e.currentTarget) return
       e.preventDefault()
+      clearDropUi()
       const raw = e.dataTransfer.getData(BOOKMARK_DRAG_MIME_TYPE)
       if (!raw) return
       const sourceItem = parseBookmarkDragPayload(raw)
       if (sourceItem) onDrop(sourceItem, undefined)
     })
 
+  const showAppPanelDropFrame = Boolean(onDrop && dropPanelSlot && dropItemIdx === null)
+
   return (
     <div
-      className="min-h-0 flex-1 overflow-auto p-3 sm:p-4"
+      className="relative min-h-0 flex-1 overflow-auto p-3 sm:p-4"
+      onDragLeave={panelDragLeave || undefined}
       onDragOver={panelDragOver || undefined}
       onDrop={panelDrop || undefined}
     >
+      {showAppPanelDropFrame ? <div className={APP_DROP_PANEL_OVERLAY_CLASS} aria-hidden /> : null}
       <div
-        className="grid min-h-[120px] grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        className="relative grid min-h-[120px] grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        onDragLeave={panelDragLeave || undefined}
         onDragOver={panelDragOver || undefined}
         onDrop={panelDrop || undefined}
       >
@@ -79,6 +113,7 @@ export default function BookmarkGrid({
               isCut={!!isCut}
               selectMode={selectMode}
               isChecked={!isFolder && selectedIds.has(item.bookmark.id)}
+              dropHighlight={dropItemIdx === idx}
               itemRef={(el) => {
                 if (el) itemRefs.current.set(idx, el)
               }}
@@ -86,6 +121,21 @@ export default function BookmarkGrid({
               onToggleSelect={onToggleSelect}
               onDoubleClick={onDoubleClick}
               onDrop={onDrop}
+              onBookmarkDragHover={
+                onDrop
+                  ? () => {
+                      setDropItemIdx(idx)
+                      setDropPanelSlot(false)
+                    }
+                  : undefined
+              }
+              onBookmarkDragHoverLeave={
+                onDrop
+                  ? () => {
+                      setDropItemIdx((prev) => (prev === idx ? null : prev))
+                    }
+                  : undefined
+              }
             />
           )
         })}

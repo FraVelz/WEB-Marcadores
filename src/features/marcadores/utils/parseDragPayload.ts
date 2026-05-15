@@ -2,6 +2,10 @@ import type { GridItem } from "./types"
 
 export const BOOKMARK_DRAG_MIME_TYPE = "application/x-bookmark-item"
 
+export function isBookmarkDragTransfer(dt: DataTransfer): boolean {
+  return [...dt.types].includes(BOOKMARK_DRAG_MIME_TYPE)
+}
+
 export function parseBookmarkDragPayload(raw: string): GridItem | null {
   try {
     const payload = JSON.parse(raw) as {

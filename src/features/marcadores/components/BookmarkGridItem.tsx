@@ -19,6 +19,9 @@ type Props = {
   onToggleSelect: (id: string) => void
   onDoubleClick: (item: GridItem) => void
   onDrop?: (sourceItem: GridItem, targetFolderId?: string | null) => void
+  dropHighlight?: boolean
+  onBookmarkDragHover?: () => void
+  onBookmarkDragHoverLeave?: () => void
 }
 
 export default function BookmarkGridItem({
@@ -33,6 +36,9 @@ export default function BookmarkGridItem({
   onToggleSelect,
   onDoubleClick,
   onDrop,
+  dropHighlight = false,
+  onBookmarkDragHover,
+  onBookmarkDragHoverLeave,
 }: Props) {
   const selectControlId = useId()
   const isFolder = item.type === "folder"
@@ -52,12 +58,21 @@ export default function BookmarkGridItem({
     e.preventDefault()
     e.stopPropagation()
     e.dataTransfer.dropEffect = "move"
+    onBookmarkDragHover?.()
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    if (!onDrop || !onBookmarkDragHoverLeave) return
+    const rt = e.relatedTarget as Node | null
+    if (rt && e.currentTarget.contains(rt)) return
+    onBookmarkDragHoverLeave()
   }
 
   const handleDrop = (e: React.DragEvent) => {
     if (!onDrop) return
     e.preventDefault()
     e.stopPropagation()
+    onBookmarkDragHoverLeave?.()
     const raw = e.dataTransfer.getData(BOOKMARK_DRAG_MIME_TYPE)
     if (!raw) return
     const sourceItem = parseBookmarkDragPayload(raw)
@@ -73,14 +88,22 @@ export default function BookmarkGridItem({
     }
   }
 
-  const baseClass = `relative flex items-center gap-3 rounded-lg border px-4 py-3 transition-colors ${
-    isCut ? "border-dashed border-app-cut-border bg-app-cut-surface opacity-60" : ""
-  } ${
+  const dropFrameClass =
+    dropHighlight && !isCut
+      ? "border-app-accent bg-app-accent/[0.07] outline outline-2 outline-offset-[-2px] outline-dashed outline-app-accent/85 ring-2 ring-app-accent/30 dark:bg-app-accent/[0.11] dark:outline-app-accent/70"
+      : undefined
+
+  const baseClass = cn(
+    "relative flex items-center gap-3 rounded-lg border px-4 py-3 transition-colors",
+    isCut ? "border-app-cut-border bg-app-cut-surface border-dashed opacity-60" : "",
     !isCut &&
-    (isSelected
-      ? "border-app-focus bg-app-selection ring-2 ring-app-focus"
-      : "border-app-border-muted bg-app-raised/80 hover:border-app-input-border hover:bg-app-hover-strong/50")
-  } ${selectMode && !isFolder ? "cursor-pointer" : ""}`
+      !dropHighlight &&
+      (isSelected
+        ? "border-app-focus bg-app-selection ring-app-focus ring-2"
+        : "border-app-border-muted bg-app-raised/80 hover:border-app-input-border hover:bg-app-hover-strong/50"),
+    dropFrameClass,
+    selectMode && !isFolder ? "cursor-pointer" : ""
+  )
 
   return (
     <div
@@ -89,7 +112,7 @@ export default function BookmarkGridItem({
       role="button"
       tabIndex={0}
       aria-pressed={selectMode && !isFolder ? isChecked : undefined}
-      className={cn(baseClass, "cursor-grab active:cursor-grabbing")}
+      className={cn(baseClass, "z-[1] cursor-grab active:cursor-grabbing")}
       onClick={() => {
         if (selectMode && !isFolder) onToggleSelect(item.bookmark.id)
         else onSelect(idx)
@@ -98,6 +121,7 @@ export default function BookmarkGridItem({
       onDoubleClick={() => onDoubleClick(item)}
       onDragStart={handleDragStart}
       onDragOver={onDrop ? handleDragOver : undefined}
+      onDragLeave={onDrop ? handleDragLeave : undefined}
       onDrop={onDrop ? handleDrop : undefined}
     >
       {selectMode && !isFolder && (

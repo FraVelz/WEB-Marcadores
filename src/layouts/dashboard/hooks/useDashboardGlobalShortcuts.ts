@@ -7,6 +7,7 @@ import { navItems } from "../utils"
 type Params = {
   pathname: string
   sidebarRef: RefObject<HTMLDivElement | null>
+  marcadoresExplorerPanelRef?: RefObject<HTMLDivElement | null>
   focusMain: () => void
   focusSidebar: () => void
   push: (href: string) => void
@@ -16,6 +17,7 @@ type Params = {
 export function useDashboardGlobalShortcuts({
   pathname,
   sidebarRef,
+  marcadoresExplorerPanelRef,
   focusMain,
   focusSidebar,
   push,
@@ -41,8 +43,9 @@ export function useDashboardGlobalShortcuts({
           return
         e.preventDefault()
         if (pathname === "/marcadores") {
-          const isSidebarFocused = sidebarRef.current?.contains(active)
-          if (isSidebarFocused) focusMain()
+          const inExplorer = marcadoresExplorerPanelRef?.current?.contains(active ?? null) ?? false
+          const inAsideNav = sidebarRef.current?.contains(active ?? null) ?? false
+          if (inExplorer || inAsideNav) focusMain()
           else focusSidebar()
         } else {
           focusMain()
@@ -60,5 +63,5 @@ export function useDashboardGlobalShortcuts({
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [pathname, focusMain, focusSidebar, sidebarRef, push, setCommandPaletteOpen])
+  }, [pathname, focusMain, focusSidebar, sidebarRef, marcadoresExplorerPanelRef, push, setCommandPaletteOpen])
 }

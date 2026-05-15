@@ -2,7 +2,31 @@ export const dynamic = "force-dynamic"
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 
+import { AppAppearanceProvider } from "@/contexts/AppAppearanceContext"
+import { APP_APPEARANCE_STORAGE_KEY } from "@/lib/appAppearance"
+
 import "./globals.css"
+
+const APPEARANCE_INIT_SCRIPT = `try{
+var k=${JSON.stringify(APP_APPEARANCE_STORAGE_KEY)};
+var d=null;
+try{d=JSON.parse(localStorage.getItem(k)||'null')}catch(__){}
+if(!d||typeof d!=='object'){
+document.documentElement.classList.add('dark');
+}else{
+var r=document.documentElement;
+if(d.theme==='light'){r.classList.remove('dark')}
+else if(d.theme==='dark'){r.classList.add('dark')}
+else{if(window.matchMedia('(prefers-color-scheme: dark)').matches)r.classList.add('dark');else r.classList.remove('dark')}
+if(d.useCustomPalette&&d.customColors&&typeof d.customColors==='object'){
+var pairs=[['canvas','--app-canvas'],['sidebar','--app-sidebar'],['toolbar','--app-toolbar'],['raised','--app-raised'],['fg','--app-fg'],['primary','--app-primary']];
+for(var i=0;i<pairs.length;i++){var key=pairs[i][0];var vv=d.customColors[key];
+if(typeof vv!=='string')continue;var m=vv.match(/^#?([0-9a-f]{6})$/i);if(!m)continue;var hc='#'+m[1].toLowerCase();
+r.style.setProperty(pairs[i][1],hc)}
+var pk=d.customColors.primary;var pm=(typeof pk==='string'&&pk.match(/^#?([0-9a-f]{6})$/i));
+if(pm){var pr='#'+pm[1].toLowerCase();r.style.setProperty('--app-accent',pr);r.style.setProperty('--app-link',pr);r.style.setProperty('--app-focus',pr);r.style.setProperty('--app-primary-hover','color-mix(in srgb,'+pr+' 82%, black)')}}
+}
+}catch(__){}`
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -75,8 +99,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" className="dark">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
+    <html lang="es" suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {/* Tema antes de pintar para evitar flash; sin tapiz aquí */}
+        <script dangerouslySetInnerHTML={{ __html: APPEARANCE_INIT_SCRIPT }} />
+        <AppAppearanceProvider>{children}</AppAppearanceProvider>
+      </body>
     </html>
   )
 }
