@@ -14,7 +14,7 @@ type Props = {
   onSelectIndex: (idx: number) => void
   onToggleSelect: (id: string) => void
   onDoubleClick: (item: GridItem) => void
-  onDrop?: (sourceItem: GridItem, targetFolderId: string | null) => void
+  onDrop?: (sourceItem: GridItem, targetFolderId?: string | null) => void
   onAddBookmark: () => void
   onNewFolder: () => void
   itemRefs: React.MutableRefObject<Map<number, HTMLDivElement>>
@@ -34,30 +34,36 @@ export default function BookmarkGrid({
   onNewFolder,
   itemRefs,
 }: Props) {
+  const panelDragOver =
+    onDrop &&
+    ((e: React.DragEvent) => {
+      if (e.target !== e.currentTarget) return
+      e.preventDefault()
+      e.dataTransfer.dropEffect = "move"
+    })
+
+  const panelDrop =
+    onDrop &&
+    ((e: React.DragEvent) => {
+      if (e.target !== e.currentTarget) return
+      e.preventDefault()
+      const raw = e.dataTransfer.getData(BOOKMARK_DRAG_MIME_TYPE)
+      if (!raw) return
+      const sourceItem = parseBookmarkDragPayload(raw)
+      if (sourceItem) onDrop(sourceItem, undefined)
+    })
+
   return (
     <div
       className="min-h-0 flex-1 overflow-auto p-3 sm:p-4"
-      onDragOver={
-        onDrop
-          ? (e) => {
-              e.preventDefault()
-              e.dataTransfer.dropEffect = "move"
-            }
-          : undefined
-      }
-      onDrop={
-        onDrop
-          ? (e) => {
-              e.preventDefault()
-              const raw = e.dataTransfer.getData(BOOKMARK_DRAG_MIME_TYPE)
-              if (!raw) return
-              const sourceItem = parseBookmarkDragPayload(raw)
-              if (sourceItem) onDrop(sourceItem, null)
-            }
-          : undefined
-      }
+      onDragOver={panelDragOver || undefined}
+      onDrop={panelDrop || undefined}
     >
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div
+        className="grid min-h-[120px] grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        onDragOver={panelDragOver || undefined}
+        onDrop={panelDrop || undefined}
+      >
         {flatList.map((item, idx) => {
           const isFolder = item.type === "folder"
           const isCut =

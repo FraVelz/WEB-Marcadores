@@ -35,14 +35,7 @@ const emptyForm: BookmarkFormData = {
   tags: "",
 }
 
-export default function BookmarkModal({
-  onClose,
-  onSubmit,
-  initialData,
-  allTags,
-  folders,
-  currentFolderId,
-}: Props) {
+export default function BookmarkModal({ onClose, onSubmit, initialData, allTags, folders, currentFolderId }: Props) {
   const merged = useMemo(
     () => ({
       ...emptyForm,
@@ -110,9 +103,7 @@ export default function BookmarkModal({
     setSubmitting(true)
     const form = e.currentTarget
     const trimmedPending = tagInputRef.current?.trim() ?? ""
-    const finalTags = trimmedPending
-      ? [...splitCommaTags(tagsValue), trimmedPending].join(", ")
-      : tagsValue
+    const finalTags = trimmedPending ? [...splitCommaTags(tagsValue), trimmedPending].join(", ") : tagsValue
     const formData: BookmarkFormData = {
       title: (form.elements.namedItem("title") as HTMLInputElement).value,
       url: (form.elements.namedItem("url") as HTMLInputElement).value,
@@ -122,7 +113,7 @@ export default function BookmarkModal({
     }
     try {
       await onSubmit(formData)
-      onCloseEvent()
+      onClose()
       return
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Error al guardar")

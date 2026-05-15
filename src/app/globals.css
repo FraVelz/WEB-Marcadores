@@ -65,6 +65,10 @@
 
   --app-success-fg: #16a34a;
 
+  /* Escritorio / ventanas (Marcadores escritorio tipo Windows) */
+  --app-desktop: #cdd6e4;
+  --app-window-chrome: #eef1f8;
+
   --app-surface-canvas: var(--app-canvas);
   --app-text-primary: var(--app-fg);
 }
@@ -119,6 +123,9 @@ html.dark {
   --app-empty-icon: #52525b;
 
   --app-success-fg: #4ade80;
+
+  --app-desktop: #27272f;
+  --app-window-chrome: #3f3f4a;
 
   --app-surface-canvas: var(--app-canvas);
   --app-text-primary: var(--app-fg);
@@ -185,6 +192,9 @@ html.dark {
   --color-app-empty-icon: var(--app-empty-icon);
 
   --color-app-success-fg: var(--app-success-fg);
+
+  --color-app-desktop: var(--app-desktop);
+  --color-app-window-chrome: var(--app-window-chrome);
 
   --font-family-body: var(--font-geist-sans);
   --font-family-code: var(--font-geist-mono);

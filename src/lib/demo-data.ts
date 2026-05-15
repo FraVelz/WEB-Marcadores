@@ -19,7 +19,24 @@ export type DemoBookmark = {
   folder_id: string | null
   tags?: string[]
   created_at?: string
+  updated_at?: string
+  is_favorite?: boolean
+  archived_at?: string | null
+  opened_at?: string | null
+  open_count?: number
 }
+
+export type DemoWorkspace = {
+  id: string
+  name: string
+  sort_order: number
+}
+
+export const DEMO_WORKSPACES: DemoWorkspace[] = [
+  { id: "demo-ws-personal", name: "Personal", sort_order: 0 },
+  { id: "demo-ws-design", name: "Diseño UI", sort_order: 1 },
+  { id: "demo-ws-dev", name: "Programación", sort_order: 2 },
+]
 
 export const DEMO_FOLDERS: DemoFolder[] = [
   // Pocas carpetas de ejemplo — datos genéricos de desarrollo web
@@ -30,6 +47,8 @@ export const DEMO_FOLDERS: DemoFolder[] = [
   { id: "f5", parent_id: "f2", name: "Backend", sort_order: 1 },
 ]
 
+const DEMO_NOW = Date.now()
+
 export const DEMO_BOOKMARKS: DemoBookmark[] = [
   {
     id: "demo-1",
@@ -38,7 +57,12 @@ export const DEMO_BOOKMARKS: DemoBookmark[] = [
     description: "Documentación web estándar",
     folder_id: "f1",
     tags: ["documentación", "web"],
-    created_at: new Date().toISOString(),
+    created_at: new Date(DEMO_NOW - 86400000 * 200).toISOString(),
+    updated_at: new Date(DEMO_NOW - 86400000 * 2).toISOString(),
+    is_favorite: true,
+    archived_at: null,
+    opened_at: new Date(DEMO_NOW - 86400000 * 5).toISOString(),
+    open_count: 12,
   },
   {
     id: "demo-2",
@@ -47,7 +71,12 @@ export const DEMO_BOOKMARKS: DemoBookmark[] = [
     description: "Biblioteca JavaScript para interfaces",
     folder_id: "f4",
     tags: ["react", "frontend", "javascript"],
-    created_at: new Date().toISOString(),
+    created_at: new Date(DEMO_NOW - 86400000 * 120).toISOString(),
+    updated_at: new Date(DEMO_NOW - 86400000 * 1).toISOString(),
+    is_favorite: true,
+    archived_at: null,
+    opened_at: new Date(DEMO_NOW - 86400000 * 1).toISOString(),
+    open_count: 40,
   },
   {
     id: "demo-3",
@@ -56,7 +85,12 @@ export const DEMO_BOOKMARKS: DemoBookmark[] = [
     description: "Framework React para producción",
     folder_id: "f4",
     tags: ["react", "framework", "web"],
-    created_at: new Date().toISOString(),
+    created_at: new Date(DEMO_NOW - 86400000 * 90).toISOString(),
+    updated_at: new Date(DEMO_NOW - 86400000 * 3).toISOString(),
+    is_favorite: false,
+    archived_at: null,
+    opened_at: new Date(DEMO_NOW - 86400000 * 100).toISOString(),
+    open_count: 3,
   },
   {
     id: "demo-4",
@@ -65,16 +99,26 @@ export const DEMO_BOOKMARKS: DemoBookmark[] = [
     description: "Framework CSS utility-first",
     folder_id: "f4",
     tags: ["css", "frontend"],
-    created_at: new Date().toISOString(),
+    created_at: new Date(DEMO_NOW - 86400000 * 30).toISOString(),
+    updated_at: new Date(DEMO_NOW - 86400000 * 4).toISOString(),
+    is_favorite: false,
+    archived_at: null,
+    opened_at: null,
+    open_count: 0,
   },
   {
     id: "demo-5",
     title: "Supabase",
-    url: "https://supabase.com",
+    url: "https://supabase.com/?utm_source=test",
     description: "Backend as a Service",
     folder_id: "f5",
     tags: ["backend", "database", "auth"],
-    created_at: new Date().toISOString(),
+    created_at: new Date(DEMO_NOW - 86400000 * 15).toISOString(),
+    updated_at: new Date(DEMO_NOW - 86400000 * 5).toISOString(),
+    is_favorite: false,
+    archived_at: null,
+    opened_at: new Date(DEMO_NOW - 86400000 * 20).toISOString(),
+    open_count: 1,
   },
   {
     id: "demo-6",
@@ -82,8 +126,27 @@ export const DEMO_BOOKMARKS: DemoBookmark[] = [
     url: "https://github.com",
     description: "Plataforma de desarrollo colaborativo",
     folder_id: "f3",
-    tags: ["git", "herramientas"],
-    created_at: new Date().toISOString(),
+    tags: [],
+    created_at: new Date(DEMO_NOW - 86400000 * 10).toISOString(),
+    updated_at: new Date(DEMO_NOW - 86400000 * 6).toISOString(),
+    is_favorite: false,
+    archived_at: null,
+    opened_at: null,
+    open_count: 0,
+  },
+  {
+    id: "demo-7-dupe",
+    title: "Supabase dup",
+    url: "https://supabase.com",
+    description: "Posible duplicado de Supabase sin UTM",
+    folder_id: "f5",
+    tags: ["backend"],
+    created_at: new Date(DEMO_NOW - 86400000 * 40).toISOString(),
+    updated_at: new Date(DEMO_NOW - 86400000 * 7).toISOString(),
+    is_favorite: false,
+    archived_at: null,
+    opened_at: null,
+    open_count: 0,
   },
 ]
 
