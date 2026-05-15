@@ -20,11 +20,15 @@ import MarcadoresZoneBoard from "@/features/marcadores/components/MarcadoresZone
 import PasteErrorBanner from "@/features/marcadores/components/PasteErrorBanner"
 
 import { useMarcadoresActions } from "@/features/marcadores/hooks/useMarcadoresActions"
-import { useMarcadoresData, type BrowseMode } from "@/features/marcadores/hooks/useMarcadoresData"
+import {
+  useMarcadoresData,
+  buildMarcadoresFlatList,
+  type BrowseMode,
+} from "@/features/marcadores/hooks/useMarcadoresData"
 import { useMarcadoresEffects } from "@/features/marcadores/hooks/useMarcadoresEffects"
 import { useMarcadoresKeyboard } from "@/features/marcadores/hooks/useMarcadoresKeyboard"
 import type { Bookmark, CutItem, GridItem } from "@/features/marcadores/utils/types"
-import { isFolderDescendant } from "@/features/marcadores/utils/utils"
+import { getFolderPath, isFolderDescendant } from "@/features/marcadores/utils/utils"
 
 import { MarcadoresDesktopLibraryPane } from "@/features/marcadores/desktop/MarcadoresDesktopLibraryPane"
 import { MarcadoresDesktopShell } from "@/features/marcadores/desktop/MarcadoresDesktopShell"
@@ -33,6 +37,7 @@ import { useMinWidthMd } from "@/features/marcadores/hooks/useMinWidthMd"
 import type { ViewAst } from "@/features/marcadores/views/viewTypes"
 import { isZonesLayout } from "@/features/marcadores/workspaces/workspaceLayout"
 import { cn } from "@/lib/utils"
+import { readTabScopedItem, writeTabScopedItem } from "@/lib/tabScopedStorage"
 
 function workspacePrefsStorageKey(workspaceId: string) {
   return `marcadores_ws_prefs_${workspaceId}`
@@ -92,6 +97,36 @@ export function MarcadoresPage() {
 
   const dataOpts = useMemo(() => ({ browseMode, activeViewAst }), [browseMode, activeViewAst])
 
+  const zonesBoard = !!(workspaceLayout && isZonesLayout(workspaceLayout))
+
+  const zoneColumns = zonesBoard && workspaceLayout.template === "zones" ? workspaceLayout.columns : []
+
+  const wideViewport = useMinWidthMd()
+  const desktopWindowChrome = wideViewport && !zonesBoard
+
+  const [deskLibWinIds, setDeskLibWinIds] = useState<string[]>(() => [makeDeskLibWinId()])
+  const [focusedDeskLibId, setFocusedDeskLibId] = useState<string | null>(null)
+  const [deskFolderByWin, setDeskFolderByWin] = useState<Record<string, string | null>>({})
+
+  const resolvedDeskLibPaneId = useMemo(() => {
+    if (focusedDeskLibId && deskLibWinIds.includes(focusedDeskLibId)) return focusedDeskLibId
+    return deskLibWinIds[0] ?? null
+  }, [deskLibWinIds, focusedDeskLibId])
+
+  const activeBrowseFolderId =
+    desktopWindowChrome && resolvedDeskLibPaneId ? (deskFolderByWin[resolvedDeskLibPaneId] ?? null) : selectedFolderId
+
+  const setActiveBrowseFolderId = useCallback(
+    (id: string | null) => {
+      if (desktopWindowChrome && resolvedDeskLibPaneId) {
+        setDeskFolderByWin((prev) => ({ ...prev, [resolvedDeskLibPaneId]: id }))
+      } else {
+        setSelectedFolderId(id)
+      }
+    },
+    [desktopWindowChrome, resolvedDeskLibPaneId, setSelectedFolderId]
+  )
+
   const {
     bookmarks,
     setBookmarks,
@@ -103,7 +138,7 @@ export function MarcadoresPage() {
     filteredBookmarks,
     breadcrumb,
     libraryMatchesSearch,
-  } = useMarcadoresData(searchValue, selectedFolderId, setCtxFolders, refreshFolders, dataOpts)
+  } = useMarcadoresData(searchValue, activeBrowseFolderId, setCtxFolders, refreshFolders, dataOpts)
 
   const {
     handleCreateFolder,
@@ -124,26 +159,24 @@ export function MarcadoresPage() {
     refreshFolders,
     refreshTags,
     fetchData,
-    selectedFolderId,
+    selectedFolderId: activeBrowseFolderId,
     setDetailBookmark,
   })
 
   const duplicateClusterCount = useMemo(() => buildDuplicateClusters(bookmarks).length, [bookmarks])
 
-  const zonesBoard = !!(workspaceLayout && isZonesLayout(workspaceLayout))
-
-  const zoneColumns = zonesBoard && workspaceLayout.template === "zones" ? workspaceLayout.columns : []
-
-  const wideViewport = useMinWidthMd()
-  const desktopWindowChrome = wideViewport && !zonesBoard
-
-  const [deskLibWinIds, setDeskLibWinIds] = useState<string[]>(() => [makeDeskLibWinId()])
-  const [focusedDeskLibId, setFocusedDeskLibId] = useState<string | null>(null)
-
-  const resolvedDeskLibPaneId = useMemo(() => {
-    if (focusedDeskLibId && deskLibWinIds.includes(focusedDeskLibId)) return focusedDeskLibId
-    return deskLibWinIds[0] ?? null
-  }, [deskLibWinIds, focusedDeskLibId])
+  const desktopPaneDerived = useMemo(() => {
+    if (!desktopWindowChrome) return null
+    const m: Record<string, { flatList: GridItem[]; breadcrumb: { id: string | null; label: string }[] }> = {}
+    for (const id of deskLibWinIds) {
+      const fid = deskFolderByWin[id] ?? null
+      m[id] = {
+        flatList: buildMarcadoresFlatList(folders, filteredBookmarks, fid, browseMode),
+        breadcrumb: getFolderPath(folders, fid),
+      }
+    }
+    return m
+  }, [browseMode, deskFolderByWin, deskLibWinIds, desktopWindowChrome, filteredBookmarks, folders])
 
   const addDeskLibraryWindow = useCallback(() => {
     const id = makeDeskLibWinId()
@@ -153,6 +186,12 @@ export function MarcadoresPage() {
 
   const closeDeskLibraryWindow = useCallback((id: string) => {
     setDeskLibWinIds((prev) => (prev.length <= 1 ? prev : prev.filter((w) => w !== id)))
+    setDeskFolderByWin((prev) => {
+      if (!(id in prev)) return prev
+      const next = { ...prev }
+      delete next[id]
+      return next
+    })
   }, [])
 
   const focusDeskLibraryPane = useCallback((id: string) => {
@@ -185,7 +224,7 @@ export function MarcadoresPage() {
     queueMicrotask(() => {
       try {
         const raw =
-          typeof window !== "undefined" ? localStorage.getItem(workspacePrefsStorageKey(activeWorkspaceId)) : null
+          typeof window !== "undefined" ? readTabScopedItem(workspacePrefsStorageKey(activeWorkspaceId)) : null
         if (!raw) return
         const parsed = JSON.parse(raw) as StoredWorkspacePrefs
         if (parsed.browseMode === "folder" || parsed.browseMode === "filter") setBrowseMode(parsed.browseMode)
@@ -200,7 +239,7 @@ export function MarcadoresPage() {
     if (!activeWorkspaceId || typeof window === "undefined") return
     try {
       const payload: StoredWorkspacePrefs = { browseMode, activeViewAst }
-      localStorage.setItem(workspacePrefsStorageKey(activeWorkspaceId), JSON.stringify(payload))
+      writeTabScopedItem(workspacePrefsStorageKey(activeWorkspaceId), JSON.stringify(payload))
     } catch {
       /* ignore */
     }
@@ -311,7 +350,7 @@ export function MarcadoresPage() {
     totalCount: focusFlatList.length,
     gridCols: primaryViewMode === "tree" ? 1 : gridCols,
     selectMode,
-    selectedFolderId,
+    selectedFolderId: activeBrowseFolderId,
     folders,
     bookmarks,
     cutItem,
@@ -319,7 +358,7 @@ export function MarcadoresPage() {
     setPasteError,
     setSelectedIds,
     setSelectedIndex,
-    setSelectedFolderId,
+    setSelectedFolderId: setActiveBrowseFolderId,
     setInfoPanelEnabled,
     setDetailBookmark,
     handlePasteFolder,
@@ -355,7 +394,7 @@ export function MarcadoresPage() {
 
   useMarcadoresEffects({
     searchValue,
-    selectedFolderId,
+    selectedFolderId: activeBrowseFolderId,
     selectedIndex,
     flatList: focusFlatList,
     infoPanelEnabled,
@@ -468,6 +507,55 @@ export function MarcadoresPage() {
       }
     },
     [selectedFolderId, folders, bookmarks, handlePasteFolder, handlePasteLink, setPasteError]
+  )
+
+  const makeDeskPaneDoubleClick = useCallback(
+    (winId: string) => (item: GridItem) => {
+      if (selectMode) return
+      if (item.type === "folder") {
+        setDeskFolderByWin((prev) => ({ ...prev, [winId]: item.folderId }))
+      } else {
+        openBookmarkTab(item.bookmark)
+      }
+    },
+    [selectMode, openBookmarkTab]
+  )
+
+  const makeDeskPaneDrop = useCallback(
+    (winId: string) => (sourceItem: GridItem, targetFolderId?: string | null) => {
+      const paneFolder = deskFolderByWin[winId] ?? null
+      const destId = targetFolderId === undefined ? paneFolder : targetFolderId
+      setPasteError(null)
+      if (sourceItem.type === "folder") {
+        if (destId === sourceItem.id) return
+        const sameName = folders.some(
+          (f) =>
+            (f.parent_id || null) === destId &&
+            f.name.toLowerCase() === sourceItem.label.toLowerCase() &&
+            f.id !== sourceItem.id
+        )
+        if (sameName) {
+          setPasteError("Ya existe una carpeta con ese nombre en el destino")
+          return
+        }
+        if (destId === sourceItem.id || (destId && isFolderDescendant(folders, destId, sourceItem.id))) {
+          setPasteError("No se puede mover una carpeta dentro de sí misma o de sus subcarpetas")
+          return
+        }
+        handlePasteFolder(sourceItem.id, destId)
+      } else {
+        const sameUrl = bookmarks.some(
+          (b) =>
+            (b.folder_id || null) === destId && b.url === sourceItem.bookmark.url && b.id !== sourceItem.bookmark.id
+        )
+        if (sameUrl) {
+          setPasteError("Ya existe un enlace con esa URL en el destino")
+          return
+        }
+        handlePasteLink(sourceItem.bookmark.id, destId)
+      }
+    },
+    [deskFolderByWin, folders, bookmarks, handlePasteFolder, handlePasteLink, setPasteError]
   )
 
   const treeToggleDisabled = zonesBoard || browseMode !== "folder"
@@ -600,72 +688,88 @@ export function MarcadoresPage() {
                 />
               ) : null
             }
-            renderLibraryPane={(_winId, focused) => (
-              <MarcadoresDesktopLibraryPane
-                paneId={_winId}
-                focused={focused}
-                parentItemRefs={itemRefs}
-                onRequestFocusPane={focusDeskLibraryPane}
-                showSearch={showSearch}
-                setShowSearch={setShowSearch}
-                searchValue={searchValue}
-                setSearchValue={setSearchValue}
-                searchRef={searchRef}
-                focusMain={focusMain}
-                showNewFolder={showNewFolder}
-                setShowNewFolder={setShowNewFolder}
-                newFolderName={newFolderName}
-                setNewFolderName={setNewFolderName}
-                editingFolder={editingFolder}
-                setEditingFolder={setEditingFolder}
-                renameFolderName={renameFolderName}
-                setRenameFolderName={setRenameFolderName}
-                onRenameFolder={onRenameFolder}
-                onNavigateUp={() => setSelectedFolderId(null)}
-                onAddBookmark={handleAdd}
-                onDeleteFocused={() => {
-                  const item = focusFlatList[selectedIndex]
-                  if (item) setDeleteConfirmItem(item)
-                }}
-                onCreateFolder={onCreateFolder}
-                selectMode={selectMode}
-                setSelectMode={setSelectMode}
-                selectedIds={selectedIds}
-                setSelectedIds={setSelectedIds}
-                onEdit={handleEdit}
-                onDelete={onDelete}
-                infoPanelEnabled={infoPanelEnabled}
-                setInfoPanelEnabled={setInfoPanelEnabled}
-                flatList={focusFlatList}
-                selectedIndex={selectedIndex}
-                setDetailBookmark={setDetailBookmark}
-                treeView={viewMode === "tree"}
-                onToggleTreeView={treeToggleDisabled ? undefined : toggleTreeMainView}
-                treeToggleDisabled={treeToggleDisabled}
-                browseMode={browseMode}
-                setBrowseMode={setBrowseMode}
-                activeViewAst={activeViewAst}
-                setActiveViewAst={setActiveViewAst}
-                duplicateClusterCount={duplicateClusterCount}
-                breadcrumb={breadcrumb}
-                onSelectBreadcrumb={setSelectedFolderId}
-                primaryViewMode={primaryViewMode}
-                flatListGrid={flatList}
-                treeFlatRows={treeFlatRows}
-                folders={folders}
-                filteredBookmarks={filteredBookmarks}
-                selectedIndexGrid={selectedIndex}
-                onSelectIndex={setSelectedIndex}
-                cutItem={cutItem}
-                onToggleSelect={toggleSelect}
-                onDoubleClick={handleDoubleClick}
-                onDrop={handleDrop}
-                onToggleFolderCollapse={toggleTreeFolderCollapse}
-                treeCollapsedIds={treeCollapsedIds}
-                currentLocationLabel={breadcrumb.map((p) => p.label).join(" › ")}
-                registerExplorerFocus={focused}
-              />
-            )}
+            renderLibraryPane={(winId, focused) => {
+              const pane = desktopPaneDerived?.[winId]
+              const paneFlatList = pane?.flatList ?? flatList
+              const paneBreadcrumb = pane?.breadcrumb ?? breadcrumb
+              const paneFolderId = deskFolderByWin[winId] ?? null
+              const setPaneFolder = (id: string | null) => {
+                setDeskFolderByWin((prev) => ({ ...prev, [winId]: id }))
+              }
+              const focusedListForDelete =
+                resolvedDeskLibPaneId && desktopPaneDerived?.[resolvedDeskLibPaneId]
+                  ? desktopPaneDerived[resolvedDeskLibPaneId]!.flatList
+                  : focusFlatList
+
+              return (
+                <MarcadoresDesktopLibraryPane
+                  paneId={winId}
+                  focused={focused}
+                  explorerFolderId={paneFolderId}
+                  setExplorerFolderId={setPaneFolder}
+                  parentItemRefs={itemRefs}
+                  onRequestFocusPane={focusDeskLibraryPane}
+                  showSearch={showSearch}
+                  setShowSearch={setShowSearch}
+                  searchValue={searchValue}
+                  setSearchValue={setSearchValue}
+                  searchRef={searchRef}
+                  focusMain={focusMain}
+                  showNewFolder={showNewFolder}
+                  setShowNewFolder={setShowNewFolder}
+                  newFolderName={newFolderName}
+                  setNewFolderName={setNewFolderName}
+                  editingFolder={editingFolder}
+                  setEditingFolder={setEditingFolder}
+                  renameFolderName={renameFolderName}
+                  setRenameFolderName={setRenameFolderName}
+                  onRenameFolder={onRenameFolder}
+                  onNavigateUp={() => setPaneFolder(null)}
+                  onAddBookmark={handleAdd}
+                  onDeleteFocused={() => {
+                    const item = focusedListForDelete[selectedIndex]
+                    if (item) setDeleteConfirmItem(item)
+                  }}
+                  onCreateFolder={onCreateFolder}
+                  selectMode={selectMode}
+                  setSelectMode={setSelectMode}
+                  selectedIds={selectedIds}
+                  setSelectedIds={setSelectedIds}
+                  onEdit={handleEdit}
+                  onDelete={onDelete}
+                  infoPanelEnabled={infoPanelEnabled}
+                  setInfoPanelEnabled={setInfoPanelEnabled}
+                  flatList={paneFlatList}
+                  selectedIndex={selectedIndex}
+                  setDetailBookmark={setDetailBookmark}
+                  treeView={viewMode === "tree"}
+                  onToggleTreeView={treeToggleDisabled ? undefined : toggleTreeMainView}
+                  treeToggleDisabled={treeToggleDisabled}
+                  browseMode={browseMode}
+                  setBrowseMode={setBrowseMode}
+                  activeViewAst={activeViewAst}
+                  setActiveViewAst={setActiveViewAst}
+                  duplicateClusterCount={duplicateClusterCount}
+                  breadcrumb={paneBreadcrumb}
+                  onSelectBreadcrumb={setPaneFolder}
+                  primaryViewMode={primaryViewMode}
+                  flatListGrid={paneFlatList}
+                  treeFlatRows={treeFlatRows}
+                  folders={folders}
+                  filteredBookmarks={filteredBookmarks}
+                  selectedIndexGrid={selectedIndex}
+                  onSelectIndex={setSelectedIndex}
+                  cutItem={cutItem}
+                  onToggleSelect={toggleSelect}
+                  onDoubleClick={makeDeskPaneDoubleClick(winId)}
+                  onDrop={makeDeskPaneDrop(winId)}
+                  onToggleFolderCollapse={toggleTreeFolderCollapse}
+                  treeCollapsedIds={treeCollapsedIds}
+                  currentLocationLabel={paneBreadcrumb.map((p) => p.label).join(" › ")}
+                  registerExplorerFocus={focused}
+                />
+              )
+            }}
           />
         ) : (
           <div className="flex min-h-0 min-w-0 flex-1 flex-row overflow-hidden">
@@ -756,7 +860,7 @@ export function MarcadoresPage() {
           }
           allTags={allTags}
           folders={folders}
-          currentFolderId={selectedFolderId}
+          currentFolderId={activeBrowseFolderId}
         />
       )}
     </div>

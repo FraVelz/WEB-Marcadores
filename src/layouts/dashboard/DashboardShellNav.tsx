@@ -9,15 +9,18 @@ type DashboardShellNavProps = {
   onNavigate?: () => void
   /** Sin borde inferior (p. ej. dentro de la banda «Explorador» superior). */
   toolbar?: boolean
+  /** Menos padding vertical (cabecera compacta junto a otras herramientas). */
+  compact?: boolean
 }
 
 /** Barra de navegación principal en una sola fila horizontal (scroll si el panel es estrecho). */
-export function DashboardShellNav({ pathname, onNavigate, toolbar }: DashboardShellNavProps) {
+export function DashboardShellNav({ pathname, onNavigate, toolbar, compact }: DashboardShellNavProps) {
   return (
     <nav
       aria-label="Navegación principal"
       className={cn(
-        "flex shrink-0 flex-nowrap gap-1 overscroll-x-contain px-2 py-2",
+        "flex shrink-0 flex-nowrap gap-1 overscroll-x-contain",
+        toolbar && compact ? "px-1 py-0.5" : "px-2 py-2",
         !toolbar && "border-app-border border-b",
         "snap-x overflow-x-auto md:snap-none [&::-webkit-scrollbar]:h-1"
       )}
@@ -30,7 +33,8 @@ export function DashboardShellNav({ pathname, onNavigate, toolbar }: DashboardSh
             href={item.href}
             onClick={onNavigate}
             className={cn(
-              "flex min-h-9 shrink-0 snap-start items-center gap-1.5 rounded-md px-2.5 py-2 text-xs font-medium whitespace-nowrap transition-colors",
+              "flex shrink-0 snap-start items-center gap-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-colors",
+              compact ? "min-h-8 px-2 py-1" : "min-h-9 px-2.5 py-2",
               active ? "bg-app-nav-active text-app-fg" : "text-app-fg-secondary hover:bg-app-hover hover:text-app-fg"
             )}
           >

@@ -14,6 +14,9 @@ export type MarcadoresDesktopLayoutV1 = {
 
 export type DesktopWindowKind = "library" | "detail"
 
+/** Id persistido para la ventana de detalle en el modelo v2 del escritorio. */
+export const DESKTOP_DETAIL_WINDOW_ID = "__desk_detail__"
+
 export type PersistedDesktopWindowV2 = PersistedWindowState & {
   id: string
   kind: DesktopWindowKind
@@ -23,4 +26,25 @@ export type MarcadoresDesktopLayoutV2 = {
   v: 2
   libraryWindowIds: string[]
   windows: PersistedDesktopWindowV2[]
+}
+
+export type DesktopSurfaceTask = {
+  id: string
+  title: string
+  subtitle?: string
+  minimized: boolean
+  maximized: boolean
+  /** Ventana seleccionada (z-order alto / panel activo del escritorio). */
+  isFocused: boolean
+  kind: DesktopWindowKind
+}
+
+/** API expuesta desde el escritorio (cabecera tipo barra de tareas y acciones en bloque). */
+export type DesktopWmExtras = {
+  tasks: DesktopSurfaceTask[]
+  focusTask: (id: string) => void
+  minimizeAll: () => void
+  restoreMinimized: () => void
+  maximizeAll: () => void
+  restoreWindowSizes: () => void
 }

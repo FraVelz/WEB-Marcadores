@@ -5,15 +5,20 @@ import { usePathname, useRouter } from "next/navigation"
 import { useDashboardGlobalShortcuts } from "./hooks/useDashboardGlobalShortcuts"
 import { useFocusMainOnMarcadoresRoute } from "./hooks/useFocusMainOnMarcadoresRoute"
 
+import { useAppAppearance } from "@/contexts/AppAppearanceContext"
 import { useDashboard } from "@/contexts/DashboardContext"
 
 import { DashboardCommandPalette } from "./components/DashboardCommandPalette"
 
 import { DashboardMobileLayout } from "./DashboardMobileLayout"
 
+import { cn } from "@/lib/utils"
+
 export default function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const { push } = useRouter()
+  const { appearance } = useAppAppearance()
+  const wallpaperActive = Boolean(appearance.wallpaperDataUrl)
 
   const {
     mainRef,
@@ -39,7 +44,9 @@ export default function DashboardShell({ children }: { children: React.ReactNode
 
   return (
     <>
-      <div className="bg-app-canvas flex min-h-dvh flex-col md:min-h-screen">
+      <div
+        className={cn("flex min-h-dvh flex-col md:min-h-screen", wallpaperActive ? "bg-transparent" : "bg-app-canvas")}
+      >
         <DashboardMobileLayout
           pathname={pathname}
           sidebarRef={sidebarRef}

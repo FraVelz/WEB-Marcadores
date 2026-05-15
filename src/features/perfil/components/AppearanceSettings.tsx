@@ -112,7 +112,7 @@ export function AppearanceSettings() {
     <div className="border-app-border-muted bg-app-raised rounded-lg border p-6">
       <h2 className="text-app-fg mb-1 text-lg font-semibold">Apariencia</h2>
       <p className="text-app-fg-secondary mb-6 text-sm">
-        Tema, colores y fondo se guardan en este dispositivo (localStorage) y aplican a toda la aplicación.
+        Tema, colores y fondo se guardan en el navegador (localmente, por pestaña); cada pestaña puede lucir distinto.
       </p>
 
       <div className="space-y-6">

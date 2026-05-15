@@ -8,6 +8,7 @@ import ExplorerTree from "@/components/ExplorerTree"
 import { useDashboardSidebarKeyboard } from "@/layouts/dashboard/hooks/useDashboardSidebarKeyboard"
 
 import { cn } from "@/lib/utils"
+import { readTabScopedItem, writeTabScopedItem } from "@/lib/tabScopedStorage"
 
 const OPEN_KEY = "marcadores_explorer_rail_open"
 
@@ -17,13 +18,14 @@ type Props = {
    * para atajos (p. ej. tecla n). En layout apilado siempre true.
    */
   registerGlobalExplorerRef?: boolean
+  folderSelection?: { folderId: string | null; onFolderChange: (id: string | null) => void } | null
 }
 
-export function MarcadoresExplorerRail({ registerGlobalExplorerRef = true }: Props) {
+export function MarcadoresExplorerRail({ registerGlobalExplorerRef = true, folderSelection = null }: Props) {
   const {
     folders,
-    selectedFolderId,
-    setSelectedFolderId,
+    selectedFolderId: ctxFolderId,
+    setSelectedFolderId: setCtxFolderId,
     explorerCollapsedIds,
     setExplorerCollapsedIds,
     toggleExplorerCollapsed,
@@ -33,10 +35,13 @@ export function MarcadoresExplorerRail({ registerGlobalExplorerRef = true }: Pro
     focusMain,
   } = useDashboard()
 
+  const selectedFolderId = folderSelection ? folderSelection.folderId : ctxFolderId
+  const setSelectedFolderId = folderSelection ? folderSelection.onFolderChange : setCtxFolderId
+
   const [open, setOpen] = useState(() => {
     if (typeof window === "undefined") return true
     try {
-      return localStorage.getItem(OPEN_KEY) !== "0"
+      return readTabScopedItem(OPEN_KEY) !== "0"
     } catch {
       return true
     }
@@ -46,7 +51,7 @@ export function MarcadoresExplorerRail({ registerGlobalExplorerRef = true }: Pro
   const persistOpen = useCallback((next: boolean) => {
     setOpen(next)
     try {
-      localStorage.setItem(OPEN_KEY, next ? "1" : "0")
+      writeTabScopedItem(OPEN_KEY, next ? "1" : "0")
     } catch {
       /* ignore */
     }
@@ -103,15 +108,15 @@ export function MarcadoresExplorerRail({ registerGlobalExplorerRef = true }: Pro
           ref={innerRef}
           tabIndex={0}
           role="navigation"
-          aria-label="Árbol de carpetas"
+          aria-label="Explorador de carpetas"
           data-marcadores-explorer-rail
           className={cn(
-            "flex w-[min(15rem,calc(100vw-4rem))] max-w-[16rem] min-w-[11rem] flex-col overflow-hidden outline-none md:w-[13.75rem]",
+            "flex min-h-0 w-[min(15rem,calc(100vw-4rem))] max-w-[16rem] min-w-[11rem] flex-col overflow-hidden outline-none md:w-[13.75rem]",
             "focus:ring-0"
           )}
           onKeyDown={handleExplorerKeyDown}
         >
-          <div className="border-app-border flex items-center justify-between gap-1 border-b px-2 py-1.5">
+          <div className="border-app-border flex shrink-0 items-center justify-between gap-1 border-b px-2 py-1.5">
             <span className="text-app-fg-label truncate text-[11px] font-semibold tracking-wide uppercase">
               Carpetas
             </span>
@@ -125,14 +130,16 @@ export function MarcadoresExplorerRail({ registerGlobalExplorerRef = true }: Pro
               ◀
             </button>
           </div>
-          <div className="flex-1 overflow-x-hidden overflow-y-auto p-1.5">
-            <ExplorerTree
-              folders={folders}
-              selectedFolderId={selectedFolderId}
-              onSelect={setSelectedFolderId}
-              collapsedIds={explorerCollapsedIds}
-              onToggle={toggleExplorerCollapsed}
-            />
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-1.5">
+              <ExplorerTree
+                folders={folders}
+                selectedFolderId={selectedFolderId}
+                onSelect={setSelectedFolderId}
+                collapsedIds={explorerCollapsedIds}
+                onToggle={toggleExplorerCollapsed}
+              />
+            </div>
           </div>
         </div>
       )}

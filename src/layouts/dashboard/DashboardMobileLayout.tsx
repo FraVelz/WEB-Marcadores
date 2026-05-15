@@ -11,6 +11,8 @@ import { useDashboardViewportMd } from "./hooks/useDashboardViewportMd"
 
 import { useDashboard } from "@/contexts/DashboardContext"
 
+import { useAppAppearance } from "@/contexts/AppAppearanceContext"
+
 import { cn } from "@/lib/utils"
 
 type DashboardMobileLayoutProps = {
@@ -31,7 +33,9 @@ export function DashboardMobileLayout({
 }: DashboardMobileLayoutProps) {
   const wide = useDashboardViewportMd()
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
-  const { dashboardFullscreenHostRef } = useDashboard()
+  const { dashboardFullscreenHostRef, explorerWideHeaderEndSlot } = useDashboard()
+  const { appearance } = useAppAppearance()
+  const wallpaperActive = Boolean(appearance.wallpaperDataUrl)
 
   useBodyScrollLock(mobileSidebarOpen)
 
@@ -40,15 +44,20 @@ export function DashboardMobileLayout({
   const isMarcadores = pathname === "/marcadores"
 
   const explorerNavChrome = wide ? (
-    <header className="border-app-border bg-app-sidebar flex shrink-0 flex-row flex-wrap items-center gap-x-3 gap-y-1 border-b px-3 py-1.5">
+    <header className="border-app-border bg-app-sidebar flex shrink-0 flex-row flex-nowrap items-center gap-2 border-b px-3 py-1.5">
       <span className="text-app-fg-label shrink-0 text-xs font-medium tracking-wider uppercase">Explorador</span>
       <div
         ref={sidebarRef}
         tabIndex={0}
-        className="outline-app-focus flex min-h-0 min-w-0 flex-1 flex-col focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+        className="outline-app-focus flex min-h-0 max-w-[42vw] min-w-0 shrink flex-col focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 md:max-w-none md:flex-[0_1_auto]"
       >
-        <DashboardShellNav pathname={pathname} toolbar />
+        <DashboardShellNav pathname={pathname} toolbar compact />
       </div>
+      {explorerWideHeaderEndSlot ? (
+        <div className="border-app-border flex min-h-9 min-w-0 flex-1 items-center justify-end gap-2 overflow-x-auto overscroll-x-contain border-l pl-3 md:min-h-10 [&::-webkit-scrollbar]:h-1">
+          {explorerWideHeaderEndSlot}
+        </div>
+      ) : null}
     </header>
   ) : (
     <aside
@@ -103,7 +112,10 @@ export function DashboardMobileLayout({
         <main
           ref={mainRef}
           tabIndex={0}
-          className="bg-app-canvas flex min-h-0 flex-1 flex-col overflow-hidden outline-none focus:ring-0"
+          className={cn(
+            "flex min-h-0 flex-1 flex-col overflow-hidden outline-none focus:ring-0",
+            wallpaperActive ? "bg-transparent" : "bg-app-canvas"
+          )}
           onKeyDown={(e) => mainKeyDownRef.current?.(e)}
         >
           {children}

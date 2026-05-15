@@ -1,3 +1,5 @@
+import { readTabScopedItem, writeTabScopedItem } from "@/lib/tabScopedStorage"
+
 export const APP_APPEARANCE_STORAGE_KEY = "marcadores_app_appearance_v1"
 
 export type AppThemePreset = "light" | "dark" | "system"
@@ -92,7 +94,7 @@ export function sanitizeAppAppearanceState(raw: unknown): AppAppearanceState {
 export function loadAppAppearanceFromStorage(): AppAppearanceState {
   if (typeof window === "undefined") return { ...defaultAppAppearanceState }
   try {
-    const raw = localStorage.getItem(APP_APPEARANCE_STORAGE_KEY)
+    const raw = readTabScopedItem(APP_APPEARANCE_STORAGE_KEY)
     if (!raw) return { ...defaultAppAppearanceState }
     return sanitizeAppAppearanceState(JSON.parse(raw) as unknown)
   } catch {
@@ -103,7 +105,7 @@ export function loadAppAppearanceFromStorage(): AppAppearanceState {
 export function saveAppAppearanceToStorage(state: AppAppearanceState): void {
   if (typeof window === "undefined") return
   try {
-    localStorage.setItem(APP_APPEARANCE_STORAGE_KEY, JSON.stringify(state))
+    writeTabScopedItem(APP_APPEARANCE_STORAGE_KEY, JSON.stringify(state))
   } catch {
     /* espacio localStorage insuficiente u otro — ignoramos */
   }
