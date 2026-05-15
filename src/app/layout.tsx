@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic"
 import type { Metadata } from "next"
+import Script from "next/script"
 import { Geist, Geist_Mono } from "next/font/google"
 
 import { AppAppearanceProvider } from "@/contexts/AppAppearanceContext"
@@ -116,7 +117,9 @@ export default function RootLayout({
     <html lang="es" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {/* Tema antes de pintar para evitar flash; sin tapiz aquí */}
-        <script dangerouslySetInnerHTML={{ __html: APPEARANCE_INIT_SCRIPT }} />
+        <Script id="appearance-init-bootstrap" strategy="beforeInteractive">
+          {APPEARANCE_INIT_SCRIPT}
+        </Script>
         <AppAppearanceProvider>{children}</AppAppearanceProvider>
       </body>
     </html>

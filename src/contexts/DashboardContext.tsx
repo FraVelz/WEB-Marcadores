@@ -1,107 +1,40 @@
 "use client"
 
-import { createContext, use, useRef, useCallback, useState, useEffect, useEffectEvent } from "react"
+import { createContext, use, useRef, useCallback, useReducer } from "react"
+
 import type { ReactNode } from "react"
 
 import { createClient } from "@/lib/supabase/client"
 
 import type { WorkspaceLayoutPayload } from "@/features/marcadores/workspaces/workspaceLayout"
-import { SINGLE_LAYOUT_PAYLOAD } from "@/features/marcadores/workspaces/workspaceLayout"
 import type { WorkspaceRow } from "@/features/marcadores/workspaces/workspaceTypes"
-import { DEMO_TAGS, DEMO_WORKSPACES } from "@/lib/demo-data"
-import { sortedUniqueTagsFromRows } from "@/lib/bookmark-tags"
-import { readTabScopedItem, writeTabScopedItem } from "@/lib/tabScopedStorage"
+import { writeTabScopedItem } from "@/lib/tabScopedStorage"
 import { useSidebarTreeCollapse } from "@/layouts/dashboard/hooks/useSidebarTreeCollapse"
 
-export type Folder = {
-  id: string
-  parent_id: string | null
-  name: string
-  sort_order: number
-  children?: Folder[]
-}
+import {
+  ACTIVE_WS_KEY,
+  layoutStorageKeyBase,
+  useDashboardWorkspaceBootstrap,
+} from "@/contexts/useDashboardWorkspaceBootstrap"
+import { useDashboardBookmarksTree } from "@/contexts/useDashboardBookmarksTree"
+import type { DashboardContextType, MarcadoresRuntimeSnap, ViewMode } from "@/contexts/dashboardContextContract"
+import { INITIAL_DASHBOARD_UI, dashboardUiReducer } from "@/contexts/dashboardUiReducer"
+import { INITIAL_DASHBOARD_WORKSPACE, dashboardWorkspaceReducer } from "@/contexts/dashboardWorkspaceReducer"
 
-type ViewMode = "grid" | "hierarchical"
-
-export type MarcadoresRuntimeSnap = {
-  bookmarks: Array<{ id: string; title: string; url: string }>
-  recordBookmarkOpened: (id: string) => Promise<void>
-}
-
-const ACTIVE_WS_KEY = "marcadores_active_workspace_id"
-const DEMO_LAYOUT_PREFIX = "marcadores_demo_workspace_layout."
-
-type DashboardContextType = {
-  demoMode: boolean
-  mainRef: React.RefObject<HTMLElement | null>
-  sidebarRef: React.RefObject<HTMLDivElement | null>
-  focusMain: () => void
-  focusSidebar: () => void
-  allTags: string[]
-  refreshTags: () => void
-  setAllTagsFromBookmarks: (rows: { tags?: string[] | null }[]) => void
-  viewMode: ViewMode
-  setViewMode: (m: ViewMode) => void
-  setMainKeyDown: (handler: ((e: React.KeyboardEvent) => void) | null) => void
-  mainKeyDownRef: React.MutableRefObject<((e: React.KeyboardEvent) => void) | null>
-  editFolderRef: React.MutableRefObject<((id: string, name: string) => void) | null>
-  selectedFolderId: string | null
-  setSelectedFolderId: (id: string | null) => void
-  folders: Folder[]
-  setFolders: (folders: Folder[]) => void
-  refreshFolders: () => void
-  workspaces: WorkspaceRow[]
-  activeWorkspaceId: string | null
-  setActiveWorkspaceId: (id: string | null) => void
-  workspaceLayout: WorkspaceLayoutPayload | null
-  workspacesLoading: boolean
-  reloadWorkspacesAndLayout: () => Promise<void>
-  persistWorkspaceLayout: (payload: WorkspaceLayoutPayload) => Promise<void>
-
-  commandPaletteOpen: boolean
-  setCommandPaletteOpen: React.Dispatch<React.SetStateAction<boolean>>
-
-  registerMarcadoresRuntime: (snapshot: MarcadoresRuntimeSnap | null) => void
-  marcadoresPalette: MarcadoresRuntimeSnap | null
-
-  /** Árbol de carpetas (Marcadores): colapsar / teclado desde el panel interno */
-  explorerCollapsedIds: Set<string>
-  setExplorerCollapsedIds: React.Dispatch<React.SetStateAction<Set<string>>>
-  toggleExplorerCollapsed: (folderId: string) => void
-  explorerFlatSidebarItems: (string | null)[]
-  /** Solo la instancia enfocada del escritorio debe enlazar esta ref para atajos „n“. */
-  marcadoresExplorerPanelRef: React.RefObject<HTMLDivElement | null>
-  /**
-   * Contenedor de la columna principal (Explorador + cabecera móvil + main).
-   * Pantalla completa del escritorio lo usa para mantener visible la barra superior de la app.
-   */
-  dashboardFullscreenHostRef: React.RefObject<HTMLDivElement | null>
-
-  /**
-   * Contenido opcional alineado a la derecha de la cabecera «Explorador» (viewport ancho),
-   * p. ej. acciones del escritorio de Marcadores en una sola fila.
-   */
-  explorerWideHeaderEndSlot: ReactNode | null
-  registerExplorerWideHeaderEnd: (node: ReactNode | null) => void
-}
+export type { Folder } from "@/contexts/dashboardTypes"
+export type { MarcadoresRuntimeSnap, ViewMode } from "@/contexts/dashboardContextContract"
 
 const DashboardContext = createContext<DashboardContextType | null>(null)
-
-/** Clave base sin scope de pestaña (`readTabScopedItem` / `writeTabScopedItem`). */
-function layoutStorageKeyBase(workspaceId: string, demoMode: boolean) {
-  if (demoMode) return `${DEMO_LAYOUT_PREFIX}${workspaceId}`
-  return ACTIVE_WS_KEY + ".layout." + workspaceId
-}
 
 export function DashboardProvider({ children, demoMode }: { children: React.ReactNode; demoMode: boolean }) {
   const mainRef = useRef<HTMLElement>(null)
   const sidebarRef = useRef<HTMLDivElement>(null)
   const marcadoresExplorerPanelRef = useRef<HTMLDivElement>(null)
   const dashboardFullscreenHostRef = useRef<HTMLDivElement>(null)
-  const [allTags, setAllTags] = useState<string[]>([])
-  const [viewMode, setViewMode] = useState<ViewMode>("hierarchical")
-  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null)
-  const [folders, setFolders] = useState<Folder[]>([])
+  const { allTags, folders, setFolders, refreshTags, setAllTagsFromBookmarks, refreshFolders } =
+    useDashboardBookmarksTree(demoMode)
+  const [ui, dispatchUi] = useReducer(dashboardUiReducer, INITIAL_DASHBOARD_UI)
+  const { viewMode, selectedFolderId, commandPaletteOpen, marcadoresPalette, explorerWideHeaderEndSlot } = ui
   const {
     collapsedIds: explorerCollapsedIds,
     setCollapsedIds: setExplorerCollapsedIds,
@@ -109,28 +42,49 @@ export function DashboardProvider({ children, demoMode }: { children: React.Reac
     toggleCollapsed: toggleExplorerCollapsed,
   } = useSidebarTreeCollapse(folders)
 
-  const mainKeyDownRef = useRef<((e: React.KeyboardEvent) => void) | null>(null)
-  const editFolderRef = useRef<((id: string, name: string) => void) | null>(null)
+  const setViewMode = useCallback((m: ViewMode) => {
+    dispatchUi({ type: "view_mode", mode: m })
+  }, [])
 
-  const [workspaces, setWorkspaces] = useState<WorkspaceRow[]>([])
-  const [activeWorkspaceId, setActiveWorkspaceIdState] = useState<string | null>(null)
-  const [workspaceLayout, setWorkspaceLayout] = useState<WorkspaceLayoutPayload | null>(SINGLE_LAYOUT_PAYLOAD)
-  const [workspacesLoading, setWorkspacesLoading] = useState(true)
-  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
+  const setSelectedFolderId = useCallback((id: string | null) => {
+    dispatchUi({ type: "selected_folder", id })
+  }, [])
 
-  const [marcadoresPalette, setMarcadoresPalette] = useState<MarcadoresRuntimeSnap | null>(null)
-  const [explorerWideHeaderEndSlot, setExplorerWideHeaderEndSlot] = useState<ReactNode | null>(null)
+  const setCommandPaletteOpen = useCallback((updater: React.SetStateAction<boolean>) => {
+    dispatchUi({ type: "command_palette", updater })
+  }, [])
 
   const registerMarcadoresRuntime = useCallback((snapshot: MarcadoresRuntimeSnap | null) => {
     queueMicrotask(() => {
-      setMarcadoresPalette(snapshot)
+      dispatchUi({ type: "marcadores_palette", updater: snapshot })
     })
   }, [])
 
   const registerExplorerWideHeaderEnd = useCallback((node: ReactNode | null) => {
     queueMicrotask(() => {
-      setExplorerWideHeaderEndSlot(node)
+      dispatchUi({ type: "explorer_header_slot", updater: node })
     })
+  }, [])
+  const mainKeyDownRef = useRef<((e: React.KeyboardEvent) => void) | null>(null)
+  const editFolderRef = useRef<((id: string, name: string) => void) | null>(null)
+
+  const [ws, dispatchWs] = useReducer(dashboardWorkspaceReducer, INITIAL_DASHBOARD_WORKSPACE)
+  const { workspaces, activeWorkspaceId, workspaceLayout, workspacesLoading } = ws
+
+  const setWorkspaces = useCallback((updater: React.SetStateAction<WorkspaceRow[]>) => {
+    dispatchWs({ type: "set_workspaces", updater })
+  }, [])
+
+  const setActiveWorkspaceIdState = useCallback((id: string | null) => {
+    dispatchWs({ type: "set_active_id", id })
+  }, [])
+
+  const setWorkspaceLayout = useCallback((updater: React.SetStateAction<WorkspaceLayoutPayload | null>) => {
+    dispatchWs({ type: "set_layout", updater })
+  }, [])
+
+  const setWorkspacesLoading = useCallback((updater: React.SetStateAction<boolean>) => {
+    dispatchWs({ type: "set_loading", updater })
   }, [])
 
   const setActiveWorkspaceId = useCallback(
@@ -146,89 +100,15 @@ export function DashboardProvider({ children, demoMode }: { children: React.Reac
     [setActiveWorkspaceIdState]
   )
 
-  const loadLayoutPayload = useCallback(
-    async (workspaceId: string) => {
-      if (demoMode) {
-        try {
-          const raw = readTabScopedItem(layoutStorageKeyBase(workspaceId, true))
-          if (raw) setWorkspaceLayout(JSON.parse(raw) as WorkspaceLayoutPayload)
-          else setWorkspaceLayout(SINGLE_LAYOUT_PAYLOAD)
-        } catch {
-          setWorkspaceLayout(SINGLE_LAYOUT_PAYLOAD)
-        }
-        return
-      }
-      const supabase = createClient()
-      const { data } = await supabase
-        .from("workspace_layouts")
-        .select("payload")
-        .eq("workspace_id", workspaceId)
-        .maybeSingle()
-      if (data?.payload) setWorkspaceLayout(data.payload as WorkspaceLayoutPayload)
-      else setWorkspaceLayout(SINGLE_LAYOUT_PAYLOAD)
-    },
-    [demoMode]
-  )
-
-  const bootstrapWorkspaces = useCallback(async () => {
-    setWorkspacesLoading(true)
-    try {
-      if (demoMode) {
-        const rows = DEMO_WORKSPACES.map((w) => ({ id: w.id, name: w.name, sort_order: w.sort_order }))
-        setWorkspaces(rows)
-        const stored = typeof window !== "undefined" ? readTabScopedItem(ACTIVE_WS_KEY) : null
-        const pick = (stored && rows.some((x) => x.id === stored) ? stored : null) ?? rows[0]?.id ?? null
-        setActiveWorkspaceId(pick)
-        return
-      }
-
-      const supabase = createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
-      if (!user) {
-        setWorkspaces([])
-        setActiveWorkspaceId(null)
-        setWorkspaceLayout(SINGLE_LAYOUT_PAYLOAD)
-        setWorkspacesLoading(false)
-        return
-      }
-
-      let { data: rows } = await supabase.from("workspaces").select("*").eq("user_id", user.id).order("sort_order")
-
-      const list = rows || []
-      if (list.length === 0) {
-        const inserts = [
-          { name: "Personal", sort_order: 0 },
-          { name: "Trabajo", sort_order: 1 },
-          { name: "Investigación", sort_order: 2 },
-        ].map((r) => ({ ...r, user_id: user.id }))
-
-        const { data: inserted, error } = await supabase.from("workspaces").insert(inserts).select("*")
-        if (!error && inserted?.length) {
-          rows = inserted
-        } else {
-          rows = []
-        }
-      }
-
-      const normalized = rows || []
-
-      const stored = typeof window !== "undefined" ? readTabScopedItem(ACTIVE_WS_KEY) : null
-      const pick =
-        (stored && normalized.some((x: WorkspaceRow) => x.id === stored) ? stored : null) ?? normalized[0]?.id ?? null
-
-      setWorkspaces(normalized)
-      setActiveWorkspaceId(pick)
-    } finally {
-      setWorkspacesLoading(false)
-    }
-  }, [demoMode, setActiveWorkspaceId])
-
-  const reloadWorkspacesAndLayout = useCallback(async () => {
-    await bootstrapWorkspaces()
-  }, [bootstrapWorkspaces])
+  const { reloadWorkspacesAndLayout } = useDashboardWorkspaceBootstrap({
+    demoMode,
+    setWorkspaces,
+    activeWorkspaceId,
+    setActiveWorkspaceId,
+    setWorkspaceLayout,
+    setWorkspacesLoading,
+    workspacesLoading,
+  })
 
   const persistWorkspaceLayout = useCallback(
     async (payload: WorkspaceLayoutPayload) => {
@@ -255,71 +135,8 @@ export function DashboardProvider({ children, demoMode }: { children: React.Reac
         { onConflict: "workspace_id" }
       )
     },
-    [activeWorkspaceId, demoMode]
+    [activeWorkspaceId, demoMode, setWorkspaceLayout]
   )
-
-  useEffect(() => {
-    void bootstrapWorkspaces()
-  }, [bootstrapWorkspaces])
-
-  useEffect(() => {
-    const id = activeWorkspaceId
-    if (!id || workspacesLoading) return
-    void loadLayoutPayload(id)
-  }, [activeWorkspaceId, workspacesLoading, loadLayoutPayload])
-
-  const refreshTags = useCallback(async () => {
-    if (demoMode) {
-      setAllTags(DEMO_TAGS)
-      return
-    }
-    const supabase = createClient()
-    const { data } = await supabase.from("bookmarks").select("tags")
-    setAllTags(sortedUniqueTagsFromRows(data || []))
-  }, [demoMode])
-
-  const setAllTagsFromBookmarks = useCallback((rows: { tags?: string[] | null }[]) => {
-    setAllTags(sortedUniqueTagsFromRows(rows))
-  }, [])
-
-  const refreshFolders = useCallback(async () => {
-    if (demoMode) return
-    const supabase = createClient()
-    const { data } = await supabase.from("folders").select("*").order("sort_order")
-    if (!data) return
-    const byParent: Record<string, Folder[]> = {}
-    for (const f of data) {
-      const pid = f.parent_id || "root"
-      if (!byParent[pid]) byParent[pid] = []
-      byParent[pid].push({ ...f, children: [] })
-    }
-    const buildTree = (parentId: string): Folder[] => {
-      const list = byParent[parentId] || []
-      return list.sort((a, b) => a.sort_order - b.sort_order).map((f) => ({ ...f, children: buildTree(f.id) }))
-    }
-    setFolders(buildTree("root"))
-  }, [demoMode])
-
-  const refreshTagsEffect = useEffectEvent(() => {
-    void refreshTags()
-  })
-
-  useEffect(() => {
-    if (!demoMode) return
-    queueMicrotask(() => {
-      refreshTagsEffect()
-    })
-  }, [demoMode])
-
-  const refreshFoldersEffect = useEffectEvent(() => {
-    void refreshFolders()
-  })
-
-  useEffect(() => {
-    queueMicrotask(() => {
-      refreshFoldersEffect()
-    })
-  }, [demoMode])
 
   const setMainKeyDown = useCallback((handler: ((e: React.KeyboardEvent) => void) | null) => {
     mainKeyDownRef.current = handler

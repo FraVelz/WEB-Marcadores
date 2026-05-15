@@ -2,7 +2,7 @@
 
 const config = {
   plugins: ["prettier-plugin-tailwindcss"],
-  tailwindFunctions: ["clsx", "cn"],
+  tailwindFunctions: ["clsx", "cn", "cnLines"],
 
   semi: false,
   singleQuote: false,

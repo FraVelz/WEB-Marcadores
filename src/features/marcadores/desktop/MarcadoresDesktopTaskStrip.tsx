@@ -41,7 +41,7 @@ export function MarcadoresDesktopTaskStrip({ surfaces, onFocusTask }: Props) {
             </span>
             <span className="text-app-fg min-w-0 truncate text-[11px] font-semibold">
               {task.title}
-              {task.subtitle ? <span className="text-app-fg-muted ml-1 font-normal">— {task.subtitle}</span> : null}
+              {task.subtitle ? <span className="text-app-fg-muted ml-1 font-normal">({task.subtitle})</span> : null}
             </span>
             {task.minimized || task.maximized ? (
               <span className="text-app-fg-muted shrink-0 text-[9px] uppercase tabular-nums">

@@ -1,6 +1,6 @@
 export type WindowBounds = { x: number; y: number; w: number; h: number }
 
-export type PersistedWindowState = WindowBounds & {
+type PersistedWindowState = WindowBounds & {
   minimized?: boolean
   maximized?: boolean
 }
@@ -12,14 +12,11 @@ export type MarcadoresDesktopLayoutV1 = {
   detail?: PersistedWindowState
 }
 
-export type DesktopWindowKind = "library" | "detail"
-
-/** Id persistido para la ventana de detalle en el modelo v2 del escritorio. */
 export const DESKTOP_DETAIL_WINDOW_ID = "__desk_detail__"
 
 export type PersistedDesktopWindowV2 = PersistedWindowState & {
   id: string
-  kind: DesktopWindowKind
+  kind: "library" | "detail"
 }
 
 export type MarcadoresDesktopLayoutV2 = {
@@ -36,7 +33,7 @@ export type DesktopSurfaceTask = {
   maximized: boolean
   /** Ventana seleccionada (z-order alto / panel activo del escritorio). */
   isFocused: boolean
-  kind: DesktopWindowKind
+  kind: "library" | "detail"
 }
 
 /** API expuesta desde el escritorio (cabecera tipo barra de tareas y acciones en bloque). */

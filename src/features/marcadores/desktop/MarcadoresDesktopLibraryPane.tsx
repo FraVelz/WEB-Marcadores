@@ -8,87 +8,11 @@ import { MarcadoresExplorerRail } from "@/features/marcadores/components/Marcado
 import MarcadoresBrowseControls from "@/features/marcadores/components/MarcadoresBrowseControls"
 import MarcadoresFooter from "@/features/marcadores/components/MarcadoresFooter"
 import MarcadoresToolbar from "@/features/marcadores/components/MarcadoresToolbar"
-import MarcadoresTreeView, { type TreeFlatRow } from "@/features/marcadores/components/MarcadoresTreeView"
+import MarcadoresTreeView from "@/features/marcadores/components/MarcadoresTreeView"
 
-import type { Bookmark, CutItem, FlatFolder, GridItem } from "@/features/marcadores/utils/types"
-import type { BrowseMode } from "@/features/marcadores/hooks/useMarcadoresData"
-import type { ViewAst } from "@/features/marcadores/views/viewTypes"
+import type { MarcadoresDesktopLibraryPaneProps } from "@/features/marcadores/desktop/marcadoresDesktopLibraryPane.props"
 
-export type MarcadoresDesktopLibraryPaneProps = {
-  paneId: string
-  focused: boolean
-  /** Ref compartido cuando `focused`; ref local si no (evita pisar índices entre ventanas). */
-  parentItemRefs: React.MutableRefObject<Map<number, HTMLDivElement>>
-  onRequestFocusPane: (paneId: string) => void
-
-  showSearch: boolean
-  setShowSearch: React.Dispatch<React.SetStateAction<boolean>>
-  searchValue: string
-  setSearchValue: (v: string) => void
-  searchRef: React.RefObject<HTMLInputElement | null>
-  focusMain?: () => void
-
-  showNewFolder: boolean
-  setShowNewFolder: React.Dispatch<React.SetStateAction<boolean>>
-  newFolderName: string
-  setNewFolderName: (v: string) => void
-  editingFolder: { id: string; name: string } | null
-  setEditingFolder: React.Dispatch<React.SetStateAction<{ id: string; name: string } | null>>
-  renameFolderName: string
-  setRenameFolderName: (v: string) => void
-  onRenameFolder: () => void
-  onNavigateUp: () => void
-  onAddBookmark: () => void
-  onDeleteFocused?: () => void
-  onCreateFolder: () => void
-
-  selectMode: boolean
-  setSelectMode: React.Dispatch<React.SetStateAction<boolean>>
-  selectedIds: Set<string>
-  setSelectedIds: React.Dispatch<React.SetStateAction<Set<string>>>
-  onEdit: () => void
-  onDelete: () => void
-
-  infoPanelEnabled: boolean
-  setInfoPanelEnabled: React.Dispatch<React.SetStateAction<boolean>>
-  flatList: GridItem[]
-  selectedIndex: number
-  setDetailBookmark: React.Dispatch<React.SetStateAction<Bookmark | null>>
-
-  treeView: boolean
-  onToggleTreeView?: () => void
-  treeToggleDisabled?: boolean
-
-  browseMode: BrowseMode
-  setBrowseMode: React.Dispatch<React.SetStateAction<BrowseMode>>
-  activeViewAst: ViewAst | null
-  setActiveViewAst: React.Dispatch<React.SetStateAction<ViewAst | null>>
-  duplicateClusterCount: number
-
-  breadcrumb: { id: string | null; label: string }[]
-  onSelectBreadcrumb: (id: string | null) => void
-
-  primaryViewMode: "grid" | "tree"
-  flatListGrid: GridItem[]
-  treeFlatRows: TreeFlatRow[]
-  folders: FlatFolder[]
-  filteredBookmarks: Bookmark[]
-
-  selectedIndexGrid: number
-  onSelectIndex: React.Dispatch<React.SetStateAction<number>>
-  cutItem: CutItem | null
-  onToggleSelect: (id: string) => void
-  onDoubleClick: (item: GridItem) => void
-  onDrop: (sourceItem: GridItem, targetFolderId?: string | null) => void
-
-  onToggleFolderCollapse: (folderId: string) => void
-  treeCollapsedIds: Set<string>
-  currentLocationLabel: string
-  /** En modo escritorio multi-ventana: solo la ventana enfocada enlaza atajos del árbol. */
-  registerExplorerFocus?: boolean
-  explorerFolderId: string | null
-  setExplorerFolderId: (id: string | null) => void
-}
+export type { MarcadoresDesktopLibraryPaneProps } from "@/features/marcadores/desktop/marcadoresDesktopLibraryPane.props"
 
 export function MarcadoresDesktopLibraryPane(props: MarcadoresDesktopLibraryPaneProps) {
   const localRefs = useRef<Map<number, HTMLDivElement>>(new Map())

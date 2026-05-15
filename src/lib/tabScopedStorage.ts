@@ -10,7 +10,7 @@ export const TAB_SCOPE_FALLBACK_ID = "__no_session__"
 
 const SSR_SENTINEL = "__ssr__"
 
-export function getTabScopeId(): string {
+function getTabScopeId(): string {
   if (typeof window === "undefined") return SSR_SENTINEL
   try {
     let id = sessionStorage.getItem(TAB_SCOPE_SESSION_KEY)
@@ -24,7 +24,7 @@ export function getTabScopeId(): string {
   }
 }
 
-export function tabScopedStorageKey(baseKey: string): string {
+function tabScopedStorageKey(baseKey: string): string {
   const scope = getTabScopeId()
   if (scope === SSR_SENTINEL) return baseKey
   return `${scope}::${baseKey}`

@@ -54,7 +54,7 @@ export function DashboardMobileLayout({
         <DashboardShellNav pathname={pathname} toolbar compact />
       </div>
       {explorerWideHeaderEndSlot ? (
-        <div className="border-app-border flex min-h-9 min-w-0 flex-1 items-center justify-end gap-2 overflow-x-auto overscroll-x-contain border-l pl-3 md:min-h-10 [&::-webkit-scrollbar]:h-1">
+        <div className="border-app-border flex min-h-9 min-w-0 flex-1 items-center justify-end gap-2 overflow-x-auto overscroll-x-contain border-l pl-3 [-webkit-overflow-scrolling:touch] md:min-h-10 [&::-webkit-scrollbar]:h-1">
           {explorerWideHeaderEndSlot}
         </div>
       ) : null}

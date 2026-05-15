@@ -1,11 +1,11 @@
 "use client"
 
-import { useId, useState } from "react"
-import Image from "next/image"
-import { cn } from "@/lib/utils"
-import { getFavicon } from "../utils/utils"
-import type { Bookmark, GridItem } from "../utils/types"
+import { useId } from "react"
+
+import { cn, cnLines } from "@/lib/utils"
 import { BOOKMARK_DRAG_MIME_TYPE, parseBookmarkDragPayload } from "../utils/parseDragPayload"
+import type { GridItem } from "../utils/types"
+import { FolderContent, LinkContent } from "./bookmarkGrid/BookmarkGridItemBodies"
 
 type Props = {
   item: GridItem
@@ -90,7 +90,11 @@ export default function BookmarkGridItem({
 
   const dropFrameClass =
     dropHighlight && !isCut
-      ? "border-app-accent bg-app-accent/[0.07] outline outline-2 outline-offset-[-2px] outline-dashed outline-app-accent/85 ring-2 ring-app-accent/30 dark:bg-app-accent/[0.11] dark:outline-app-accent/70"
+      ? cnLines(
+          "border-app-accent bg-app-accent/[0.07] outline outline-2 outline-offset-[-2px]",
+          "outline-app-accent/85 ring-app-accent/30 ring-2 outline-dashed",
+          "dark:bg-app-accent/[0.11] dark:outline-app-accent/70"
+        )
       : undefined
 
   const baseClass = cn(
@@ -100,7 +104,10 @@ export default function BookmarkGridItem({
       !dropHighlight &&
       (isSelected
         ? "border-app-focus bg-app-selection ring-app-focus ring-2"
-        : "border-app-border-muted bg-app-raised/80 hover:border-app-input-border hover:bg-app-hover-strong/50"),
+        : cnLines(
+            "border-app-border-muted bg-app-raised/80",
+            "hover:border-app-input-border hover:bg-app-hover-strong/50"
+          )),
     dropFrameClass,
     selectMode && !isFolder ? "cursor-pointer" : ""
   )
@@ -142,67 +149,5 @@ export default function BookmarkGridItem({
       )}
       {isFolder ? <FolderContent label={item.label} /> : <LinkContent bookmark={item.bookmark} />}
     </div>
-  )
-}
-
-function FolderContent({ label }: { label: string }) {
-  return (
-    <>
-      <div className="flex size-10 shrink-0 items-center justify-center rounded">
-        <svg className="text-app-folder size-10" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
-        </svg>
-      </div>
-      <div className="min-w-0 flex-1">
-        <span className="text-app-fg font-medium">{label}</span>
-        <p className="text-app-fg-label text-xs">Carpeta</p>
-      </div>
-    </>
-  )
-}
-
-function LinkContent({ bookmark }: { bookmark: Bookmark }) {
-  const favicon = getFavicon(bookmark.url)
-  const [faviconError, setFaviconError] = useState(false)
-  const hostname = (() => {
-    try {
-      return new URL(bookmark.url).hostname.replace(/^www\./, "")
-    } catch {
-      return bookmark.url
-    }
-  })()
-
-  return (
-    <>
-      {favicon && !faviconError ? (
-        <Image
-          src={favicon}
-          alt=""
-          width={32}
-          height={32}
-          className="size-8 shrink-0 rounded"
-          unoptimized
-          onError={() => setFaviconError(true)}
-        />
-      ) : (
-        <div className="bg-app-hover flex size-8 shrink-0 items-center justify-center rounded">
-          <svg className="text-app-accent size-5" viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d={
-                "M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 " +
-                "5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1z" +
-                "M8 13h8v-2H8v2z" +
-                "m9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 " +
-                "3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"
-              }
-            />
-          </svg>
-        </div>
-      )}
-      <div className="min-w-0 flex-1">
-        <span className="text-app-fg font-medium">{bookmark.title}</span>
-        <p className="text-app-fg-label truncate text-xs">{hostname}</p>
-      </div>
-    </>
   )
 }
