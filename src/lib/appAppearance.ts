@@ -281,18 +281,16 @@ export function applyWallpaperToHTMLElement(
   if (!el) return
   const layer = buildWallpaperLayerStyle(state)
   if (!layer) {
-    el.style.removeProperty("background-color")
-    el.style.removeProperty("background-image")
-    el.style.removeProperty("background-size")
-    el.style.removeProperty("background-attachment")
-    el.style.removeProperty("background-repeat")
+    el.style.cssText = ""
     return
   }
-  el.style.backgroundColor = layer.backgroundColor
-  el.style.backgroundImage = layer.backgroundImage
-  el.style.backgroundSize = layer.backgroundSize
-  el.style.backgroundAttachment = layer.backgroundAttachment
-  el.style.backgroundRepeat = layer.backgroundRepeat
+  el.style.cssText = [
+    `background-color: ${layer.backgroundColor}`,
+    `background-image: ${layer.backgroundImage}`,
+    `background-size: ${layer.backgroundSize}`,
+    `background-attachment: ${layer.backgroundAttachment}`,
+    `background-repeat: ${layer.backgroundRepeat}`,
+  ].join(";")
 }
 
 function clearWallpaperInlineFromBody(): void {
@@ -314,11 +312,13 @@ export function applyWallpaperToBody(state: Pick<AppAppearanceState, "wallpaperD
     clearWallpaperInlineFromBody()
     return
   }
-  el.style.backgroundColor = layer.backgroundColor
-  el.style.backgroundImage = layer.backgroundImage
-  el.style.backgroundSize = layer.backgroundSize
-  el.style.backgroundAttachment = layer.backgroundAttachment
-  el.style.backgroundRepeat = layer.backgroundRepeat
+  el.style.cssText = [
+    `background-color: ${layer.backgroundColor}`,
+    `background-image: ${layer.backgroundImage}`,
+    `background-size: ${layer.backgroundSize}`,
+    `background-attachment: ${layer.backgroundAttachment}`,
+    `background-repeat: ${layer.backgroundRepeat}`,
+  ].join(";")
 }
 
 const MAX_IMG_BYTES = 2_500_000

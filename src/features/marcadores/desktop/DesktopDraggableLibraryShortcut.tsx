@@ -72,7 +72,9 @@ export function DesktopDraggableLibraryShortcut(props: {
   }, [hostRef, storageKey])
 
   const reclampRef = useRef(reclamp)
-  reclampRef.current = reclamp
+  useEffect(() => {
+    reclampRef.current = reclamp
+  }, [reclamp])
 
   useEffect(() => {
     try {

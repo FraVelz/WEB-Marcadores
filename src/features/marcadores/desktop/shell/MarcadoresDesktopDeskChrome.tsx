@@ -1,7 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { useMemo, useState } from "react"
+import { useState } from "react"
 
 import { useAppAppearance } from "@/contexts/AppAppearanceContext"
 
@@ -34,10 +34,7 @@ export function MarcadoresDesktopDeskChrome({
   const wallpaperActive = Boolean(appearance.wallpaperDataUrl)
 
   const [libraryShortcutSelected, setLibraryShortcutSelected] = useState(false)
-  const shortcutStorageKey = useMemo(
-    () => `marcadores.deskLibraryShortcut.v1:${workspaceId ?? "default"}`,
-    [workspaceId]
-  )
+  const shortcutStorageKey = `marcadores.deskLibraryShortcut.v1:${workspaceId ?? "default"}`
 
   const { marquee, marqueePointerHandlers } = useDeskDecorMarquee()
   const mqLeft = marquee ? Math.min(marquee.x0, marquee.x1) : 0

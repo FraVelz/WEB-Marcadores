@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useId, useMemo } from "react"
 
 import { useDashboard } from "@/contexts/DashboardContext"
 import type { BrowseMode } from "@/features/marcadores/hooks/useMarcadoresData"
@@ -52,6 +52,8 @@ export default function MarcadoresBrowseControls(props: Props) {
     [workspaces]
   )
 
+  const deskSearchWideLibId = useId()
+
   const zonesActive = workspaceLayout?.template === "zones"
 
   const handleWorkspaceChange = (id: string) => {
@@ -86,8 +88,12 @@ export default function MarcadoresBrowseControls(props: Props) {
       </label>
 
       {deskSearch ? (
-        <label className="text-app-fg-secondary flex cursor-pointer items-center gap-2 text-xs normal-case">
+        <label
+          htmlFor={deskSearchWideLibId}
+          className="text-app-fg-secondary flex cursor-pointer items-center gap-2 text-xs normal-case"
+        >
           <input
+            id={deskSearchWideLibId}
             type="checkbox"
             className="border-app-input-border bg-app-raised-muted accent-app-primary size-3.5 shrink-0 rounded"
             checked={props.searchLibraryWide}
