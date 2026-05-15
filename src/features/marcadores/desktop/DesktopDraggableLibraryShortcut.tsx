@@ -8,6 +8,18 @@ const DEFAULT_XY = { x: 12, y: 12 }
 const DRAG_SLIP_PX = 6
 const PAD = 6
 
+function readStoredPosition(key: string): { x: number; y: number } | null {
+  try {
+    const raw = localStorage.getItem(key)
+    if (!raw) return null
+    const p = JSON.parse(raw) as { x?: unknown; y?: unknown }
+    if (typeof p.x === "number" && typeof p.y === "number") return { x: p.x, y: p.y }
+    return null
+  } catch {
+    return null
+  }
+}
+
 function clampPos(
   x: number,
   y: number,
@@ -77,21 +89,15 @@ export function DesktopDraggableLibraryShortcut(props: {
   }, [reclamp])
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(storageKey)
-      if (raw) {
-        const p = JSON.parse(raw) as { x?: unknown; y?: unknown }
-        if (typeof p.x === "number" && typeof p.y === "number") {
-          setPos({ x: p.x, y: p.y })
-          requestAnimationFrame(() => reclampRef.current())
-          return
-        }
+    queueMicrotask(() => {
+      const parsed = readStoredPosition(storageKey)
+      if (parsed) {
+        setPos(parsed)
+      } else {
+        setPos(DEFAULT_XY)
       }
-    } catch {
-      /* ignore */
-    }
-    setPos(DEFAULT_XY)
-    requestAnimationFrame(() => reclampRef.current())
+      requestAnimationFrame(() => reclampRef.current())
+    })
   }, [storageKey])
 
   useEffect(() => {
