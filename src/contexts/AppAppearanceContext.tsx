@@ -1,15 +1,6 @@
 "use client"
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react"
+import { createContext, use, useCallback, useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from "react"
 
 import {
   type AppAppearanceState,
@@ -17,6 +8,7 @@ import {
   applyWallpaperToBody,
   defaultAppAppearanceState,
   loadAppAppearanceFromStorage,
+  resolveDarkClass,
   saveAppAppearanceToStorage,
   type AppCustomColors,
   type AppThemePreset,
@@ -39,8 +31,7 @@ function syncDom(next: AppAppearanceState): void {
   if (typeof document === "undefined") return
 
   const root = document.documentElement
-  const prefersDark = typeof window !== "undefined" ? window.matchMedia("(prefers-color-scheme: dark)").matches : true
-  const useDark = next.theme === "dark" || (next.theme === "system" && prefersDark)
+  const useDark = resolveDarkClass(next.theme)
 
   root.classList.toggle("dark", useDark)
 
@@ -159,7 +150,7 @@ export function AppAppearanceProvider({ children }: { children: ReactNode }) {
 }
 
 export function useAppAppearance(): AppAppearanceContextValue {
-  const ctx = useContext(AppAppearanceContext)
+  const ctx = use(AppAppearanceContext)
   if (!ctx) {
     throw new Error("useAppAppearance debe usarse dentro de AppAppearanceProvider")
   }

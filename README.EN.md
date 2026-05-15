@@ -100,12 +100,12 @@ Without a valid `.env.local` or Supabase credentials, the app runs in demo mode 
 
 Copy `.env.example` to `.env.local` and fill in the variables when using Supabase outside demo mode.
 
-| Variable                        | Description                             |
-| ------------------------------- | --------------------------------------- |
-| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL                    |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key                  |
+| Variable                        | Description                                   |
+| ------------------------------- | --------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL                          |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key                        |
 | `NEXT_PUBLIC_SITE_URL`          | Site URL (Open Graph; default Vercel in code) |
-| `NEXT_PUBLIC_DEMO_MODE`         | `true` to force demo mode in production |
+| `NEXT_PUBLIC_DEMO_MODE`         | `true` to force demo mode in production       |
 
 **FraVelz**
 

@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useSyncExternalStore } from "react"
+import { useId, useState, useSyncExternalStore } from "react"
+import Image from "next/image"
 
 import { useAppAppearance } from "@/contexts/AppAppearanceContext"
 import {
@@ -88,6 +89,8 @@ export function AppearanceSettings() {
   const fallbacks = PRESET_FALLBACK_HEX[paletteKey]
 
   const [wallpaperMessage, setWallpaperMessage] = useState<string | null>(null)
+  const customPaletteCheckboxId = useId()
+  const veilRangeId = useId()
 
   const onPickWallpaper = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWallpaperMessage(null)
@@ -138,9 +141,11 @@ export function AppearanceSettings() {
         </div>
 
         <div className="border-app-border-muted border-t pt-5">
-          <label className="flex cursor-pointer items-start gap-3">
+          <label htmlFor={customPaletteCheckboxId} className="flex cursor-pointer items-start gap-3">
             <input
+              id={customPaletteCheckboxId}
               type="checkbox"
+              aria-label="Personalizar colores del tema"
               className="border-app-input-border bg-app-raised-muted accent-app-primary mt-0.5 size-4 rounded"
               checked={appearance.useCustomPalette}
               onChange={(e) => setUseCustomPalette(e.target.checked)}
@@ -223,17 +228,20 @@ export function AppearanceSettings() {
           </div>
           {appearance.wallpaperDataUrl ? (
             <div className="border-app-input-border mt-4 overflow-hidden rounded-lg border">
-              {/* eslint-disable-next-line @next/next/no-img-element -- data URL usuario */}
-              <img
+              <Image
                 alt="Vista previa del fondo"
                 src={appearance.wallpaperDataUrl}
+                width={960}
+                height={256}
+                unoptimized
                 className="max-h-32 w-full object-cover"
               />
             </div>
           ) : null}
-          <label className="text-app-fg-secondary mt-4 block text-sm">
+          <label htmlFor={veilRangeId} className="text-app-fg-secondary mt-4 block text-sm">
             Velo sobre la imagen: {Math.round(appearance.wallpaperVeil * 100)}%
             <input
+              id={veilRangeId}
               type="range"
               min={0}
               max={100}

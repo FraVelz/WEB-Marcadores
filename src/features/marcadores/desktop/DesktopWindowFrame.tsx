@@ -3,96 +3,19 @@
 import type { ReactNode } from "react"
 import { useCallback, useRef } from "react"
 
+import { DesktopWindowResizeHandles } from "@/features/marcadores/desktop/DesktopWindowResizeHandles"
+import { DesktopWindowTitleChrome } from "@/features/marcadores/desktop/DesktopWindowTitleChrome"
+import {
+  TITLE_H,
+  clampBounds,
+  maxInset,
+  resizeBoundsByEdge,
+  type ResizeEdge,
+} from "@/features/marcadores/desktop/desktopWindowGeometry"
 import type { WindowBounds } from "@/features/marcadores/desktop/windowTypes"
 import { isBookmarkDragTransfer } from "@/features/marcadores/utils/parseDragPayload"
 
 import { cn } from "@/lib/utils"
-
-const TITLE_H = 36
-const MIN_W = 280
-const MIN_H = 200
-const DESKTOP_MARGIN = 8
-/** Grosor de la zona de agarre en bordes (px), estilo ventana de escritorio. */
-const EDGE_HIT = 6
-
-export type ResizeEdge = "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw"
-
-function applyResize(orig: WindowBounds, edge: ResizeEdge, dx: number, dy: number): WindowBounds {
-  let { x, y, w, h } = orig
-  switch (edge) {
-    case "e":
-      w = orig.w + dx
-      break
-    case "w":
-      x = orig.x + dx
-      w = orig.w - dx
-      break
-    case "s":
-      h = orig.h + dy
-      break
-    case "n":
-      y = orig.y + dy
-      h = orig.h - dy
-      break
-    case "se":
-      w = orig.w + dx
-      h = orig.h + dy
-      break
-    case "sw":
-      x = orig.x + dx
-      w = orig.w - dx
-      h = orig.h + dy
-      break
-    case "ne":
-      w = orig.w + dx
-      y = orig.y + dy
-      h = orig.h - dy
-      break
-    case "nw":
-      x = orig.x + dx
-      w = orig.w - dx
-      y = orig.y + dy
-      h = orig.h - dy
-      break
-  }
-  return { x, y, w, h }
-}
-
-function clampBounds(b: WindowBounds, cw: number, ch: number): WindowBounds {
-  if (!Number.isFinite(cw) || !Number.isFinite(ch) || cw <= 0 || ch <= 0) {
-    return {
-      x: DESKTOP_MARGIN,
-      y: DESKTOP_MARGIN,
-      w: Math.max(MIN_W, b.w),
-      h: Math.max(MIN_H, b.h),
-    }
-  }
-
-  const capW = Math.max(1, cw - DESKTOP_MARGIN * 2)
-  const capH = Math.max(1, ch - DESKTOP_MARGIN * 2)
-  const w = Math.min(Math.max(MIN_W, b.w), capW)
-  const h = Math.min(Math.max(MIN_H, b.h), capH)
-
-  const minX = DESKTOP_MARGIN
-  const minY = DESKTOP_MARGIN
-  const maxX = cw - DESKTOP_MARGIN - w
-  const maxY = ch - DESKTOP_MARGIN - h
-  const x = Math.min(Math.max(minX, b.x), Math.max(minX, maxX))
-  const y = Math.min(Math.max(minY, b.y), Math.max(minY, maxY))
-  return { x, y, w, h }
-}
-
-function maxInset(cw: number, ch: number): WindowBounds {
-  if (!Number.isFinite(cw) || !Number.isFinite(ch) || cw <= 0 || ch <= 0) {
-    return { x: DESKTOP_MARGIN, y: DESKTOP_MARGIN, w: MIN_W, h: MIN_H }
-  }
-  return {
-    x: DESKTOP_MARGIN,
-    y: DESKTOP_MARGIN,
-    w: Math.max(1, cw - DESKTOP_MARGIN * 2),
-    h: Math.max(1, ch - DESKTOP_MARGIN * 2),
-  }
-}
 
 type Props = {
   title: string
@@ -112,9 +35,8 @@ type Props = {
   showMaximize?: boolean
   showClose?: boolean
   onClose?: () => void
-  /** Evita que arrastrar marcadores burbujee al lienzo del escritorio (resaltado del fondo). */
+  /** Aislar burbuja de drag de marcadores; al pasar por el marco, `onDismissDesktopDropHighlight`. */
   isolateBookmarkDragBubble?: boolean
-  /** Al arrastrar sobre el marco de la ventana, oculta el resaltado del fondo del escritorio. */
   onDismissDesktopDropHighlight?: () => void
 }
 
@@ -163,7 +85,7 @@ export function DesktopWindowFrame({
         if (kind === "move") {
           onBoundsChange(clampBounds({ x: orig.x + dx, y: orig.y + dy, w: orig.w, h: orig.h }, cw, ch))
         } else {
-          onBoundsChange(clampBounds(applyResize(orig, kind, dx, dy), cw, ch))
+          onBoundsChange(resizeBoundsByEdge(orig, kind, dx, dy, cw, ch))
         }
       }
 
@@ -246,176 +168,34 @@ export function DesktopWindowFrame({
       onPointerDown={() => onActivate()}
       {...isolateBookmarkDragHandlers}
     >
-      {!minimized && !maximized ? (
-        <div className="pointer-events-none absolute inset-0 z-20" aria-hidden>
-          {/* Esquinas (encima de bordes para cursor diagonal) */}
-          <button
-            type="button"
-            tabIndex={-1}
-            aria-label="Redimensionar esquina superior izquierda"
-            className="pointer-events-auto absolute top-0 left-0 z-10 cursor-nwse-resize"
-            style={{ width: EDGE_HIT, height: EDGE_HIT, padding: 0, border: "none", background: "transparent" }}
-            onPointerDown={onResizePointerDown("nw")}
-          />
-          <button
-            type="button"
-            tabIndex={-1}
-            aria-label="Redimensionar esquina superior derecha"
-            className="pointer-events-auto absolute top-0 right-0 z-10 cursor-nesw-resize"
-            style={{ width: EDGE_HIT, height: EDGE_HIT, padding: 0, border: "none", background: "transparent" }}
-            onPointerDown={onResizePointerDown("ne")}
-          />
-          <button
-            type="button"
-            tabIndex={-1}
-            aria-label="Redimensionar esquina inferior izquierda"
-            className="pointer-events-auto absolute bottom-0 left-0 z-10 cursor-nesw-resize"
-            style={{ width: EDGE_HIT, height: EDGE_HIT, padding: 0, border: "none", background: "transparent" }}
-            onPointerDown={onResizePointerDown("sw")}
-          />
-          <button
-            type="button"
-            tabIndex={-1}
-            aria-label="Redimensionar esquina inferior derecha"
-            className="pointer-events-auto absolute right-0 bottom-0 z-10 cursor-nwse-resize"
-            style={{ width: EDGE_HIT, height: EDGE_HIT, padding: 0, border: "none", background: "transparent" }}
-            onPointerDown={onResizePointerDown("se")}
-          />
-          {/* Bordes (dejamos hueco en esquinas) */}
-          <button
-            type="button"
-            tabIndex={-1}
-            aria-label="Redimensionar borde superior"
-            className="pointer-events-auto absolute top-0 z-[9] cursor-ns-resize"
-            style={{
-              height: EDGE_HIT,
-              left: EDGE_HIT,
-              right: EDGE_HIT,
-              padding: 0,
-              border: "none",
-              background: "transparent",
-            }}
-            onPointerDown={onResizePointerDown("n")}
-          />
-          <button
-            type="button"
-            tabIndex={-1}
-            aria-label="Redimensionar borde inferior"
-            className="pointer-events-auto absolute bottom-0 z-[9] cursor-ns-resize"
-            style={{
-              height: EDGE_HIT,
-              left: EDGE_HIT,
-              right: EDGE_HIT,
-              padding: 0,
-              border: "none",
-              background: "transparent",
-            }}
-            onPointerDown={onResizePointerDown("s")}
-          />
-          <button
-            type="button"
-            tabIndex={-1}
-            aria-label="Redimensionar borde izquierdo"
-            className="pointer-events-auto absolute left-0 z-[9] cursor-ew-resize"
-            style={{
-              width: EDGE_HIT,
-              top: EDGE_HIT,
-              bottom: EDGE_HIT,
-              padding: 0,
-              border: "none",
-              background: "transparent",
-            }}
-            onPointerDown={onResizePointerDown("w")}
-          />
-          <button
-            type="button"
-            tabIndex={-1}
-            aria-label="Redimensionar borde derecho"
-            className="pointer-events-auto absolute right-0 z-[9] cursor-ew-resize"
-            style={{
-              width: EDGE_HIT,
-              top: EDGE_HIT,
-              bottom: EDGE_HIT,
-              padding: 0,
-              border: "none",
-              background: "transparent",
-            }}
-            onPointerDown={onResizePointerDown("e")}
-          />
-        </div>
-      ) : null}
+      <DesktopWindowResizeHandles
+        minimized={minimized}
+        maximized={maximized}
+        onResizePointerDown={onResizePointerDown}
+      />
 
-      <div
-        className={cn(
-          "bg-app-window-chrome border-app-border relative z-10 flex shrink-0 cursor-default items-center gap-2 border-b px-2",
-          minimized ? "rounded-b-lg" : ""
-        )}
-        style={{ height: TITLE_H }}
-        onPointerDown={onTitlePointerDown}
-        onDoubleClick={onTitleDoubleClick}
-      >
-        <div className="text-app-fg min-w-0 flex-1 truncate pl-1 text-xs font-semibold tracking-tight select-none">
-          {title}
-          {subtitle ? <span className="text-app-fg-muted ml-1 font-normal">— {subtitle}</span> : null}
-        </div>
-        <div className="flex shrink-0 items-center gap-0.5">
-          {showMinimize ? (
-            <button
-              type="button"
-              data-window-control
-              className="text-app-fg-muted hover:bg-app-hover flex size-7 items-center justify-center rounded"
-              aria-label="Minimizar"
-              onClick={(e) => {
-                e.stopPropagation()
-                onActivate()
-                onToggleMinimize()
-              }}
-            >
-              <span className="text-sm leading-none">─</span>
-            </button>
-          ) : null}
-          {showMaximize ? (
-            <button
-              type="button"
-              data-window-control
-              className="text-app-fg-muted hover:bg-app-hover flex size-7 items-center justify-center rounded"
-              aria-label={maximized ? "Restaurar" : "Maximizar"}
-              onClick={(e) => {
-                e.stopPropagation()
-                onActivate()
-                if (maximized) {
-                  const prev = preMaxBoundsRef.current
-                  if (prev) onBoundsChange(clampBounds(prev, cw, ch))
-                  preMaxBoundsRef.current = null
-                } else {
-                  preMaxBoundsRef.current = { ...clampBounds(bounds, cw, ch) }
-                }
-                onToggleMaximize()
-              }}
-            >
-              <span className="text-xs leading-none">{maximized ? "❐" : "□"}</span>
-            </button>
-          ) : null}
-          {showClose && onClose ? (
-            <button
-              type="button"
-              data-window-control
-              className="hover:bg-app-danger text-app-fg-muted flex size-7 items-center justify-center rounded hover:text-white"
-              aria-label="Cerrar"
-              onClick={(e) => {
-                e.stopPropagation()
-                onClose()
-              }}
-            >
-              <span className="text-sm leading-none">✕</span>
-            </button>
-          ) : null}
-        </div>
-      </div>
+      <DesktopWindowTitleChrome
+        title={title}
+        subtitle={subtitle}
+        minimized={minimized}
+        maximized={maximized}
+        cw={cw}
+        ch={ch}
+        bounds={bounds}
+        showMinimize={showMinimize}
+        showMaximize={showMaximize}
+        showClose={showClose}
+        onClose={onClose}
+        preMaxBoundsRef={preMaxBoundsRef}
+        onBoundsChange={onBoundsChange}
+        onActivate={onActivate}
+        onToggleMinimize={onToggleMinimize}
+        onToggleMaximize={onToggleMaximize}
+        onTitlePointerDown={onTitlePointerDown}
+        onTitleDoubleClick={onTitleDoubleClick}
+      />
 
       {!minimized ? <div className="relative z-0 flex min-h-0 flex-1 flex-col overflow-hidden">{children}</div> : null}
     </div>
   )
 }
-
-export { TITLE_H, clampBounds, maxInset, MIN_W, MIN_H, DESKTOP_MARGIN, EDGE_HIT }

@@ -50,7 +50,7 @@ export function sanitizeHexColor(value?: string): string | null {
   return HEX_RE.test(withHash) ? withHash.toLowerCase() : null
 }
 
-export function sanitizeAppAppearanceState(raw: unknown): AppAppearanceState {
+function sanitizeAppAppearanceState(raw: unknown): AppAppearanceState {
   if (!raw || typeof raw !== "object") return { ...defaultAppAppearanceState }
 
   const o = raw as Record<string, unknown>
@@ -111,7 +111,7 @@ export function saveAppAppearanceToStorage(state: AppAppearanceState): void {
   }
 }
 
-export function getSystemDarkMode(): boolean {
+function getSystemDarkMode(): boolean {
   if (typeof window === "undefined") return true
   return window.matchMedia("(prefers-color-scheme: dark)").matches
 }
@@ -153,7 +153,7 @@ export function applyCustomColorVars(colors: AppCustomColors, enabled: boolean):
   }
 }
 
-export function hexToRgbTriplet(hex: string): [number, number, number] | null {
+function hexToRgbTriplet(hex: string): [number, number, number] | null {
   const canonical = sanitizeHexColor(hex)
   if (!canonical) return null
   const h = canonical.replace("#", "")
@@ -168,25 +168,23 @@ export function applyWallpaperToBody(state: Pick<AppAppearanceState, "wallpaperD
   const veil = Number.isFinite(state.wallpaperVeil) ? state.wallpaperVeil : defaultAppAppearanceState.wallpaperVeil
 
   if (!state.wallpaperDataUrl) {
-    el.style.backgroundImage = ""
-    el.style.backgroundSize = ""
-    el.style.backgroundAttachment = ""
-    el.style.backgroundRepeat = ""
-    el.style.backgroundColor = ""
+    el.style.cssText = ""
     return
   }
 
   const canvasRgb = resolveCanvasRgbForWallpaperOverlay()
   const a = Math.min(0.98, Math.max(0, veil))
   const [r, g, b] = canvasRgb ?? [24, 24, 27]
-  el.style.backgroundColor = "transparent"
-  el.style.backgroundImage = `linear-gradient(rgba(${r},${g},${b},${a}),rgba(${r},${g},${b},${a})),url(${state.wallpaperDataUrl})`
-  el.style.backgroundSize = "cover,cover"
-  el.style.backgroundAttachment = "fixed"
-  el.style.backgroundRepeat = "no-repeat"
+  el.style.cssText = [
+    "background-color: transparent",
+    `background-image: linear-gradient(rgba(${r},${g},${b},${a}),rgba(${r},${g},${b},${a})),url(${state.wallpaperDataUrl})`,
+    "background-size: cover,cover",
+    "background-attachment: fixed",
+    "background-repeat: no-repeat",
+  ].join(";")
 }
 
-export function resolveCanvasRgbForWallpaperOverlay(): [number, number, number] | null {
+function resolveCanvasRgbForWallpaperOverlay(): [number, number, number] | null {
   if (typeof document === "undefined") return null
   const raw = getComputedStyle(document.documentElement).getPropertyValue("--app-canvas").trim()
   const tri = hexToRgbTriplet(raw)

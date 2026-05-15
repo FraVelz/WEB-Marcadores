@@ -52,7 +52,7 @@ export default function MarcadoresBrowseControls(props: Props) {
   }
 
   return (
-    <div className="border-app-border-muted bg-app-toolbar/40 flex flex-col gap-2 border-b px-2 py-2 md:flex-row md:flex-wrap md:items-center">
+    <div className="border-app-border-muted bg-app-toolbar/40 flex flex-col gap-2 border-b p-2 md:flex-row md:flex-wrap md:items-center">
       <label className="text-app-fg-label flex items-center gap-2 text-[11px] font-semibold tracking-wide uppercase">
         Workspace
         <select

@@ -17,7 +17,7 @@ function norm(s: string) {
 export function DashboardCommandPalette() {
   const id = useId()
   const inputRef = useRef<HTMLInputElement>(null)
-  const router = useRouter()
+  const { push } = useRouter()
   const { commandPaletteOpen, setCommandPaletteOpen, workspaces, setActiveWorkspaceId, marcadoresPalette } =
     useDashboard()
 
@@ -36,10 +36,16 @@ export function DashboardCommandPalette() {
     const palette = marcadoresPalette
     const q = norm(query)
     if (!palette || !q || q.length < 2) return []
+    let matchRe: RegExp
+    try {
+      matchRe = new RegExp(q.replace(/[\\^$.*+?()[\]{}|]/g, "\\$&"))
+    } catch {
+      return []
+    }
     const out: { id: string; title: string; url: string }[] = []
     for (const b of palette.bookmarks) {
       const hay = `${b.title} ${b.url}`.toLowerCase()
-      if (hay.includes(q)) out.push(b)
+      if (matchRe.test(hay)) out.push(b)
       if (out.length >= 25) break
     }
     return out
@@ -57,7 +63,7 @@ export function DashboardCommandPalette() {
 
   const selectWorkspace = (w: WorkspaceRow) => {
     setActiveWorkspaceId(w.id)
-    router.push("/marcadores")
+    push("/marcadores")
     close()
   }
 
@@ -94,7 +100,7 @@ export function DashboardCommandPalette() {
           <div className="text-app-fg-muted mt-1 text-[11px]">Ctrl/Cmd + K · Busca y pulsa resultado</div>
         </div>
 
-        <div className="max-h-[60vh] min-h-[120px] overflow-y-auto px-2 py-2">
+        <div className="max-h-[60vh] min-h-[120px] overflow-y-auto p-2">
           <div className="text-app-fg-muted mb-1 px-2 text-[11px] font-semibold tracking-wide uppercase">Atajos</div>
           <div className="mb-3 flex flex-col gap-1">
             <ShortcutPaletteLink title="Marcadores" hint="Gestor principal" href="/marcadores" onNavigate={close} />
@@ -112,7 +118,7 @@ export function DashboardCommandPalette() {
                 key={w.id}
                 type="button"
                 onClick={() => selectWorkspace(w)}
-                className="hover:bg-app-hover text-app-fg flex w-full items-center justify-between rounded-md px-2 py-2 text-left text-sm"
+                className="hover:bg-app-hover text-app-fg flex w-full items-center justify-between rounded-md p-2 text-left text-sm"
               >
                 <span className="font-medium">{w.name}</span>
                 <span className="text-app-fg-muted text-xs">Seleccionar</span>
@@ -134,7 +140,7 @@ export function DashboardCommandPalette() {
                 type="button"
                 onClick={() => selectBookmark(b)}
                 className={cn(
-                  "hover:bg-app-hover flex w-full items-start gap-3 rounded-md px-2 py-2 text-left",
+                  "hover:bg-app-hover flex w-full items-start gap-3 rounded-md p-2 text-left",
                   "focus-visible:ring-app-focus outline-none focus-visible:ring-2"
                 )}
               >
@@ -160,7 +166,7 @@ function ShortcutPaletteLink(props: { title: string; hint?: string; href: string
     <Link
       href={props.href}
       onClick={props.onNavigate}
-      className="hover:bg-app-hover text-app-fg flex w-full items-center justify-between rounded-md px-2 py-2 text-sm no-underline"
+      className="hover:bg-app-hover text-app-fg flex w-full items-center justify-between rounded-md p-2 text-sm no-underline"
     >
       <span className="font-medium">{props.title}</span>
       {props.hint ? <span className="text-app-fg-muted text-xs">{props.hint}</span> : null}

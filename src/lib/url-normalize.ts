@@ -47,7 +47,7 @@ export function normalizeUrlDedupeKey(raw: string): string | null {
       return `youtube:${yt}`
     }
 
-    const sortedKeys = [...u.searchParams.keys()].sort()
+    const sortedKeys = [...u.searchParams.keys()].toSorted()
     const qp = sortedKeys
       .map((k) => `${encodeURIComponent(k)}=${encodeURIComponent(u.searchParams.get(k) || "")}`)
       .join("&")

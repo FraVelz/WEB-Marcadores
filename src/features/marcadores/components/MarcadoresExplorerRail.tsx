@@ -50,8 +50,10 @@ export function MarcadoresExplorerRail({ registerGlobalExplorerRef = true, folde
 
   const persistOpen = useCallback((next: boolean) => {
     setOpen(next)
+    if (typeof window === "undefined") return
+    const value = next ? "1" : "0"
     try {
-      writeTabScopedItem(OPEN_KEY, next ? "1" : "0")
+      writeTabScopedItem(OPEN_KEY, value)
     } catch {
       /* ignore */
     }

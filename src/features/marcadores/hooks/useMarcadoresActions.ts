@@ -4,22 +4,14 @@ import { useCallback } from "react"
 import { useDashboard } from "@/contexts/DashboardContext"
 import { createClient } from "@/lib/supabase/client"
 import { buildFolderTree } from "../utils/utils"
-import { splitCommaTags } from "@/lib/comma-tags"
-import type { Bookmark, FlatFolder } from "../utils/types"
-import type { BookmarkFormData } from "@/components/BookmarkModal"
+import { collectFolderSubtreeIds } from "../utils/folderDescendants"
+import type { Bookmark } from "../utils/types"
 
-type UseMarcadoresActionsParams = {
-  bookmarks: Bookmark[]
-  setBookmarks: React.Dispatch<React.SetStateAction<Bookmark[]>>
-  folders: FlatFolder[]
-  setFolders: React.Dispatch<React.SetStateAction<FlatFolder[]>>
-  setCtxFolders: (folders: import("@/contexts/DashboardContext").Folder[]) => void
-  refreshFolders: () => void
-  refreshTags: () => void
-  fetchData: () => Promise<void>
-  selectedFolderId: string | null
-  setDetailBookmark: React.Dispatch<React.SetStateAction<Bookmark | null>>
-}
+import { bumpBookmarkOpenStats } from "./bumpBookmarkOpenStats"
+import { persistMarcadoresBookmarkModal } from "./persistMarcadoresBookmarkModal"
+import type { UseMarcadoresActionsParams } from "./useMarcadoresActions.types"
+
+export type { UseMarcadoresActionsParams } from "./useMarcadoresActions.types"
 
 export function useMarcadoresActions({
   bookmarks,
@@ -72,76 +64,12 @@ export function useMarcadoresActions({
   )
 
   const handleModalSubmit = useCallback(
-    async (data: BookmarkFormData, editingBookmark: Bookmark | null) => {
-      const tags = data.tags ? splitCommaTags(data.tags) : []
-      const folder_id = data.folder_id || null
-
-      if (demoMode) {
-        if (editingBookmark) {
-          setBookmarks((prev) =>
-            prev.map((b) =>
-              b.id === editingBookmark.id
-                ? {
-                    ...b,
-                    title: data.title,
-                    url: data.url,
-                    description: data.description || undefined,
-                    folder_id,
-                    tags,
-                  }
-                : b
-            )
-          )
-          setDetailBookmark((prev) =>
-            prev?.id === editingBookmark.id
-              ? {
-                  ...prev,
-                  title: data.title,
-                  url: data.url,
-                  description: data.description,
-                  folder_id,
-                  tags,
-                }
-              : prev
-          )
-        } else {
-          setBookmarks((prev) => [
-            ...prev,
-            {
-              id: `demo-${Date.now()}`,
-              title: data.title,
-              url: data.url,
-              description: data.description || undefined,
-              folder_id,
-              tags,
-              created_at: new Date().toISOString(),
-            },
-          ])
-        }
-        refreshTags()
-        return
-      }
-
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (!user) throw new Error("Debes iniciar sesión")
-
-      const payload = {
-        title: data.title,
-        url: data.url,
-        description: data.description || null,
-        folder_id,
-        tags: data.tags ? splitCommaTags(data.tags) : [],
-      }
-
-      if (editingBookmark) {
-        await supabase.from("bookmarks").update(payload).eq("id", editingBookmark.id)
-      } else {
-        await supabase.from("bookmarks").insert({ user_id: user.id, ...payload })
-      }
-      await fetchData()
-      refreshTags()
+    async (data: import("@/components/BookmarkModal").BookmarkFormData, editingBookmark: Bookmark | null) => {
+      await persistMarcadoresBookmarkModal(
+        { demoMode, supabase, setBookmarks, setDetailBookmark, refreshTags, fetchData },
+        data,
+        editingBookmark
+      )
     },
     [demoMode, supabase, setBookmarks, setDetailBookmark, refreshTags, fetchData]
   )
@@ -166,15 +94,7 @@ export function useMarcadoresActions({
   const handleDeleteFolder = useCallback(
     async (folderId: string) => {
       const parentId = folders.find((f) => f.id === folderId)?.parent_id ?? null
-      const descendantIds = new Set<string>()
-      const stack = [folderId]
-      while (stack.length > 0) {
-        const id = stack.pop()!
-        descendantIds.add(id)
-        for (const f of folders) {
-          if ((f.parent_id || null) === id) stack.push(f.id)
-        }
-      }
+      const descendantIds = collectFolderSubtreeIds(folders, folderId)
 
       if (demoMode) {
         setBookmarks((prev) =>
@@ -261,29 +181,7 @@ export function useMarcadoresActions({
 
   const recordBookmarkOpened = useCallback(
     async (bookmarkId: string) => {
-      const nowIso = new Date().toISOString()
-      const bumpLocal = () => {
-        setBookmarks((prev) =>
-          prev.map((b) => {
-            if (b.id !== bookmarkId) return b
-            const nextCount = (b.open_count ?? 0) + 1
-            return { ...b, opened_at: nowIso, open_count: nextCount, updated_at: nowIso }
-          })
-        )
-      }
-
-      if (demoMode) {
-        bumpLocal()
-        return
-      }
-
-      const current = bookmarks.find((b) => b.id === bookmarkId)
-      const prevCount = current?.open_count ?? 0
-      await supabase
-        .from("bookmarks")
-        .update({ opened_at: nowIso, open_count: prevCount + 1, updated_at: nowIso })
-        .eq("id", bookmarkId)
-      bumpLocal()
+      await bumpBookmarkOpenStats({ demoMode, supabase, bookmarks, setBookmarks }, bookmarkId)
     },
     [demoMode, supabase, setBookmarks, bookmarks]
   )
