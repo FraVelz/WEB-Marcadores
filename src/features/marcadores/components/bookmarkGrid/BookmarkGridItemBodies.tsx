@@ -3,6 +3,8 @@
 import Image from "next/image"
 import { useState } from "react"
 
+import { cn } from "@/lib/utils"
+
 import { getFavicon } from "../../utils/utils"
 import type { Bookmark } from "../../utils/types"
 
@@ -15,14 +17,14 @@ export function FolderContent({ label }: { label: string }) {
         </svg>
       </div>
       <div className="min-w-0 flex-1">
-        <span className="text-app-fg font-medium">{label}</span>
+        <span className="text-app-fg block truncate font-medium">{label}</span>
         <p className="text-app-fg-label text-xs">Carpeta</p>
       </div>
     </>
   )
 }
 
-export function LinkContent({ bookmark }: { bookmark: Bookmark }) {
+export function LinkContent({ bookmark, locationLabel }: { bookmark: Bookmark; locationLabel?: string }) {
   const favicon = getFavicon(bookmark.url)
   const [faviconError, setFaviconError] = useState(false)
   const hostname = (() => {
@@ -61,8 +63,13 @@ export function LinkContent({ bookmark }: { bookmark: Bookmark }) {
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <span className="text-app-fg font-medium">{bookmark.title}</span>
-        <p className="text-app-fg-label truncate text-xs">{hostname}</p>
+        <span className="text-app-fg line-clamp-2 font-medium">{bookmark.title}</span>
+        {locationLabel ? (
+          <p className="text-app-fg-secondary truncate text-xs" title={locationLabel}>
+            {locationLabel}
+          </p>
+        ) : null}
+        <p className={cn("text-app-fg-label truncate text-xs", locationLabel && "opacity-90")}>{hostname}</p>
       </div>
     </>
   )

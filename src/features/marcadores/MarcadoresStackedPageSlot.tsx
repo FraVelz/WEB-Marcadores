@@ -35,6 +35,8 @@ export function MarcadoresStackedPageSlot(props: {
   selectMode: boolean
   selectedIds: Set<string>
   toggleSelect: (id: string) => void
+  setSelectedIds: Dispatch<SetStateAction<Set<string>>>
+  setSelectMode: Dispatch<SetStateAction<boolean>>
   breadcrumbLabel: string
 }) {
   return (
@@ -55,6 +57,8 @@ export function MarcadoresStackedPageSlot(props: {
             onAddBookmark={props.handleAdd}
             onNewFolder={() => props.setShowNewFolder(true)}
             itemRefs={props.itemRefs}
+            setSelectedIds={props.setSelectedIds}
+            setSelectMode={props.setSelectMode}
           />
         ) : (
           <MarcadoresTreeView

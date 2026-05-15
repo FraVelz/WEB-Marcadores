@@ -60,7 +60,7 @@ export function MarcadoresDesktopShell({
   onCloseDetail,
   onRequestCloseLibraryWindow,
 }: MarcadoresDesktopShellProps) {
-  const { registerExplorerWideHeaderEnd } = useDashboard()
+  const { registerExplorerWideHeaderEnd, focusMain } = useDashboard()
   const hostRef = useRef<HTMLDivElement>(null)
 
   const [desk, dispatchDesk] = useReducer(deskShellReducer, INITIAL_DESK_SHELL)
@@ -159,6 +159,11 @@ export function MarcadoresDesktopShell({
     focusedLibraryPaneId,
   })
 
+  const minimizeAllAndFocusMain = useCallback(() => {
+    minimizeAllWindows()
+    queueMicrotask(() => focusMain())
+  }, [focusMain, minimizeAllWindows])
+
   const canCloseLibrary = libraryWindowIds.length > 1
   const deskSurfaceReady = deskReady && canvas.w >= MIN_CANVAS && canvas.h >= MIN_CANVAS
   const canTileTwoColumns = libraryWindowIds.length === 2
@@ -169,7 +174,7 @@ export function MarcadoresDesktopShell({
     canTileTwoColumns,
     tileTwoColumns,
     deskSurfaceReady,
-    minimizeAllWindows,
+    minimizeAllWindows: minimizeAllAndFocusMain,
     restoreMinimizedWindows,
     maximizeAllWindows,
     restoreWindowSizes,
@@ -178,6 +183,7 @@ export function MarcadoresDesktopShell({
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <MarcadoresDesktopShellCanvas
+        workspaceId={workspaceId}
         hostRef={hostRef}
         canvas={canvas}
         deskCanvasDropHighlight={deskCanvasDropHighlight}

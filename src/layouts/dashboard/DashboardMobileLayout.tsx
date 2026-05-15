@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useLayoutEffect, useState } from "react"
 
 import { DashboardMobileHeader } from "./DashboardMobileHeader"
 import { DashboardShellNav } from "./DashboardShellNav"
@@ -12,6 +12,7 @@ import { useDashboardViewportMd } from "./hooks/useDashboardViewportMd"
 import { useDashboard } from "@/contexts/DashboardContext"
 
 import { useAppAppearance } from "@/contexts/AppAppearanceContext"
+import { applyWallpaperToHTMLElement } from "@/lib/appAppearance"
 
 import { cn } from "@/lib/utils"
 
@@ -36,6 +37,10 @@ export function DashboardMobileLayout({
   const { dashboardFullscreenHostRef, explorerWideHeaderEndSlot } = useDashboard()
   const { appearance } = useAppAppearance()
   const wallpaperActive = Boolean(appearance.wallpaperDataUrl)
+
+  useLayoutEffect(() => {
+    applyWallpaperToHTMLElement(dashboardFullscreenHostRef.current, appearance)
+  }, [appearance, dashboardFullscreenHostRef])
 
   useBodyScrollLock(mobileSidebarOpen)
 

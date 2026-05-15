@@ -1,5 +1,7 @@
 "use client"
 
+import { useCallback } from "react"
+
 import BookmarkModal from "@/components/BookmarkModal"
 
 import MarcadoresFooter from "@/features/marcadores/components/MarcadoresFooter"
@@ -16,6 +18,26 @@ import { useMarcadoresPageDataHooks } from "@/features/marcadores/page/useMarcad
 export function MarcadoresPage() {
   const d = useMarcadoresPageDataHooks()
   const c = useMarcadoresPageCommandHooks(d)
+
+  const deskModalUi =
+    d.desktopWindowChrome && d.deskModalHostWinId ? d.deskUiByWin[d.deskModalHostWinId] : null
+  const bookmarkModalOpen = d.desktopWindowChrome ? Boolean(deskModalUi?.modalOpen) : d.modalOpen
+  const bookmarkModalEditing = d.desktopWindowChrome ? deskModalUi?.editingBookmark ?? null : d.editingBookmark
+  const bookmarkModalNonce = d.desktopWindowChrome ? deskModalUi?.bookmarkModalNonce ?? 0 : d.bookmarkModalNonce
+  const bookmarkModalFolderId =
+    d.desktopWindowChrome && d.deskModalHostWinId
+      ? d.deskFolderByWin[d.deskModalHostWinId] ?? null
+      : d.activeBrowseFolderId
+
+  const closeBookmarkModal = useCallback(() => {
+    if (d.desktopWindowChrome && d.deskModalHostWinId) {
+      d.updateDeskUi(d.deskModalHostWinId, (s) => ({ ...s, modalOpen: false, editingBookmark: null }))
+    } else {
+      d.setModalOpen(false)
+      d.setEditingBookmark(null)
+    }
+    requestAnimationFrame(() => d.focusMain())
+  }, [d])
 
   if (d.loading) return <div className="text-app-fg-label flex flex-1 items-center justify-center">Cargando…</div>
 
@@ -138,6 +160,8 @@ export function MarcadoresPage() {
             selectMode={d.selectMode}
             selectedIds={d.selectedIds}
             toggleSelect={d.toggleSelect}
+            setSelectedIds={d.setSelectedIds}
+            setSelectMode={d.setSelectMode}
             breadcrumbLabel={d.breadcrumb.map((p) => p.label).join(" › ")}
           />
         }
@@ -154,29 +178,25 @@ export function MarcadoresPage() {
         <MarcadoresFooter flatList={d.focusFlatList} selectedIndex={d.selectedIndex} />
       ) : null}
 
-      {d.modalOpen ? (
+      {bookmarkModalOpen ? (
         <BookmarkModal
-          key={d.editingBookmark?.id ?? `new-${d.bookmarkModalNonce}`}
-          onClose={() => {
-            d.setModalOpen(false)
-            d.setEditingBookmark(null)
-            requestAnimationFrame(() => d.focusMain())
-          }}
+          key={bookmarkModalEditing?.id ?? `new-${bookmarkModalNonce}`}
+          onClose={closeBookmarkModal}
           onSubmit={d.onModalSubmit}
           initialData={
-            d.editingBookmark
+            bookmarkModalEditing
               ? {
-                  title: d.editingBookmark.title,
-                  url: d.editingBookmark.url,
-                  description: d.editingBookmark.description || "",
-                  folder_id: d.editingBookmark.folder_id || "",
-                  tags: d.editingBookmark.tags?.join(", ") || "",
+                  title: bookmarkModalEditing.title,
+                  url: bookmarkModalEditing.url,
+                  description: bookmarkModalEditing.description || "",
+                  folder_id: bookmarkModalEditing.folder_id || "",
+                  tags: bookmarkModalEditing.tags?.join(", ") || "",
                 }
               : null
           }
           allTags={d.allTags}
           folders={d.folders}
-          currentFolderId={d.activeBrowseFolderId}
+          currentFolderId={bookmarkModalFolderId}
         />
       ) : null}
     </div>

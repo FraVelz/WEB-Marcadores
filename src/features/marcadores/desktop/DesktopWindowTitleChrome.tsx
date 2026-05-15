@@ -49,10 +49,13 @@ export function DesktopWindowTitleChrome({
   return (
     <div
       className={cn(
-        "bg-app-window-chrome border-app-border relative z-10 flex shrink-0 cursor-default items-center gap-2 border-b px-2",
+        "border-app-border relative z-10 flex shrink-0 cursor-default items-center gap-2 border-b px-2",
         minimized ? "rounded-b-lg" : ""
       )}
-      style={{ height: TITLE_H }}
+      style={{
+        height: TITLE_H,
+        backgroundColor: "color-mix(in srgb, var(--app-window-chrome) var(--app-desk-window-solid-pct, 100%), transparent)",
+      }}
       onPointerDown={onTitlePointerDown}
       onDoubleClick={onTitleDoubleClick}
     >

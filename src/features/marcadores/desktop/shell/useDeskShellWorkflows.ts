@@ -106,14 +106,20 @@ export function useDeskShellWorkflows(opts: {
         zSeqRef.current += 1
         setZDetail(zSeqRef.current)
         setPreferLibraryInStrip(false)
+        setDetailFrame((prev) => (prev?.minimized ? { ...prev, minimized: false } : prev))
         return
       }
       zSeqRef.current += 1
       setZLib((z) => ({ ...z, [id]: zSeqRef.current }))
       setPreferLibraryInStrip(true)
+      setLibFrames((prev) => {
+        const cur = prev[id]
+        if (!cur?.minimized) return prev
+        return { ...prev, [id]: { ...cur, minimized: false } }
+      })
       onFocusLibraryPane(id)
     },
-    [onFocusLibraryPane, setPreferLibraryInStrip, setZDetail, setZLib, zSeqRef]
+    [onFocusLibraryPane, setDetailFrame, setLibFrames, setPreferLibraryInStrip, setZDetail, setZLib, zSeqRef]
   )
 
   const { minimizeAllWindows, restoreMinimizedWindows, maximizeAllWindows, restoreWindowSizes } =
@@ -135,7 +141,10 @@ export function useDeskShellWorkflows(opts: {
         subtitle: libraryWindowIds.length > 1 ? `#${idx + 1}` : undefined,
         minimized: f?.minimized ?? false,
         maximized: f?.maximized ?? false,
-        isFocused: focusedSurface.kind === "library" && focusedSurface.id === wid,
+        isFocused:
+          focusedSurface.kind === "library" &&
+          focusedSurface.id === wid &&
+          !(f?.minimized ?? false),
         kind: "library",
       }
     })
@@ -146,7 +155,7 @@ export function useDeskShellWorkflows(opts: {
         subtitle: detailTitle,
         minimized: detailFrame.minimized,
         maximized: detailFrame.maximized,
-        isFocused: focusedSurface.kind === "detail",
+        isFocused: focusedSurface.kind === "detail" && !detailFrame.minimized,
         kind: "detail",
       })
     }

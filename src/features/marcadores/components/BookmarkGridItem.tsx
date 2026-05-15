@@ -3,6 +3,7 @@
 import { useId } from "react"
 
 import { cn, cnLines } from "@/lib/utils"
+import { applyBookmarkDragPreview } from "../utils/bookmarkDragPreview"
 import { BOOKMARK_DRAG_MIME_TYPE, parseBookmarkDragPayload } from "../utils/parseDragPayload"
 import type { GridItem } from "../utils/types"
 import { FolderContent, LinkContent } from "./bookmarkGrid/BookmarkGridItemBodies"
@@ -51,6 +52,7 @@ export default function BookmarkGridItem({
     e.dataTransfer.setData(BOOKMARK_DRAG_MIME_TYPE, JSON.stringify(payload))
     e.dataTransfer.effectAllowed = "move"
     e.dataTransfer.setData("text/plain", isFolder ? item.label : item.bookmark.title)
+    applyBookmarkDragPreview(e)
   }
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -115,6 +117,7 @@ export default function BookmarkGridItem({
   return (
     <div
       ref={itemRef}
+      data-bookmark-grid-item
       draggable
       role="button"
       tabIndex={0}
@@ -147,7 +150,7 @@ export default function BookmarkGridItem({
           />
         </label>
       )}
-      {isFolder ? <FolderContent label={item.label} /> : <LinkContent bookmark={item.bookmark} />}
+      {isFolder ? <FolderContent label={item.label} /> : <LinkContent bookmark={item.bookmark} locationLabel={item.locationLabel} />}
     </div>
   )
 }

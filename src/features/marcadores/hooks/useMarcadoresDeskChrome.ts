@@ -1,14 +1,12 @@
 "use client"
 
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useMemo, useRef, useState } from "react"
 
-import type { Folder } from "@/contexts/DashboardContext"
-
-import type { BrowseMode } from "@/features/marcadores/hooks/useMarcadoresData"
-import { buildMarcadoresFlatList } from "@/features/marcadores/hooks/useMarcadoresData"
+import {
+  createDefaultDeskWindowUi,
+  type DeskWindowUiState,
+} from "@/features/marcadores/page/deskWindowUiState"
 import { makeDeskLibWinId } from "@/features/marcadores/page/marcadoresPageStorage"
-import type { Bookmark, GridItem } from "@/features/marcadores/utils/types"
-import { getFolderPath } from "@/features/marcadores/utils/utils"
 
 export function useMarcadoresDeskChrome(opts: {
   desktopWindowChrome: boolean
@@ -20,6 +18,10 @@ export function useMarcadoresDeskChrome(opts: {
   const [deskLibWinIds, setDeskLibWinIds] = useState<string[]>(() => [makeDeskLibWinId()])
   const [focusedDeskLibId, setFocusedDeskLibId] = useState<string | null>(null)
   const [deskFolderByWin, setDeskFolderByWin] = useState<Record<string, string | null>>({})
+  const [deskUiByWin, setDeskUiByWin] = useState<Record<string, DeskWindowUiState>>({})
+
+  const itemRefsMapRef = useRef<Map<string, React.MutableRefObject<Map<number, HTMLDivElement>>>>(new Map())
+  const searchRefMapRef = useRef<Map<string, React.RefObject<HTMLInputElement | null>>>(new Map())
 
   const resolvedDeskLibPaneId = useMemo(() => {
     if (focusedDeskLibId && deskLibWinIds.includes(focusedDeskLibId)) return focusedDeskLibId
@@ -40,15 +42,62 @@ export function useMarcadoresDeskChrome(opts: {
     [desktopWindowChrome, resolvedDeskLibPaneId, setSelectedFolderId]
   )
 
+  const updateDeskUi = useCallback((winId: string, recipe: (s: DeskWindowUiState) => DeskWindowUiState) => {
+    setDeskUiByWin((prev) => {
+      const winPrev = prev[winId] ?? createDefaultDeskWindowUi()
+      const winNext = recipe(winPrev)
+      if (winNext === winPrev) return prev
+      return { ...prev, [winId]: winNext }
+    })
+  }, [])
+
+  const toggleDeskTreeFolderCollapse = useCallback((winId: string, folderId: string) => {
+    updateDeskUi(winId, (s) => {
+      const next = new Set(s.treeCollapsedIds)
+      if (next.has(folderId)) next.delete(folderId)
+      else next.add(folderId)
+      return { ...s, treeCollapsedIds: next }
+    })
+  }, [updateDeskUi])
+
+  const getDeskItemRefs = useCallback((winId: string) => {
+    const m = itemRefsMapRef.current
+    let ref = m.get(winId)
+    if (!ref) {
+      ref = { current: new Map() }
+      m.set(winId, ref)
+    }
+    return ref
+  }, [])
+
+  const getDeskSearchRef = useCallback((winId: string): React.RefObject<HTMLInputElement | null> => {
+    const m = searchRefMapRef.current
+    let ref = m.get(winId)
+    if (!ref) {
+      ref = { current: null }
+      m.set(winId, ref)
+    }
+    return ref
+  }, [])
+
   const addDeskLibraryWindow = useCallback(() => {
     const id = makeDeskLibWinId()
     setDeskLibWinIds((prev) => [...prev, id])
+    setDeskUiByWin((prev) => ({ ...prev, [id]: createDefaultDeskWindowUi() }))
     queueMicrotask(() => setFocusedDeskLibId(id))
   }, [])
 
   const closeDeskLibraryWindow = useCallback((id: string) => {
+    itemRefsMapRef.current.delete(id)
+    searchRefMapRef.current.delete(id)
     setDeskLibWinIds((prev) => (prev.length <= 1 ? prev : prev.filter((w) => w !== id)))
     setDeskFolderByWin((prev) => {
+      if (!(id in prev)) return prev
+      const next = { ...prev }
+      delete next[id]
+      return next
+    })
+    setDeskUiByWin((prev) => {
       if (!(id in prev)) return prev
       const next = { ...prev }
       delete next[id]
@@ -67,6 +116,11 @@ export function useMarcadoresDeskChrome(opts: {
     setFocusedDeskLibId,
     deskFolderByWin,
     setDeskFolderByWin,
+    deskUiByWin,
+    updateDeskUi,
+    toggleDeskTreeFolderCollapse,
+    getDeskItemRefs,
+    getDeskSearchRef,
     resolvedDeskLibPaneId,
     activeBrowseFolderId,
     setActiveBrowseFolderId,
@@ -74,29 +128,4 @@ export function useMarcadoresDeskChrome(opts: {
     closeDeskLibraryWindow,
     focusDeskLibraryPane,
   }
-}
-
-/** Mapas por ventana del escritorio; requiere datos ya cargados (`useMarcadoresData`). */
-export function useMarcadoresDeskPaneDerivedMap(opts: {
-  desktopWindowChrome: boolean
-  deskLibWinIds: string[]
-  deskFolderByWin: Record<string, string | null>
-  browseMode: BrowseMode
-  folders: Folder[]
-  filteredBookmarks: Bookmark[]
-}): Record<string, { flatList: GridItem[]; breadcrumb: { id: string | null; label: string }[] }> | null {
-  const { desktopWindowChrome, deskLibWinIds, deskFolderByWin, browseMode, folders, filteredBookmarks } = opts
-
-  return useMemo(() => {
-    if (!desktopWindowChrome) return null
-    const m: Record<string, { flatList: GridItem[]; breadcrumb: { id: string | null; label: string }[] }> = {}
-    for (const id of deskLibWinIds) {
-      const fid = deskFolderByWin[id] ?? null
-      m[id] = {
-        flatList: buildMarcadoresFlatList(folders, filteredBookmarks, fid, browseMode),
-        breadcrumb: getFolderPath(folders, fid),
-      }
-    }
-    return m
-  }, [browseMode, deskFolderByWin, deskLibWinIds, desktopWindowChrome, filteredBookmarks, folders])
 }

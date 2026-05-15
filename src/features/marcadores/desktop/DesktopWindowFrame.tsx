@@ -5,13 +5,7 @@ import { useCallback, useRef } from "react"
 
 import { DesktopWindowResizeHandles } from "@/features/marcadores/desktop/DesktopWindowResizeHandles"
 import { DesktopWindowTitleChrome } from "@/features/marcadores/desktop/DesktopWindowTitleChrome"
-import {
-  TITLE_H,
-  clampBounds,
-  maxInset,
-  resizeBoundsByEdge,
-  type ResizeEdge,
-} from "@/features/marcadores/desktop/desktopWindowGeometry"
+import { clampBounds, maxInset, resizeBoundsByEdge, type ResizeEdge } from "@/features/marcadores/desktop/desktopWindowGeometry"
 import type { WindowBounds } from "@/features/marcadores/desktop/windowTypes"
 import { isBookmarkDragTransfer } from "@/features/marcadores/utils/parseDragPayload"
 
@@ -38,6 +32,8 @@ type Props = {
   /** Aislar burbuja de drag de marcadores; al pasar por el marco, `onDismissDesktopDropHighlight`. */
   isolateBookmarkDragBubble?: boolean
   onDismissDesktopDropHighlight?: () => void
+  /** Al pasar a minimizada (antes del toggle): p. ej. devolver foco al lienzo principal. */
+  onWillBecomeMinimized?: () => void
 }
 
 export function DesktopWindowFrame({
@@ -60,6 +56,7 @@ export function DesktopWindowFrame({
   onClose,
   isolateBookmarkDragBubble = false,
   onDismissDesktopDropHighlight,
+  onWillBecomeMinimized,
 }: Props) {
   const { w: cw, h: ch } = canvasSize
   const dragCleanupRef = useRef<(() => void) | null>(null)
@@ -69,11 +66,15 @@ export function DesktopWindowFrame({
     dragCleanupRef.current = null
   }, [])
 
-  const visualBounds = minimized
-    ? { ...bounds, h: TITLE_H }
-    : maximized && cw > 0 && ch > 0
-      ? maxInset(cw, ch)
-      : clampBounds(bounds, cw, ch)
+  const visualBounds =
+    maximized && !minimized && cw > 0 && ch > 0 ? maxInset(cw, ch) : clampBounds(bounds, cw, ch)
+
+  const handleToggleMinimize = useCallback(() => {
+    if (!minimized) {
+      onWillBecomeMinimized?.()
+    }
+    onToggleMinimize()
+  }, [minimized, onToggleMinimize, onWillBecomeMinimized])
 
   const attachWindowDrag = useCallback(
     (kind: "move" | ResizeEdge, orig: WindowBounds, startX: number, startY: number) => {
@@ -155,8 +156,8 @@ export function DesktopWindowFrame({
   return (
     <div
       className={cn(
-        "border-app-border-muted bg-app-raised absolute flex flex-col overflow-hidden rounded-lg border shadow-2xl",
-        minimized && "opacity-95"
+        "border-app-border-muted absolute flex flex-col overflow-hidden rounded-lg border shadow-2xl",
+        minimized && "hidden"
       )}
       style={{
         left: visualBounds.x,
@@ -164,6 +165,7 @@ export function DesktopWindowFrame({
         width: visualBounds.w,
         height: visualBounds.h,
         zIndex,
+        backgroundColor: "color-mix(in srgb, var(--app-raised) var(--app-desk-window-solid-pct, 100%), transparent)",
       }}
       onPointerDown={() => onActivate()}
       {...isolateBookmarkDragHandlers}
@@ -189,7 +191,7 @@ export function DesktopWindowFrame({
         preMaxBoundsRef={preMaxBoundsRef}
         onBoundsChange={onBoundsChange}
         onActivate={onActivate}
-        onToggleMinimize={onToggleMinimize}
+        onToggleMinimize={handleToggleMinimize}
         onToggleMaximize={onToggleMaximize}
         onTitlePointerDown={onTitlePointerDown}
         onTitleDoubleClick={onTitleDoubleClick}

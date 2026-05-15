@@ -4,7 +4,10 @@ import { createContext, use, useCallback, useEffect, useLayoutEffect, useMemo, u
 
 import {
   type AppAppearanceState,
+  APP_APPEARANCE_STORAGE_KEY,
   applyCustomColorVars,
+  applyDeskWindowGlass,
+  applyTextSelectionHighlight,
   applyWallpaperToBody,
   defaultAppAppearanceState,
   loadAppAppearanceFromStorage,
@@ -22,6 +25,8 @@ type AppAppearanceContextValue = {
   resetCustomColors: () => void
   setWallpaper: (dataUrl: string | null) => void
   setWallpaperVeil: (v: number) => void
+  setDeskWindowTransparency: (v: number) => void
+  setTextSelection: (value: string | null) => void
   resetAllAppearance: () => void
 }
 
@@ -36,7 +41,9 @@ function syncDom(next: AppAppearanceState): void {
   root.classList.toggle("dark", useDark)
 
   applyCustomColorVars(next.customColors, next.useCustomPalette)
+  applyTextSelectionHighlight(next)
   applyWallpaperToBody(next)
+  applyDeskWindowGlass(next)
 }
 
 function persistState(next: AppAppearanceState): void {
@@ -51,6 +58,17 @@ export function AppAppearanceProvider({ children }: { children: ReactNode }) {
 
   useLayoutEffect(() => {
     syncDom(loadAppAppearanceFromStorage())
+  }, [])
+
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== APP_APPEARANCE_STORAGE_KEY) return
+      const fresh = loadAppAppearanceFromStorage()
+      setAppearance(fresh)
+      syncDom(fresh)
+    }
+    window.addEventListener("storage", onStorage)
+    return () => window.removeEventListener("storage", onStorage)
   }, [])
 
   const update = useCallback((updater: (prev: AppAppearanceState) => AppAppearanceState) => {
@@ -117,6 +135,23 @@ export function AppAppearanceProvider({ children }: { children: ReactNode }) {
     [update]
   )
 
+  const setDeskWindowTransparency = useCallback(
+    (v: number) => {
+      update((prev) => ({ ...prev, deskWindowTransparency: v }))
+    },
+    [update]
+  )
+
+  const setTextSelection = useCallback(
+    (value: string | null) => {
+      update((prev) => ({
+        ...prev,
+        textSelection: value == null || value.trim() === "" ? null : value.trim(),
+      }))
+    },
+    [update]
+  )
+
   const resetAllAppearance = useCallback(() => {
     const next = { ...defaultAppAppearanceState }
     setAppearance(next)
@@ -132,6 +167,8 @@ export function AppAppearanceProvider({ children }: { children: ReactNode }) {
       resetCustomColors,
       setWallpaper,
       setWallpaperVeil,
+      setDeskWindowTransparency,
+      setTextSelection,
       resetAllAppearance,
     }),
     [
@@ -142,6 +179,8 @@ export function AppAppearanceProvider({ children }: { children: ReactNode }) {
       resetCustomColors,
       setWallpaper,
       setWallpaperVeil,
+      setDeskWindowTransparency,
+      setTextSelection,
       resetAllAppearance,
     ]
   )
