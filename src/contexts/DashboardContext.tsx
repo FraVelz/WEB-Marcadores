@@ -9,6 +9,7 @@ import { SINGLE_LAYOUT_PAYLOAD } from "@/features/marcadores/workspaces/workspac
 import type { WorkspaceRow } from "@/features/marcadores/workspaces/workspaceTypes"
 import { DEMO_TAGS, DEMO_WORKSPACES } from "@/lib/demo-data"
 import { sortedUniqueTagsFromRows } from "@/lib/bookmark-tags"
+import { useSidebarTreeCollapse } from "@/layouts/dashboard/hooks/useSidebarTreeCollapse"
 
 export type Folder = {
   id: string
@@ -60,6 +61,19 @@ type DashboardContextType = {
 
   registerMarcadoresRuntime: (snapshot: MarcadoresRuntimeSnap | null) => void
   marcadoresPalette: MarcadoresRuntimeSnap | null
+
+  /** Árbol de carpetas (Marcadores): colapsar / teclado desde el panel interno */
+  explorerCollapsedIds: Set<string>
+  setExplorerCollapsedIds: React.Dispatch<React.SetStateAction<Set<string>>>
+  toggleExplorerCollapsed: (folderId: string) => void
+  explorerFlatSidebarItems: (string | null)[]
+  /** Solo la instancia enfocada del escritorio debe enlazar esta ref para atajos „n“. */
+  marcadoresExplorerPanelRef: React.RefObject<HTMLDivElement | null>
+  /**
+   * Contenedor de la columna principal (Explorador + cabecera móvil + main).
+   * Pantalla completa del escritorio lo usa para mantener visible la barra superior de la app.
+   */
+  dashboardFullscreenHostRef: React.RefObject<HTMLDivElement | null>
 }
 
 const DashboardContext = createContext<DashboardContextType | null>(null)
@@ -72,10 +86,19 @@ function layoutStorageKey(workspaceId: string, demoMode: boolean) {
 export function DashboardProvider({ children, demoMode }: { children: React.ReactNode; demoMode: boolean }) {
   const mainRef = useRef<HTMLElement>(null)
   const sidebarRef = useRef<HTMLDivElement>(null)
+  const marcadoresExplorerPanelRef = useRef<HTMLDivElement>(null)
+  const dashboardFullscreenHostRef = useRef<HTMLDivElement>(null)
   const [allTags, setAllTags] = useState<string[]>([])
   const [viewMode, setViewMode] = useState<ViewMode>("hierarchical")
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null)
   const [folders, setFolders] = useState<Folder[]>([])
+  const {
+    collapsedIds: explorerCollapsedIds,
+    setCollapsedIds: setExplorerCollapsedIds,
+    flatSidebarItems: explorerFlatSidebarItems,
+    toggleCollapsed: toggleExplorerCollapsed,
+  } = useSidebarTreeCollapse(folders)
+
   const mainKeyDownRef = useRef<((e: React.KeyboardEvent) => void) | null>(null)
   const editFolderRef = useRef<((id: string, name: string) => void) | null>(null)
 
@@ -290,6 +313,7 @@ export function DashboardProvider({ children, demoMode }: { children: React.Reac
   }, [])
 
   const focusSidebar = useCallback(() => {
+    marcadoresExplorerPanelRef.current?.focus()
     sidebarRef.current?.focus()
   }, [])
 
@@ -326,6 +350,13 @@ export function DashboardProvider({ children, demoMode }: { children: React.Reac
         setCommandPaletteOpen,
         registerMarcadoresRuntime,
         marcadoresPalette,
+
+        explorerCollapsedIds,
+        setExplorerCollapsedIds,
+        toggleExplorerCollapsed,
+        explorerFlatSidebarItems,
+        marcadoresExplorerPanelRef,
+        dashboardFullscreenHostRef,
       }}
     >
       {children}

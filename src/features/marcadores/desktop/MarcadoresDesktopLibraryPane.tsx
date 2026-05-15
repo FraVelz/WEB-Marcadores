@@ -4,6 +4,7 @@ import { useMemo, useRef } from "react"
 
 import BookmarkGrid from "@/features/marcadores/components/BookmarkGrid"
 import MarcadoresBreadcrumb from "@/features/marcadores/components/MarcadoresBreadcrumb"
+import { MarcadoresExplorerRail } from "@/features/marcadores/components/MarcadoresExplorerRail"
 import MarcadoresBrowseControls from "@/features/marcadores/components/MarcadoresBrowseControls"
 import MarcadoresFooter from "@/features/marcadores/components/MarcadoresFooter"
 import MarcadoresToolbar from "@/features/marcadores/components/MarcadoresToolbar"
@@ -83,6 +84,8 @@ export type MarcadoresDesktopLibraryPaneProps = {
   onToggleFolderCollapse: (folderId: string) => void
   treeCollapsedIds: Set<string>
   currentLocationLabel: string
+  /** En modo escritorio multi-ventana: solo la ventana enfocada enlaza atajos del árbol. */
+  registerExplorerFocus?: boolean
 }
 
 export function MarcadoresDesktopLibraryPane(props: MarcadoresDesktopLibraryPaneProps) {
@@ -149,43 +152,46 @@ export function MarcadoresDesktopLibraryPane(props: MarcadoresDesktopLibraryPane
 
       <MarcadoresBreadcrumb breadcrumb={props.breadcrumb} onSelect={props.onSelectBreadcrumb} />
 
-      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-        {props.primaryViewMode === "grid" ? (
-          <BookmarkGrid
-            flatList={props.flatListGrid}
-            selectedIndex={props.selectedIndexGrid}
-            selectMode={props.selectMode}
-            selectedIds={props.selectedIds}
-            cutItem={props.cutItem}
-            onSelectIndex={props.onSelectIndex}
-            onToggleSelect={props.onToggleSelect}
-            onDoubleClick={props.onDoubleClick}
-            onDrop={props.onDrop}
-            onAddBookmark={props.onAddBookmark}
-            onNewFolder={() => props.setShowNewFolder(true)}
-            itemRefs={gridRefs}
-          />
-        ) : (
-          <MarcadoresTreeView
-            folders={props.folders}
-            bookmarks={props.filteredBookmarks}
-            rows={props.treeFlatRows}
-            selectedIndex={props.selectedIndexGrid}
-            selectMode={props.selectMode}
-            selectedIds={props.selectedIds}
-            cutItem={props.cutItem}
-            onSelectIndex={props.onSelectIndex}
-            onToggleSelect={props.onToggleSelect}
-            onDoubleClick={props.onDoubleClick}
-            onDrop={props.onDrop}
-            onToggleFolderCollapse={props.onToggleFolderCollapse}
-            collapsedIds={props.treeCollapsedIds}
-            onAddBookmark={props.onAddBookmark}
-            onNewFolder={() => props.setShowNewFolder(true)}
-            itemRefs={gridRefs}
-            currentLocationLabel={props.currentLocationLabel}
-          />
-        )}
+      <div className="flex min-h-0 flex-1 flex-row overflow-hidden">
+        <MarcadoresExplorerRail registerGlobalExplorerRef={props.registerExplorerFocus ?? true} />
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+          {props.primaryViewMode === "grid" ? (
+            <BookmarkGrid
+              flatList={props.flatListGrid}
+              selectedIndex={props.selectedIndexGrid}
+              selectMode={props.selectMode}
+              selectedIds={props.selectedIds}
+              cutItem={props.cutItem}
+              onSelectIndex={props.onSelectIndex}
+              onToggleSelect={props.onToggleSelect}
+              onDoubleClick={props.onDoubleClick}
+              onDrop={props.onDrop}
+              onAddBookmark={props.onAddBookmark}
+              onNewFolder={() => props.setShowNewFolder(true)}
+              itemRefs={gridRefs}
+            />
+          ) : (
+            <MarcadoresTreeView
+              folders={props.folders}
+              bookmarks={props.filteredBookmarks}
+              rows={props.treeFlatRows}
+              selectedIndex={props.selectedIndexGrid}
+              selectMode={props.selectMode}
+              selectedIds={props.selectedIds}
+              cutItem={props.cutItem}
+              onSelectIndex={props.onSelectIndex}
+              onToggleSelect={props.onToggleSelect}
+              onDoubleClick={props.onDoubleClick}
+              onDrop={props.onDrop}
+              onToggleFolderCollapse={props.onToggleFolderCollapse}
+              collapsedIds={props.treeCollapsedIds}
+              onAddBookmark={props.onAddBookmark}
+              onNewFolder={() => props.setShowNewFolder(true)}
+              itemRefs={gridRefs}
+              currentLocationLabel={props.currentLocationLabel}
+            />
+          )}
+        </div>
       </div>
 
       <MarcadoresFooter flatList={focusFlatList} selectedIndex={props.selectedIndexGrid} />

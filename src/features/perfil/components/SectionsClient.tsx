@@ -5,6 +5,8 @@ import { useDashboard } from "@/contexts/DashboardContext"
 
 import { cn } from "@/lib/utils"
 
+import { AppearanceSettings } from "./AppearanceSettings"
+
 export function SectionsClient() {
   const { demoMode } = useDashboard()
 
@@ -14,7 +16,9 @@ export function SectionsClient() {
   const { newPassword, setNewPassword, loading, message, handleSubmit } = useChangePassword(demoMode)
 
   return (
-    <div className="mx-auto w-full max-w-md space-y-6 px-1 sm:px-0">
+    <div className="mx-auto w-full max-w-2xl space-y-6 px-1 sm:px-0">
+      <AppearanceSettings />
+
       <div className="border-app-border-muted bg-app-raised rounded-lg border p-6">
         {user ? (
           <>

@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from "react"
 
 import { DashboardMobileHeader } from "./DashboardMobileHeader"
@@ -5,93 +7,93 @@ import { DashboardShellNav } from "./DashboardShellNav"
 import { MobileDrawerBackdrop } from "./MobileDrawerBackdrop"
 
 import { useBodyScrollLock } from "./hooks/useBodyScrollLock"
+import { useDashboardViewportMd } from "./hooks/useDashboardViewportMd"
 
-import { type Folder } from "@/contexts/DashboardContext"
+import { useDashboard } from "@/contexts/DashboardContext"
 
-import ExplorerTree from "@/components/ExplorerTree"
 import { cn } from "@/lib/utils"
 
 type DashboardMobileLayoutProps = {
   pathname: string
   children: React.ReactNode
-  collapsedIds: Set<string>
-  toggleCollapsed: (id: string) => void
+  /** En rutas fuera de Marcadores permite enfocar el panel lateral con atajos. */
   sidebarRef: React.RefObject<HTMLDivElement | null>
-  folders: Folder[]
-  selectedFolderId: string | null
-  setSelectedFolderId: (id: string | null) => void
-  handleSidebarKeyDown: (e: React.KeyboardEvent) => void
   mainRef: React.RefObject<HTMLElement | null>
   mainKeyDownRef: React.MutableRefObject<((e: React.KeyboardEvent) => void) | null>
 }
 
 export function DashboardMobileLayout({
   pathname,
-  children,
-  collapsedIds,
-  toggleCollapsed,
   sidebarRef,
-  folders,
-  selectedFolderId,
-  setSelectedFolderId,
-  handleSidebarKeyDown,
+  children,
   mainRef,
   mainKeyDownRef,
 }: DashboardMobileLayoutProps) {
+  const wide = useDashboardViewportMd()
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+  const { dashboardFullscreenHostRef } = useDashboard()
 
   useBodyScrollLock(mobileSidebarOpen)
 
   const closeDrawer = () => setMobileSidebarOpen(false)
 
+  const isMarcadores = pathname === "/marcadores"
+
+  const explorerNavChrome = wide ? (
+    <header className="border-app-border bg-app-sidebar flex shrink-0 flex-row flex-wrap items-center gap-x-3 gap-y-1 border-b px-3 py-1.5">
+      <span className="text-app-fg-label shrink-0 text-xs font-medium tracking-wider uppercase">Explorador</span>
+      <div
+        ref={sidebarRef}
+        tabIndex={0}
+        className="outline-app-focus flex min-h-0 min-w-0 flex-1 flex-col focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+      >
+        <DashboardShellNav pathname={pathname} toolbar />
+      </div>
+    </header>
+  ) : (
+    <aside
+      className={cn(
+        "border-app-border bg-app-sidebar fixed inset-y-0 left-0 z-40 flex flex-col border-r shadow-xl",
+        "h-dvh w-[min(18rem,calc(100vw-3rem))] transition-transform duration-200 ease-out",
+        isMarcadores ? "max-w-[min(14rem,calc(100vw-3rem))]" : "max-w-[20rem]",
+        mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
+      )}
+    >
+      <div className="border-app-border flex shrink-0 items-center justify-between border-b px-3 py-2">
+        <span className="text-app-fg-label text-xs font-medium tracking-wider uppercase">Explorador</span>
+
+        <button
+          type="button"
+          className="text-app-fg-muted hover:bg-app-hover hover:text-app-fg rounded p-1"
+          aria-label="Cerrar menú"
+          onClick={closeDrawer}
+        >
+          ✕
+        </button>
+      </div>
+
+      <div
+        ref={sidebarRef}
+        tabIndex={0}
+        className={cn(
+          "outline-app-focus flex min-h-0 shrink-0 flex-col focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+          isMarcadores ? "min-h-0 overflow-y-auto" : "flex-1 overflow-y-auto"
+        )}
+      >
+        <DashboardShellNav pathname={pathname} onNavigate={closeDrawer} toolbar />
+      </div>
+    </aside>
+  )
+
   return (
     <>
       <MobileDrawerBackdrop open={mobileSidebarOpen} onClose={closeDrawer} />
 
-      <aside
-        className={cn(
-          "border-app-border bg-app-sidebar flex w-56 flex-col border-r",
-          "inset-y-0 left-0",
-          "z-40 h-dvh transition-transform duration-200 ease-out md:relative md:z-auto md:h-screen md:translate-x-0",
-          mobileSidebarOpen ? "translate-x-0 shadow-xl" : "-translate-x-full md:translate-x-0 md:shadow-none"
-        )}
-      >
-        <div className="border-app-border flex items-center justify-between border-b px-3 py-2">
-          <span className="text-app-fg-label text-xs font-medium tracking-wider uppercase">Explorador</span>
+      {!wide ? explorerNavChrome : null}
 
-          <button
-            type="button"
-            className="text-app-fg-muted hover:bg-app-hover hover:text-app-fg rounded p-1 md:hidden"
-            aria-label="Cerrar menú"
-            onClick={closeDrawer}
-          >
-            ✕
-          </button>
-        </div>
+      <div ref={dashboardFullscreenHostRef} className="flex min-h-0 flex-1 flex-col md:min-h-screen">
+        {wide ? explorerNavChrome : null}
 
-        <DashboardShellNav pathname={pathname} onNavigate={closeDrawer} />
-
-        {pathname === "/marcadores" && (
-          <div
-            ref={sidebarRef}
-            tabIndex={0}
-            role="navigation"
-            aria-label="Árbol de carpetas"
-            className="flex-1 overflow-y-auto p-2 outline-none focus:ring-0"
-            onKeyDown={handleSidebarKeyDown}
-          >
-            <ExplorerTree
-              folders={folders}
-              selectedFolderId={selectedFolderId}
-              onSelect={setSelectedFolderId}
-              collapsedIds={collapsedIds}
-              onToggle={toggleCollapsed}
-            />
-          </div>
-        )}
-      </aside>
-
-      <div className="flex min-h-0 w-full flex-1 flex-col md:min-h-screen">
         <DashboardMobileHeader
           pathname={pathname}
           sidebarOpen={mobileSidebarOpen}
