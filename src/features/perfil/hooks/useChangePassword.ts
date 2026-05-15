@@ -16,9 +16,7 @@ export function useChangePassword(demoMode: boolean) {
     }
 
     if (demoMode) {
-      setMessage(
-        "Contraseña actualizada correctamente (solo demostración; no se guarda en el servidor)."
-      )
+      setMessage("Contraseña actualizada correctamente (solo demostración; no se guarda en el servidor).")
       setNewPassword("")
       return
     }

@@ -18,7 +18,7 @@ type Props = {
   onSelect: (idx: number) => void
   onToggleSelect: (id: string) => void
   onDoubleClick: (item: GridItem) => void
-  onDrop?: (sourceItem: GridItem, targetFolderId: string | null) => void
+  onDrop?: (sourceItem: GridItem, targetFolderId?: string | null) => void
 }
 
 export default function BookmarkGridItem({
@@ -48,14 +48,18 @@ export default function BookmarkGridItem({
   }
 
   const handleDragOver = (e: React.DragEvent) => {
+    if (!onDrop) return
     e.preventDefault()
+    e.stopPropagation()
     e.dataTransfer.dropEffect = "move"
   }
 
   const handleDrop = (e: React.DragEvent) => {
+    if (!onDrop) return
     e.preventDefault()
+    e.stopPropagation()
     const raw = e.dataTransfer.getData(BOOKMARK_DRAG_MIME_TYPE)
-    if (!raw || !onDrop) return
+    if (!raw) return
     const sourceItem = parseBookmarkDragPayload(raw)
     if (sourceItem) onDrop(sourceItem, targetFolderId)
   }
@@ -97,11 +101,7 @@ export default function BookmarkGridItem({
       onDrop={onDrop ? handleDrop : undefined}
     >
       {selectMode && !isFolder && (
-        <label
-          className="absolute top-3 left-3 z-10"
-          htmlFor={selectControlId}
-          onClick={(e) => e.stopPropagation()}
-        >
+        <label className="absolute top-3 left-3 z-10" htmlFor={selectControlId} onClick={(e) => e.stopPropagation()}>
           <span className="sr-only">Seleccionar {item.bookmark.title}</span>
           <input
             id={selectControlId}

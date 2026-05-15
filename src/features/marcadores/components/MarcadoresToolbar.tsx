@@ -38,6 +38,9 @@ type Props = {
   flatList: GridItem[]
   selectedIndex: number
   setDetailBookmark: (v: import("../utils/types").Bookmark | null) => void
+  treeView?: boolean
+  onToggleTreeView?: () => void
+  treeToggleDisabled?: boolean
 }
 
 export default function MarcadoresToolbar(props: Props) {
@@ -66,6 +69,9 @@ export default function MarcadoresToolbar(props: Props) {
           onToggleInfoPanel={handleToggleInfoPanel}
           showSearch={props.showSearch}
           onToggleSearch={() => props.setShowSearch((s) => !s)}
+          treeView={props.treeView}
+          onToggleTreeView={props.onToggleTreeView}
+          treeToggleDisabled={props.treeToggleDisabled}
         />
         <ToolbarSelectActions
           selectMode={props.selectMode}
@@ -77,7 +83,7 @@ export default function MarcadoresToolbar(props: Props) {
         />
       </div>
       {props.showSearch && (
-        <div className="min-w-0 w-full shrink-0 border-app-border-muted border-t pt-2 md:min-w-[12rem] md:flex-1 md:border-t-0 md:pt-0">
+        <div className="border-app-border-muted w-full min-w-0 shrink-0 border-t pt-2 md:min-w-[12rem] md:flex-1 md:border-t-0 md:pt-0">
           <ToolbarSearchSection
             searchValue={props.searchValue}
             setSearchValue={props.setSearchValue}

@@ -12,6 +12,9 @@ type Props = {
   onToggleInfoPanel: () => void
   showSearch: boolean
   onToggleSearch: () => void
+  treeView?: boolean
+  onToggleTreeView?: () => void
+  treeToggleDisabled?: boolean
 }
 
 export default function ToolbarNavigationButtons({
@@ -24,6 +27,9 @@ export default function ToolbarNavigationButtons({
   onToggleInfoPanel,
   showSearch,
   onToggleSearch,
+  treeView,
+  onToggleTreeView,
+  treeToggleDisabled = false,
 }: Props) {
   return (
     <>
@@ -84,6 +90,27 @@ export default function ToolbarNavigationButtons({
         </svg>
       </button>
       <div className="bg-app-active mx-1 h-5 w-px" />
+      {onToggleTreeView && !treeToggleDisabled && (
+        <button
+          type="button"
+          onClick={onToggleTreeView}
+          className={cn(
+            "rounded p-1.5",
+            treeView ? "bg-app-active text-app-fg" : "text-app-fg-muted hover:bg-app-active hover:text-app-fg"
+          )}
+          title={treeView ? "Vista cuadrícula" : "Vista árbol en el contenido principal"}
+        >
+          {treeView ? (
+            <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z" />
+            </svg>
+          ) : (
+            <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 12h8v2H8v-2zm0 4h5v2H8v-2z" />
+            </svg>
+          )}
+        </button>
+      )}
       <button
         type="button"
         onClick={onToggleSearch}

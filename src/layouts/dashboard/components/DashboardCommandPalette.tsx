@@ -1,0 +1,169 @@
+"use client"
+
+import { useEffect, useId, useMemo, useRef, useState } from "react"
+
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+
+import { useDashboard } from "@/contexts/DashboardContext"
+import type { WorkspaceRow } from "@/features/marcadores/workspaces/workspaceTypes"
+
+import { cn } from "@/lib/utils"
+
+function norm(s: string) {
+  return s.trim().toLowerCase()
+}
+
+export function DashboardCommandPalette() {
+  const id = useId()
+  const inputRef = useRef<HTMLInputElement>(null)
+  const router = useRouter()
+  const { commandPaletteOpen, setCommandPaletteOpen, workspaces, setActiveWorkspaceId, marcadoresPalette } =
+    useDashboard()
+
+  const [query, setQuery] = useState("")
+
+  useEffect(() => {
+    if (!commandPaletteOpen) return
+    queueMicrotask(() => {
+      setQuery("")
+    })
+    const t = requestAnimationFrame(() => inputRef.current?.focus())
+    return () => cancelAnimationFrame(t)
+  }, [commandPaletteOpen])
+
+  const bookmarkHits = useMemo(() => {
+    const palette = marcadoresPalette
+    const q = norm(query)
+    if (!palette || !q || q.length < 2) return []
+    const out: { id: string; title: string; url: string }[] = []
+    for (const b of palette.bookmarks) {
+      const hay = `${b.title} ${b.url}`.toLowerCase()
+      if (hay.includes(q)) out.push(b)
+      if (out.length >= 25) break
+    }
+    return out
+  }, [marcadoresPalette, query])
+
+  const workspaceHits = useMemo(() => {
+    const q = norm(query)
+    if (!q || q.length < 1) return workspaces.slice().sort((a, b) => a.sort_order - b.sort_order)
+    return workspaces.filter((w) => norm(w.name).includes(q)).sort((a, b) => a.sort_order - b.sort_order)
+  }, [workspaces, query])
+
+  const close = () => setCommandPaletteOpen(false)
+
+  if (!commandPaletteOpen) return null
+
+  const selectWorkspace = (w: WorkspaceRow) => {
+    setActiveWorkspaceId(w.id)
+    router.push("/marcadores")
+    close()
+  }
+
+  const selectBookmark = (b: { id: string; title: string; url: string }) => {
+    window.open(b.url, "_blank", "noopener,noreferrer")
+    void marcadoresPalette?.recordBookmarkOpened(b.id)
+    close()
+  }
+
+  return (
+    <div className="fixed inset-0 z-[100]" role="dialog" aria-labelledby={`${id}-title`}>
+      <button
+        type="button"
+        className="bg-app-overlay-strong absolute inset-0 cursor-default border-0"
+        aria-label="Cerrar paleta"
+        onClick={close}
+      />
+      <div className="border-app-border bg-app-sidebar absolute top-[10vh] left-1/2 flex w-[min(640px,92vw)] -translate-x-1/2 flex-col rounded-xl border shadow-xl">
+        <div className="border-app-border-muted border-b px-3 py-2">
+          <label htmlFor={`${id}-input`} className="sr-only" id={`${id}-title`}>
+            Buscar workspaces y marcadores
+          </label>
+          <input
+            id={`${id}-input`}
+            ref={inputRef}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Workspace, marcador…"
+            className="placeholder:text-app-fg-muted bg-app-hover text-app-fg focus:border-app-input-border focus:ring-app-focus w-full rounded-md border border-transparent px-3 py-2 text-sm outline-none focus:ring-1"
+            onKeyDown={(e) => {
+              if (e.key === "Escape") close()
+            }}
+          />
+          <div className="text-app-fg-muted mt-1 text-[11px]">Ctrl/Cmd + K · Busca y pulsa resultado</div>
+        </div>
+
+        <div className="max-h-[60vh] min-h-[120px] overflow-y-auto px-2 py-2">
+          <div className="text-app-fg-muted mb-1 px-2 text-[11px] font-semibold tracking-wide uppercase">Atajos</div>
+          <div className="mb-3 flex flex-col gap-1">
+            <ShortcutPaletteLink title="Marcadores" hint="Gestor principal" href="/marcadores" onNavigate={close} />
+            <ShortcutPaletteLink title="Perfil" hint="Preferencias & cuenta" href="/perfil" onNavigate={close} />
+          </div>
+
+          <div className="text-app-fg-muted mb-1 px-2 text-[11px] font-semibold tracking-wide uppercase">
+            Workspaces
+          </div>
+          {workspaceHits.length === 0 ? (
+            <EmptyRow text="Sin coincidencias" />
+          ) : (
+            workspaceHits.map((w) => (
+              <button
+                key={w.id}
+                type="button"
+                onClick={() => selectWorkspace(w)}
+                className="hover:bg-app-hover text-app-fg flex w-full items-center justify-between rounded-md px-2 py-2 text-left text-sm"
+              >
+                <span className="font-medium">{w.name}</span>
+                <span className="text-app-fg-muted text-xs">Seleccionar</span>
+              </button>
+            ))
+          )}
+
+          <div className="text-app-fg-muted mt-3 mb-1 px-2 text-[11px] font-semibold tracking-wide uppercase">
+            Marcadores
+          </div>
+          {bookmarkHits.length === 0 ? (
+            <EmptyRow
+              text={query.trim().length < 2 ? "Escribe para buscar marcadores disponibles aquí." : "Sin coincidencias"}
+            />
+          ) : (
+            bookmarkHits.map((b) => (
+              <button
+                key={b.id}
+                type="button"
+                onClick={() => selectBookmark(b)}
+                className={cn(
+                  "hover:bg-app-hover flex w-full items-start gap-3 rounded-md px-2 py-2 text-left",
+                  "focus-visible:ring-app-focus outline-none focus-visible:ring-2"
+                )}
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="text-app-fg truncate text-sm font-medium">{b.title}</div>
+                  <div className="text-app-fg-muted truncate text-[11px]">{b.url}</div>
+                </div>
+              </button>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function EmptyRow({ text }: { text: string }) {
+  return <div className="text-app-fg-muted px-3 py-2 text-sm">{text}</div>
+}
+
+function ShortcutPaletteLink(props: { title: string; hint?: string; href: string; onNavigate: () => void }) {
+  return (
+    <Link
+      href={props.href}
+      onClick={props.onNavigate}
+      className="hover:bg-app-hover text-app-fg flex w-full items-center justify-between rounded-md px-2 py-2 text-sm no-underline"
+    >
+      <span className="font-medium">{props.title}</span>
+      {props.hint ? <span className="text-app-fg-muted text-xs">{props.hint}</span> : null}
+    </Link>
+  )
+}

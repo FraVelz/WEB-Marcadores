@@ -3,21 +3,13 @@
 import { useState, useRef, useEffect, useEffectEvent } from "react"
 import Image from "next/image"
 
+import type { Bookmark } from "@/features/marcadores/utils/types"
+
 import { buildFolderOptions, getFaviconUrl, getFolderPathLabel } from "@/lib/bookmark-utils"
 import BookmarkDetailFolderSection from "./bookmark/BookmarkDetailFolderSection"
 import BookmarkDetailTagsSection from "./bookmark/BookmarkDetailTagsSection"
 
 import { cn } from "@/lib/utils"
-
-type Bookmark = {
-  id: string
-  title: string
-  url: string
-  description?: string
-  folder_id?: string | null
-  tags?: string[]
-  created_at?: string
-}
 
 type Folder = { id: string; parent_id: string | null; name: string; sort_order: number }
 
@@ -25,18 +17,23 @@ type Props = {
   bookmark: Bookmark | null
   onClose: () => void
   onUpdate: (id: string, updates: Partial<Bookmark>) => Promise<void>
+  onTelemetryOpen?: (id: string) => Promise<void>
   allTags: string[]
   folders: Folder[]
   embedded?: boolean
+  /** Oculta la cabecera interna cuando el panel va dentro de un marco de ventana de escritorio */
+  omitEmbeddedHeader?: boolean
 }
 
 function BookmarkDetailPanelInner({
   bookmark,
   onClose,
   onUpdate,
+  onTelemetryOpen,
   allTags,
   folders,
   embedded = false,
+  omitEmbeddedHeader = false,
 }: Props & { bookmark: NonNullable<Props["bookmark"]> }) {
   const [newTag, setNewTag] = useState("")
   const [saving, setSaving] = useState(false)
@@ -53,8 +50,19 @@ function BookmarkDetailPanelInner({
         year: "numeric",
       })
     : null
+  const opened = bookmark.opened_at
+    ? new Date(bookmark.opened_at).toLocaleDateString("es", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : null
   const folderOptions = buildFolderOptions(folders)
   const currentFolderPath = getFolderPathLabel(folders, bookmark.folder_id || null)
+
+  const handleTelemetry = () => {
+    if (onTelemetryOpen) void onTelemetryOpen(bookmark.id)
+  }
 
   const handleAddTag = async (tag: string) => {
     const t = tag.trim()
@@ -79,6 +87,19 @@ function BookmarkDetailPanelInner({
     setSaving(false)
   }
 
+  const toggleFavorite = async () => {
+    setSaving(true)
+    await onUpdate(bookmark.id, { is_favorite: !(bookmark.is_favorite ?? false) })
+    setSaving(false)
+  }
+
+  const toggleArchived = async () => {
+    setSaving(true)
+    const archived = bookmark.archived_at ? null : new Date().toISOString()
+    await onUpdate(bookmark.id, { archived_at: archived })
+    setSaving(false)
+  }
+
   const panelContent = (
     <div
       ref={panelRef}
@@ -92,7 +113,9 @@ function BookmarkDetailPanelInner({
           ? cn(
               "border-app-border bg-app-sidebar flex max-h-none min-h-0 flex-col overflow-hidden",
               "fixed inset-0 z-[45] h-dvh shadow-none md:relative md:inset-auto md:z-auto",
-              "md:h-full md:max-h-full md:min-h-0 md:max-w-[320px] md:min-w-[280px] md:border-l md:shadow-none"
+              omitEmbeddedHeader
+                ? "h-full min-h-0 w-full max-w-none border-0 md:h-full md:max-h-full"
+                : "md:h-full md:max-h-full md:min-h-0 md:max-w-[320px] md:min-w-[280px] md:border-l md:shadow-none"
             )
           : cn(
               "border-app-border-muted bg-app-raised fixed top-0 right-0 z-50 h-full max-h-dvh w-full max-w-full border-l shadow-xl",
@@ -101,19 +124,21 @@ function BookmarkDetailPanelInner({
       }
     >
       <div className="flex h-full min-h-0 flex-col p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] md:pt-4 md:pb-4">
-        <div className="border-app-border mb-4 flex items-center justify-between border-b pb-2">
-          <h3 className="text-app-fg-label text-xs font-semibold tracking-wider uppercase">
-            {embedded ? "Propiedades" : "Detalle"}
-          </h3>
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-app-fg-label hover:bg-app-hover hover:text-app-fg rounded p-1"
-            aria-label="Cerrar"
-          >
-            ✕
-          </button>
-        </div>
+        {!omitEmbeddedHeader ? (
+          <div className="border-app-border mb-4 flex items-center justify-between border-b pb-2">
+            <h3 className="text-app-fg-label text-xs font-semibold tracking-wider uppercase">
+              {embedded ? "Propiedades" : "Detalle"}
+            </h3>
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-app-fg-label hover:bg-app-hover hover:text-app-fg rounded p-1"
+              aria-label="Cerrar"
+            >
+              ✕
+            </button>
+          </div>
+        ) : null}
 
         <div className="flex flex-1 flex-col gap-4 overflow-y-auto">
           <div className="flex items-start gap-3">
@@ -138,11 +163,40 @@ function BookmarkDetailPanelInner({
                 href={bookmark.url}
                 target="_blank"
                 rel="noopener noreferrer"
+                onAuxClick={(e) => {
+                  if (e.button !== 1) return
+                  handleTelemetry()
+                }}
+                onClick={handleTelemetry}
                 className="text-app-link mt-1 block truncate text-xs hover:underline"
               >
                 {bookmark.url}
               </a>
             </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={saving}
+              onClick={() => void toggleFavorite()}
+              className={cn(
+                "rounded-md border px-2 py-1 text-xs transition-colors",
+                bookmark.is_favorite
+                  ? "border-app-accent bg-app-selection ring-app-focus ring-1"
+                  : "border-app-border-muted bg-app-toolbar hover:border-app-accent"
+              )}
+            >
+              {bookmark.is_favorite ? "Favorito ★" : "Marcar favorito"}
+            </button>
+            <button
+              type="button"
+              disabled={saving}
+              onClick={() => void toggleArchived()}
+              className="border-app-border-muted bg-app-toolbar hover:border-app-accent rounded-md border px-2 py-1 text-xs"
+            >
+              {bookmark.archived_at ? "Restaurar" : "Archivar"}
+            </button>
           </div>
 
           <BookmarkDetailFolderSection
@@ -162,7 +216,11 @@ function BookmarkDetailPanelInner({
             </div>
           ) : null}
 
-          {created && <p className="text-app-fg-label text-xs">Añadido: {created}</p>}
+          <div className="text-app-fg-muted space-y-1 text-xs">
+            {created && <p>Añadido: {created}</p>}
+            <p>Aperturas: {bookmark.open_count ?? 0}</p>
+            {opened ? <p>Última apertura: {opened}</p> : <p>Nunca abierto desde la app</p>}
+          </div>
 
           <BookmarkDetailTagsSection
             tags={tags}
@@ -180,8 +238,9 @@ function BookmarkDetailPanelInner({
             href={bookmark.url}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={handleTelemetry}
             className={cn(
-              "bg-app-primary flex-1 rounded-lg py-2 text-center text-sm font-medium text-white",
+              "bg-app-primary flex-1 rounded-lg py-2 text-center text-sm font-medium text-white no-underline",
               "hover:bg-app-primary-hover"
             )}
           >
@@ -211,9 +270,11 @@ export default function BookmarkDetailPanel({
   bookmark,
   onClose,
   onUpdate,
+  onTelemetryOpen,
   allTags,
   folders,
   embedded = false,
+  omitEmbeddedHeader = false,
 }: Props) {
   const onCloseEvent = useEffectEvent(onClose)
 
@@ -235,9 +296,11 @@ export default function BookmarkDetailPanel({
       bookmark={bookmark}
       onClose={onClose}
       onUpdate={onUpdate}
+      onTelemetryOpen={onTelemetryOpen}
       allTags={allTags}
       folders={folders}
       embedded={embedded}
+      omitEmbeddedHeader={omitEmbeddedHeader}
     />
   )
 }

@@ -33,6 +33,7 @@ type Params = {
   onAddBookmark: () => void
   onNewFolder: () => void
   onEditItem: (item: GridItem) => void
+  openBookmarkTab: (bookmark: Bookmark) => void
 }
 
 export function useMarcadoresKeyboard(params: Params) {
@@ -64,6 +65,7 @@ export function useMarcadoresKeyboard(params: Params) {
     onAddBookmark,
     onNewFolder,
     onEditItem,
+    openBookmarkTab,
   } = params
 
   return useCallback(
@@ -198,7 +200,7 @@ export function useMarcadoresKeyboard(params: Params) {
         if (e.key === "Enter") {
           e.preventDefault()
           if (item.type === "folder") setSelectedFolderId(item.folderId)
-          else window.open(item.bookmark.url, "_blank")
+          else openBookmarkTab(item.bookmark)
           return
         }
         if ((e.key === "i" || e.key === "I") && item.type === "link") {
@@ -267,6 +269,7 @@ export function useMarcadoresKeyboard(params: Params) {
       onAddBookmark,
       onNewFolder,
       onEditItem,
+      openBookmarkTab,
     ]
   )
 }

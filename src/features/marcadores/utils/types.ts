@@ -1,5 +1,3 @@
-import type { Folder } from "@/contexts/DashboardContext"
-
 export type Bookmark = {
   id: string
   title: string
@@ -8,6 +6,11 @@ export type Bookmark = {
   folder_id?: string | null
   tags?: string[]
   created_at?: string
+  updated_at?: string | null
+  is_favorite?: boolean
+  archived_at?: string | null
+  opened_at?: string | null
+  open_count?: number
 }
 
 export type FlatFolder = {

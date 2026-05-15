@@ -67,8 +67,7 @@ export function useMarcadoresEffects<T>(params: Params<T>) {
   }, [setGridCols])
   useEffect(() => {
     const item = flatList[selectedIndex]
-    const next =
-      infoPanelEnabled && item?.type === "link" ? ((item.bookmark ?? null) as T | null) : null
+    const next = infoPanelEnabled && item?.type === "link" ? ((item.bookmark ?? null) as T | null) : null
     setDetailBookmark(next)
   }, [flatList, selectedIndex, infoPanelEnabled, setDetailBookmark])
   useEffect(() => {
