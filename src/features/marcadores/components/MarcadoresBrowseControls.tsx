@@ -90,6 +90,7 @@ export default function MarcadoresBrowseControls(props: Props) {
       {deskSearch ? (
         <label
           htmlFor={deskSearchWideLibId}
+          aria-label="Buscar en toda la biblioteca"
           className="text-app-fg-secondary flex cursor-pointer items-center gap-2 text-xs normal-case"
         >
           <input
