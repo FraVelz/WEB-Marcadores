@@ -6,6 +6,7 @@ import { useDashboard } from "@/contexts/DashboardContext"
 
 import { useMarcadoresDeskChrome } from "@/features/marcadores/hooks/useMarcadoresDeskChrome"
 import { useMarcadoresTreeDerived } from "@/features/marcadores/hooks/useMarcadoresTreeDerived"
+import { useMarcadoresViewMode } from "@/features/marcadores/hooks/useMarcadoresViewMode"
 import { useMinWidthMd } from "@/features/marcadores/hooks/useMinWidthMd"
 
 import { createDefaultDeskWindowUi } from "@/features/marcadores/page/deskWindowUiState"
@@ -40,9 +41,10 @@ export function useMarcadoresPageDataHooks() {
   } = useDashboard()
 
   const wideViewport = useMinWidthMd()
+  const { mode: marcadoresViewMode } = useMarcadoresViewMode()
   const zonesBoard = !!(workspaceLayout && isZonesLayout(workspaceLayout))
   const zoneColumns = zonesBoard && workspaceLayout?.template === "zones" ? workspaceLayout.columns : []
-  const desktopWindowChrome = wideViewport && !zonesBoard
+  const desktopWindowChrome = wideViewport && !zonesBoard && marcadoresViewMode === "escritorio"
 
   const desk = useMarcadoresDeskChrome({
     desktopWindowChrome,
@@ -265,6 +267,7 @@ export function useMarcadoresPageDataHooks() {
     activeWorkspaceId,
     zonesBoard,
     zoneColumns,
+    marcadoresViewMode,
     desktopWindowChrome,
     deskLibWinIds,
     setDeskLibWinIds,

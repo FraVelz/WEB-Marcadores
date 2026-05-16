@@ -1,4 +1,12 @@
+"use client"
+
+import { MarcadoresViewModeToggle } from "@/features/marcadores/components/MarcadoresViewModeToggle"
+
 import { mobileTitle } from "./utils"
+
+function isMarcadoresRoute(pathname: string) {
+  return pathname === "/marcadores" || pathname.startsWith("/marcadores/")
+}
 
 type DashboardMobileHeaderProps = {
   pathname: string
@@ -21,7 +29,9 @@ export function DashboardMobileHeader({ pathname, sidebarOpen, onOpenSidebar }: 
         </svg>
       </button>
 
-      <span className="text-app-fg truncate text-sm font-medium">{mobileTitle(pathname)}</span>
+      <span className="text-app-fg min-w-0 flex-1 truncate text-sm font-medium">{mobileTitle(pathname)}</span>
+
+      {isMarcadoresRoute(pathname) ? <MarcadoresViewModeToggle compact className="shrink-0" /> : null}
     </header>
   )
 }
