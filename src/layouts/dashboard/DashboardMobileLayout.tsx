@@ -12,6 +12,7 @@ import { useDashboardViewportMd } from "./hooks/useDashboardViewportMd"
 import { useDashboard } from "@/contexts/DashboardContext"
 
 import { useAppAppearance } from "@/contexts/AppAppearanceContext"
+import { MarcadoresViewModeToggle } from "@/features/marcadores/components/MarcadoresViewModeToggle"
 import { applyWallpaperToHTMLElement } from "@/lib/appAppearance"
 
 import { cn } from "@/lib/utils"
@@ -46,7 +47,7 @@ export function DashboardMobileLayout({
 
   const closeDrawer = () => setMobileSidebarOpen(false)
 
-  const isMarcadores = pathname === "/marcadores"
+  const isMarcadores = pathname === "/marcadores" || pathname.startsWith("/marcadores/")
 
   const explorerNavChrome = wide ? (
     <header className="border-app-border bg-app-sidebar flex shrink-0 flex-row flex-nowrap items-center gap-2 border-b px-3 py-1.5">
@@ -58,6 +59,7 @@ export function DashboardMobileLayout({
       >
         <DashboardShellNav pathname={pathname} toolbar compact />
       </div>
+      {isMarcadores ? <MarcadoresViewModeToggle className="shrink-0" /> : null}
       {explorerWideHeaderEndSlot ? (
         <div className="border-app-border flex min-h-9 min-w-0 flex-1 items-center justify-end gap-2 overflow-x-auto overscroll-x-contain border-l pl-3 [-webkit-overflow-scrolling:touch] md:min-h-10 [&::-webkit-scrollbar]:h-1">
           {explorerWideHeaderEndSlot}
