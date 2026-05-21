@@ -1,6 +1,21 @@
+import {
+  APP_APPEARANCE_COOKIE_NAME,
+  APP_APPEARANCE_STORAGE_KEY,
+  APP_APPEARANCE_WALLPAPER_STORAGE_KEY,
+  parseAppearanceCookieJson,
+  readAppearanceCookieValueClient,
+  readAppearanceCookieValueFromStore,
+  writeAppearanceCookieClient,
+} from "@/lib/appAppearanceCookies"
 import { readTabScopedItem } from "@/lib/tabScopedStorage"
 
-export const APP_APPEARANCE_STORAGE_KEY = "marcadores_app_appearance_v1"
+export {
+  APP_APPEARANCE_COOKIE_NAME,
+  APP_APPEARANCE_STORAGE_KEY,
+  APP_APPEARANCE_WALLPAPER_STORAGE_KEY,
+} from "@/lib/appAppearanceCookies"
+
+export type AppearanceCookiePayload = Omit<AppAppearanceState, "wallpaperDataUrl">
 
 export type AppThemePreset = "light" | "dark" | "system"
 
@@ -121,38 +136,112 @@ function sanitizeAppAppearanceState(raw: unknown): AppAppearanceState {
   }
 }
 
+export function appearanceToCookiePayload(state: AppAppearanceState): AppearanceCookiePayload {
+  const { wallpaperDataUrl: _w, ...rest } = state
+  return rest
+}
+
+function loadWallpaperFromStorage(): Pick<AppAppearanceState, "wallpaperDataUrl" | "wallpaperVeil"> {
+  if (typeof window === "undefined") {
+    return {
+      wallpaperDataUrl: defaultAppAppearanceState.wallpaperDataUrl,
+      wallpaperVeil: defaultAppAppearanceState.wallpaperVeil,
+    }
+  }
+  try {
+    const raw = localStorage.getItem(APP_APPEARANCE_WALLPAPER_STORAGE_KEY)
+    if (!raw) {
+      return {
+        wallpaperDataUrl: defaultAppAppearanceState.wallpaperDataUrl,
+        wallpaperVeil: defaultAppAppearanceState.wallpaperVeil,
+      }
+    }
+    const parsed = JSON.parse(raw) as unknown
+    const base = sanitizeAppAppearanceState(parsed)
+    return {
+      wallpaperDataUrl: base.wallpaperDataUrl,
+      wallpaperVeil: base.wallpaperVeil,
+    }
+  } catch {
+    return {
+      wallpaperDataUrl: defaultAppAppearanceState.wallpaperDataUrl,
+      wallpaperVeil: defaultAppAppearanceState.wallpaperVeil,
+    }
+  }
+}
+
+function saveWallpaperToStorage(state: AppAppearanceState): void {
+  if (typeof window === "undefined") return
+  try {
+    localStorage.setItem(
+      APP_APPEARANCE_WALLPAPER_STORAGE_KEY,
+      JSON.stringify({
+        wallpaperDataUrl: state.wallpaperDataUrl,
+        wallpaperVeil: state.wallpaperVeil,
+      })
+    )
+  } catch {
+    /* quota */
+  }
+}
+
+function loadAppearanceCookiePart(): AppearanceCookiePayload {
+  const raw = readAppearanceCookieValueClient()
+  const parsed = parseAppearanceCookieJson(raw)
+  if (!parsed) return appearanceToCookiePayload(defaultAppAppearanceState)
+  return appearanceToCookiePayload(sanitizeAppAppearanceState(parsed))
+}
+
+/** Servidor: lee apariencia desde `cookies()` (sin tapiz). */
+export function loadAppAppearanceFromCookies(
+  cookieStore: { get(name: string): { value: string } | undefined }
+): AppAppearanceState {
+  const raw = readAppearanceCookieValueFromStore(cookieStore)
+  const parsed = parseAppearanceCookieJson(raw)
+  if (!parsed) return { ...defaultAppAppearanceState }
+  return sanitizeAppAppearanceState(parsed)
+}
+
 /**
- * Tema y tapiz deben ser los mismos en todas las pestañas: usamos una clave global.
- * Se migra una vez desde la clave con scope por pestaña (legacy).
+ * Cliente: cookie (tema y paleta) + localStorage (tapiz).
+ * Migra una vez desde localStorage legacy si no hay cookie.
  */
 export function loadAppAppearanceFromStorage(): AppAppearanceState {
   if (typeof window === "undefined") return { ...defaultAppAppearanceState }
-  try {
-    let raw = localStorage.getItem(APP_APPEARANCE_STORAGE_KEY)
-    if (!raw) {
-      raw = readTabScopedItem(APP_APPEARANCE_STORAGE_KEY)
-      if (raw) {
-        try {
-          localStorage.setItem(APP_APPEARANCE_STORAGE_KEY, raw)
-        } catch {
-          /* quota u otro — seguimos con raw en memoria */
-        }
-      }
-    }
-    if (!raw) return { ...defaultAppAppearanceState }
-    return sanitizeAppAppearanceState(JSON.parse(raw) as unknown)
-  } catch {
-    return { ...defaultAppAppearanceState }
-  }
+
+  migrateLegacyAppearanceToCookies()
+
+  const cookiePart = loadAppearanceCookiePart()
+  const wallpaperPart = loadWallpaperFromStorage()
+  return { ...cookiePart, ...wallpaperPart }
 }
 
 export function saveAppAppearanceToStorage(state: AppAppearanceState): void {
   if (typeof window === "undefined") return
+  writeAppearanceCookieClient(appearanceToCookiePayload(state))
+  saveWallpaperToStorage(state)
+}
+
+/** Migra `localStorage` (y clave por pestaña) a cookie + tapiz separado. */
+export function migrateLegacyAppearanceToCookies(): void {
+  if (typeof window === "undefined") return
+  if (readAppearanceCookieValueClient()) return
+
   try {
-    const json = JSON.stringify(state)
-    localStorage.setItem(APP_APPEARANCE_STORAGE_KEY, json)
+    let raw = localStorage.getItem(APP_APPEARANCE_STORAGE_KEY)
+    if (!raw) raw = readTabScopedItem(APP_APPEARANCE_STORAGE_KEY)
+    if (!raw) return
+
+    const legacy = sanitizeAppAppearanceState(JSON.parse(raw) as unknown)
+    writeAppearanceCookieClient(appearanceToCookiePayload(legacy))
+    saveWallpaperToStorage(legacy)
+    try {
+      localStorage.removeItem(APP_APPEARANCE_STORAGE_KEY)
+    } catch {
+      /* ignore */
+    }
   } catch {
-    /* espacio localStorage insuficiente u otro — ignoramos */
+    /* ignore */
   }
 }
 

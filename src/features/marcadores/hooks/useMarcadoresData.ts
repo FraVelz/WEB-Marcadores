@@ -10,6 +10,7 @@ import { compileView } from "../views/applyFilter"
 import { deriveBookmarkFields } from "../views/bookmarkDerived"
 import type { ViewAst } from "../views/viewTypes"
 import { EMPTY_VIEW_AST } from "../views/viewTypes"
+import { buildFoldersByParentIndex } from "../utils/folderIndex"
 import { buildFolderTree, getFolderPath } from "../utils/utils"
 import type { Bookmark, FlatFolder, GridItem } from "../utils/types"
 
@@ -50,11 +51,14 @@ export function buildMarcadoresFlatList(
       .sort((a, b) => (a.title || "").localeCompare(b.title || ""))
       .map((b) => ({ type: "link" as const, bookmark: b }))
   }
+  const byParent = buildFoldersByParentIndex(folders)
   const parentId = selectedFolderId
-  const subfolders = folders
-    .filter((f) => (f.parent_id || null) === parentId)
-    .sort((a, b) => a.sort_order - b.sort_order)
-    .map((f) => ({ type: "folder" as const, id: f.id, folderId: f.id, label: f.name }))
+  const subfolders = (byParent.get(parentId) ?? []).map((f) => ({
+    type: "folder" as const,
+    id: f.id,
+    folderId: f.id,
+    label: f.name,
+  }))
   const links = viewFilteredBookmarks
     .filter((b) => (b.folder_id || null) === parentId)
     .sort((a, b) => (a.title || "").localeCompare(b.title || ""))
@@ -66,7 +70,6 @@ export function useMarcadoresData(
   searchValue: string,
   selectedFolderId: string | null,
   setCtxFolders: (folders: import("@/contexts/DashboardContext").Folder[]) => void,
-  refreshFolders: () => void,
   opts: UseMarcadoresDataOpts = defaultOpts
 ) {
   const { demoMode, setAllTagsFromBookmarks } = useDashboard()
@@ -89,11 +92,12 @@ export function useMarcadoresData(
       setBookmarks(rows)
       setAllTagsFromBookmarks(rows)
       const { data: fData } = await supabase.from("folders").select("*").order("sort_order")
-      setFolders(fData || [])
-      refreshFolders()
+      const flat = fData || []
+      setFolders(flat)
+      setCtxFolders(buildFolderTree(flat))
     }
     setLoading(false)
-  }, [demoMode, setCtxFolders, refreshFolders, setAllTagsFromBookmarks])
+  }, [demoMode, setCtxFolders, setAllTagsFromBookmarks])
 
   useEffect(() => {
     startTransition(() => {
@@ -103,26 +107,32 @@ export function useMarcadoresData(
 
   const bookmarksVisible = useMemo(() => bookmarks.filter((b) => !b.archived_at), [bookmarks])
 
+  const derivedRows = useMemo(
+    () => bookmarksVisible.map((b) => ({ b, d: deriveBookmarkFields(b) })),
+    [bookmarksVisible]
+  )
+
   const filteredBySearch = useMemo(() => {
     const q = searchValue.trim().toLowerCase()
     if (!q) return bookmarksVisible
-    return bookmarksVisible.filter((b) => {
-      const derived = deriveBookmarkFields(b)
-      return (
-        derived.lowerTitle.includes(q) ||
-        derived.lowerDesc.includes(q) ||
-        derived.lowerUrl.includes(q) ||
-        [...derived.tagSetLower].some((t) => t.includes(q))
+    return derivedRows
+      .filter(
+        ({ d }) =>
+          d.lowerTitle.includes(q) ||
+          d.lowerDesc.includes(q) ||
+          d.lowerUrl.includes(q) ||
+          [...d.tagSetLower].some((t) => t.includes(q))
       )
-    })
-  }, [bookmarksVisible, searchValue])
+      .map(({ b }) => b)
+  }, [bookmarksVisible, derivedRows, searchValue])
 
   const compiledView = useMemo(() => compileView(activeViewAst ?? EMPTY_VIEW_AST), [activeViewAst])
 
   const filteredBookmarks = useMemo(() => {
     if (browseMode === "folder") return filteredBySearch
-    return filteredBySearch.filter((b) => compiledView.match(b, deriveBookmarkFields(b)))
-  }, [browseMode, compiledView, filteredBySearch])
+    const visibleSet = new Set(filteredBySearch.map((b) => b.id))
+    return derivedRows.filter(({ b, d }) => visibleSet.has(b.id) && compiledView.match(b, d)).map(({ b }) => b)
+  }, [browseMode, compiledView, derivedRows, filteredBySearch])
 
   const flatList = useMemo(
     (): GridItem[] => buildMarcadoresFlatList(folders, filteredBookmarks, selectedFolderId, browseMode),

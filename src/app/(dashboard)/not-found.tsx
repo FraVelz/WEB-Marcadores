@@ -1,32 +1,27 @@
 import Link from "next/link"
-import type { Metadata } from "next"
 
 import { cn } from "@/lib/utils"
 
-export const metadata: Metadata = {
-  title: "Página no encontrada",
-}
-
 export default function NotFound() {
   return (
-    <div className="bg-app-canvas text-app-fg flex min-h-dvh items-center justify-center p-4 md:min-h-screen">
+    <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto p-4 sm:p-6">
       <main
         className={cn(
           "border-app-border-muted bg-app-raised w-full max-w-md rounded-xl border px-6 py-10 text-center shadow-sm sm:px-8",
-          "flex flex-col items-center gap-3"
+          "flex flex-col items-center"
         )}
       >
-        <p className="text-app-fg-muted font-mono text-4xl font-semibold tracking-tight tabular-nums sm:text-5xl">
-          404
-        </p>
+        <p className="text-app-fg-muted font-mono text-4xl font-semibold tracking-tight tabular-nums sm:text-5xl">404</p>
 
-        <h1 className="text-app-fg mt-4 text-xl font-semibold tracking-tight sm:text-2xl">Página no encontrada</h1>
+        <div className="bg-app-border-muted mt-5 mb-6 h-px w-10" aria-hidden />
 
-        <p className="text-app-fg-secondary max-w-sm text-sm leading-relaxed">
+        <h1 className="text-app-fg text-xl font-semibold tracking-tight sm:text-2xl">Página no encontrada</h1>
+
+        <p className="text-app-fg-secondary mt-3 max-w-sm text-sm leading-relaxed">
           La ruta que buscas no existe o ha cambiado. Vuelve a tus marcadores o al inicio de la app.
         </p>
 
-        <div className="border-app-border-muted mt-4 flex w-full flex-col gap-2 border-t sm:flex-row sm:justify-center">
+        <div className="border-app-border-muted mt-8 flex w-full flex-col gap-2 border-t pt-8 sm:flex-row sm:justify-center">
           <Link
             href="/marcadores"
             className="bg-app-primary hover:bg-app-primary-hover rounded-lg px-6 py-2.5 text-sm font-medium text-white"

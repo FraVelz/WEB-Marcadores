@@ -5,7 +5,12 @@ import { useCallback, useRef } from "react"
 
 import { DesktopWindowResizeHandles } from "@/features/marcadores/desktop/DesktopWindowResizeHandles"
 import { DesktopWindowTitleChrome } from "@/features/marcadores/desktop/DesktopWindowTitleChrome"
-import { clampBounds, maxInset, resizeBoundsByEdge, type ResizeEdge } from "@/features/marcadores/desktop/desktopWindowGeometry"
+import {
+  clampBounds,
+  maxInset,
+  resizeBoundsByEdge,
+  type ResizeEdge,
+} from "@/features/marcadores/desktop/desktopWindowGeometry"
 import type { WindowBounds } from "@/features/marcadores/desktop/windowTypes"
 import { isBookmarkDragTransfer } from "@/features/marcadores/utils/parseDragPayload"
 
@@ -66,8 +71,7 @@ export function DesktopWindowFrame({
     dragCleanupRef.current = null
   }, [])
 
-  const visualBounds =
-    maximized && !minimized && cw > 0 && ch > 0 ? maxInset(cw, ch) : clampBounds(bounds, cw, ch)
+  const visualBounds = maximized && !minimized && cw > 0 && ch > 0 ? maxInset(cw, ch) : clampBounds(bounds, cw, ch)
 
   const handleToggleMinimize = useCallback(() => {
     if (!minimized) {

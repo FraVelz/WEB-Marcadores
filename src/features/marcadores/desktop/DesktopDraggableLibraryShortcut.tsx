@@ -145,7 +145,14 @@ export function DesktopDraggableLibraryShortcut(props: {
           if (Math.abs(ev.clientX - startX) < DRAG_SLIP_PX && Math.abs(ev.clientY - startY) < DRAG_SLIP_PX) return
           kind = "drag"
         }
-        const next = clampPos(ev.clientX - hr.left - dx, ev.clientY - hr.top - dy, hr.width, hr.height, er.width, er.height)
+        const next = clampPos(
+          ev.clientX - hr.left - dx,
+          ev.clientY - hr.top - dy,
+          hr.width,
+          hr.height,
+          er.width,
+          er.height
+        )
         latestPosRef.current = next
         setPos(next)
       }
@@ -176,8 +183,18 @@ export function DesktopDraggableLibraryShortcut(props: {
   )
 
   return (
-    <div ref={wrapRef} className="pointer-events-auto absolute z-[8] touch-none select-none" style={{ left: pos.x, top: pos.y }} onPointerDown={onPointerDown}>
-      <DesktopShortcut label="Marcadores" icon={<span aria-hidden>📚</span>} onDoubleClick={onOpen} selected={selected} />
+    <div
+      ref={wrapRef}
+      className="pointer-events-auto absolute z-[8] touch-none select-none"
+      style={{ left: pos.x, top: pos.y }}
+      onPointerDown={onPointerDown}
+    >
+      <DesktopShortcut
+        label="Marcadores"
+        icon={<span aria-hidden>📚</span>}
+        onDoubleClick={onOpen}
+        selected={selected}
+      />
     </div>
   )
 }

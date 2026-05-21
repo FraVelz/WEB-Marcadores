@@ -40,9 +40,7 @@ export function filterBookmarksForDeskPane(
   } else if (searchLibraryWide) {
     pool = bookmarksVisible.filter((b) => bookmarkMatchesSearch(b, q))
   } else {
-    pool = bookmarksVisible.filter(
-      (b) => (b.folder_id || null) === currentFolderId && bookmarkMatchesSearch(b, q)
-    )
+    pool = bookmarksVisible.filter((b) => (b.folder_id || null) === currentFolderId && bookmarkMatchesSearch(b, q))
   }
 
   return pool
