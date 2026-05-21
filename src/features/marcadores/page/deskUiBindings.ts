@@ -35,9 +35,7 @@ export function createDeskUiBindings(
   const patch = <K extends keyof DeskWindowUiState>(key: K, action: SetStateAction<DeskWindowUiState[K]>) => {
     updateDeskUi(winId, (s) => {
       const next =
-        typeof action === "function"
-          ? (action as (x: DeskWindowUiState[K]) => DeskWindowUiState[K])(s[key])
-          : action
+        typeof action === "function" ? (action as (x: DeskWindowUiState[K]) => DeskWindowUiState[K])(s[key]) : action
       if (Object.is(next, s[key])) return s
       return { ...s, [key]: next }
     })

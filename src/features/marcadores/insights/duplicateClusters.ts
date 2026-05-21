@@ -7,6 +7,19 @@ export type DuplicateCluster = {
   ids: string[]
 }
 
+/** Cuenta grupos con URL duplicada sin materializar el array completo. */
+export function countDuplicateClusters(bookmarks: Bookmark[]): number {
+  const counts = new Map<string, number>()
+  let clusters = 0
+  for (const b of bookmarks) {
+    const k = normalizeUrlDedupeKey(b.url || "") || `_invalid:${b.id}`
+    const next = (counts.get(k) ?? 0) + 1
+    counts.set(k, next)
+    if (next === 2) clusters++
+  }
+  return clusters
+}
+
 export function buildDuplicateClusters(bookmarks: Bookmark[]): DuplicateCluster[] {
   const groups = new Map<string, string[]>()
   for (const b of bookmarks) {

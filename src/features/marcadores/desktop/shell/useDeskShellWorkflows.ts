@@ -141,10 +141,7 @@ export function useDeskShellWorkflows(opts: {
         subtitle: libraryWindowIds.length > 1 ? `#${idx + 1}` : undefined,
         minimized: f?.minimized ?? false,
         maximized: f?.maximized ?? false,
-        isFocused:
-          focusedSurface.kind === "library" &&
-          focusedSurface.id === wid &&
-          !(f?.minimized ?? false),
+        isFocused: focusedSurface.kind === "library" && focusedSurface.id === wid && !(f?.minimized ?? false),
         kind: "library",
       }
     })

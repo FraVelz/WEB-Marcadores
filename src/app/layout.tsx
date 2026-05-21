@@ -1,53 +1,20 @@
 export const dynamic = "force-dynamic"
 import type { Metadata } from "next"
+import { cookies, headers } from "next/headers"
 import Script from "next/script"
 import { Geist, Geist_Mono } from "next/font/google"
 
 import { AppAppearanceProvider } from "@/contexts/AppAppearanceContext"
-import { APP_APPEARANCE_STORAGE_KEY } from "@/lib/appAppearance"
-import { TAB_SCOPE_FALLBACK_ID, TAB_SCOPE_SESSION_KEY } from "@/lib/tabScopedStorage"
+import { loadAppAppearanceFromCookies } from "@/lib/appAppearance"
+
+import {
+  buildAppearanceInlineStyle,
+  buildHtmlClassName,
+  readPrefersColorSchemeDark,
+  resolveDarkClassForServer,
+} from "@/lib/appAppearanceHtml"
 
 import "./globals.css"
-
-const APPEARANCE_INIT_SCRIPT = `try{
-var SK=${JSON.stringify(TAB_SCOPE_SESSION_KEY)};
-var FB=${JSON.stringify(TAB_SCOPE_FALLBACK_ID)};
-var BK=${JSON.stringify(APP_APPEARANCE_STORAGE_KEY)};
-var sid=null;
-try{
-sid=sessionStorage.getItem(SK);
-if(!sid){sid=crypto.randomUUID();sessionStorage.setItem(SK,sid)}
-}catch(__){sid=FB}
-var k=sid+'::'+BK;
-var raw=null;
-try{
-raw=localStorage.getItem(BK);
-if(raw==null)raw=localStorage.getItem(k);
-}catch(__){}
-var d=null;
-try{if(raw)d=JSON.parse(raw)}catch(__){}
-if(!d||typeof d!=='object'){
-document.documentElement.classList.add('dark');
-}else{
-var r=document.documentElement;
-if(d.theme==='light'){r.classList.remove('dark')}
-else if(d.theme==='dark'){r.classList.add('dark')}
-else{if(window.matchMedia('(prefers-color-scheme: dark)').matches)r.classList.add('dark');else r.classList.remove('dark')}
-if(d.useCustomPalette&&d.customColors&&typeof d.customColors==='object'){
-var pairs=[['canvas','--app-canvas'],['sidebar','--app-sidebar'],['toolbar','--app-toolbar'],['raised','--app-raised'],['fg','--app-fg'],['primary','--app-primary']];
-for(var i=0;i<pairs.length;i++){var key=pairs[i][0];var vv=d.customColors[key];
-if(typeof vv!=='string')continue;var m=vv.match(/^#?([0-9a-f]{6})$/i);if(!m)continue;var hc='#'+m[1].toLowerCase();
-r.style.setProperty(pairs[i][1],hc)}
-var pk=d.customColors.primary;var pm=(typeof pk==='string'&&pk.match(/^#?([0-9a-f]{6})$/i));
-if(pm){var pr='#'+pm[1].toLowerCase();r.style.setProperty('--app-accent',pr);r.style.setProperty('--app-link',pr);r.style.setProperty('--app-focus',pr);r.style.setProperty('--app-primary-hover','color-mix(in srgb,'+pr+' 82%, black)')}}
-var tss=d.textSelection;
-if(typeof tss==='string'){
-var tsm=tss.match(/^#?([0-9a-f]{6})$/i);
-if(tsm){var tsx='#'+tsm[1].toLowerCase();r.style.setProperty('--app-text-selection-bg','color-mix(in srgb,'+tsx+' 30%, transparent)');}
-}
-var dwt=d.deskWindowTransparency;if(typeof dwt==='number'&&isFinite(dwt)){var dt=Math.min(1,Math.max(0,dwt));r.style.setProperty('--app-desk-window-solid-pct',String(100-dt*62)+'%')}
-}
-}catch(__){}`
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -114,19 +81,27 @@ export const viewport = {
   viewportFit: "cover" as const,
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const cookieStore = await cookies()
+  const headersList = await headers()
+
+  const appearance = loadAppAppearanceFromCookies(cookieStore)
+  const prefersDark = readPrefersColorSchemeDark(headersList)
+  const useDark = resolveDarkClassForServer(appearance.theme, prefersDark)
+
+  const htmlClass = buildHtmlClassName(useDark)
+  const htmlStyle = buildAppearanceInlineStyle(appearance)
+
   return (
-    <html lang="es" suppressHydrationWarning>
+    <html lang="es" className={htmlClass} style={htmlStyle} suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {/* Tema antes de pintar para evitar flash; sin tapiz aquí */}
-        <Script id="appearance-init-bootstrap" strategy="beforeInteractive">
-          {APPEARANCE_INIT_SCRIPT}
-        </Script>
-        <AppAppearanceProvider>{children}</AppAppearanceProvider>
+        <Script src="/appearance-init.js" strategy="beforeInteractive" />
+
+        <AppAppearanceProvider initialAppearance={appearance}>{children}</AppAppearanceProvider>
       </body>
     </html>
   )

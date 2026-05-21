@@ -1,6 +1,6 @@
 "use client"
 
-import { useId } from "react"
+import { memo, useId } from "react"
 
 import { cn, cnLines } from "@/lib/utils"
 import { applyBookmarkDragPreview } from "../utils/bookmarkDragPreview"
@@ -25,7 +25,7 @@ type Props = {
   onBookmarkDragHoverLeave?: () => void
 }
 
-export default function BookmarkGridItem({
+function BookmarkGridItem({
   item,
   idx,
   isSelected,
@@ -150,7 +150,13 @@ export default function BookmarkGridItem({
           />
         </label>
       )}
-      {isFolder ? <FolderContent label={item.label} /> : <LinkContent bookmark={item.bookmark} locationLabel={item.locationLabel} />}
+      {isFolder ? (
+        <FolderContent label={item.label} />
+      ) : (
+        <LinkContent bookmark={item.bookmark} locationLabel={item.locationLabel} />
+      )}
     </div>
   )
 }
+
+export default memo(BookmarkGridItem)

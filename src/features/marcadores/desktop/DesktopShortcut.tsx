@@ -31,9 +31,7 @@ export function DesktopShortcut({ label, icon, onDoubleClick, selected, classNam
       <span className="bg-app-raised group-hover:bg-app-sidebar flex size-14 items-center justify-center rounded-lg border border-white/10 text-3xl shadow-md">
         {icon}
       </span>
-      <span className="text-app-fg line-clamp-2 w-full max-w-[6.75rem] text-xs leading-tight font-medium">
-        {label}
-      </span>
+      <span className="text-app-fg line-clamp-2 w-full max-w-[6.75rem] text-xs leading-tight font-medium">{label}</span>
     </button>
   )
 }

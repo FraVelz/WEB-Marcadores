@@ -9,7 +9,7 @@ export const MARCADORES_VIEW_MODE_CHANGE_EVENT = "marcadores-view-mode-changed" 
 
 export type MarcadoresViewMode = "escritorio" | "simple"
 
-const DEFAULT_MODE: MarcadoresViewMode = "escritorio"
+const DEFAULT_MODE: MarcadoresViewMode = "simple"
 
 function isMarcadoresViewMode(value: string): value is MarcadoresViewMode {
   return value === "escritorio" || value === "simple"

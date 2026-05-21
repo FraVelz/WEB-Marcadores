@@ -62,16 +62,6 @@ function isStaleBookmark(b: Bookmark, cutoff: Date): boolean {
   return new Date(b.opened_at) <= cutoff
 }
 
-function bookmarkRow(b: Bookmark, subtitle?: string, meta?: string): StatBookmarkRow {
-  const host = deriveBookmarkFields(b).host
-  return {
-    id: b.id,
-    title: b.title || b.url || "Sin título",
-    subtitle: subtitle ?? host ?? undefined,
-    meta,
-  }
-}
-
 function topCountsFromMap(map: Map<string, number>, limit: number): StatCountRow[] {
   return [...map.entries()]
     .sort((a, b) => b[1] - a[1])
@@ -79,8 +69,33 @@ function topCountsFromMap(map: Map<string, number>, limit: number): StatCountRow
     .map(([label, value]) => ({ label, value }))
 }
 
-function folderDepth(folders: FlatFolder[], id: string): number {
-  const byId = new Map(folders.map((f) => [f.id, f]))
+function buildFolderChildrenIndex(folders: FlatFolder[]): Map<string, string[]> {
+  const children = new Map<string, string[]>()
+  for (const f of folders) {
+    if (!f.parent_id) continue
+    const list = children.get(f.parent_id)
+    if (list) list.push(f.id)
+    else children.set(f.parent_id, [f.id])
+  }
+  return children
+}
+
+function descendantFolderIds(children: Map<string, string[]>, rootId: string): Set<string> {
+  const out = new Set<string>([rootId])
+  const stack = [rootId]
+  while (stack.length > 0) {
+    const id = stack.pop()!
+    for (const kid of children.get(id) ?? []) {
+      if (!out.has(kid)) {
+        out.add(kid)
+        stack.push(kid)
+      }
+    }
+  }
+  return out
+}
+
+function folderDepth(byId: Map<string, FlatFolder>, id: string): number {
   let depth = 0
   let cur = byId.get(id)
   while (cur?.parent_id) {
@@ -90,77 +105,85 @@ function folderDepth(folders: FlatFolder[], id: string): number {
   return depth
 }
 
-function descendantFolderIds(folders: FlatFolder[], rootId: string): Set<string> {
-  const out = new Set<string>([rootId])
-  let changed = true
-  while (changed) {
-    changed = false
-    for (const f of folders) {
-      if (f.parent_id && out.has(f.parent_id) && !out.has(f.id)) {
-        out.add(f.id)
-        changed = true
+export function computeEstadisticas(bookmarks: Bookmark[], folders: FlatFolder[]): EstadisticasSnapshot {
+  const active: Bookmark[] = []
+  const archived: Bookmark[] = []
+  const hostById = new Map<string, string | null>()
+  const domainCounts = new Map<string, number>()
+  const tagCounts = new Map<string, number>()
+  const tagSet = new Set<string>()
+  const monthCounts = new Map<string, number>()
+  const linksByFolder = new Map<string | null, number>()
+
+  let favorites = 0
+  let neverOpened = 0
+  let staleCount = 0
+  const staleCutoff = monthsAgoDate(STALE_MONTHS)
+
+  for (const b of bookmarks) {
+    if (b.archived_at) {
+      archived.push(b)
+      continue
+    }
+    active.push(b)
+
+    const d = deriveBookmarkFields(b)
+    hostById.set(b.id, d.host)
+    const hostLabel = d.host ?? "(sin dominio)"
+    domainCounts.set(hostLabel, (domainCounts.get(hostLabel) ?? 0) + 1)
+
+    const fid = b.folder_id ?? null
+    linksByFolder.set(fid, (linksByFolder.get(fid) ?? 0) + 1)
+
+    for (const t of b.tags ?? []) {
+      const n = String(t).trim()
+      if (!n) continue
+      tagSet.add(n)
+      tagCounts.set(n, (tagCounts.get(n) ?? 0) + 1)
+    }
+
+    if (b.is_favorite) favorites++
+
+    const opens = b.open_count ?? 0
+    if (opens === 0) neverOpened++
+    if (isStaleBookmark(b, staleCutoff)) staleCount++
+
+    const raw = b.created_at
+    if (raw) {
+      const date = new Date(raw)
+      if (!Number.isNaN(date.getTime())) {
+        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`
+        monthCounts.set(key, (monthCounts.get(key) ?? 0) + 1)
       }
     }
   }
-  return out
-}
 
-function countLinksInFolderSubtree(activeBookmarks: Bookmark[], folders: FlatFolder[], folderId: string): number {
-  const ids = descendantFolderIds(folders, folderId)
-  return activeBookmarks.filter((b) => b.folder_id && ids.has(b.folder_id)).length
-}
+  const looseRoot = linksByFolder.get(null) ?? 0
+  const folderChildren = buildFolderChildrenIndex(folders)
+  const byId = new Map(folders.map((f) => [f.id, f]))
+  const subtreeLinkCache = new Map<string, number>()
 
-function folderHasAnyLinks(activeBookmarks: Bookmark[], folders: FlatFolder[], folderId: string): boolean {
-  return countLinksInFolderSubtree(activeBookmarks, folders, folderId) > 0
-}
-
-export function computeEstadisticas(bookmarks: Bookmark[], folders: FlatFolder[]): EstadisticasSnapshot {
-  const active = bookmarks.filter((b) => !b.archived_at)
-  const archived = bookmarks.filter((b) => b.archived_at)
-  const staleCutoff = monthsAgoDate(STALE_MONTHS)
-
-  const tagSet = new Set<string>()
-  for (const b of active) {
-    for (const t of b.tags ?? []) {
-      const n = String(t).trim()
-      if (n) tagSet.add(n)
+  const countSubtreeLinks = (folderId: string): number => {
+    const cached = subtreeLinkCache.get(folderId)
+    if (cached !== undefined) return cached
+    const ids = descendantFolderIds(folderChildren, folderId)
+    let n = 0
+    for (const fid of ids) {
+      n += linksByFolder.get(fid) ?? 0
     }
+    subtreeLinkCache.set(folderId, n)
+    return n
   }
 
-  const domainCounts = new Map<string, number>()
-  for (const b of active) {
-    const host = deriveBookmarkFields(b).host ?? "(sin dominio)"
-    domainCounts.set(host, (domainCounts.get(host) ?? 0) + 1)
-  }
-
-  const rootFolders = folders.filter((f) => !f.parent_id)
   const rootFolderCounts = new Map<string, number>()
-  for (const rf of rootFolders) {
-    rootFolderCounts.set(rf.name, countLinksInFolderSubtree(active, folders, rf.id))
+  for (const rf of folders) {
+    if (rf.parent_id) continue
+    rootFolderCounts.set(rf.name, countSubtreeLinks(rf.id))
   }
-  const looseRoot = active.filter((b) => !b.folder_id).length
   if (looseRoot > 0) {
     rootFolderCounts.set("(raíz, sin carpeta)", looseRoot)
   }
 
-  const tagCounts = new Map<string, number>()
-  for (const b of active) {
-    for (const t of b.tags ?? []) {
-      const n = String(t).trim()
-      if (!n) continue
-      tagCounts.set(n, (tagCounts.get(n) ?? 0) + 1)
-    }
-  }
-
-  const monthCounts = new Map<string, number>()
-  for (const b of bookmarks) {
-    const raw = b.created_at
-    if (!raw) continue
-    const d = new Date(raw)
-    if (Number.isNaN(d.getTime())) continue
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
-    monthCounts.set(key, (monthCounts.get(key) ?? 0) + 1)
-  }
   const createdByMonth = [...monthCounts.entries()]
     .sort(([a], [b]) => a.localeCompare(b))
     .slice(-14)
@@ -172,6 +195,13 @@ export function computeEstadisticas(bookmarks: Bookmark[], folders: FlatFolder[]
       })
       return { label: monthLabel, value, hint: label }
     })
+
+  const bookmarkRow = (b: Bookmark, subtitle?: string, meta?: string): StatBookmarkRow => ({
+    id: b.id,
+    title: b.title || b.url || "Sin título",
+    subtitle: subtitle ?? hostById.get(b.id) ?? undefined,
+    meta,
+  })
 
   const neverOpenedList = active
     .filter((b) => (b.open_count ?? 0) === 0)
@@ -208,7 +238,7 @@ export function computeEstadisticas(bookmarks: Bookmark[], folders: FlatFolder[]
     .filter((b) => (b.open_count ?? 0) > 0)
     .sort((a, b) => (b.open_count ?? 0) - (a.open_count ?? 0))
     .slice(0, LIST_CAP)
-    .map((b) => bookmarkRow(b, deriveBookmarkFields(b).host ?? undefined, `${b.open_count ?? 0} aperturas`))
+    .map((b) => bookmarkRow(b, hostById.get(b.id) ?? undefined, `${b.open_count ?? 0} aperturas`))
 
   const dupClusters = buildDuplicateClusters(active)
   const duplicates: StatDuplicateGroup[] = dupClusters.slice(0, LIST_CAP).map((c) => {
@@ -216,14 +246,10 @@ export function computeEstadisticas(bookmarks: Bookmark[], folders: FlatFolder[]
     return { key: c.key, count: c.ids.length, sampleTitles: titles.slice(0, 3) }
   })
 
-  const favorites = active.filter((b) => b.is_favorite).length
-  const neverOpened = active.filter((b) => (b.open_count ?? 0) === 0).length
-  const staleCount = active.filter((b) => isStaleBookmark(b, staleCutoff)).length
-
-  const emptyFolders = folders.filter((f) => !folderHasAnyLinks(active, folders, f.id))
+  const emptyFolderCount = folders.filter((f) => countSubtreeLinks(f.id) === 0).length
   const depthByFolder = folders.map((f) => ({
     name: f.name,
-    depth: folderDepth(folders, f.id) + 1,
+    depth: folderDepth(byId, f.id) + 1,
   }))
   const maxDepth = depthByFolder.reduce((m, x) => Math.max(m, x.depth), 0)
   const deepestFolders = [...depthByFolder]
@@ -243,7 +269,7 @@ export function computeEstadisticas(bookmarks: Bookmark[], folders: FlatFolder[]
       staleCount,
     },
     statusBreakdown: {
-      normal: active.filter((b) => !b.is_favorite).length,
+      normal: active.length - favorites,
       favorite: favorites,
       archived: archived.length,
     },
@@ -258,7 +284,7 @@ export function computeEstadisticas(bookmarks: Bookmark[], folders: FlatFolder[]
     duplicates,
     tree: {
       maxDepth,
-      emptyFolderCount: emptyFolders.length,
+      emptyFolderCount,
       linksAtRoot: looseRoot,
       deepestFolders,
     },

@@ -19,14 +19,13 @@ export function MarcadoresPage() {
   const d = useMarcadoresPageDataHooks()
   const c = useMarcadoresPageCommandHooks(d)
 
-  const deskModalUi =
-    d.desktopWindowChrome && d.deskModalHostWinId ? d.deskUiByWin[d.deskModalHostWinId] : null
+  const deskModalUi = d.desktopWindowChrome && d.deskModalHostWinId ? d.deskUiByWin[d.deskModalHostWinId] : null
   const bookmarkModalOpen = d.desktopWindowChrome ? Boolean(deskModalUi?.modalOpen) : d.modalOpen
-  const bookmarkModalEditing = d.desktopWindowChrome ? deskModalUi?.editingBookmark ?? null : d.editingBookmark
-  const bookmarkModalNonce = d.desktopWindowChrome ? deskModalUi?.bookmarkModalNonce ?? 0 : d.bookmarkModalNonce
+  const bookmarkModalEditing = d.desktopWindowChrome ? (deskModalUi?.editingBookmark ?? null) : d.editingBookmark
+  const bookmarkModalNonce = d.desktopWindowChrome ? (deskModalUi?.bookmarkModalNonce ?? 0) : d.bookmarkModalNonce
   const bookmarkModalFolderId =
     d.desktopWindowChrome && d.deskModalHostWinId
-      ? d.deskFolderByWin[d.deskModalHostWinId] ?? null
+      ? (d.deskFolderByWin[d.deskModalHostWinId] ?? null)
       : d.activeBrowseFolderId
 
   const closeBookmarkModal = useCallback(() => {

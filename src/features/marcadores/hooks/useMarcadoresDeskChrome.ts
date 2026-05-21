@@ -2,10 +2,7 @@
 
 import { useCallback, useMemo, useRef, useState } from "react"
 
-import {
-  createDefaultDeskWindowUi,
-  type DeskWindowUiState,
-} from "@/features/marcadores/page/deskWindowUiState"
+import { createDefaultDeskWindowUi, type DeskWindowUiState } from "@/features/marcadores/page/deskWindowUiState"
 import { makeDeskLibWinId } from "@/features/marcadores/page/marcadoresPageStorage"
 
 export function useMarcadoresDeskChrome(opts: {
@@ -51,14 +48,17 @@ export function useMarcadoresDeskChrome(opts: {
     })
   }, [])
 
-  const toggleDeskTreeFolderCollapse = useCallback((winId: string, folderId: string) => {
-    updateDeskUi(winId, (s) => {
-      const next = new Set(s.treeCollapsedIds)
-      if (next.has(folderId)) next.delete(folderId)
-      else next.add(folderId)
-      return { ...s, treeCollapsedIds: next }
-    })
-  }, [updateDeskUi])
+  const toggleDeskTreeFolderCollapse = useCallback(
+    (winId: string, folderId: string) => {
+      updateDeskUi(winId, (s) => {
+        const next = new Set(s.treeCollapsedIds)
+        if (next.has(folderId)) next.delete(folderId)
+        else next.add(folderId)
+        return { ...s, treeCollapsedIds: next }
+      })
+    },
+    [updateDeskUi]
+  )
 
   const getDeskItemRefs = useCallback((winId: string) => {
     const m = itemRefsMapRef.current

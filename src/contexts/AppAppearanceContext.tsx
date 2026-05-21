@@ -4,7 +4,6 @@ import { createContext, use, useCallback, useEffect, useLayoutEffect, useMemo, u
 
 import {
   type AppAppearanceState,
-  APP_APPEARANCE_STORAGE_KEY,
   applyCustomColorVars,
   applyDeskWindowGlass,
   applyTextSelectionHighlight,
@@ -51,24 +50,37 @@ function persistState(next: AppAppearanceState): void {
   syncDom(next)
 }
 
-export function AppAppearanceProvider({ children }: { children: ReactNode }) {
-  const [appearance, setAppearance] = useState<AppAppearanceState>(() =>
-    typeof window !== "undefined" ? loadAppAppearanceFromStorage() : defaultAppAppearanceState
-  )
+function reloadAppearanceFromClient(): AppAppearanceState {
+  return loadAppAppearanceFromStorage()
+}
+
+type AppAppearanceProviderProps = {
+  children: ReactNode
+  /** Valor leído en el servidor desde la cookie (sin tapiz). */
+  initialAppearance?: AppAppearanceState
+}
+
+export function AppAppearanceProvider({
+  children,
+  initialAppearance = defaultAppAppearanceState,
+}: AppAppearanceProviderProps) {
+  const [appearance, setAppearance] = useState<AppAppearanceState>(() => initialAppearance)
 
   useLayoutEffect(() => {
-    syncDom(loadAppAppearanceFromStorage())
+    const fresh = reloadAppearanceFromClient()
+    setAppearance(fresh)
+    syncDom(fresh)
   }, [])
 
   useEffect(() => {
-    const onStorage = (e: StorageEvent) => {
-      if (e.key !== APP_APPEARANCE_STORAGE_KEY) return
-      const fresh = loadAppAppearanceFromStorage()
+    const onVisible = () => {
+      if (document.visibilityState !== "visible") return
+      const fresh = reloadAppearanceFromClient()
       setAppearance(fresh)
       syncDom(fresh)
     }
-    window.addEventListener("storage", onStorage)
-    return () => window.removeEventListener("storage", onStorage)
+    document.addEventListener("visibilitychange", onVisible)
+    return () => document.removeEventListener("visibilitychange", onVisible)
   }, [])
 
   const update = useCallback((updater: (prev: AppAppearanceState) => AppAppearanceState) => {
@@ -84,7 +96,7 @@ export function AppAppearanceProvider({ children }: { children: ReactNode }) {
 
     const mq = window.matchMedia("(prefers-color-scheme: dark)")
     const onChange = () => {
-      const fresh = loadAppAppearanceFromStorage()
+      const fresh = reloadAppearanceFromClient()
       if (fresh.theme !== "system") return
       setAppearance(fresh)
       syncDom(fresh)

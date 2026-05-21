@@ -209,10 +209,7 @@ export default function BookmarkGrid({
   return (
     <div
       ref={scrollRef}
-      className={cn(
-        "relative min-h-0 flex-1 overflow-auto p-3 sm:p-4",
-        marqueeClient && "touch-none select-none"
-      )}
+      className={cn("relative min-h-0 flex-1 overflow-auto p-3 sm:p-4", marqueeClient && "touch-none select-none")}
       onPointerDown={setSelectedIds && setSelectMode ? onSurfacePointerDown : undefined}
       onDragLeave={panelDragLeave || undefined}
       onDragOver={panelDragOver || undefined}
@@ -237,8 +234,7 @@ export default function BookmarkGrid({
       {showAppPanelDropFrame ? <div className={APP_DROP_PANEL_OVERLAY_CLASS} aria-hidden /> : null}
       <div
         className={
-          "relative grid min-h-[120px] gap-3 " +
-          "[grid-template-columns:repeat(auto-fill,minmax(min(100%,15rem),1fr))]"
+          "relative grid min-h-[120px] gap-3 " + "[grid-template-columns:repeat(auto-fill,minmax(min(100%,15rem),1fr))]"
         }
         onDragLeave={panelDragLeave || undefined}
         onDragOver={panelDragOver || undefined}
@@ -312,10 +308,7 @@ function normalizeMarqueeClientRect(x1: number, y1: number, x2: number, y2: numb
   }
 }
 
-function marqueeClientRectsIntersect(
-  a: DOMRect,
-  b: { left: number; top: number; right: number; bottom: number }
-) {
+function marqueeClientRectsIntersect(a: DOMRect, b: { left: number; top: number; right: number; bottom: number }) {
   return !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom)
 }
 

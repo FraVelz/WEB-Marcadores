@@ -10,9 +10,12 @@ import { useMarcadoresData } from "@/features/marcadores/hooks/useMarcadoresData
 import type { DeskWindowUiState } from "@/features/marcadores/page/deskWindowUiState"
 import { createDefaultDeskWindowUi } from "@/features/marcadores/page/deskWindowUiState"
 import { useMarcadoresPageUiState } from "@/features/marcadores/page/useMarcadoresPageUiState"
-import { buildDuplicateClusters } from "@/features/marcadores/insights/duplicateClusters"
+import { countDuplicateClusters } from "@/features/marcadores/insights/duplicateClusters"
 import { buildMarcadoresTreeFlatRows } from "@/features/marcadores/utils/buildMarcadoresTreeFlatRows"
-import { buildDeskPaneGridItems, filterBookmarksForDeskPane } from "@/features/marcadores/utils/filterBookmarksForDeskPane"
+import {
+  buildDeskPaneGridItems,
+  filterBookmarksForDeskPane,
+} from "@/features/marcadores/utils/filterBookmarksForDeskPane"
 import type { Bookmark, GridItem } from "@/features/marcadores/utils/types"
 import { getFolderPath } from "@/features/marcadores/utils/utils"
 
@@ -43,20 +46,14 @@ export function useMarcadoresPageBookmarksBootstrap(p: {
   const dataOpts = useMemo(
     () =>
       p.desktopWindowChrome
-        ? ({ browseMode: "folder" as const, activeViewAst: null })
-        : ({ browseMode: p.u.browseMode, activeViewAst: p.u.activeViewAst }),
+        ? { browseMode: "folder" as const, activeViewAst: null }
+        : { browseMode: p.u.browseMode, activeViewAst: p.u.activeViewAst },
     [p.desktopWindowChrome, p.u.activeViewAst, p.u.browseMode]
   )
 
   const searchForData = p.desktopWindowChrome ? "" : p.u.searchValue
 
-  const data = useMarcadoresData(
-    searchForData,
-    p.activeBrowseFolderId,
-    p.dash.setFolders,
-    p.dash.refreshFolders,
-    dataOpts
-  )
+  const data = useMarcadoresData(searchForData, p.activeBrowseFolderId, p.dash.setFolders, dataOpts)
 
   const desktopPaneDerived = useMemo((): Record<string, DesktopPaneDerivedEntry> | null => {
     if (!p.desktopWindowChrome) return null
@@ -92,7 +89,7 @@ export function useMarcadoresPageBookmarksBootstrap(p: {
     setDetailBookmark: p.bookmarkPanelHooks?.setDetailBookmark ?? p.u.setDetailBookmark,
   })
 
-  const duplicateClusterCount = useMemo(() => buildDuplicateClusters(data.bookmarks).length, [data.bookmarks])
+  const duplicateClusterCount = useMemo(() => countDuplicateClusters(data.bookmarks), [data.bookmarks])
 
   return { ...data, desktopPaneDerived, duplicateClusterCount, ...actions }
 }

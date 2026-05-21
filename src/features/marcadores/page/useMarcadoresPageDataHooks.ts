@@ -109,7 +109,7 @@ export function useMarcadoresPageDataHooks() {
 
   const deskUiFocused =
     desktopWindowChrome && resolvedDeskLibPaneId
-      ? deskUiByWin[resolvedDeskLibPaneId] ?? createDefaultDeskWindowUi()
+      ? (deskUiByWin[resolvedDeskLibPaneId] ?? createDefaultDeskWindowUi())
       : null
 
   const deskModalHostWinId = useMemo(() => {
@@ -139,19 +139,24 @@ export function useMarcadoresPageDataHooks() {
   const treeItemRefs =
     desktopWindowChrome && resolvedDeskLibPaneId ? getDeskItemRefs(resolvedDeskLibPaneId) : u.itemRefs
 
-  const { treeCollapsedIds, treeFlatRows, toggleTreeFolderCollapse, primaryViewMode: primaryTreeGlobal, focusFlatList: focusFlatGlobal } =
-    useMarcadoresTreeDerived({
-      folders,
-      filteredBookmarks,
-      browseMode: desktopWindowChrome ? "folder" : u.browseMode,
-      zonesBoard,
-      viewMode: deskUiFocused?.viewMode ?? u.viewMode,
-      setViewMode: deskBindings?.setViewMode ?? u.setViewMode,
-      flatList,
-      setSelectedIndex: deskBindings?.setSelectedIndex ?? u.setSelectedIndex,
-      itemRefs: treeItemRefs,
-      searchValue: deskUiFocused?.searchValue ?? u.searchValue,
-    })
+  const {
+    treeCollapsedIds,
+    treeFlatRows,
+    toggleTreeFolderCollapse,
+    primaryViewMode: primaryTreeGlobal,
+    focusFlatList: focusFlatGlobal,
+  } = useMarcadoresTreeDerived({
+    folders,
+    filteredBookmarks,
+    browseMode: desktopWindowChrome ? "folder" : u.browseMode,
+    zonesBoard,
+    viewMode: deskUiFocused?.viewMode ?? u.viewMode,
+    setViewMode: deskBindings?.setViewMode ?? u.setViewMode,
+    flatList,
+    setSelectedIndex: deskBindings?.setSelectedIndex ?? u.setSelectedIndex,
+    itemRefs: treeItemRefs,
+    searchValue: deskUiFocused?.searchValue ?? u.searchValue,
+  })
 
   const derivedFocused =
     desktopWindowChrome && resolvedDeskLibPaneId ? desktopPaneDerived?.[resolvedDeskLibPaneId] : null

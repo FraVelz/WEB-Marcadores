@@ -54,7 +54,8 @@ export function DesktopWindowTitleChrome({
       )}
       style={{
         height: TITLE_H,
-        backgroundColor: "color-mix(in srgb, var(--app-window-chrome) var(--app-desk-window-solid-pct, 100%), transparent)",
+        backgroundColor:
+          "color-mix(in srgb, var(--app-window-chrome) var(--app-desk-window-solid-pct, 100%), transparent)",
       }}
       onPointerDown={onTitlePointerDown}
       onDoubleClick={onTitleDoubleClick}
