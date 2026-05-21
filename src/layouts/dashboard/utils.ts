@@ -32,6 +32,7 @@ export function flattenTree(folders: Folder[], collapsedIds: Set<string>): (stri
 
 export const navItems = [
   { href: "/marcadores", label: "Marcadores" },
+  { href: "/estadisticas", label: "Estadísticas" },
   { href: "/atajos", label: "Atajos" },
   { href: "/perfil", label: "Perfil" },
 ]
