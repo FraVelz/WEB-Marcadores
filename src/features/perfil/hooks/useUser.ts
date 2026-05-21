@@ -20,7 +20,7 @@ export function useUser(demoMode: boolean) {
     }
 
     fetchUser()
-  }, [demoMode])
+  }, [demoMode, supabase.auth])
 
   return { user }
 }

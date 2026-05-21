@@ -63,8 +63,8 @@ function isStaleBookmark(b: Bookmark, cutoff: Date): boolean {
 }
 
 function topCountsFromMap(map: Map<string, number>, limit: number): StatCountRow[] {
-  return [...map.entries()]
-    .sort((a, b) => b[1] - a[1])
+  return Array.from(map.entries())
+    .toSorted((a, b) => b[1] - a[1])
     .slice(0, limit)
     .map(([label, value]) => ({ label, value }))
 }
@@ -184,8 +184,8 @@ export function computeEstadisticas(bookmarks: Bookmark[], folders: FlatFolder[]
     rootFolderCounts.set("(raíz, sin carpeta)", looseRoot)
   }
 
-  const createdByMonth = [...monthCounts.entries()]
-    .sort(([a], [b]) => a.localeCompare(b))
+  const createdByMonth = Array.from(monthCounts.entries())
+    .toSorted(([a], [b]) => a.localeCompare(b))
     .slice(-14)
     .map(([label, value]) => {
       const [y, m] = label.split("-")
@@ -240,9 +240,14 @@ export function computeEstadisticas(bookmarks: Bookmark[], folders: FlatFolder[]
     .slice(0, LIST_CAP)
     .map((b) => bookmarkRow(b, hostById.get(b.id) ?? undefined, `${b.open_count ?? 0} aperturas`))
 
+  const titleById = new Map(active.map((b) => [b.id, b.title]))
   const dupClusters = buildDuplicateClusters(active)
   const duplicates: StatDuplicateGroup[] = dupClusters.slice(0, LIST_CAP).map((c) => {
-    const titles = c.ids.map((id) => active.find((b) => b.id === id)?.title).filter((t): t is string => Boolean(t))
+    const titles: string[] = []
+    for (const id of c.ids) {
+      const title = titleById.get(id)
+      if (title) titles.push(title)
+    }
     return { key: c.key, count: c.ids.length, sampleTitles: titles.slice(0, 3) }
   })
 
@@ -252,8 +257,8 @@ export function computeEstadisticas(bookmarks: Bookmark[], folders: FlatFolder[]
     depth: folderDepth(byId, f.id) + 1,
   }))
   const maxDepth = depthByFolder.reduce((m, x) => Math.max(m, x.depth), 0)
-  const deepestFolders = [...depthByFolder]
-    .sort((a, b) => b.depth - a.depth || a.name.localeCompare(b.name))
+  const deepestFolders = depthByFolder
+    .toSorted((a, b) => b.depth - a.depth || a.name.localeCompare(b.name))
     .slice(0, 6)
     .map((x) => ({ label: x.name, value: x.depth, hint: "niveles" }))
 

@@ -1,5 +1,4 @@
-/** Cookie con tema y apariencia (sin tapiz: supera el límite ~4KB). */
-export const APP_APPEARANCE_COOKIE_NAME = "marcadores_app_appearance_v1"
+const APP_APPEARANCE_COOKIE_NAME = "marcadores_app_appearance_v1"
 
 /** Clave legacy en localStorage; se migra una vez a la cookie. */
 export const APP_APPEARANCE_STORAGE_KEY = APP_APPEARANCE_COOKIE_NAME
@@ -30,7 +29,7 @@ export function readAppearanceCookieValueFromStore(store: CookieReader): string 
   return store.get(APP_APPEARANCE_COOKIE_NAME)?.value ?? null
 }
 
-export function serializeAppearanceCookieValue(payload: unknown): string {
+function serializeAppearanceCookieValue(payload: unknown): string {
   return encodeURIComponent(JSON.stringify(payload))
 }
 

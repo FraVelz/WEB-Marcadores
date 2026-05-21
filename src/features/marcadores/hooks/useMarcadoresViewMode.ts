@@ -2,10 +2,9 @@
 
 import { useCallback, useSyncExternalStore } from "react"
 
-export const MARCADORES_VIEW_MODE_STORAGE_KEY = "marcadores-view-mode" as const
+const MARCADORES_VIEW_MODE_STORAGE_KEY = "marcadores-view-mode"
 
-/** Mismo nombre que el evento interno (pestañas de la misma ventana). */
-export const MARCADORES_VIEW_MODE_CHANGE_EVENT = "marcadores-view-mode-changed" as const
+const MARCADORES_VIEW_MODE_CHANGE_EVENT = "marcadores-view-mode-changed"
 
 export type MarcadoresViewMode = "escritorio" | "simple"
 
@@ -44,8 +43,7 @@ function getServerSnapshot(): MarcadoresViewMode {
   return DEFAULT_MODE
 }
 
-/** Escribe localStorage y notifica a `useMarcadoresViewMode` en esta pestaña. */
-export function setMarcadoresViewMode(next: MarcadoresViewMode) {
+function setMarcadoresViewMode(next: MarcadoresViewMode) {
   if (typeof window === "undefined") return
   try {
     const prev = window.localStorage.getItem(MARCADORES_VIEW_MODE_STORAGE_KEY)

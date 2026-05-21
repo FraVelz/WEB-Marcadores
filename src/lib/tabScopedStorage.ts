@@ -3,10 +3,10 @@
  * `sessionStorage` y prefijamos las claves para que el estado UI sea independiente.
  */
 
-export const TAB_SCOPE_SESSION_KEY = "marcadores_tab_scope_v1"
+const TAB_SCOPE_SESSION_KEY = "marcadores_tab_scope_v1"
 
-/** Mismo valor que usa el script inline de `layout.tsx` si `sessionStorage` falla. */
-export const TAB_SCOPE_FALLBACK_ID = "__no_session__"
+/** Mismo valor que usa `appearance-init.js` si `sessionStorage` falla. */
+const TAB_SCOPE_FALLBACK_ID = "__no_session__"
 
 const SSR_SENTINEL = "__ssr__"
 

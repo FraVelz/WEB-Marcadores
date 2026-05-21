@@ -29,6 +29,7 @@ function KeyCombo({ keys }: { keys: string }) {
 
   const nodes: ReactNode[] = []
   let seq = 0
+
   for (const part of parts) {
     if (nodes.length > 0) {
       nodes.push(
@@ -41,6 +42,7 @@ function KeyCombo({ keys }: { keys: string }) {
         </span>
       )
     }
+
     nodes.push(
       <span key={`keycombo-wrap-${keys}-${seq++}`} className="flex items-center gap-2">
         <Kbd>{part}</Kbd>
@@ -53,8 +55,8 @@ function KeyCombo({ keys }: { keys: string }) {
 
 export function AtajosPage() {
   return (
-    <div className="overflow-auto p-4 pb-12 sm:p-6">
-      <header className="mb-6 max-w-3xl sm:mb-8">
+    <div className="overflow-auto p-4 pb-12 text-center sm:p-6">
+      <header className="mx-auto mb-6 max-w-3xl sm:mb-8">
         <h1 className="text-app-fg text-xl font-semibold tracking-tight sm:text-2xl">Atajos de teclado</h1>
 
         <p className="text-app-fg-secondary mt-2 text-sm leading-relaxed">
@@ -78,14 +80,11 @@ export function AtajosPage() {
               role="list"
             >
               {section.rows.map((row) => (
-                <li
-                  key={`${section.title}::${row.keys}::${row.desc}`}
-                  className="group relative"
-                >
+                <li key={`${section.title}::${row.keys}::${row.desc}`} className="group relative">
                   <div
                     aria-hidden
                     className={cn(
-                      "pointer-events-none absolute inset-y-0 left-0 z-0 w-0 bg-gradient-to-r from-app-hover from-55% to-transparent",
+                      "from-app-hover pointer-events-none absolute inset-y-0 left-0 z-0 w-0 bg-gradient-to-r from-55% to-transparent",
                       "motion-safe:transition-[width] motion-safe:duration-300 motion-safe:ease-out",
                       "group-hover:w-full"
                     )}

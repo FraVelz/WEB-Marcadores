@@ -28,8 +28,9 @@
   --app-nav-active: rgb(161 161 170 / 0.9);
   --app-list-selected: rgb(37 99 235 / 0.22);
   --app-selection: rgb(37 99 235 / 0.22);
-  /** Color del texto sobre el resaltado (::selection); `currentColor` conserva el tono del texto seleccionado */
-  --app-selection-text: currentColor;
+  /** Resaltado al seleccionar texto (legible sobre fondo claro) */
+  --app-text-selection-bg: color-mix(in srgb, #2563eb 52%, var(--app-canvas));
+  --app-text-selection-text: #ffffff;
 
   --app-primary: #2563eb;
   --app-primary-hover: #1d4ed8;
@@ -102,7 +103,8 @@ html.dark {
   --app-nav-active: rgb(82 82 91 / 0.85);
   --app-list-selected: rgb(37 99 235 / 0.3);
   --app-selection: rgb(37 99 235 / 0.26);
-  --app-selection-text: currentColor;
+  --app-text-selection-bg: color-mix(in srgb, #60a5fa 52%, var(--app-canvas));
+  --app-text-selection-text: #fafafa;
 
   --app-accent: #60a5fa;
   --app-link: #60a5fa;
@@ -215,8 +217,8 @@ body {
 }
 
 ::selection {
-  background-color: var(--app-text-selection-bg, var(--app-selection));
-  color: var(--app-text-selection-text, var(--app-selection-text));
+  background-color: var(--app-text-selection-bg);
+  color: var(--app-text-selection-text);
 }
 
 @layer base {
