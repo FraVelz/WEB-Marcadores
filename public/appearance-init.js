@@ -62,13 +62,11 @@
           WALLPAPER_KEY,
           JSON.stringify({
             wallpaperDataUrl: legacy.wallpaperDataUrl,
-            wallpaperVeil:
-              typeof legacy.wallpaperVeil === "number" ? legacy.wallpaperVeil : DEFAULT_VEIL,
+            wallpaperVeil: typeof legacy.wallpaperVeil === "number" ? legacy.wallpaperVeil : DEFAULT_VEIL,
           })
         )
       }
       localStorage.removeItem(LEGACY_LS_KEY)
-
     } catch {
       /* quota u otro */
     }
@@ -110,11 +108,7 @@
     }
 
     const stored = parseJson(raw)
-    if (
-      !stored ||
-      typeof stored.wallpaperDataUrl !== "string" ||
-      !stored.wallpaperDataUrl.startsWith("data:image/")
-    ) {
+    if (!stored || typeof stored.wallpaperDataUrl !== "string" || !stored.wallpaperDataUrl.startsWith("data:image/")) {
       return
     }
 
@@ -128,18 +122,19 @@
     const [r, g, b] = canvasRgbTriplet()
     const alpha = Math.min(0.98, Math.max(0, veil))
 
-    body.style.backgroundColor = "transparent"
-    body.style.backgroundImage = `linear-gradient(rgba(${r},${g},${b},${alpha}),rgba(${r},${g},${b},${alpha})),url(${stored.wallpaperDataUrl})`
-    body.style.backgroundSize = "cover,cover"
-    body.style.backgroundAttachment = "fixed"
-    body.style.backgroundRepeat = "no-repeat"
+    body.style.cssText = [
+      "background-color:transparent",
+      `background-image:linear-gradient(rgba(${r},${g},${b},${alpha}),rgba(${r},${g},${b},${alpha})),url(${stored.wallpaperDataUrl})`,
+      "background-size:cover,cover",
+      "background-attachment:fixed",
+      "background-repeat:no-repeat",
+    ].join(";")
   }
 
   try {
     const theme = readThemeFromCookie()
     applySystemTheme(theme)
     applyWallpaper()
-
   } catch {
     /* no bloquear la carga */
   }

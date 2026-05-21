@@ -79,7 +79,7 @@ export function useMarcadoresEffects<T>(params: Params<T>) {
     if (!pasteError) return
     const t = setTimeout(() => clearPasteError(), 4000)
     return () => clearTimeout(t)
-  }, [pasteError, clearPasteError])
+  }, [pasteError])
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
       if (e.ctrlKey && (e.key === "f" || e.key === "k")) {
@@ -89,5 +89,5 @@ export function useMarcadoresEffects<T>(params: Params<T>) {
     }
     window.addEventListener("keydown", h)
     return () => window.removeEventListener("keydown", h)
-  }, [focusSearchShortcut])
+  }, [])
 }

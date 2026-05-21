@@ -86,15 +86,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const cookieStore = await cookies()
-  const headersList = await headers()
+  const [cookieStore, headersList] = await Promise.all([cookies(), headers()])
 
   const appearance = loadAppAppearanceFromCookies(cookieStore)
   const prefersDark = readPrefersColorSchemeDark(headersList)
   const useDark = resolveDarkClassForServer(appearance.theme, prefersDark)
 
   const htmlClass = buildHtmlClassName(useDark)
-  const htmlStyle = buildAppearanceInlineStyle(appearance)
+  const htmlStyle = buildAppearanceInlineStyle(appearance, useDark)
 
   return (
     <html lang="es" className={htmlClass} style={htmlStyle} suppressHydrationWarning>

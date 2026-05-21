@@ -16,9 +16,10 @@ export function EstadisticasPage() {
   }
 
   return (
-    <div className="overflow-auto p-4 pb-12 sm:p-6">
-      <header className="mb-6 max-w-5xl sm:mb-8">
+    <div className="overflow-auto p-4 pb-12 text-center sm:p-6">
+      <header className="mx-auto mb-6 max-w-5xl sm:mb-8">
         <h1 className="text-app-fg text-xl font-semibold tracking-tight sm:text-2xl">Estadísticas</h1>
+
         <p className="text-app-fg-secondary mt-2 text-sm leading-relaxed">
           Resumen de tu biblioteca de marcadores: uso, organización e higiene de datos.
           {demoMode ? (
@@ -73,14 +74,17 @@ export function EstadisticasPage() {
               <h3 className="text-app-fg-secondary mb-2 text-sm font-medium">Nunca abiertos</h3>
               <StatBookmarkList rows={stats.neverOpened} emptyLabel="Todos tienen al menos una apertura" />
             </div>
+
             <div>
               <h3 className="text-app-fg-secondary mb-2 text-sm font-medium">Sin etiquetas</h3>
               <StatBookmarkList rows={stats.noTags} emptyLabel="Todos tienen al menos una etiqueta" />
             </div>
+
             <div>
               <h3 className="text-app-fg-secondary mb-2 text-sm font-medium">Sin uso reciente (&gt;6 meses o nunca)</h3>
               <StatBookmarkList rows={stats.stale} emptyLabel="Biblioteca al día" />
             </div>
+
             <div>
               <h3 className="text-app-fg-secondary mb-2 text-sm font-medium">URLs duplicadas</h3>
               <StatDuplicateList groups={stats.duplicates} />

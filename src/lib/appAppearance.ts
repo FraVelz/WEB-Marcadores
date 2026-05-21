@@ -1,5 +1,4 @@
 import {
-  APP_APPEARANCE_COOKIE_NAME,
   APP_APPEARANCE_STORAGE_KEY,
   APP_APPEARANCE_WALLPAPER_STORAGE_KEY,
   parseAppearanceCookieJson,
@@ -8,14 +7,9 @@ import {
   writeAppearanceCookieClient,
 } from "@/lib/appAppearanceCookies"
 import { readTabScopedItem } from "@/lib/tabScopedStorage"
+import { defaultTextSelectionCssVars, textSelectionCssVars } from "@/lib/textSelectionStyle"
 
-export {
-  APP_APPEARANCE_COOKIE_NAME,
-  APP_APPEARANCE_STORAGE_KEY,
-  APP_APPEARANCE_WALLPAPER_STORAGE_KEY,
-} from "@/lib/appAppearanceCookies"
-
-export type AppearanceCookiePayload = Omit<AppAppearanceState, "wallpaperDataUrl">
+type AppearanceCookiePayload = Omit<AppAppearanceState, "wallpaperDataUrl">
 
 export type AppThemePreset = "light" | "dark" | "system"
 
@@ -136,9 +130,9 @@ function sanitizeAppAppearanceState(raw: unknown): AppAppearanceState {
   }
 }
 
-export function appearanceToCookiePayload(state: AppAppearanceState): AppearanceCookiePayload {
-  const { wallpaperDataUrl: _w, ...rest } = state
-  return rest
+function appearanceToCookiePayload(state: AppAppearanceState): AppearanceCookiePayload {
+  const { theme, useCustomPalette, customColors, wallpaperVeil, deskWindowTransparency, textSelection } = state
+  return { theme, useCustomPalette, customColors, wallpaperVeil, deskWindowTransparency, textSelection }
 }
 
 function loadWallpaperFromStorage(): Pick<AppAppearanceState, "wallpaperDataUrl" | "wallpaperVeil"> {
@@ -193,9 +187,9 @@ function loadAppearanceCookiePart(): AppearanceCookiePayload {
 }
 
 /** Servidor: lee apariencia desde `cookies()` (sin tapiz). */
-export function loadAppAppearanceFromCookies(
-  cookieStore: { get(name: string): { value: string } | undefined }
-): AppAppearanceState {
+export function loadAppAppearanceFromCookies(cookieStore: {
+  get(name: string): { value: string } | undefined
+}): AppAppearanceState {
   const raw = readAppearanceCookieValueFromStore(cookieStore)
   const parsed = parseAppearanceCookieJson(raw)
   if (!parsed) return { ...defaultAppAppearanceState }
@@ -223,7 +217,7 @@ export function saveAppAppearanceToStorage(state: AppAppearanceState): void {
 }
 
 /** Migra `localStorage` (y clave por pestaña) a cookie + tapiz separado. */
-export function migrateLegacyAppearanceToCookies(): void {
+function migrateLegacyAppearanceToCookies(): void {
   if (typeof window === "undefined") return
   if (readAppearanceCookieValueClient()) return
 
@@ -266,27 +260,17 @@ export function applyDeskWindowGlass(state: Pick<AppAppearanceState, "deskWindow
 }
 
 /** Resaltado al seleccionar texto (`::selection`). No altera `--app-selection` (listas / chips). */
-export function applyTextSelectionHighlight(state: Pick<AppAppearanceState, "textSelection">): void {
+export function applyTextSelectionHighlight(
+  state: Pick<AppAppearanceState, "textSelection" | "useCustomPalette" | "customColors">
+): void {
   if (typeof document === "undefined") return
   const root = document.documentElement
-  const hex = sanitizeHexColor(state.textSelection ?? undefined)
-  if (!hex) {
-    root.style.removeProperty("--app-text-selection-bg")
-    root.style.removeProperty("--app-text-selection-text")
-    return
-  }
-  root.style.setProperty("--app-text-selection-bg", `color-mix(in srgb, ${hex} 30%, transparent)`)
-  const tri = hexToRgbTriplet(hex)
-  const L = tri ? relativeLuminance(tri[0], tri[1], tri[2]) : 0.5
-  root.style.setProperty("--app-text-selection-text", L > 0.55 ? "#0a0a0a" : "#fafafa")
-}
-
-function relativeLuminance(r: number, g: number, b: number): number {
-  const lin = (v: number) => {
-    const x = v / 255
-    return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4)
-  }
-  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
+  const isDark = root.classList.contains("dark")
+  const canvasRaw = getComputedStyle(root).getPropertyValue("--app-canvas").trim()
+  const canvasHex = sanitizeHexColor(canvasRaw) ?? undefined
+  const vars = textSelectionCssVars(state.textSelection, { canvasHex, isDark }) ?? defaultTextSelectionCssVars(isDark)
+  root.style.setProperty("--app-text-selection-bg", vars["--app-text-selection-bg"])
+  root.style.setProperty("--app-text-selection-text", vars["--app-text-selection-text"])
 }
 
 /** Aplica sólo variables personalizadas (deja el resto al CSS del preset claro/oscuro). */
@@ -335,9 +319,7 @@ function resolveCanvasRgbForWallpaperOverlay(): [number, number, number] | null 
   return tri ?? null
 }
 
-function buildWallpaperLayerStyle(
-  state: Pick<AppAppearanceState, "wallpaperDataUrl" | "wallpaperVeil">
-): {
+function buildWallpaperLayerStyle(state: Pick<AppAppearanceState, "wallpaperDataUrl" | "wallpaperVeil">): {
   backgroundColor: string
   backgroundImage: string
   backgroundSize: string

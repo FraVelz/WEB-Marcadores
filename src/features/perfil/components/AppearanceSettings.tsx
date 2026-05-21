@@ -201,8 +201,8 @@ export function AppearanceSettings() {
             <span>
               <span className="text-app-fg block text-sm font-medium">Personalizar estilo</span>
               <span className="text-app-fg-secondary mt-0.5 block text-xs">
-                Sustituye los colores base del tema (superficies, texto y acento). Lo que no cambies sigue el modo claro /
-                oscuro.
+                Sustituye los colores base del tema (superficies, texto y acento). Lo que no cambies sigue el modo claro
+                / oscuro.
               </span>
             </span>
           </label>
@@ -305,8 +305,8 @@ export function AppearanceSettings() {
         <div className="border-app-border-muted border-t pt-5">
           <p className="text-app-fg-label mb-2 text-xs font-medium tracking-wide uppercase">Ventanas del escritorio</p>
           <p className="text-app-fg-secondary mb-3 text-xs">
-            Solo afecta a las ventanas de Marcadores en modo escritorio (marco y barra de título). A más
-            transparencia, se ve más el fondo detrás.
+            Solo afecta a las ventanas de Marcadores en modo escritorio (marco y barra de título). A más transparencia,
+            se ve más el fondo detrás.
           </p>
           <label htmlFor={deskWindowGlassRangeId} className="text-app-fg-secondary block text-sm">
             Transparencia tipo cristal: {Math.round(appearance.deskWindowTransparency * 100)}%

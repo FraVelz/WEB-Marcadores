@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client"
 import { DEMO_BOOKMARKS, DEMO_FOLDERS } from "@/lib/demo-data"
 
 import { compileView } from "../views/applyFilter"
-import { deriveBookmarkFields } from "../views/bookmarkDerived"
+import { bookmarkDerivedMatchesSearchQuery, deriveBookmarkFields } from "../views/bookmarkDerived"
 import type { ViewAst } from "../views/viewTypes"
 import { EMPTY_VIEW_AST } from "../views/viewTypes"
 import { buildFoldersByParentIndex } from "../utils/folderIndex"
@@ -115,15 +115,11 @@ export function useMarcadoresData(
   const filteredBySearch = useMemo(() => {
     const q = searchValue.trim().toLowerCase()
     if (!q) return bookmarksVisible
-    return derivedRows
-      .filter(
-        ({ d }) =>
-          d.lowerTitle.includes(q) ||
-          d.lowerDesc.includes(q) ||
-          d.lowerUrl.includes(q) ||
-          [...d.tagSetLower].some((t) => t.includes(q))
-      )
-      .map(({ b }) => b)
+    const matched: typeof bookmarksVisible = []
+    for (const { b, d } of derivedRows) {
+      if (bookmarkDerivedMatchesSearchQuery(d, q)) matched.push(b)
+    }
+    return matched
   }, [bookmarksVisible, derivedRows, searchValue])
 
   const compiledView = useMemo(() => compileView(activeViewAst ?? EMPTY_VIEW_AST), [activeViewAst])
@@ -131,7 +127,11 @@ export function useMarcadoresData(
   const filteredBookmarks = useMemo(() => {
     if (browseMode === "folder") return filteredBySearch
     const visibleSet = new Set(filteredBySearch.map((b) => b.id))
-    return derivedRows.filter(({ b, d }) => visibleSet.has(b.id) && compiledView.match(b, d)).map(({ b }) => b)
+    const matched: typeof bookmarksVisible = []
+    for (const { b, d } of derivedRows) {
+      if (visibleSet.has(b.id) && compiledView.match(b, d)) matched.push(b)
+    }
+    return matched
   }, [browseMode, compiledView, derivedRows, filteredBySearch])
 
   const flatList = useMemo(

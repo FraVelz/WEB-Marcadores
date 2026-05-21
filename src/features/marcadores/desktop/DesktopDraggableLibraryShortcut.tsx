@@ -128,7 +128,6 @@ export function DesktopDraggableLibraryShortcut(props: {
       const pointerId = e.pointerId
       const startX = e.clientX
       const startY = e.clientY
-      const hr0 = host.getBoundingClientRect()
       const er0 = el.getBoundingClientRect()
       const dx = e.clientX - er0.left
       const dy = e.clientY - er0.top

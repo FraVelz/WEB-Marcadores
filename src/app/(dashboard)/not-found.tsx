@@ -11,7 +11,9 @@ export default function NotFound() {
           "flex flex-col items-center"
         )}
       >
-        <p className="text-app-fg-muted font-mono text-4xl font-semibold tracking-tight tabular-nums sm:text-5xl">404</p>
+        <p className="text-app-fg-muted font-mono text-4xl font-semibold tracking-tight tabular-nums sm:text-5xl">
+          404
+        </p>
 
         <div className="bg-app-border-muted mt-5 mb-6 h-px w-10" aria-hidden />
 

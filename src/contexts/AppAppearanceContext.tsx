@@ -54,6 +54,11 @@ function reloadAppearanceFromClient(): AppAppearanceState {
   return loadAppAppearanceFromStorage()
 }
 
+function resolveInitialAppearance(serverAppearance: AppAppearanceState): AppAppearanceState {
+  if (typeof window === "undefined") return serverAppearance
+  return loadAppAppearanceFromStorage()
+}
+
 type AppAppearanceProviderProps = {
   children: ReactNode
   /** Valor leído en el servidor desde la cookie (sin tapiz). */
@@ -64,12 +69,10 @@ export function AppAppearanceProvider({
   children,
   initialAppearance = defaultAppAppearanceState,
 }: AppAppearanceProviderProps) {
-  const [appearance, setAppearance] = useState<AppAppearanceState>(() => initialAppearance)
+  const [appearance, setAppearance] = useState<AppAppearanceState>(() => resolveInitialAppearance(initialAppearance))
 
   useLayoutEffect(() => {
-    const fresh = reloadAppearanceFromClient()
-    setAppearance(fresh)
-    syncDom(fresh)
+    syncDom(loadAppAppearanceFromStorage())
   }, [])
 
   useEffect(() => {

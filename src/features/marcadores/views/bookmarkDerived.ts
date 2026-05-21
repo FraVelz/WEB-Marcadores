@@ -27,3 +27,18 @@ export function deriveBookmarkFields(b: Bookmark): DerivedBookmarkFields {
     tagSetLower,
   }
 }
+
+function textContainsQuery(text: string, q: string): boolean {
+  return text.indexOf(q) !== -1
+}
+
+/** Búsqueda en título, descripción, URL y etiquetas (una pasada, sin `.includes` en bucles anidados). */
+export function bookmarkDerivedMatchesSearchQuery(d: DerivedBookmarkFields, q: string): boolean {
+  if (textContainsQuery(d.lowerTitle, q)) return true
+  if (textContainsQuery(d.lowerDesc, q)) return true
+  if (textContainsQuery(d.lowerUrl, q)) return true
+  for (const tag of d.tagSetLower) {
+    if (textContainsQuery(tag, q)) return true
+  }
+  return false
+}

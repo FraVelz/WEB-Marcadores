@@ -8,7 +8,7 @@ import { MarcadoresDesktopLibraryPane } from "@/features/marcadores/desktop/Marc
 import { createDefaultDeskWindowUi, type DeskWindowUiState } from "@/features/marcadores/page/deskWindowUiState"
 import { createDeskUiBindings } from "@/features/marcadores/page/deskUiBindings"
 import type { DesktopPaneDerivedEntry } from "@/features/marcadores/page/useMarcadoresPageBookmarksBootstrap"
-import type { Bookmark, CutItem, GridItem } from "@/features/marcadores/utils/types"
+import type { GridItem } from "@/features/marcadores/utils/types"
 
 type BreadcrumbSeg = { id: string | null; label: string }
 
@@ -44,40 +44,67 @@ export type MarcadoresDesktopLibraryPaneBodyProps = {
 export type MarcadoresDesktopLibraryPaneShareProps = Omit<MarcadoresDesktopLibraryPaneBodyProps, "winId" | "focused">
 
 export function MarcadoresDesktopLibraryPaneBody(props: MarcadoresDesktopLibraryPaneBodyProps) {
-  const pane = props.desktopPaneDerived?.[props.winId]
-  const ui = props.deskUiByWin[props.winId] ?? createDefaultDeskWindowUi()
-  const b = useMemo(() => createDeskUiBindings(props.winId, props.updateDeskUi), [props.winId, props.updateDeskUi])
+  const {
+    winId,
+    focused,
+    desktopPaneDerived,
+    flatListFallback,
+    breadcrumbFallback,
+    deskFolderByWin,
+    setDeskFolderByWin,
+    deskUiByWin,
+    updateDeskUi,
+    toggleDeskTreeFolderCollapse,
+    getDeskItemRefs,
+    getDeskSearchRef,
+    focusDeskLibraryPane,
+    treeToggleDisabledGlobal,
+    focusMain,
+    onRenameFolder,
+    handleAdd,
+    onCreateFolder,
+    handleEdit,
+    onDelete,
+    folders,
+    makeDeskPaneDoubleClick,
+    makeDeskPaneDrop,
+    setDeleteConfirmItem,
+  } = props
 
-  const paneFlatList = pane?.flatList ?? props.flatListFallback
-  const paneBreadcrumb = pane?.breadcrumb ?? props.breadcrumbFallback
+  const pane = desktopPaneDerived?.[winId]
+  const ui = deskUiByWin[winId] ?? createDefaultDeskWindowUi()
+  const b = useMemo(() => createDeskUiBindings(winId, updateDeskUi), [winId, updateDeskUi])
+
+  const paneFlatList = pane?.flatList ?? flatListFallback
+  const paneBreadcrumb = pane?.breadcrumb ?? breadcrumbFallback
   const paneFiltered = pane?.filteredBookmarks ?? []
   const paneTreeRows = pane?.treeFlatRows ?? []
   const panePrimaryMode = pane?.primaryViewMode ?? "grid"
   const focusFlatList = pane?.focusFlatList ?? paneFlatList
 
-  const paneFolderId = props.deskFolderByWin[props.winId] ?? null
+  const paneFolderId = deskFolderByWin[winId] ?? null
   const setPaneFolder = (id: string | null) => {
-    props.setDeskFolderByWin((prev) => ({ ...prev, [props.winId]: id }))
+    setDeskFolderByWin((prev) => ({ ...prev, [winId]: id }))
   }
 
   const listForDelete = focusFlatList
 
   useEffect(() => {
     if (!ui.searchValue.trim()) return
-    props.updateDeskUi(props.winId, (s) => ({ ...s, treeCollapsedIds: new Set() }))
-  }, [ui.searchValue, props.winId, props.updateDeskUi])
+    updateDeskUi(winId, (s) => ({ ...s, treeCollapsedIds: new Set() }))
+  }, [ui.searchValue, winId, updateDeskUi])
 
   useEffect(() => {
     queueMicrotask(() => {
-      props.getDeskItemRefs(props.winId).current.clear()
-      props.updateDeskUi(props.winId, (s) => ({ ...s, selectedIndex: 0 }))
+      getDeskItemRefs(winId).current.clear()
+      updateDeskUi(winId, (s) => ({ ...s, selectedIndex: 0 }))
     })
-  }, [ui.viewMode, props.winId, props.getDeskItemRefs, props.updateDeskUi])
+  }, [ui.viewMode, winId, getDeskItemRefs, updateDeskUi])
 
   useEffect(() => {
     if (panePrimaryMode !== "tree") return
     queueMicrotask(() => {
-      props.updateDeskUi(props.winId, (s) => {
+      updateDeskUi(winId, (s) => {
         const max = Math.max(0, paneTreeRows.length - 1)
         return {
           ...s,
@@ -85,7 +112,7 @@ export function MarcadoresDesktopLibraryPaneBody(props: MarcadoresDesktopLibrary
         }
       })
     })
-  }, [panePrimaryMode, paneTreeRows.length, props.winId, props.updateDeskUi])
+  }, [panePrimaryMode, paneTreeRows.length, winId, updateDeskUi])
 
   const globalResultsActive = ui.searchLibraryWide && ui.searchValue.trim() !== ""
 
@@ -93,22 +120,22 @@ export function MarcadoresDesktopLibraryPaneBody(props: MarcadoresDesktopLibrary
     b.setViewMode((m) => (m === "grid" ? "tree" : "grid"))
   }
 
-  const treeToggleDisabled = props.treeToggleDisabledGlobal || globalResultsActive
+  const treeToggleDisabled = treeToggleDisabledGlobal || globalResultsActive
 
   return (
     <MarcadoresDesktopLibraryPane
-      paneId={props.winId}
-      focused={props.focused}
+      paneId={winId}
+      focused={focused}
       explorerFolderId={paneFolderId}
       setExplorerFolderId={setPaneFolder}
-      parentItemRefs={props.getDeskItemRefs(props.winId)}
-      onRequestFocusPane={props.focusDeskLibraryPane}
+      parentItemRefs={getDeskItemRefs(winId)}
+      onRequestFocusPane={focusDeskLibraryPane}
       showSearch={ui.showSearch}
       setShowSearch={b.setShowSearch}
       searchValue={ui.searchValue}
       setSearchValue={b.setSearchValue}
-      searchRef={props.getDeskSearchRef(props.winId)}
-      focusMain={props.focusMain}
+      searchRef={getDeskSearchRef(winId)}
+      focusMain={focusMain}
       showNewFolder={ui.showNewFolder}
       setShowNewFolder={b.setShowNewFolder}
       newFolderName={ui.newFolderName}
@@ -117,20 +144,20 @@ export function MarcadoresDesktopLibraryPaneBody(props: MarcadoresDesktopLibrary
       setEditingFolder={b.setEditingFolder}
       renameFolderName={ui.renameFolderName}
       setRenameFolderName={b.setRenameFolderName}
-      onRenameFolder={props.onRenameFolder}
+      onRenameFolder={onRenameFolder}
       onNavigateUp={() => setPaneFolder(null)}
-      onAddBookmark={props.handleAdd}
+      onAddBookmark={handleAdd}
       onDeleteFocused={() => {
         const item = listForDelete[ui.selectedIndex]
-        if (item) props.setDeleteConfirmItem(item)
+        if (item) setDeleteConfirmItem(item)
       }}
-      onCreateFolder={props.onCreateFolder}
+      onCreateFolder={onCreateFolder}
       selectMode={ui.selectMode}
       setSelectMode={b.setSelectMode}
       selectedIds={ui.selectedIds}
       setSelectedIds={b.setSelectedIds}
-      onEdit={props.handleEdit}
-      onDelete={props.onDelete}
+      onEdit={handleEdit}
+      onDelete={onDelete}
       infoPanelEnabled={ui.infoPanelEnabled}
       setInfoPanelEnabled={b.setInfoPanelEnabled}
       flatList={paneFlatList}
@@ -146,7 +173,7 @@ export function MarcadoresDesktopLibraryPaneBody(props: MarcadoresDesktopLibrary
       primaryViewMode={panePrimaryMode}
       flatListGrid={paneFlatList}
       treeFlatRows={paneTreeRows}
-      folders={props.folders}
+      folders={folders}
       filteredBookmarks={paneFiltered}
       selectedIndexGrid={ui.selectedIndex}
       onSelectIndex={b.setSelectedIndex}
@@ -160,12 +187,12 @@ export function MarcadoresDesktopLibraryPaneBody(props: MarcadoresDesktopLibrary
         }
         b.setSelectedIds(toggle)
       }}
-      onDoubleClick={props.makeDeskPaneDoubleClick(props.winId)}
-      onDrop={props.makeDeskPaneDrop(props.winId, props.deskFolderByWin)}
-      onToggleFolderCollapse={(folderId) => props.toggleDeskTreeFolderCollapse(props.winId, folderId)}
+      onDoubleClick={makeDeskPaneDoubleClick(winId)}
+      onDrop={makeDeskPaneDrop(winId, deskFolderByWin)}
+      onToggleFolderCollapse={(folderId) => toggleDeskTreeFolderCollapse(winId, folderId)}
       treeCollapsedIds={ui.treeCollapsedIds}
       currentLocationLabel={paneBreadcrumb.map((p) => p.label).join(" › ")}
-      registerExplorerFocus={props.focused}
+      registerExplorerFocus={focused}
     />
   )
 }
