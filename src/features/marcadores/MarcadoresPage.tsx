@@ -1,7 +1,5 @@
 "use client"
 
-import { useCallback } from "react"
-
 import BookmarkModal from "@/components/BookmarkModal"
 
 import MarcadoresFooter from "@/features/marcadores/components/MarcadoresFooter"
@@ -11,191 +9,171 @@ import { MarcadoresPageMainLayout } from "@/features/marcadores/MarcadoresPageMa
 import { MarcadoresPageStackedChrome } from "@/features/marcadores/MarcadoresPageStackedChrome"
 import { MarcadoresStackedPageSlot } from "@/features/marcadores/MarcadoresStackedPageSlot"
 import { MarcadoresZonesPageSlot } from "@/features/marcadores/MarcadoresZonesPageSlot"
-
-import { useMarcadoresPageCommandHooks } from "@/features/marcadores/page/useMarcadoresPageCommandHooks"
-import { useMarcadoresPageDataHooks } from "@/features/marcadores/page/useMarcadoresPageDataHooks"
+import { useMarcadoresPage } from "@/features/marcadores/useMarcadoresPage"
 
 export function MarcadoresPage() {
-  const d = useMarcadoresPageDataHooks()
-  const c = useMarcadoresPageCommandHooks(d)
+  const m = useMarcadoresPage()
+  const modal = m.bookmarkModal
 
-  const deskModalUi = d.desktopWindowChrome && d.deskModalHostWinId ? d.deskUiByWin[d.deskModalHostWinId] : null
-  const bookmarkModalOpen = d.desktopWindowChrome ? Boolean(deskModalUi?.modalOpen) : d.modalOpen
-  const bookmarkModalEditing = d.desktopWindowChrome ? (deskModalUi?.editingBookmark ?? null) : d.editingBookmark
-  const bookmarkModalNonce = d.desktopWindowChrome ? (deskModalUi?.bookmarkModalNonce ?? 0) : d.bookmarkModalNonce
-  const bookmarkModalFolderId =
-    d.desktopWindowChrome && d.deskModalHostWinId
-      ? (d.deskFolderByWin[d.deskModalHostWinId] ?? null)
-      : d.activeBrowseFolderId
-
-  const closeBookmarkModal = useCallback(() => {
-    if (d.desktopWindowChrome && d.deskModalHostWinId) {
-      d.updateDeskUi(d.deskModalHostWinId, (s) => ({ ...s, modalOpen: false, editingBookmark: null }))
-    } else {
-      d.setModalOpen(false)
-      d.setEditingBookmark(null)
-    }
-    requestAnimationFrame(() => d.focusMain())
-  }, [d])
-
-  if (d.loading) return <div className="text-app-fg-label flex flex-1 items-center justify-center">Cargando…</div>
+  if (m.loading) return <div className="text-app-fg-label flex flex-1 items-center justify-center">Cargando…</div>
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
-      {!d.desktopWindowChrome ? (
+      {!m.desktopWindowChrome ? (
         <MarcadoresPageStackedChrome
-          showBreadcrumb={!d.zonesBoard}
-          demoMode={d.demoMode}
-          pasteError={d.pasteError}
-          deleteConfirmItem={d.deleteConfirmItem}
-          onConfirmDelete={d.onConfirmDelete}
-          onCancelDelete={() => d.setDeleteConfirmItem(null)}
-          browseMode={d.browseMode}
-          setBrowseMode={d.setBrowseMode}
-          activeViewAst={d.activeViewAst}
-          setActiveViewAst={d.setActiveViewAst}
-          duplicateClusterCount={d.duplicateClusterCount}
-          breadcrumb={d.breadcrumb}
-          onSelectBreadcrumb={d.setSelectedFolderId}
-          showSearch={d.showSearch}
-          setShowSearch={d.setShowSearch}
-          searchValue={d.searchValue}
-          setSearchValue={d.setSearchValue}
-          searchRef={d.searchRef}
-          focusMain={d.focusMain}
-          showNewFolder={d.showNewFolder}
-          setShowNewFolder={d.setShowNewFolder}
-          newFolderName={d.newFolderName}
-          setNewFolderName={d.setNewFolderName}
-          editingFolder={d.editingFolder}
-          setEditingFolder={d.setEditingFolder}
-          renameFolderName={d.renameFolderName}
-          setRenameFolderName={d.setRenameFolderName}
-          onRenameFolder={d.onRenameFolder}
-          onNavigateExploreRoot={() => d.setSelectedFolderId(null)}
-          handleAdd={d.handleAdd}
+          showBreadcrumb={!m.zonesBoard}
+          demoMode={m.demoMode}
+          pasteError={m.pasteError}
+          deleteConfirmItem={m.deleteConfirmItem}
+          onConfirmDelete={m.onConfirmDelete}
+          onCancelDelete={() => m.setDeleteConfirmItem(null)}
+          browseMode={m.browseMode}
+          setBrowseMode={m.setBrowseMode}
+          activeViewAst={m.activeViewAst}
+          setActiveViewAst={m.setActiveViewAst}
+          duplicateClusterCount={m.duplicateClusterCount}
+          breadcrumb={m.breadcrumb}
+          onSelectBreadcrumb={m.browseScope.setFolderId}
+          showSearch={m.showSearch}
+          setShowSearch={m.setShowSearch}
+          searchValue={m.searchValue}
+          setSearchValue={m.setSearchValue}
+          searchRef={m.searchRef}
+          focusMain={m.focusMain}
+          showNewFolder={m.showNewFolder}
+          setShowNewFolder={m.setShowNewFolder}
+          newFolderName={m.newFolderName}
+          setNewFolderName={m.setNewFolderName}
+          editingFolder={m.editingFolder}
+          setEditingFolder={m.setEditingFolder}
+          renameFolderName={m.renameFolderName}
+          setRenameFolderName={m.setRenameFolderName}
+          onRenameFolder={m.onRenameFolder}
+          onNavigateExploreRoot={() => m.browseScope.setFolderId(null)}
+          handleAdd={m.handleAdd}
           onDeleteFocused={() => {
-            const item = d.focusFlatList[d.selectedIndex]
-            if (item) d.setDeleteConfirmItem(item)
+            const item = m.focusFlatList[m.selectedIndex]
+            if (item) m.setDeleteConfirmItem(item)
           }}
-          onCreateFolder={d.onCreateFolder}
-          selectMode={d.selectMode}
-          setSelectMode={d.setSelectMode}
-          selectedIds={d.selectedIds}
-          setSelectedIds={d.setSelectedIds}
-          handleEdit={d.handleEdit}
-          onDelete={d.onDelete}
-          infoPanelEnabled={d.infoPanelEnabled}
-          setInfoPanelEnabled={d.setInfoPanelEnabled}
-          focusFlatList={d.focusFlatList}
-          selectedIndex={d.selectedIndex}
-          setDetailBookmark={d.setDetailBookmark}
-          treeView={d.viewMode === "tree"}
-          onToggleTreeView={c.treeToggleDisabled ? undefined : c.toggleTreeMainView}
-          treeToggleDisabled={c.treeToggleDisabled}
+          onCreateFolder={m.onCreateFolder}
+          selectMode={m.selectMode}
+          setSelectMode={m.setSelectMode}
+          selectedIds={m.selectedIds}
+          setSelectedIds={m.setSelectedIds}
+          handleEdit={m.handleEdit}
+          onDelete={m.onDelete}
+          infoPanelEnabled={m.infoPanelEnabled}
+          setInfoPanelEnabled={m.setInfoPanelEnabled}
+          focusFlatList={m.focusFlatList}
+          selectedIndex={m.selectedIndex}
+          setDetailBookmark={m.setDetailBookmark}
+          treeView={m.viewMode === "tree"}
+          onToggleTreeView={m.treeToggleDisabled ? undefined : m.toggleTreeMainView}
+          treeToggleDisabled={m.treeToggleDisabled}
+          showFullscreenToggle={!m.stackedExplorerHeaderBar}
         />
       ) : null}
 
       <MarcadoresPageMainLayout
-        desktopWindowChrome={d.desktopWindowChrome}
-        zonesBoard={d.zonesBoard}
+        desktopWindowChrome={m.desktopWindowChrome}
+        zonesBoard={m.zonesBoard}
         zonesSlot={
           <MarcadoresZonesPageSlot
-            pool={d.libraryMatchesSearch}
-            columns={d.zoneColumns}
-            selectMode={d.selectMode}
-            selectedIds={d.selectedIds}
-            cutItem={d.cutItem}
-            onToggleSelect={d.toggleSelect}
-            openBookmarkTab={d.openBookmarkTab}
-            onZonesReorder={(cols) => void d.handleZonesReorder(cols)}
+            pool={m.libraryMatchesSearch}
+            columns={m.zoneColumns}
+            selectMode={m.selectMode}
+            selectedIds={m.selectedIds}
+            cutItem={m.cutItem}
+            onToggleSelect={m.toggleSelect}
+            openBookmarkTab={m.openBookmarkTab}
+            onZonesReorder={(cols) => void m.handleZonesReorder(cols)}
           />
         }
         desktopSlot={
           <MarcadoresDesktopPageSlot
-            workspaceId={d.activeWorkspaceId}
-            deskLibWinIds={d.deskLibWinIds}
-            setDeskLibWinIds={d.setDeskLibWinIds}
-            addDeskLibraryWindow={d.addDeskLibraryWindow}
-            resolvedDeskLibPaneId={d.resolvedDeskLibPaneId}
-            focusDeskLibraryPane={d.focusDeskLibraryPane}
-            closeDeskLibraryWindow={d.closeDeskLibraryWindow}
-            floatingOverlays={c.desktopFloatingOverlays}
-            detailBookmark={d.detailBookmark}
-            closeBookmarkDetailPanel={d.closeBookmarkDetailPanel}
-            recordBookmarkOpened={d.recordBookmarkOpened}
-            onBookmarkUpdate={d.onBookmarkUpdate}
-            allTags={d.allTags}
-            folders={d.folders}
-            desktopPaneDerived={d.desktopPaneDerived}
-            breadcrumb={d.breadcrumb}
-            flatList={d.flatList}
-            listForDeleteFallback={d.focusFlatList}
-            body={c.paneBody}
+            workspaceId={m.activeWorkspaceId}
+            deskLibWinIds={m.deskLibWinIds}
+            setDeskLibWinIds={m.setDeskLibWinIds}
+            addDeskLibraryWindow={m.addDeskLibraryWindow}
+            resolvedDeskLibPaneId={m.resolvedDeskLibPaneId}
+            focusDeskLibraryPane={m.focusDeskLibraryPane}
+            closeDeskLibraryWindow={m.closeDeskLibraryWindow}
+            floatingOverlays={m.desktopFloatingOverlays}
+            detailBookmark={m.detailBookmark}
+            closeBookmarkDetailPanel={m.closeBookmarkDetailPanel}
+            recordBookmarkOpened={m.recordBookmarkOpened}
+            onBookmarkUpdate={m.onBookmarkUpdate}
+            allTags={m.allTags}
+            folders={m.folders}
+            desktopPaneDerived={m.desktopPaneDerived}
+            breadcrumb={m.breadcrumb}
+            flatList={m.flatList}
+            listForDeleteFallback={m.focusFlatList}
+            body={m.paneBody}
           />
         }
         stackedSlot={
           <MarcadoresStackedPageSlot
-            primaryViewMode={d.primaryViewMode}
-            flatList={d.flatList}
-            folders={d.folders}
-            filteredBookmarks={d.filteredBookmarks}
-            treeFlatRows={d.treeFlatRows}
-            treeCollapsedIds={d.treeCollapsedIds}
-            toggleTreeFolderCollapse={d.toggleTreeFolderCollapse}
-            cutItem={d.cutItem}
-            handleAdd={d.handleAdd}
-            handleDoubleClick={d.handleDoubleClick}
-            handleDrop={d.handleDrop}
-            setShowNewFolder={d.setShowNewFolder}
-            detailBookmark={d.detailBookmark}
-            closeBookmarkDetailPanel={d.closeBookmarkDetailPanel}
-            recordBookmarkOpened={d.recordBookmarkOpened}
-            onBookmarkUpdate={d.onBookmarkUpdate}
-            allTags={d.allTags}
-            itemRefs={d.itemRefs}
-            selectedIndex={d.selectedIndex}
-            setSelectedIndex={d.setSelectedIndex}
-            selectMode={d.selectMode}
-            selectedIds={d.selectedIds}
-            toggleSelect={d.toggleSelect}
-            setSelectedIds={d.setSelectedIds}
-            setSelectMode={d.setSelectMode}
-            breadcrumbLabel={d.breadcrumb.map((p) => p.label).join(" › ")}
+            primaryViewMode={m.primaryViewMode}
+            flatList={m.flatList}
+            folders={m.folders}
+            filteredBookmarks={m.filteredBookmarks}
+            treeFlatRows={m.treeFlatRows}
+            treeCollapsedIds={m.treeCollapsedIds}
+            toggleTreeFolderCollapse={m.toggleTreeFolderCollapse}
+            cutItem={m.cutItem}
+            handleAdd={m.handleAdd}
+            handleDoubleClick={m.handleDoubleClick}
+            handleDrop={m.handleDrop}
+            setShowNewFolder={m.setShowNewFolder}
+            detailBookmark={m.detailBookmark}
+            closeBookmarkDetailPanel={m.closeBookmarkDetailPanel}
+            recordBookmarkOpened={m.recordBookmarkOpened}
+            onBookmarkUpdate={m.onBookmarkUpdate}
+            allTags={m.allTags}
+            itemRefs={m.itemRefs}
+            selectedIndex={m.selectedIndex}
+            setSelectedIndex={m.setSelectedIndex}
+            selectMode={m.selectMode}
+            selectedIds={m.selectedIds}
+            toggleSelect={m.toggleSelect}
+            setSelectedIds={m.setSelectedIds}
+            setSelectMode={m.setSelectMode}
+            breadcrumbLabel={m.breadcrumb.map((p) => p.label).join(" › ")}
           />
         }
       />
 
-      {d.zonesBoard ? (
+      {m.zonesBoard ? (
         <MarcadoresFooter
           variant="zones"
-          poolCount={d.libraryMatchesSearch.length}
-          flatList={d.focusFlatList}
-          selectedIndex={d.selectedIndex}
+          poolCount={m.libraryMatchesSearch.length}
+          flatList={m.focusFlatList}
+          selectedIndex={m.selectedIndex}
         />
-      ) : !d.desktopWindowChrome ? (
-        <MarcadoresFooter flatList={d.focusFlatList} selectedIndex={d.selectedIndex} />
+      ) : !m.desktopWindowChrome ? (
+        <MarcadoresFooter flatList={m.focusFlatList} selectedIndex={m.selectedIndex} />
       ) : null}
 
-      {bookmarkModalOpen ? (
+      {modal.open ? (
         <BookmarkModal
-          key={bookmarkModalEditing?.id ?? `new-${bookmarkModalNonce}`}
-          onClose={closeBookmarkModal}
-          onSubmit={d.onModalSubmit}
+          key={modal.editing?.id ?? `new-${modal.nonce}`}
+          onClose={modal.close}
+          onSubmit={m.onModalSubmit}
           initialData={
-            bookmarkModalEditing
+            modal.editing
               ? {
-                  title: bookmarkModalEditing.title,
-                  url: bookmarkModalEditing.url,
-                  description: bookmarkModalEditing.description || "",
-                  folder_id: bookmarkModalEditing.folder_id || "",
-                  tags: bookmarkModalEditing.tags?.join(", ") || "",
+                  title: modal.editing.title,
+                  url: modal.editing.url,
+                  description: modal.editing.description || "",
+                  folder_id: modal.editing.folder_id || "",
+                  tags: modal.editing.tags?.join(", ") || "",
                 }
               : null
           }
-          allTags={d.allTags}
-          folders={d.folders}
-          currentFolderId={bookmarkModalFolderId}
+          allTags={m.allTags}
+          folders={m.folders}
+          currentFolderId={modal.folderId}
         />
       ) : null}
     </div>

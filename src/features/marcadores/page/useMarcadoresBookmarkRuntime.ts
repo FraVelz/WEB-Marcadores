@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect } from "react"
 
+import type { LibraryPaneUiBindings } from "@/features/marcadores/state/libraryPaneUiScope"
 import type { Bookmark } from "@/features/marcadores/utils/types"
 
 /** Registro para atajos globales + navegador de pestaña y cierre consistente del panel de detalle. */
@@ -14,10 +15,10 @@ export function useMarcadoresBookmarkRuntime(opts: {
     } | null
   ) => void
   recordBookmarkOpened: (id: string) => Promise<void>
-  setDetailBookmark: React.Dispatch<React.SetStateAction<Bookmark | null>>
-  setInfoPanelEnabled: React.Dispatch<React.SetStateAction<boolean>>
+  paneBindings: Pick<LibraryPaneUiBindings, "setDetailBookmark" | "setInfoPanelEnabled">
 }) {
-  const { bookmarks, registerMarcadoresRuntime, recordBookmarkOpened, setDetailBookmark, setInfoPanelEnabled } = opts
+  const { bookmarks, registerMarcadoresRuntime, recordBookmarkOpened, paneBindings } = opts
+  const { setDetailBookmark, setInfoPanelEnabled } = paneBindings
 
   const closeBookmarkDetailPanel = useCallback(() => {
     setDetailBookmark(null)

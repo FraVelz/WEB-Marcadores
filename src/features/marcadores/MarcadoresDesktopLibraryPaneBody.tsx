@@ -6,7 +6,7 @@ import type { FlatFolder } from "@/features/marcadores/utils/types"
 
 import { MarcadoresDesktopLibraryPane } from "@/features/marcadores/desktop/MarcadoresDesktopLibraryPane"
 import { createDefaultDeskWindowUi, type DeskWindowUiState } from "@/features/marcadores/page/deskWindowUiState"
-import { createDeskUiBindings } from "@/features/marcadores/page/deskUiBindings"
+import { createDeskPaneScope, type DeskPaneUiBindings } from "@/features/marcadores/state/libraryPaneUiScope"
 import type { DesktopPaneDerivedEntry } from "@/features/marcadores/page/useMarcadoresPageBookmarksBootstrap"
 import type { GridItem } from "@/features/marcadores/utils/types"
 
@@ -73,7 +73,11 @@ export function MarcadoresDesktopLibraryPaneBody(props: MarcadoresDesktopLibrary
 
   const pane = desktopPaneDerived?.[winId]
   const ui = deskUiByWin[winId] ?? createDefaultDeskWindowUi()
-  const b = useMemo(() => createDeskUiBindings(winId, updateDeskUi), [winId, updateDeskUi])
+  const paneScope = useMemo(
+    () => createDeskPaneScope(winId, deskUiByWin, updateDeskUi, getDeskItemRefs, getDeskSearchRef),
+    [winId, deskUiByWin, updateDeskUi, getDeskItemRefs, getDeskSearchRef]
+  )
+  const b = paneScope.bindings as DeskPaneUiBindings
 
   const paneFlatList = pane?.flatList ?? flatListFallback
   const paneBreadcrumb = pane?.breadcrumb ?? breadcrumbFallback

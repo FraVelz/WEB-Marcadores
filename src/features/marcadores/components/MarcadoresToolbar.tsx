@@ -41,6 +41,8 @@ type Props = {
   treeView?: boolean
   onToggleTreeView?: () => void
   treeToggleDisabled?: boolean
+  /** false en ventanas del escritorio (el toggle vive en MarcadoresDesktopLayoutBar). */
+  showFullscreenToggle?: boolean
 }
 
 export default function MarcadoresToolbar(props: Props) {
@@ -72,6 +74,7 @@ export default function MarcadoresToolbar(props: Props) {
           treeView={props.treeView}
           onToggleTreeView={props.onToggleTreeView}
           treeToggleDisabled={props.treeToggleDisabled}
+          showFullscreenToggle={props.showFullscreenToggle}
         />
         <ToolbarSelectActions
           selectMode={props.selectMode}
