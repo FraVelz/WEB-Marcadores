@@ -1,80 +1,64 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useCallback, useMemo, useRef, useState, type SetStateAction } from "react"
 
 import type { BrowseMode } from "@/features/marcadores/hooks/useMarcadoresData"
-import type { Bookmark, CutItem, GridItem } from "@/features/marcadores/utils/types"
 import type { ViewAst } from "@/features/marcadores/views/viewTypes"
+import { createDefaultLibraryPaneUi, type LibraryPaneUiState } from "@/features/marcadores/state/libraryPaneUiState"
+import {
+  createLibraryPaneBindings,
+  expandLibraryPaneFields,
+  type LibraryPaneUiScope,
+} from "@/features/marcadores/state/libraryPaneUiScope"
 
 export function useMarcadoresPageUiState() {
-  const [selectedIndex, setSelectedIndex] = useState(0)
-  const [selectMode, setSelectMode] = useState(false)
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
-  const [modalOpen, setModalOpen] = useState(false)
-  const [editingBookmark, setEditingBookmark] = useState<Bookmark | null>(null)
-  const [detailBookmark, setDetailBookmark] = useState<Bookmark | null>(null)
-  const [showSearch, setShowSearch] = useState(false)
-  const [infoPanelEnabled, setInfoPanelEnabled] = useState(true)
-  const [gridCols, setGridCols] = useState(3)
-  const [newFolderName, setNewFolderName] = useState("")
-  const [showNewFolder, setShowNewFolder] = useState(false)
-  const [editingFolder, setEditingFolder] = useState<{ id: string; name: string } | null>(null)
-  const [renameFolderName, setRenameFolderName] = useState("")
-  const [cutItem, setCutItem] = useState<CutItem | null>(null)
-  const [pasteError, setPasteError] = useState<string | null>(null)
-  const [deleteConfirmItem, setDeleteConfirmItem] = useState<GridItem | null>(null)
-  const [searchValue, setSearchValue] = useState("")
-  const [bookmarkModalNonce, setBookmarkModalNonce] = useState(0)
-  const [viewMode, setViewMode] = useState<"grid" | "tree">("grid")
+  const [paneUi, setPaneUi] = useState<LibraryPaneUiState>(createDefaultLibraryPaneUi)
   const [browseMode, setBrowseMode] = useState<BrowseMode>("folder")
   const [activeViewAst, setActiveViewAst] = useState<ViewAst | null>(null)
 
   const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map())
   const searchRef = useRef<HTMLInputElement>(null)
 
+  const patchState = useCallback((recipe: (s: LibraryPaneUiState) => LibraryPaneUiState) => {
+    setPaneUi((s) => {
+      const next = recipe(s)
+      return next === s ? s : next
+    })
+  }, [])
+
+  const bindings = useMemo(
+    () =>
+      createLibraryPaneBindings(
+        <Key extends keyof LibraryPaneUiState>(key: Key, action: SetStateAction<LibraryPaneUiState[Key]>) => {
+          setPaneUi((s) => {
+            const next =
+              typeof action === "function"
+                ? (action as (x: LibraryPaneUiState[Key]) => LibraryPaneUiState[Key])(s[key])
+                : action
+            if (Object.is(next, s[key])) return s
+            return { ...s, [key]: next }
+          })
+        }
+      ),
+    []
+  )
+
+  const globalScope: LibraryPaneUiScope = {
+    getState: () => paneUi,
+    patch: patchState,
+    bindings,
+    itemRefs,
+    searchRef,
+  }
+
   return {
-    selectedIndex,
-    setSelectedIndex,
-    selectMode,
-    setSelectMode,
-    selectedIds,
-    setSelectedIds,
-    modalOpen,
-    setModalOpen,
-    editingBookmark,
-    setEditingBookmark,
-    detailBookmark,
-    setDetailBookmark,
-    showSearch,
-    setShowSearch,
-    infoPanelEnabled,
-    setInfoPanelEnabled,
-    gridCols,
-    setGridCols,
-    newFolderName,
-    setNewFolderName,
-    showNewFolder,
-    setShowNewFolder,
-    editingFolder,
-    setEditingFolder,
-    renameFolderName,
-    setRenameFolderName,
-    cutItem,
-    setCutItem,
-    pasteError,
-    setPasteError,
-    deleteConfirmItem,
-    setDeleteConfirmItem,
-    searchValue,
-    setSearchValue,
-    bookmarkModalNonce,
-    setBookmarkModalNonce,
-    viewMode,
-    setViewMode,
     browseMode,
     setBrowseMode,
     activeViewAst,
     setActiveViewAst,
+    globalScope,
+    patchPaneUi: patchState,
+    ...expandLibraryPaneFields(paneUi, bindings),
     itemRefs,
     searchRef,
   }

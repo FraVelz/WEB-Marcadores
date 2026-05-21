@@ -60,6 +60,7 @@ export type MarcadoresPageStackedChromeProps = {
   treeView: boolean
   onToggleTreeView?: () => void
   treeToggleDisabled: boolean
+  showFullscreenToggle?: boolean
 }
 
 export function MarcadoresPageStackedChrome(props: MarcadoresPageStackedChromeProps) {
@@ -110,6 +111,7 @@ export function MarcadoresPageStackedChrome(props: MarcadoresPageStackedChromePr
     treeView,
     onToggleTreeView,
     treeToggleDisabled,
+    showFullscreenToggle = true,
   } = props
 
   return (
@@ -148,6 +150,7 @@ export function MarcadoresPageStackedChrome(props: MarcadoresPageStackedChromePr
         treeView={treeView}
         onToggleTreeView={onToggleTreeView}
         treeToggleDisabled={treeToggleDisabled}
+        showFullscreenToggle={showFullscreenToggle}
       />
 
       <MarcadoresBrowseControls

@@ -1,5 +1,6 @@
 "use client"
 
+import { MarcadoresFullscreenToggleButton } from "@/features/marcadores/components/MarcadoresFullscreenToggleButton"
 import { cn } from "@/lib/utils"
 
 type Props = {
@@ -15,6 +16,7 @@ type Props = {
   treeView?: boolean
   onToggleTreeView?: () => void
   treeToggleDisabled?: boolean
+  showFullscreenToggle?: boolean
 }
 
 export default function ToolbarNavigationButtons({
@@ -30,6 +32,7 @@ export default function ToolbarNavigationButtons({
   treeView,
   onToggleTreeView,
   treeToggleDisabled = false,
+  showFullscreenToggle = true,
 }: Props) {
   return (
     <>
@@ -130,6 +133,12 @@ export default function ToolbarNavigationButtons({
           />
         </svg>
       </button>
+      {showFullscreenToggle ? (
+        <>
+          <div className="bg-app-active mx-1 h-5 w-px" />
+          <MarcadoresFullscreenToggleButton variant="toolbar" />
+        </>
+      ) : null}
     </>
   )
 }

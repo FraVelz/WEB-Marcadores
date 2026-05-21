@@ -6,6 +6,7 @@ import type { Folder } from "@/contexts/DashboardContext"
 
 import type { TreeFlatRow } from "@/features/marcadores/components/MarcadoresTreeView"
 import type { BrowseMode } from "@/features/marcadores/hooks/useMarcadoresData"
+import type { LibraryPaneUiScope } from "@/features/marcadores/state/libraryPaneUiScope"
 import type { Bookmark, GridItem } from "@/features/marcadores/utils/types"
 
 export function useMarcadoresTreeDerived(opts: {
@@ -13,25 +14,14 @@ export function useMarcadoresTreeDerived(opts: {
   filteredBookmarks: Bookmark[]
   browseMode: BrowseMode
   zonesBoard: boolean
-  viewMode: "grid" | "tree"
-  setViewMode: React.Dispatch<React.SetStateAction<"grid" | "tree">>
+  paneScope: LibraryPaneUiScope
   flatList: GridItem[]
-  setSelectedIndex: React.Dispatch<React.SetStateAction<number>>
-  itemRefs: React.MutableRefObject<Map<number, HTMLDivElement>>
-  searchValue: string
 }) {
-  const {
-    folders,
-    filteredBookmarks,
-    browseMode,
-    zonesBoard,
-    viewMode,
-    setViewMode,
-    flatList,
-    setSelectedIndex,
-    itemRefs,
-    searchValue,
-  } = opts
+  const { folders, filteredBookmarks, browseMode, zonesBoard, paneScope, flatList } = opts
+  const pane = paneScope.getState()
+  const { setViewMode, setSelectedIndex } = paneScope.bindings
+  const { viewMode, searchValue } = pane
+  const { itemRefs } = paneScope
 
   const [treeCollapsedIds, setTreeCollapsedIds] = useState<Set<string>>(() => new Set())
 

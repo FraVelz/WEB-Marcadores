@@ -8,6 +8,7 @@ import type { Folder } from "@/contexts/DashboardContext"
 
 import { useMarcadoresDropHandlers } from "@/features/marcadores/hooks/useMarcadoresDropHandlers"
 import { useMarcadoresPageInteractions } from "@/features/marcadores/hooks/useMarcadoresPageInteractions"
+import type { LibraryPaneUiScope } from "@/features/marcadores/state/libraryPaneUiScope"
 import type { Bookmark } from "@/features/marcadores/utils/types"
 import type { WorkspaceLayoutPayload } from "@/features/marcadores/workspaces/workspaceLayout"
 
@@ -19,12 +20,7 @@ export function useMarcadoresPageDnDLayer(p: {
   bookmarks: Bookmark[]
   handlePasteFolder: (folderId: string, destParentId: string | null) => void
   handlePasteLink: (bookmarkId: string, destFolderId: string | null) => void
-  selectedIds: Set<string>
-  setSelectedIds: React.Dispatch<React.SetStateAction<Set<string>>>
-  setSelectMode: React.Dispatch<React.SetStateAction<boolean>>
-  setSelectedIndex: React.Dispatch<React.SetStateAction<number>>
-  selectMode: boolean
-  setPasteError: React.Dispatch<React.SetStateAction<string | null>>
+  paneScope: LibraryPaneUiScope
   openBookmarkTab: (b: Bookmark) => void
   activeBrowseFolderId: string | null
   navigateFolderId: (id: string) => void
@@ -39,46 +35,37 @@ export function useMarcadoresPageDnDLayer(p: {
   handleRenameFolder: (id: string, name: string) => Promise<void>
   handleModalSubmit: (data: BookmarkFormData, editingBookmark: Bookmark | null) => Promise<void>
   handleBookmarkUpdate: (id: string, updates: Partial<Bookmark>, detailBookmark: Bookmark | null) => Promise<void>
-  newFolderName: string
-  setNewFolderName: React.Dispatch<React.SetStateAction<string>>
-  setShowNewFolder: React.Dispatch<React.SetStateAction<boolean>>
   bookmarksForModal: Bookmark[]
-  setEditingBookmark: React.Dispatch<React.SetStateAction<Bookmark | null>>
-  setModalOpen: React.Dispatch<React.SetStateAction<boolean>>
-  setBookmarkModalNonce: React.Dispatch<React.SetStateAction<number>>
-  editingBookmark: Bookmark | null
-  detailBookmark: Bookmark | null
-  editingFolder: { id: string; name: string } | null
-  renameFolderName: string
-  setEditingFolder: React.Dispatch<React.SetStateAction<{ id: string; name: string } | null>>
-  setRenameFolderName: React.Dispatch<React.SetStateAction<string>>
 }) {
+  const ui = p.paneScope.getState()
+  const b = p.paneScope.bindings
+
   const ix = useMarcadoresPageInteractions({
     workspaceLayout: p.workspaceLayout,
     persistWorkspaceLayout: p.persistWorkspaceLayout,
     handleDeleteFolder: p.handleDeleteFolder,
     handleDelete: p.handleDelete,
-    selectedIds: p.selectedIds,
-    setSelectedIds: p.setSelectedIds,
-    setSelectMode: p.setSelectMode,
-    setSelectedIndex: p.setSelectedIndex,
+    selectedIds: ui.selectedIds,
+    setSelectedIds: b.setSelectedIds,
+    setSelectMode: b.setSelectMode,
+    setSelectedIndex: b.setSelectedIndex,
     handleCreateFolder: p.handleCreateFolder,
-    newFolderName: p.newFolderName,
-    setNewFolderName: p.setNewFolderName,
-    setShowNewFolder: p.setShowNewFolder,
+    newFolderName: ui.newFolderName,
+    setNewFolderName: b.setNewFolderName,
+    setShowNewFolder: b.setShowNewFolder,
     bookmarks: p.bookmarksForModal,
-    setEditingBookmark: p.setEditingBookmark,
-    setModalOpen: p.setModalOpen,
-    setBookmarkModalNonce: p.setBookmarkModalNonce,
+    setEditingBookmark: b.setEditingBookmark,
+    setModalOpen: b.setModalOpen,
+    setBookmarkModalNonce: b.setBookmarkModalNonce,
     handleModalSubmit: p.handleModalSubmit,
-    editingBookmark: p.editingBookmark,
+    editingBookmark: ui.editingBookmark,
     handleBookmarkUpdate: p.handleBookmarkUpdate,
-    detailBookmark: p.detailBookmark,
+    detailBookmark: ui.detailBookmark,
     handleRenameFolder: p.handleRenameFolder,
-    editingFolder: p.editingFolder,
-    renameFolderName: p.renameFolderName,
-    setEditingFolder: p.setEditingFolder,
-    setRenameFolderName: p.setRenameFolderName,
+    editingFolder: ui.editingFolder,
+    renameFolderName: ui.renameFolderName,
+    setEditingFolder: b.setEditingFolder,
+    setRenameFolderName: b.setRenameFolderName,
   })
 
   const { setDeskFolderByWin } = p
@@ -95,8 +82,8 @@ export function useMarcadoresPageDnDLayer(p: {
     bookmarks: p.bookmarks,
     handlePasteFolder: p.handlePasteFolder,
     handlePasteLink: p.handlePasteLink,
-    setPasteError: p.setPasteError,
-    selectMode: p.selectMode,
+    setPasteError: b.setPasteError,
+    selectMode: ui.selectMode,
     openBookmarkTab: p.openBookmarkTab,
     defaultDropFolderId: p.activeBrowseFolderId,
     onNavigateFolder: p.navigateFolderId,

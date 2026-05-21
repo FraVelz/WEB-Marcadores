@@ -66,6 +66,7 @@ export function MarcadoresDesktopLibraryPane(props: MarcadoresDesktopLibraryPane
         treeView={props.treeView}
         onToggleTreeView={props.onToggleTreeView}
         treeToggleDisabled={props.treeToggleDisabled}
+        showFullscreenToggle={false}
       />
 
       <MarcadoresBrowseControls

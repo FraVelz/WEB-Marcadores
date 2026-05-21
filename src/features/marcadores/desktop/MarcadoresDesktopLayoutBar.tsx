@@ -1,13 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
-
-import { useDashboard } from "@/contexts/DashboardContext"
-import {
-  isElementFullscreen,
-  subscribeFullscreenChange,
-  toggleElementFullscreen,
-} from "@/features/marcadores/desktop/desktopFullscreenDom"
+import { MarcadoresFullscreenToggleButton } from "@/features/marcadores/components/MarcadoresFullscreenToggleButton"
 import {
   DESKTOP_LAYOUT_TOOL_BTN_ROW,
   desktopLayoutToolBtnState,
@@ -34,7 +27,7 @@ type Props = {
 
 /** Acciones globales del escritorio (pantalla completa, ventanas en bloque, reparto en dos columnas). */
 export function MarcadoresDesktopLayoutBar({
-  fullscreenTargetRef: fullscreenTargetRefProp,
+  fullscreenTargetRef,
   canTileTwoColumns,
   onTileTwoColumns,
   deskSurfaceReady,
@@ -44,23 +37,6 @@ export function MarcadoresDesktopLayoutBar({
   onRestoreWindowSizes,
   inlineInExplorerHeader = true,
 }: Props) {
-  const { dashboardFullscreenHostRef } = useDashboard()
-  const [fullscreen, setFullscreen] = useState(false)
-
-  useEffect(() => {
-    const targetRef = fullscreenTargetRefProp ?? dashboardFullscreenHostRef
-    const sync = () => setFullscreen(isElementFullscreen(targetRef.current))
-    const unsub = subscribeFullscreenChange(sync)
-    sync()
-    return unsub
-  }, [fullscreenTargetRefProp, dashboardFullscreenHostRef])
-
-  const toggleFullscreen = useCallback(async () => {
-    const targetRef = fullscreenTargetRefProp ?? dashboardFullscreenHostRef
-    await toggleElementFullscreen(targetRef.current)
-    setFullscreen(isElementFullscreen(targetRef.current))
-  }, [fullscreenTargetRefProp, dashboardFullscreenHostRef])
-
   const deskReadyBtn = cn(DESKTOP_LAYOUT_TOOL_BTN_ROW, desktopLayoutToolBtnState(deskSurfaceReady))
 
   const tileBtn = cn(DESKTOP_LAYOUT_TOOL_BTN_ROW, desktopLayoutToolBtnState(canTileTwoColumns))
@@ -76,28 +52,6 @@ export function MarcadoresDesktopLayoutBar({
       role="toolbar"
       aria-label="Disposición del escritorio"
     >
-      <span className="text-app-fg-label hidden shrink-0 text-[11px] font-medium tracking-wide uppercase md:inline">
-        Escritorio
-      </span>
-      <button
-        type="button"
-        className="text-app-fg-muted hover:bg-app-active hover:text-app-fg focus-visible:ring-app-focus inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs font-medium outline-none focus-visible:ring-2"
-        title={fullscreen ? "Salir de pantalla completa (Esc)" : "Pantalla completa (Explorador + escritorio)"}
-        aria-pressed={fullscreen}
-        onClick={() => void toggleFullscreen()}
-      >
-        <svg className="size-4 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-          {fullscreen ? (
-            <path d="M9 9V5H5v4h4zm10 10v-4h-4v4h4zm0-16h-4v4h4V3zm-10 16v-4H5v4h4z" />
-          ) : (
-            <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" />
-          )}
-        </svg>
-        <span className="hidden sm:inline">{fullscreen ? "Salir pantalla completa" : "Pantalla completa"}</span>
-      </button>
-
-      <div className="bg-app-active mx-0.5 hidden h-5 w-px sm:block" aria-hidden />
-
       <button
         type="button"
         disabled={!deskSurfaceReady}
@@ -168,6 +122,14 @@ export function MarcadoresDesktopLayoutBar({
         </svg>
         <span className="hidden sm:inline">Dos columnas</span>
       </button>
+
+      <div className="bg-app-active mx-0.5 hidden h-5 w-px sm:block" aria-hidden />
+
+      <span className="text-app-fg-label hidden shrink-0 text-[11px] font-medium tracking-wide uppercase md:inline">
+        Escritorio
+      </span>
+
+      <MarcadoresFullscreenToggleButton fullscreenTargetRef={fullscreenTargetRef} variant="labeled" />
     </div>
   )
 }
