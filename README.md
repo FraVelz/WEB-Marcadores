@@ -62,14 +62,16 @@ Sin `.env.local` o sin credenciales Supabase válidas se activa el modo demo (da
 ├── src/features/                    # UI por dominio — login, marcadores, atajos, perfil
 │   ├── login/                       # LoginPage, useLogin, types
 │   ├── marcadores/                  # página principal, hooks, toolbar, grid…
+│   │   └── components/
+│   │       ├── bookmark/            # modal, panel detalle, tags…
+│   │       └── explorer/            # árbol del explorador lateral
 │   ├── atajos/                      # AtajosPage, data de atajos
 │   └── perfil/                      # PerfilPage, hooks de usuario y auth
-├── src/components/                  # piezas reutilizables
-│   ├── bookmark/                    # secciones del formulario y detalle de marcador
-│   ├── DashboardShell.tsx
-│   ├── BookmarkModal.tsx
-│   ├── ExplorerTree.tsx
-│   └── TagAutocomplete.tsx
+├── src/components/                  # UI global del dashboard
+│   └── header/                      # cabecera móvil, explorador ancho, dashboardNav
+├── src/layouts/dashboard/           # shell del dashboard (sidebar, composición)
+│   ├── sidebar/                     # nav, drawer móvil, utilidades del árbol
+│   └── shell/                       # DashboardShell + DashboardMobileLayout
 ├── src/lib/
 │   ├── supabase/client.ts           # cliente browser
 │   ├── demo-data.ts

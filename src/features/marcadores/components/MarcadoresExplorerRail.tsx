@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 
 import { useDashboard } from "@/contexts/DashboardContext"
 
-import ExplorerTree from "@/components/ExplorerTree"
+import ExplorerTree from "@/features/marcadores/components/explorer/ExplorerTree"
 import { useDashboardSidebarKeyboard } from "@/layouts/dashboard/hooks/useDashboardSidebarKeyboard"
 
 import { cn } from "@/lib/utils"

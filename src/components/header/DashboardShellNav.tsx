@@ -1,6 +1,6 @@
 import Link from "next/link"
 
-import { navItems } from "./utils"
+import { dashboardNavItems } from "@/components/header/dashboardNav"
 
 import { cn } from "@/lib/utils"
 
@@ -13,7 +13,7 @@ type DashboardShellNavProps = {
   compact?: boolean
 }
 
-/** Barra de navegación principal en una sola fila horizontal (scroll si el panel es estrecho). */
+/** Navegación principal del dashboard (cabecera explorador y drawer móvil). */
 export function DashboardShellNav({ pathname, onNavigate, toolbar, compact }: DashboardShellNavProps) {
   return (
     <nav
@@ -25,7 +25,7 @@ export function DashboardShellNav({ pathname, onNavigate, toolbar, compact }: Da
         "snap-x overflow-x-auto md:snap-none [&::-webkit-scrollbar]:h-1"
       )}
     >
-      {navItems.map((item) => {
+      {dashboardNavItems.map((item) => {
         const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
         return (
           <Link
@@ -38,7 +38,7 @@ export function DashboardShellNav({ pathname, onNavigate, toolbar, compact }: Da
               active ? "bg-app-nav-active text-app-fg" : "text-app-fg-secondary hover:bg-app-hover hover:text-app-fg"
             )}
           >
-            <svg className="text-app-fg-icon size-3.5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+            <svg className="size-3.5 shrink-0 opacity-90" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
             </svg>
             {item.label}

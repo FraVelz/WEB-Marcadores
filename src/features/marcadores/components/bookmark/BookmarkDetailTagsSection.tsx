@@ -1,6 +1,6 @@
 "use client"
 
-import TagAutocomplete from "@/components/TagAutocomplete"
+import TagAutocomplete from "@/features/marcadores/components/bookmark/TagAutocomplete"
 import { cn } from "@/lib/utils"
 
 type Props = {

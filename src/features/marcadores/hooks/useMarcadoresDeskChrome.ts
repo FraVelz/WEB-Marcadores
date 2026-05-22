@@ -2,7 +2,10 @@
 
 import { useCallback, useMemo, useRef, useState } from "react"
 
-import { createDefaultDeskWindowUi, type DeskWindowUiState } from "@/features/marcadores/page/deskWindowUiState"
+import {
+  createDefaultDeskLibraryPaneUi,
+  type DeskLibraryPaneUiState,
+} from "@/features/marcadores/state/libraryPaneUiState"
 import { makeDeskLibWinId } from "@/features/marcadores/page/marcadoresPageStorage"
 
 export function useMarcadoresDeskChrome(opts: {
@@ -15,7 +18,7 @@ export function useMarcadoresDeskChrome(opts: {
   const [deskLibWinIds, setDeskLibWinIds] = useState<string[]>(() => [makeDeskLibWinId()])
   const [focusedDeskLibId, setFocusedDeskLibId] = useState<string | null>(null)
   const [deskFolderByWin, setDeskFolderByWin] = useState<Record<string, string | null>>({})
-  const [deskUiByWin, setDeskUiByWin] = useState<Record<string, DeskWindowUiState>>({})
+  const [deskUiByWin, setDeskUiByWin] = useState<Record<string, DeskLibraryPaneUiState>>({})
 
   const itemRefsMapRef = useRef<Map<string, React.MutableRefObject<Map<number, HTMLDivElement>>>>(new Map())
   const searchRefMapRef = useRef<Map<string, React.RefObject<HTMLInputElement | null>>>(new Map())
@@ -39,9 +42,9 @@ export function useMarcadoresDeskChrome(opts: {
     [desktopWindowChrome, resolvedDeskLibPaneId, setSelectedFolderId]
   )
 
-  const updateDeskUi = useCallback((winId: string, recipe: (s: DeskWindowUiState) => DeskWindowUiState) => {
+  const updateDeskUi = useCallback((winId: string, recipe: (s: DeskLibraryPaneUiState) => DeskLibraryPaneUiState) => {
     setDeskUiByWin((prev) => {
-      const winPrev = prev[winId] ?? createDefaultDeskWindowUi()
+      const winPrev = prev[winId] ?? createDefaultDeskLibraryPaneUi()
       const winNext = recipe(winPrev)
       if (winNext === winPrev) return prev
       return { ...prev, [winId]: winNext }
@@ -83,7 +86,7 @@ export function useMarcadoresDeskChrome(opts: {
   const addDeskLibraryWindow = useCallback(() => {
     const id = makeDeskLibWinId()
     setDeskLibWinIds((prev) => [...prev, id])
-    setDeskUiByWin((prev) => ({ ...prev, [id]: createDefaultDeskWindowUi() }))
+    setDeskUiByWin((prev) => ({ ...prev, [id]: createDefaultDeskLibraryPaneUi() }))
     queueMicrotask(() => setFocusedDeskLibId(id))
   }, [])
 

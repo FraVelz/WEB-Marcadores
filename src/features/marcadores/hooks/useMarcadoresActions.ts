@@ -64,7 +64,10 @@ export function useMarcadoresActions({
   )
 
   const handleModalSubmit = useCallback(
-    async (data: import("@/components/BookmarkModal").BookmarkFormData, editingBookmark: Bookmark | null) => {
+    async (
+      data: import("@/features/marcadores/components/bookmark/BookmarkModal").BookmarkFormData,
+      editingBookmark: Bookmark | null
+    ) => {
       await persistMarcadoresBookmarkModal(
         { demoMode, supabase, setBookmarks, setDetailBookmark, refreshTags, fetchData },
         data,

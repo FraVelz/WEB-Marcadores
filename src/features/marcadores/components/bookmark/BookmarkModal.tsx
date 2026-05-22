@@ -4,9 +4,9 @@ import { useEffect, useState, useRef, useEffectEvent, useMemo } from "react"
 import { buildFolderOptions } from "@/lib/bookmark-utils"
 import { cn } from "@/lib/utils"
 import { splitCommaTags } from "@/lib/comma-tags"
-import BookmarkFormBasicInfo from "./bookmark/BookmarkFormBasicInfo"
-import BookmarkFormFolderSelect from "./bookmark/BookmarkFormFolderSelect"
-import BookmarkFormTagsSection from "./bookmark/BookmarkFormTagsSection"
+import BookmarkFormBasicInfo from "./BookmarkFormBasicInfo"
+import BookmarkFormFolderSelect from "./BookmarkFormFolderSelect"
+import BookmarkFormTagsSection from "./BookmarkFormTagsSection"
 
 export type BookmarkFormData = {
   title: string

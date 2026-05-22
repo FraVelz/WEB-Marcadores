@@ -2,19 +2,12 @@
 
 import { useCallback, useMemo, useRef, useState, type SetStateAction } from "react"
 
-import type { BrowseMode } from "@/features/marcadores/hooks/useMarcadoresData"
-import type { ViewAst } from "@/features/marcadores/views/viewTypes"
 import { createDefaultLibraryPaneUi, type LibraryPaneUiState } from "@/features/marcadores/state/libraryPaneUiState"
-import {
-  createLibraryPaneBindings,
-  expandLibraryPaneFields,
-  type LibraryPaneUiScope,
-} from "@/features/marcadores/state/libraryPaneUiScope"
+import { createLibraryPaneBindings, type LibraryPaneUiScope } from "@/features/marcadores/state/libraryPaneUiScope"
 
+/** Estado UI del panel global (vista simple); escritorio usa `deskUiByWin`. */
 export function useMarcadoresPageUiState() {
   const [paneUi, setPaneUi] = useState<LibraryPaneUiState>(createDefaultLibraryPaneUi)
-  const [browseMode, setBrowseMode] = useState<BrowseMode>("folder")
-  const [activeViewAst, setActiveViewAst] = useState<ViewAst | null>(null)
 
   const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map())
   const searchRef = useRef<HTMLInputElement>(null)
@@ -51,15 +44,5 @@ export function useMarcadoresPageUiState() {
     searchRef,
   }
 
-  return {
-    browseMode,
-    setBrowseMode,
-    activeViewAst,
-    setActiveViewAst,
-    globalScope,
-    patchPaneUi: patchState,
-    ...expandLibraryPaneFields(paneUi, bindings),
-    itemRefs,
-    searchRef,
-  }
+  return { globalScope }
 }

@@ -6,12 +6,10 @@ import { cn } from "@/lib/utils"
 
 export function MarcadoresPageMainLayout(props: {
   desktopWindowChrome: boolean
-  zonesBoard: boolean
-  zonesSlot: ReactNode
   desktopSlot: ReactNode
   stackedSlot: ReactNode
 }) {
-  const { desktopWindowChrome, zonesBoard, zonesSlot, desktopSlot, stackedSlot } = props
+  const { desktopWindowChrome, desktopSlot, stackedSlot } = props
   return (
     <div
       className={cn(
@@ -19,7 +17,7 @@ export function MarcadoresPageMainLayout(props: {
         desktopWindowChrome ? "flex-col" : "flex-col md:flex-row"
       )}
     >
-      {zonesBoard ? zonesSlot : desktopWindowChrome ? desktopSlot : stackedSlot}
+      {desktopWindowChrome ? desktopSlot : stackedSlot}
     </div>
   )
 }

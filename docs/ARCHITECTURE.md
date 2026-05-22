@@ -9,7 +9,7 @@ MarcadoresPage.tsx
         ├── browseScope       # carpeta activa (simple o ventana escritorio)
         ├── uiScope           # estado de panel (global o por winId)
         ├── bookmarkModal     # abrir/cerrar modal unificado
-        └── modes             # stacked | desktop | zones
+        └── stacked | desktop
 ```
 
 ## Cuándo hay modo escritorio
@@ -39,8 +39,8 @@ Si no: vista **stacked** (explorador + grid integrados).
 | `core/` | Funciones puras (derivados, filtro escritorio, teclado) |
 | `state/` | Tipos UI, scopes, modal, browse |
 | `data/` | Supabase/demo, bootstrap de listas |
-| `modes/stacked/` | Chrome y slots vista simple / zones |
-| `modes/desktop/` | Shell ventanas, persistencia, DnD |
+| `stacked/` | Chrome y slots vista simple |
+| `desktop/` | Shell ventanas, persistencia, DnD |
 | `components/` | Grid, árbol, toolbar compartidos |
 
 ## Apariencia global
@@ -95,9 +95,8 @@ Repetir al cerrar cada fase del refactor.
 | [`state/useBookmarkModalController.ts`](../src/features/marcadores/state/useBookmarkModalController.ts) | Modal sin ramas en la página |
 | [`core/deriveDesktopPaneEntry.ts`](../src/features/marcadores/core/deriveDesktopPaneEntry.ts) | Derivados por ventana escritorio |
 
-## Archivos legacy (compat / retirar gradualmente)
+## Implementación interna
 
-- `page/useMarcadoresPageDataHooks.ts` — implementación interna; consumir `useMarcadoresPage`
-- `page/useMarcadoresPageCommandHooks.tsx` — interno a `useMarcadoresPage`
-- `page/deskWindowUiState.ts` — re-exporta `state/libraryPaneUiState`
-- `page/deskUiBindings.ts` — re-exporta `state/libraryPaneUiScope`
+- `page/useMarcadoresPageDataHooks.ts` — datos y derivados; consumir `useMarcadoresPage`
+- `page/useMarcadoresPageCommands.tsx` — teclado, efectos y overlays
+- `hooks/useMarcadoresExplorerHeaderSlot.tsx` — slot cabecera global (simple + escritorio)

@@ -1,4 +1,3 @@
-import type { BrowseMode } from "@/features/marcadores/hooks/useMarcadoresData"
 import { buildMarcadoresFlatList } from "@/features/marcadores/hooks/useMarcadoresData"
 import type { Bookmark, FlatFolder, GridItem } from "@/features/marcadores/utils/types"
 import { getFolderPath } from "@/features/marcadores/utils/utils"
@@ -65,5 +64,5 @@ export function buildDeskPaneGridItems(
         locationLabel: folderPathCaption(folders, b.folder_id),
       }))
   }
-  return buildMarcadoresFlatList(folders, filteredBookmarks, selectedFolderId, "folder" satisfies BrowseMode)
+  return buildMarcadoresFlatList(folders, filteredBookmarks, selectedFolderId)
 }

@@ -9,39 +9,26 @@ import { useMarcadoresActions } from "@/features/marcadores/hooks/useMarcadoresA
 import { useMarcadoresData } from "@/features/marcadores/hooks/useMarcadoresData"
 import type { DeskLibraryPaneUiState } from "@/features/marcadores/state/libraryPaneUiState"
 import { createDefaultDeskLibraryPaneUi } from "@/features/marcadores/state/libraryPaneUiState"
-import { useMarcadoresPageUiState } from "@/features/marcadores/page/useMarcadoresPageUiState"
 import { countDuplicateClusters } from "@/features/marcadores/insights/duplicateClusters"
 import type { Bookmark } from "@/features/marcadores/utils/types"
 
 type DashPick = Pick<DashboardContextType, "setFolders" | "refreshFolders" | "refreshTags">
-type Ui = ReturnType<typeof useMarcadoresPageUiState>
 
 export type { DesktopPaneDerivedEntry } from "@/features/marcadores/core/deriveDesktopPaneEntry"
 
 export function useMarcadoresPageBookmarksBootstrap(p: {
-  u: Ui
   dash: DashPick
   activeBrowseFolderId: string | null
   desktopWindowChrome: boolean
   deskLibWinIds: string[]
   deskFolderByWin: Record<string, string | null>
   deskUiByWin: Record<string, DeskLibraryPaneUiState>
-  bookmarkPanelHooks?: {
-    setDetailBookmark: React.Dispatch<React.SetStateAction<Bookmark | null>>
-  }
-  searchValue?: string
+  setDetailBookmark: React.Dispatch<React.SetStateAction<Bookmark | null>>
+  searchValue: string
 }) {
-  const dataOpts = useMemo(
-    () =>
-      p.desktopWindowChrome
-        ? { browseMode: "folder" as const, activeViewAst: null }
-        : { browseMode: p.u.browseMode, activeViewAst: p.u.activeViewAst },
-    [p.desktopWindowChrome, p.u.activeViewAst, p.u.browseMode]
-  )
+  const searchForData = p.desktopWindowChrome ? "" : p.searchValue
 
-  const searchForData = p.desktopWindowChrome ? "" : (p.searchValue ?? p.u.searchValue)
-
-  const data = useMarcadoresData(searchForData, p.activeBrowseFolderId, p.dash.setFolders, dataOpts)
+  const data = useMarcadoresData(searchForData, p.activeBrowseFolderId, p.dash.setFolders)
 
   const desktopPaneDerived = useMemo((): Record<string, DesktopPaneDerivedEntry> | null => {
     if (!p.desktopWindowChrome) return null
@@ -65,7 +52,7 @@ export function useMarcadoresPageBookmarksBootstrap(p: {
     refreshTags: p.dash.refreshTags,
     fetchData: data.fetchData,
     selectedFolderId: p.activeBrowseFolderId,
-    setDetailBookmark: p.bookmarkPanelHooks?.setDetailBookmark ?? p.u.setDetailBookmark,
+    setDetailBookmark: p.setDetailBookmark,
   })
 
   const duplicateClusterCount = useMemo(() => countDuplicateClusters(data.bookmarks), [data.bookmarks])

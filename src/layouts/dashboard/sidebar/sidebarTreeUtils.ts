@@ -16,7 +16,7 @@ export function folderHasChildren(folders: Folder[], id: string): boolean {
   return !!f?.children?.length
 }
 
-export function flattenTree(folders: Folder[], collapsedIds: Set<string>): (string | null)[] {
+export function flattenSidebarTree(folders: Folder[], collapsedIds: Set<string>): (string | null)[] {
   const result: (string | null)[] = [null]
   const add = (items: Folder[]) => {
     for (const f of items) {
@@ -28,16 +28,4 @@ export function flattenTree(folders: Folder[], collapsedIds: Set<string>): (stri
   }
   add(folders)
   return result
-}
-
-export const navItems = [
-  { href: "/marcadores", label: "Marcadores" },
-  { href: "/estadisticas", label: "Estadísticas" },
-  { href: "/atajos", label: "Atajos" },
-  { href: "/perfil", label: "Perfil" },
-]
-
-export function mobileTitle(pathname: string): string {
-  const hit = navItems.find((n) => pathname === n.href || pathname.startsWith(`${n.href}/`))
-  return hit?.label ?? "Marcadores"
 }

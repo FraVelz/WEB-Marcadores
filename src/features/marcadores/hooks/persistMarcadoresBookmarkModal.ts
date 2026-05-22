@@ -2,7 +2,7 @@
 
 import type { Dispatch, SetStateAction } from "react"
 
-import type { BookmarkFormData } from "@/components/BookmarkModal"
+import type { BookmarkFormData } from "@/features/marcadores/components/bookmark/BookmarkModal"
 import { splitCommaTags } from "@/lib/comma-tags"
 import type { createClient } from "@/lib/supabase/client"
 

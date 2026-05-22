@@ -1,11 +1,11 @@
 import { cn } from "@/lib/utils"
 
-type MobileDrawerBackdropProps = {
+type Props = {
   open: boolean
   onClose: () => void
 }
 
-export function MobileDrawerBackdrop({ open, onClose }: MobileDrawerBackdropProps) {
+export function MobileDrawerBackdrop({ open, onClose }: Props) {
   return (
     <button
       type="button"

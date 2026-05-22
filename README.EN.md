@@ -62,14 +62,16 @@ Without a valid `.env.local` or Supabase credentials, the app runs in demo mode 
 ├── src/features/                    # domain UI — login, bookmarks, shortcuts, profile
 │   ├── login/                       # LoginPage, useLogin, types
 │   ├── marcadores/                  # main page, hooks, toolbar, grid…
+│   │   └── components/
+│   │       ├── bookmark/            # modal, detail panel, tags…
+│   │       └── explorer/            # sidebar folder tree
 │   ├── atajos/                      # AtajosPage, shortcut data
 │   └── perfil/                      # PerfilPage, user & auth hooks
-├── src/components/                  # shared pieces
-│   ├── bookmark/                    # bookmark form & detail sections
-│   ├── DashboardShell.tsx
-│   ├── BookmarkModal.tsx
-│   ├── ExplorerTree.tsx
-│   └── TagAutocomplete.tsx
+├── src/components/                  # global dashboard UI
+│   └── header/                      # mobile header, wide explorer bar, nav config
+├── src/layouts/dashboard/           # dashboard shell (sidebar, composition)
+│   ├── sidebar/                     # nav, mobile drawer, tree helpers
+│   └── shell/                       # DashboardShell + DashboardMobileLayout
 ├── src/lib/
 │   ├── supabase/client.ts           # browser client
 │   ├── demo-data.ts

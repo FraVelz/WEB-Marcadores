@@ -1,52 +1,52 @@
 "use client"
 
 import { useDashboard } from "@/contexts/DashboardContext"
+import { useMarcadoresExplorerHeaderSlot } from "@/features/marcadores/hooks/useMarcadoresExplorerHeaderSlot"
+import { useMarcadoresPageCommands } from "@/features/marcadores/page/useMarcadoresPageCommands"
+import {
+  useMarcadoresPageDataHooks,
+  type MarcadoresPageCore,
+} from "@/features/marcadores/page/useMarcadoresPageDataHooks"
 import { useBookmarkModalController } from "@/features/marcadores/state/useBookmarkModalController"
-import { useMarcadoresPageCommandHooks } from "@/features/marcadores/page/useMarcadoresPageCommandHooks"
-import { useMarcadoresPageDataHooks } from "@/features/marcadores/page/useMarcadoresPageDataHooks"
-import { useStackedExplorerToolbarRegistration } from "@/features/marcadores/stacked/useStackedExplorerToolbarRegistration"
 
-export type MarcadoresPageModel = ReturnType<typeof useMarcadoresPage>
+export type MarcadoresPageModel = MarcadoresPageCore &
+  ReturnType<typeof useMarcadoresPageCommands> & {
+    bookmarkModal: ReturnType<typeof useBookmarkModalController>
+  }
 
 /**
  * Hook público de la página Marcadores: datos, comandos y modal unificado.
  */
-export function useMarcadoresPage() {
-  const data = useMarcadoresPageDataHooks()
+export function useMarcadoresPage(): MarcadoresPageModel {
+  const core = useMarcadoresPageDataHooks()
   const { registerExplorerWideHeaderEnd } = useDashboard()
-  const commands = useMarcadoresPageCommandHooks(data)
+  const commands = useMarcadoresPageCommands(core)
 
-  useStackedExplorerToolbarRegistration({
-    active: data.stackedExplorerHeaderBar,
+  useMarcadoresExplorerHeaderSlot({
+    variant: "simple",
+    active: core.stackedExplorerHeaderBar,
     registerExplorerWideHeaderEnd,
   })
 
   const bookmarkModal = useBookmarkModalController({
-    desktopWindowChrome: data.desktopWindowChrome,
-    deskLibWinIds: data.deskLibWinIds,
-    deskFolderByWin: data.deskFolderByWin,
-    activeBrowseFolderId: data.browseScope.folderId,
-    globalUi: data.globalScope.getState(),
-    globalSetters: {
-      setModalOpen: data.globalScope.bindings.setModalOpen,
-      setEditingBookmark: data.globalScope.bindings.setEditingBookmark,
-      setBookmarkModalNonce: data.globalScope.bindings.setBookmarkModalNonce,
-    },
-    deskUiByWin: data.deskUiByWin,
-    updateDeskUi: data.updateDeskUi,
-    focusMain: data.focusMain,
+    desktopWindowChrome: core.desktopWindowChrome,
+    libraryPaneScope: core.libraryPaneScope,
+    deskLibWinIds: core.deskLibWinIds,
+    deskFolderByWin: core.deskFolderByWin,
+    activeBrowseFolderId: core.browseScope.folderId,
+    deskUiByWin: core.deskUiByWin,
+    updateDeskUi: core.updateDeskUi,
+    focusMain: core.focusMain,
   })
 
   return {
-    ...data,
+    ...core,
     ...commands,
     bookmarkModal,
-    /** Snapshot UI del panel global (vista simple). */
-    globalPaneUi: data.globalScope.getState(),
   }
 }
 
 export {
   useMarcadoresPageDataHooks,
-  type MarcadoresPageDataBundle,
+  type MarcadoresPageCore,
 } from "@/features/marcadores/page/useMarcadoresPageDataHooks"

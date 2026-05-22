@@ -1,28 +1,20 @@
 "use client"
 
-import { useMemo } from "react"
-
 import { useDashboard } from "@/contexts/DashboardContext"
 
 import { useMarcadoresDeskChrome } from "@/features/marcadores/hooks/useMarcadoresDeskChrome"
 import { useMarcadoresTreeDerived } from "@/features/marcadores/hooks/useMarcadoresTreeDerived"
 import { useMarcadoresViewMode } from "@/features/marcadores/hooks/useMarcadoresViewMode"
-import { useMinWidthMd } from "@/features/marcadores/hooks/useMinWidthMd"
-
 import { useBrowseScope } from "@/features/marcadores/state/browseScope"
-import { expandLibraryPaneFields } from "@/features/marcadores/state/libraryPaneUiScope"
 import { useResolvedLibraryPaneScope } from "@/features/marcadores/state/useResolvedLibraryPaneScope"
 import { useMarcadoresBookmarkRuntime } from "@/features/marcadores/page/useMarcadoresBookmarkRuntime"
 import { useMarcadoresPageBookmarksBootstrap } from "@/features/marcadores/page/useMarcadoresPageBookmarksBootstrap"
 import { useMarcadoresPageDnDLayer } from "@/features/marcadores/page/useMarcadoresPageDnDLayer"
 import { useMarcadoresPageUiState } from "@/features/marcadores/page/useMarcadoresPageUiState"
-import { useMarcadoresWorkspacePrefs } from "@/features/marcadores/page/useMarcadoresWorkspacePrefs"
-import { isZonesLayout } from "@/features/marcadores/workspaces/workspaceLayout"
-
-export type MarcadoresPageDataBundle = ReturnType<typeof useMarcadoresPageDataHooks>
+import { useMatchMediaMd } from "@/lib/hooks/useMatchMediaMd"
 
 export function useMarcadoresPageDataHooks() {
-  const u = useMarcadoresPageUiState()
+  const { globalScope } = useMarcadoresPageUiState()
 
   const {
     demoMode,
@@ -35,18 +27,14 @@ export function useMarcadoresPageDataHooks() {
     setMainKeyDown,
     focusMain,
     editFolderRef,
-    workspaceLayout,
-    persistWorkspaceLayout,
     registerMarcadoresRuntime,
     activeWorkspaceId,
   } = useDashboard()
 
-  const wideViewport = useMinWidthMd()
+  const wideViewport = useMatchMediaMd()
   const { mode: marcadoresViewMode } = useMarcadoresViewMode()
-  const zonesBoard = !!(workspaceLayout && isZonesLayout(workspaceLayout))
-  const zoneColumns = zonesBoard && workspaceLayout?.template === "zones" ? workspaceLayout.columns : []
-  const desktopWindowChrome = wideViewport && !zonesBoard && marcadoresViewMode === "escritorio"
-  const stackedExplorerHeaderBar = wideViewport && !zonesBoard && marcadoresViewMode === "simple"
+  const desktopWindowChrome = wideViewport && marcadoresViewMode === "escritorio"
+  const stackedExplorerHeaderBar = wideViewport && marcadoresViewMode === "simple"
 
   const desk = useMarcadoresDeskChrome({
     desktopWindowChrome,
@@ -82,7 +70,7 @@ export function useMarcadoresPageDataHooks() {
   const libraryPaneScope = useResolvedLibraryPaneScope({
     desktopWindowChrome,
     resolvedDeskLibPaneId,
-    globalScope: u.globalScope,
+    globalScope,
     deskUiByWin,
     updateDeskUi,
     getDeskItemRefs,
@@ -90,24 +78,15 @@ export function useMarcadoresPageDataHooks() {
   })
 
   const paneUi = libraryPaneScope.getState()
-  const paneFlat = useMemo(() => {
-    const s = libraryPaneScope.getState()
-    return {
-      ...expandLibraryPaneFields(s, libraryPaneScope.bindings),
-      itemRefs: libraryPaneScope.itemRefs,
-      searchRef: libraryPaneScope.searchRef,
-    }
-  }, [libraryPaneScope])
 
   const b = useMarcadoresPageBookmarksBootstrap({
-    u,
     dash: { setFolders: setCtxFolders, refreshFolders, refreshTags },
     activeBrowseFolderId: browseScope.folderId,
     desktopWindowChrome,
     deskLibWinIds,
     deskFolderByWin,
     deskUiByWin,
-    bookmarkPanelHooks: { setDetailBookmark: libraryPaneScope.bindings.setDetailBookmark },
+    setDetailBookmark: libraryPaneScope.bindings.setDetailBookmark,
     searchValue: desktopWindowChrome ? "" : paneUi.searchValue,
   })
 
@@ -139,14 +118,6 @@ export function useMarcadoresPageDataHooks() {
     paneBindings: libraryPaneScope.bindings,
   })
 
-  useMarcadoresWorkspacePrefs(
-    desktopWindowChrome ? null : activeWorkspaceId,
-    u.browseMode,
-    u.activeViewAst,
-    u.setBrowseMode,
-    u.setActiveViewAst
-  )
-
   const {
     treeCollapsedIds,
     treeFlatRows,
@@ -156,8 +127,6 @@ export function useMarcadoresPageDataHooks() {
   } = useMarcadoresTreeDerived({
     folders,
     filteredBookmarks,
-    browseMode: desktopWindowChrome ? "folder" : u.browseMode,
-    zonesBoard,
     paneScope: libraryPaneScope,
     flatList,
   })
@@ -169,9 +138,7 @@ export function useMarcadoresPageDataHooks() {
   const focusFlatList = derivedFocused?.focusFlatList ?? focusFlatGlobal
   const treeFlatRowsEffective = derivedFocused?.treeFlatRows ?? treeFlatRows
 
-  const ixDnd = useMarcadoresPageDnDLayer({
-    workspaceLayout,
-    persistWorkspaceLayout,
+  const interactions = useMarcadoresPageDnDLayer({
     folders,
     bookmarks,
     handlePasteFolder,
@@ -191,14 +158,8 @@ export function useMarcadoresPageDataHooks() {
   })
 
   return {
-    ...u,
-    ...b,
-    ...paneFlat,
     libraryPaneScope,
-    browseMode: desktopWindowChrome ? "folder" : u.browseMode,
-    setBrowseMode: u.setBrowseMode,
-    activeViewAst: desktopWindowChrome ? null : u.activeViewAst,
-    setActiveViewAst: u.setActiveViewAst,
+    browseScope,
     demoMode,
     selectedFolderId,
     setSelectedFolderId,
@@ -207,8 +168,6 @@ export function useMarcadoresPageDataHooks() {
     editFolderRef,
     allTags,
     activeWorkspaceId,
-    zonesBoard,
-    zoneColumns,
     marcadoresViewMode,
     desktopWindowChrome,
     stackedExplorerHeaderBar,
@@ -222,9 +181,6 @@ export function useMarcadoresPageDataHooks() {
     getDeskItemRefs,
     getDeskSearchRef,
     resolvedDeskLibPaneId,
-    browseScope,
-    activeBrowseFolderId: browseScope.folderId,
-    setActiveBrowseFolderId: browseScope.setFolderId,
     addDeskLibraryWindow,
     closeDeskLibraryWindow,
     focusDeskLibraryPane,
@@ -245,8 +201,22 @@ export function useMarcadoresPageDataHooks() {
     toggleTreeFolderCollapse,
     primaryViewMode,
     focusFlatList,
-    ...ixDnd,
+    onModalSubmit: interactions.onModalSubmit,
+    onRenameFolder: interactions.onRenameFolder,
+    onCreateFolder: interactions.onCreateFolder,
+    onConfirmDelete: interactions.onConfirmDelete,
+    onDelete: interactions.onDelete,
+    handleAdd: interactions.handleAdd,
+    handleEdit: interactions.handleEdit,
+    handleDoubleClick: interactions.handleDoubleClick,
+    handleDrop: interactions.handleDrop,
+    makeDeskPaneDoubleClick: interactions.makeDeskPaneDoubleClick,
+    makeDeskPaneDrop: interactions.makeDeskPaneDrop,
+    toggleSelect: interactions.toggleSelect,
     handlePasteFolder,
     handlePasteLink,
+    onBookmarkUpdate: interactions.onBookmarkUpdate,
   }
 }
+
+export type MarcadoresPageCore = ReturnType<typeof useMarcadoresPageDataHooks>

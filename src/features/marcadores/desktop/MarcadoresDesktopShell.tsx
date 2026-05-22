@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useReducer, useRef } from "react"
 import { useDashboard } from "@/contexts/DashboardContext"
 
 import type { MarcadoresDesktopLibraryPaneShareProps } from "@/features/marcadores/MarcadoresDesktopLibraryPaneBody"
+import { useMarcadoresExplorerHeaderSlot } from "@/features/marcadores/hooks/useMarcadoresExplorerHeaderSlot"
 import type { WindowBounds } from "@/features/marcadores/desktop/windowTypes"
 import {
   applyDeskPatch,
@@ -18,7 +19,6 @@ import {
   MarcadoresDesktopShellCanvas,
   MIN_CANVAS,
   useDeskCanvasDropHighlight,
-  useDeskExplorerToolbarRegistration,
   useDeskPersistSchedule,
   useDeskShellDragClear,
   useDeskShellHydration,
@@ -168,7 +168,8 @@ export function MarcadoresDesktopShell({
   const deskSurfaceReady = deskReady && canvas.w >= MIN_CANVAS && canvas.h >= MIN_CANVAS
   const canTileTwoColumns = libraryWindowIds.length === 2
 
-  useDeskExplorerToolbarRegistration({
+  useMarcadoresExplorerHeaderSlot({
+    variant: "desk",
     registerExplorerWideHeaderEnd,
     desktopWm,
     canTileTwoColumns,
