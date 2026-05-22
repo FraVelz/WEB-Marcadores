@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic"
 
 import { cookies } from "next/headers"
 
-import DashboardShell from "@/layouts/dashboard/DashboardShell"
+import { DashboardShell } from "@/layouts"
 import { DashboardProvider } from "@/contexts/DashboardContext"
 
 import { cookieHeaderFromRequestCookies, isDemoMode } from "@/lib/demo-data"

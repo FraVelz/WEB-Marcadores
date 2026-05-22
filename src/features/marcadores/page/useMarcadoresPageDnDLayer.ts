@@ -2,7 +2,7 @@
 
 import { useCallback } from "react"
 
-import type { BookmarkFormData } from "@/components/BookmarkModal"
+import type { BookmarkFormData } from "@/features/marcadores/components/bookmark/BookmarkModal"
 
 import type { Folder } from "@/contexts/DashboardContext"
 
@@ -10,12 +10,9 @@ import { useMarcadoresDropHandlers } from "@/features/marcadores/hooks/useMarcad
 import { useMarcadoresPageInteractions } from "@/features/marcadores/hooks/useMarcadoresPageInteractions"
 import type { LibraryPaneUiScope } from "@/features/marcadores/state/libraryPaneUiScope"
 import type { Bookmark } from "@/features/marcadores/utils/types"
-import type { WorkspaceLayoutPayload } from "@/features/marcadores/workspaces/workspaceLayout"
 
 /** Interacciones de página + DnD, una vez cargados datos y vistas derivadas del árbol. */
 export function useMarcadoresPageDnDLayer(p: {
-  workspaceLayout: WorkspaceLayoutPayload | null
-  persistWorkspaceLayout: (payload: WorkspaceLayoutPayload) => Promise<void>
   folders: Folder[]
   bookmarks: Bookmark[]
   handlePasteFolder: (folderId: string, destParentId: string | null) => void
@@ -41,8 +38,6 @@ export function useMarcadoresPageDnDLayer(p: {
   const b = p.paneScope.bindings
 
   const ix = useMarcadoresPageInteractions({
-    workspaceLayout: p.workspaceLayout,
-    persistWorkspaceLayout: p.persistWorkspaceLayout,
     handleDeleteFolder: p.handleDeleteFolder,
     handleDelete: p.handleDelete,
     selectedIds: ui.selectedIds,

@@ -1,177 +1,73 @@
 "use client"
 
-import type { ViewAst } from "@/features/marcadores/views/viewTypes"
-
 import DemoBanner from "@/features/marcadores/components/DemoBanner"
 import DeleteConfirmBanner from "@/features/marcadores/components/DeleteConfirmBanner"
 import MarcadoresBreadcrumb from "@/features/marcadores/components/MarcadoresBreadcrumb"
 import MarcadoresBrowseControls from "@/features/marcadores/components/MarcadoresBrowseControls"
 import MarcadoresToolbar from "@/features/marcadores/components/MarcadoresToolbar"
 import PasteErrorBanner from "@/features/marcadores/components/PasteErrorBanner"
-import type { BrowseMode } from "@/features/marcadores/hooks/useMarcadoresData"
-import type { Bookmark, GridItem } from "@/features/marcadores/utils/types"
+import type { MarcadoresPageModel } from "@/features/marcadores/useMarcadoresPage"
 
-type BreadcrumbItem = { id: string | null; label: string }
-
-export type MarcadoresPageStackedChromeProps = {
-  showBreadcrumb: boolean
-  demoMode: boolean
-  pasteError: string | null
-  deleteConfirmItem: GridItem | null
-  onConfirmDelete: (item: GridItem) => void
-  onCancelDelete: () => void
-  browseMode: BrowseMode
-  setBrowseMode: React.Dispatch<React.SetStateAction<BrowseMode>>
-  activeViewAst: ViewAst | null
-  setActiveViewAst: React.Dispatch<React.SetStateAction<ViewAst | null>>
-  duplicateClusterCount: number
-  breadcrumb: BreadcrumbItem[]
-  onSelectBreadcrumb: (id: string | null) => void
-  showSearch: boolean
-  setShowSearch: React.Dispatch<React.SetStateAction<boolean>>
-  searchValue: string
-  setSearchValue: React.Dispatch<React.SetStateAction<string>>
-  searchRef: React.RefObject<HTMLInputElement | null>
-  focusMain: () => void
-  showNewFolder: boolean
-  setShowNewFolder: React.Dispatch<React.SetStateAction<boolean>>
-  newFolderName: string
-  setNewFolderName: React.Dispatch<React.SetStateAction<string>>
-  editingFolder: { id: string; name: string } | null
-  setEditingFolder: React.Dispatch<React.SetStateAction<{ id: string; name: string } | null>>
-  renameFolderName: string
-  setRenameFolderName: React.Dispatch<React.SetStateAction<string>>
-  onRenameFolder: () => Promise<void>
-  onNavigateExploreRoot: () => void
-  handleAdd: () => void
-  onDeleteFocused: () => void
-  onCreateFolder: () => Promise<void>
-  selectMode: boolean
-  setSelectMode: React.Dispatch<React.SetStateAction<boolean>>
-  selectedIds: Set<string>
-  setSelectedIds: React.Dispatch<React.SetStateAction<Set<string>>>
-  handleEdit: () => void
-  onDelete: () => Promise<void>
-  infoPanelEnabled: boolean
-  setInfoPanelEnabled: React.Dispatch<React.SetStateAction<boolean>>
-  focusFlatList: GridItem[]
-  selectedIndex: number
-  setDetailBookmark: React.Dispatch<React.SetStateAction<Bookmark | null>>
-  treeView: boolean
-  onToggleTreeView?: () => void
-  treeToggleDisabled: boolean
-  showFullscreenToggle?: boolean
-}
-
-export function MarcadoresPageStackedChrome(props: MarcadoresPageStackedChromeProps) {
-  const {
-    showBreadcrumb,
-    demoMode,
-    pasteError,
-    deleteConfirmItem,
-    onConfirmDelete,
-    onCancelDelete,
-    browseMode,
-    setBrowseMode,
-    activeViewAst,
-    setActiveViewAst,
-    duplicateClusterCount,
-    breadcrumb,
-    onSelectBreadcrumb,
-    showSearch,
-    setShowSearch,
-    searchValue,
-    setSearchValue,
-    searchRef,
-    focusMain,
-    showNewFolder,
-    setShowNewFolder,
-    newFolderName,
-    setNewFolderName,
-    editingFolder,
-    setEditingFolder,
-    renameFolderName,
-    setRenameFolderName,
-    onRenameFolder,
-    onNavigateExploreRoot,
-    handleAdd,
-    onDeleteFocused,
-    onCreateFolder,
-    selectMode,
-    setSelectMode,
-    selectedIds,
-    setSelectedIds,
-    handleEdit,
-    onDelete,
-    infoPanelEnabled,
-    setInfoPanelEnabled,
-    focusFlatList,
-    selectedIndex,
-    setDetailBookmark,
-    treeView,
-    onToggleTreeView,
-    treeToggleDisabled,
-    showFullscreenToggle = true,
-  } = props
+export function MarcadoresPageStackedChrome({ m }: { m: MarcadoresPageModel }) {
+  const scope = m.libraryPaneScope
+  const pane = scope.getState()
+  const b = scope.bindings
 
   return (
     <>
       <MarcadoresToolbar
-        showSearch={showSearch}
-        setShowSearch={setShowSearch}
-        searchValue={searchValue}
-        setSearchValue={setSearchValue}
-        searchRef={searchRef}
-        focusMain={focusMain}
-        showNewFolder={showNewFolder}
-        setShowNewFolder={setShowNewFolder}
-        newFolderName={newFolderName}
-        setNewFolderName={setNewFolderName}
-        editingFolder={editingFolder}
-        setEditingFolder={setEditingFolder}
-        renameFolderName={renameFolderName}
-        setRenameFolderName={setRenameFolderName}
-        onRenameFolder={onRenameFolder}
-        onNavigateUp={onNavigateExploreRoot}
-        onAddBookmark={handleAdd}
-        onDeleteFocused={onDeleteFocused}
-        onCreateFolder={onCreateFolder}
-        selectMode={selectMode}
-        setSelectMode={setSelectMode}
-        selectedIds={selectedIds}
-        setSelectedIds={setSelectedIds}
-        onEdit={handleEdit}
-        onDelete={onDelete}
-        infoPanelEnabled={infoPanelEnabled}
-        setInfoPanelEnabled={setInfoPanelEnabled}
-        flatList={focusFlatList}
-        selectedIndex={selectedIndex}
-        setDetailBookmark={setDetailBookmark}
-        treeView={treeView}
-        onToggleTreeView={onToggleTreeView}
-        treeToggleDisabled={treeToggleDisabled}
-        showFullscreenToggle={showFullscreenToggle}
+        showSearch={pane.showSearch}
+        setShowSearch={b.setShowSearch}
+        searchValue={pane.searchValue}
+        setSearchValue={b.setSearchValue}
+        searchRef={scope.searchRef}
+        focusMain={m.focusMain}
+        showNewFolder={pane.showNewFolder}
+        setShowNewFolder={b.setShowNewFolder}
+        newFolderName={pane.newFolderName}
+        setNewFolderName={b.setNewFolderName}
+        editingFolder={pane.editingFolder}
+        setEditingFolder={b.setEditingFolder}
+        renameFolderName={pane.renameFolderName}
+        setRenameFolderName={b.setRenameFolderName}
+        onRenameFolder={m.onRenameFolder}
+        onNavigateUp={() => m.browseScope.setFolderId(null)}
+        onAddBookmark={m.handleAdd}
+        onDeleteFocused={() => {
+          const item = m.focusFlatList[pane.selectedIndex]
+          if (item) b.setDeleteConfirmItem(item)
+        }}
+        onCreateFolder={m.onCreateFolder}
+        selectMode={pane.selectMode}
+        setSelectMode={b.setSelectMode}
+        selectedIds={pane.selectedIds}
+        setSelectedIds={b.setSelectedIds}
+        onEdit={m.handleEdit}
+        onDelete={m.onDelete}
+        infoPanelEnabled={pane.infoPanelEnabled}
+        setInfoPanelEnabled={b.setInfoPanelEnabled}
+        flatList={m.focusFlatList}
+        selectedIndex={pane.selectedIndex}
+        setDetailBookmark={b.setDetailBookmark}
+        treeView={pane.viewMode === "tree"}
+        onToggleTreeView={m.treeToggleDisabled ? undefined : m.toggleTreeMainView}
+        treeToggleDisabled={m.treeToggleDisabled}
+        showFullscreenToggle={!m.stackedExplorerHeaderBar}
       />
 
-      <MarcadoresBrowseControls
-        browseMode={browseMode}
-        setBrowseMode={setBrowseMode}
-        activeViewAst={activeViewAst}
-        setActiveViewAst={setActiveViewAst}
-        duplicateClusterCount={duplicateClusterCount}
-      />
+      <MarcadoresBrowseControls duplicateClusterCount={m.duplicateClusterCount} />
 
-      {pasteError && <PasteErrorBanner message={pasteError} />}
-      {deleteConfirmItem ? (
+      {pane.pasteError && <PasteErrorBanner message={pane.pasteError} />}
+      {pane.deleteConfirmItem ? (
         <DeleteConfirmBanner
-          item={deleteConfirmItem}
-          onConfirm={() => onConfirmDelete(deleteConfirmItem)}
-          onCancel={onCancelDelete}
+          item={pane.deleteConfirmItem}
+          onConfirm={() => m.onConfirmDelete(pane.deleteConfirmItem!)}
+          onCancel={() => b.setDeleteConfirmItem(null)}
         />
       ) : null}
-      {demoMode && <DemoBanner />}
+      {m.demoMode && <DemoBanner />}
 
-      {showBreadcrumb ? <MarcadoresBreadcrumb breadcrumb={breadcrumb} onSelect={onSelectBreadcrumb} /> : null}
+      <MarcadoresBreadcrumb breadcrumb={m.breadcrumb} onSelect={m.browseScope.setFolderId} />
     </>
   )
 }

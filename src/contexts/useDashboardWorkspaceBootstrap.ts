@@ -5,7 +5,7 @@ import { useCallback, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import type { AuthResponse } from "@supabase/supabase-js"
 import type { WorkspaceLayoutPayload } from "@/features/marcadores/workspaces/workspaceLayout"
-import { SINGLE_LAYOUT_PAYLOAD } from "@/features/marcadores/workspaces/workspaceLayout"
+import { normalizeWorkspaceLayout, SINGLE_LAYOUT_PAYLOAD } from "@/features/marcadores/workspaces/workspaceLayout"
 import type { WorkspaceRow } from "@/features/marcadores/workspaces/workspaceTypes"
 import { DEMO_WORKSPACES } from "@/lib/demo-data"
 import { readTabScopedItem } from "@/lib/tabScopedStorage"
@@ -97,7 +97,7 @@ export function useDashboardWorkspaceBootstrap(opts: {
       if (demoMode) {
         try {
           const raw = readTabScopedItem(layoutStorageKeyBase(workspaceId, true))
-          if (raw) setWorkspaceLayout(JSON.parse(raw) as WorkspaceLayoutPayload)
+          if (raw) setWorkspaceLayout(normalizeWorkspaceLayout(JSON.parse(raw)))
           else setWorkspaceLayout(SINGLE_LAYOUT_PAYLOAD)
         } catch {
           setWorkspaceLayout(SINGLE_LAYOUT_PAYLOAD)
@@ -110,7 +110,7 @@ export function useDashboardWorkspaceBootstrap(opts: {
         .select("payload")
         .eq("workspace_id", workspaceId)
         .maybeSingle()
-      if (data?.payload) setWorkspaceLayout(data.payload as WorkspaceLayoutPayload)
+      if (data?.payload) setWorkspaceLayout(normalizeWorkspaceLayout(data.payload))
       else setWorkspaceLayout(SINGLE_LAYOUT_PAYLOAD)
     },
     [demoMode, setWorkspaceLayout]

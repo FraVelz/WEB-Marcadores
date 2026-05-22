@@ -6,8 +6,8 @@ import Image from "next/image"
 import type { Bookmark } from "@/features/marcadores/utils/types"
 
 import { buildFolderOptions, getFaviconUrl, getFolderPathLabel } from "@/lib/bookmark-utils"
-import BookmarkDetailFolderSection from "./bookmark/BookmarkDetailFolderSection"
-import BookmarkDetailTagsSection from "./bookmark/BookmarkDetailTagsSection"
+import BookmarkDetailFolderSection from "./BookmarkDetailFolderSection"
+import BookmarkDetailTagsSection from "./BookmarkDetailTagsSection"
 
 import { cn } from "@/lib/utils"
 

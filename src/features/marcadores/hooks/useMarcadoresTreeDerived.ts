@@ -5,31 +5,22 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import type { Folder } from "@/contexts/DashboardContext"
 
 import type { TreeFlatRow } from "@/features/marcadores/components/MarcadoresTreeView"
-import type { BrowseMode } from "@/features/marcadores/hooks/useMarcadoresData"
 import type { LibraryPaneUiScope } from "@/features/marcadores/state/libraryPaneUiScope"
 import type { Bookmark, GridItem } from "@/features/marcadores/utils/types"
 
 export function useMarcadoresTreeDerived(opts: {
   folders: Folder[]
   filteredBookmarks: Bookmark[]
-  browseMode: BrowseMode
-  zonesBoard: boolean
   paneScope: LibraryPaneUiScope
   flatList: GridItem[]
 }) {
-  const { folders, filteredBookmarks, browseMode, zonesBoard, paneScope, flatList } = opts
+  const { folders, filteredBookmarks, paneScope, flatList } = opts
   const pane = paneScope.getState()
-  const { setViewMode, setSelectedIndex } = paneScope.bindings
+  const { setSelectedIndex } = paneScope.bindings
   const { viewMode, searchValue } = pane
   const { itemRefs } = paneScope
 
   const [treeCollapsedIds, setTreeCollapsedIds] = useState<Set<string>>(() => new Set())
-
-  useEffect(() => {
-    queueMicrotask(() => {
-      if ((browseMode === "filter" || zonesBoard) && viewMode === "tree") setViewMode("grid")
-    })
-  }, [browseMode, zonesBoard, setViewMode, viewMode])
 
   const treeFlatRows = useMemo((): TreeFlatRow[] => {
     const result: TreeFlatRow[] = []
@@ -55,7 +46,7 @@ export function useMarcadoresTreeDerived(opts: {
     return result
   }, [folders, filteredBookmarks, treeCollapsedIds])
 
-  const primaryViewMode = browseMode === "filter" ? "grid" : viewMode
+  const primaryViewMode = viewMode
   const focusFlatList = primaryViewMode === "tree" ? treeFlatRows.map((r) => r.item) : flatList
 
   const toggleTreeFolderCollapse = useCallback((folderId: string) => {

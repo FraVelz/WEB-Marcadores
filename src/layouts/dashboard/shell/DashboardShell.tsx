@@ -2,16 +2,12 @@
 
 import { usePathname, useRouter } from "next/navigation"
 
-import { useDashboardGlobalShortcuts } from "./hooks/useDashboardGlobalShortcuts"
-import { useFocusMainOnMarcadoresRoute } from "./hooks/useFocusMainOnMarcadoresRoute"
-
 import { useAppAppearance } from "@/contexts/AppAppearanceContext"
 import { useDashboard } from "@/contexts/DashboardContext"
-
-import { DashboardCommandPalette } from "./components/DashboardCommandPalette"
-
-import { DashboardMobileLayout } from "./DashboardMobileLayout"
-
+import { DashboardCommandPalette } from "@/layouts/dashboard/components/DashboardCommandPalette"
+import { useDashboardGlobalShortcuts } from "@/layouts/dashboard/hooks/useDashboardGlobalShortcuts"
+import { useFocusMainOnMarcadoresRoute } from "@/layouts/dashboard/hooks/useFocusMainOnMarcadoresRoute"
+import { DashboardMobileLayout } from "@/layouts/dashboard/shell/DashboardMobileLayout"
 import { cn } from "@/lib/utils"
 
 export default function DashboardShell({ children }: { children: React.ReactNode }) {

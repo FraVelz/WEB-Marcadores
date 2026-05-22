@@ -2,7 +2,7 @@
 
 import type { Dispatch, ReactNode, SetStateAction } from "react"
 
-import BookmarkDetailPanel from "@/components/BookmarkDetailPanel"
+import BookmarkDetailPanel from "@/features/marcadores/components/bookmark/BookmarkDetailPanel"
 
 import { MarcadoresDesktopShell } from "@/features/marcadores/desktop/MarcadoresDesktopShell"
 import type { MarcadoresDesktopLibraryPaneBodyProps } from "@/features/marcadores/MarcadoresDesktopLibraryPaneBody"

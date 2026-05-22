@@ -67,24 +67,6 @@ export function createLibraryPaneBindings(
   }
 }
 
-type GlobalPaneHost = {
-  getState: () => LibraryPaneUiState
-  patchState: (recipe: (s: LibraryPaneUiState) => LibraryPaneUiState) => void
-  itemRefs: MutableRefObject<Map<number, HTMLDivElement>>
-  searchRef: RefObject<HTMLInputElement | null>
-  setters: LibraryPaneUiBindings
-}
-
-export function createGlobalPaneScope(host: GlobalPaneHost): LibraryPaneUiScope {
-  return {
-    getState: host.getState,
-    patch: host.patchState,
-    bindings: host.setters,
-    itemRefs: host.itemRefs,
-    searchRef: host.searchRef,
-  }
-}
-
 export function createDeskPaneScope(
   winId: string,
   deskUiByWin: Record<string, DeskLibraryPaneUiState>,
@@ -124,83 +106,4 @@ export function createDeskPaneScope(
 
 export type DeskPaneUiBindings = LibraryPaneUiBindings & {
   setSearchLibraryWide: Setter<boolean>
-}
-
-/** Setters enlazados a una ventana del escritorio (compat legacy). */
-export function createDeskUiBindings(
-  winId: string,
-  updateDeskUi: (id: string, recipe: (s: DeskLibraryPaneUiState) => DeskLibraryPaneUiState) => void
-): DeskPaneUiBindings {
-  const patch = <K extends keyof DeskLibraryPaneUiState>(key: K, action: SetStateAction<DeskLibraryPaneUiState[K]>) => {
-    updateDeskUi(winId, (s) => {
-      const next =
-        typeof action === "function"
-          ? (action as (x: DeskLibraryPaneUiState[K]) => DeskLibraryPaneUiState[K])(s[key])
-          : action
-      if (Object.is(next, s[key])) return s
-      return { ...s, [key]: next }
-    })
-  }
-
-  return {
-    ...createLibraryPaneBindings(
-      patch as <Key extends keyof LibraryPaneUiState>(key: Key, action: SetStateAction<LibraryPaneUiState[Key]>) => void
-    ),
-    setSearchLibraryWide: (a) => patch("searchLibraryWide", a),
-  }
-}
-
-/** Valores + setters del panel (sin refs). */
-export function expandLibraryPaneFields(state: LibraryPaneUiState, bindings: LibraryPaneUiBindings) {
-  const s = state
-  const b = bindings
-  return {
-    selectedIndex: s.selectedIndex,
-    setSelectedIndex: b.setSelectedIndex,
-    selectMode: s.selectMode,
-    setSelectMode: b.setSelectMode,
-    selectedIds: s.selectedIds,
-    setSelectedIds: b.setSelectedIds,
-    modalOpen: s.modalOpen,
-    setModalOpen: b.setModalOpen,
-    editingBookmark: s.editingBookmark,
-    setEditingBookmark: b.setEditingBookmark,
-    detailBookmark: s.detailBookmark,
-    setDetailBookmark: b.setDetailBookmark,
-    showSearch: s.showSearch,
-    setShowSearch: b.setShowSearch,
-    infoPanelEnabled: s.infoPanelEnabled,
-    setInfoPanelEnabled: b.setInfoPanelEnabled,
-    gridCols: s.gridCols,
-    setGridCols: b.setGridCols,
-    newFolderName: s.newFolderName,
-    setNewFolderName: b.setNewFolderName,
-    showNewFolder: s.showNewFolder,
-    setShowNewFolder: b.setShowNewFolder,
-    editingFolder: s.editingFolder,
-    setEditingFolder: b.setEditingFolder,
-    renameFolderName: s.renameFolderName,
-    setRenameFolderName: b.setRenameFolderName,
-    cutItem: s.cutItem,
-    setCutItem: b.setCutItem,
-    pasteError: s.pasteError,
-    setPasteError: b.setPasteError,
-    deleteConfirmItem: s.deleteConfirmItem,
-    setDeleteConfirmItem: b.setDeleteConfirmItem,
-    searchValue: s.searchValue,
-    setSearchValue: b.setSearchValue,
-    bookmarkModalNonce: s.bookmarkModalNonce,
-    setBookmarkModalNonce: b.setBookmarkModalNonce,
-    viewMode: s.viewMode,
-    setViewMode: b.setViewMode,
-  }
-}
-
-/** Valores + setters + refs del panel para compat con el bundle legacy de la página. */
-export function expandLibraryPaneScope(scope: LibraryPaneUiScope) {
-  return {
-    ...expandLibraryPaneFields(scope.getState(), scope.bindings),
-    itemRefs: scope.itemRefs,
-    searchRef: scope.searchRef,
-  }
 }

@@ -1,7 +1,6 @@
 export { MarcadoresDesktopShellCanvas } from "./MarcadoresDesktopShellCanvas"
 export { MIN_CANVAS } from "./desktopShellConstants"
 export { useDeskCanvasDropHighlight } from "./useDeskCanvasDropHighlight"
-export { useDeskExplorerToolbarRegistration } from "./useDeskExplorerToolbarRegistration"
 export { useDeskPersistSchedule } from "./useDeskPersistSchedule"
 export { useDeskShellDragClear } from "./useDeskShellDragClear"
 export { useDeskShellHydration } from "./useDeskShellHydration"

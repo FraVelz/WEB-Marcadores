@@ -1,20 +1,16 @@
 "use client"
 
 import { MarcadoresViewModeToggle } from "@/features/marcadores/components/MarcadoresViewModeToggle"
+import { dashboardMobileTitle, isMarcadoresRoute } from "@/components/header/dashboardNav"
 
-import { mobileTitle } from "./utils"
-
-function isMarcadoresRoute(pathname: string) {
-  return pathname === "/marcadores" || pathname.startsWith("/marcadores/")
-}
-
-type DashboardMobileHeaderProps = {
+type Props = {
   pathname: string
   sidebarOpen: boolean
   onOpenSidebar: () => void
 }
 
-export function DashboardMobileHeader({ pathname, sidebarOpen, onOpenSidebar }: DashboardMobileHeaderProps) {
+/** Cabecera global sticky en viewport estrecho (menú + título de ruta). */
+export function DashboardMobileHeader({ pathname, sidebarOpen, onOpenSidebar }: Props) {
   return (
     <header className="border-app-border bg-app-toolbar sticky top-0 z-20 flex shrink-0 items-center gap-2 border-b px-3 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] md:hidden">
       <button
@@ -29,7 +25,7 @@ export function DashboardMobileHeader({ pathname, sidebarOpen, onOpenSidebar }: 
         </svg>
       </button>
 
-      <span className="text-app-fg min-w-0 flex-1 truncate text-sm font-medium">{mobileTitle(pathname)}</span>
+      <span className="text-app-fg min-w-0 flex-1 truncate text-sm font-medium">{dashboardMobileTitle(pathname)}</span>
 
       {isMarcadoresRoute(pathname) ? <MarcadoresViewModeToggle compact className="shrink-0" /> : null}
     </header>

@@ -2,7 +2,7 @@
 
 import { useEffect, type Dispatch, type RefObject, type SetStateAction } from "react"
 
-import { navItems } from "../utils"
+import { dashboardNavItems } from "@/components/header/dashboardNav"
 
 type Params = {
   pathname: string
@@ -54,9 +54,9 @@ export function useDashboardGlobalShortcuts({
 
       if (e.ctrlKey && /^[1-9]$/.test(e.key)) {
         const idx = parseInt(e.key, 10) - 1
-        if (idx < navItems.length) {
+        if (idx < dashboardNavItems.length) {
           e.preventDefault()
-          push(navItems[idx].href)
+          push(dashboardNavItems[idx].href)
         }
       }
     }

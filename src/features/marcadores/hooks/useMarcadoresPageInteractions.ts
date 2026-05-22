@@ -2,15 +2,12 @@
 
 import { useCallback } from "react"
 
-import type { BookmarkFormData } from "@/components/BookmarkModal"
-import type { WorkspaceLayoutPayload, WorkspaceZoneColumn } from "@/features/marcadores/workspaces/workspaceLayout"
+import type { BookmarkFormData } from "@/features/marcadores/components/bookmark/BookmarkModal"
 
 import type { Bookmark } from "@/features/marcadores/utils/types"
 import type { GridItem } from "@/features/marcadores/utils/types"
 
 export function useMarcadoresPageInteractions(opts: {
-  workspaceLayout: WorkspaceLayoutPayload | null
-  persistWorkspaceLayout: (payload: WorkspaceLayoutPayload) => Promise<void>
   handleDeleteFolder: (id: string) => Promise<void>
   handleDelete: (
     ids: Set<string>,
@@ -40,8 +37,6 @@ export function useMarcadoresPageInteractions(opts: {
   setRenameFolderName: React.Dispatch<React.SetStateAction<string>>
 }) {
   const {
-    workspaceLayout,
-    persistWorkspaceLayout,
     handleDeleteFolder,
     handleDelete,
     selectedIds,
@@ -66,18 +61,6 @@ export function useMarcadoresPageInteractions(opts: {
     setEditingFolder,
     setRenameFolderName,
   } = opts
-
-  const handleZonesReorder = useCallback(
-    async (cols: WorkspaceZoneColumn[]) => {
-      if (!workspaceLayout || workspaceLayout.template !== "zones") return
-      await persistWorkspaceLayout({
-        template: "zones",
-        columns: cols,
-        revision: workspaceLayout.revision ?? 1,
-      })
-    },
-    [persistWorkspaceLayout, workspaceLayout]
-  )
 
   const onConfirmDelete = useCallback(
     async (item: GridItem) => {
@@ -154,7 +137,6 @@ export function useMarcadoresPageInteractions(opts: {
   }, [editingFolder, renameFolderName, handleRenameFolder, setEditingFolder, setRenameFolderName])
 
   return {
-    handleZonesReorder,
     onConfirmDelete,
     handleAdd,
     onCreateFolder,

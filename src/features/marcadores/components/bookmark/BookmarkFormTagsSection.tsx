@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import TagAutocomplete from "@/components/TagAutocomplete"
+import TagAutocomplete from "@/features/marcadores/components/bookmark/TagAutocomplete"
 import { cn } from "@/lib/utils"
 import { splitCommaTags } from "@/lib/comma-tags"
 

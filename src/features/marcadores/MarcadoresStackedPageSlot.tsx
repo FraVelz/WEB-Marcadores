@@ -1,97 +1,63 @@
 "use client"
 
-import type { Dispatch, MutableRefObject, SetStateAction } from "react"
-
-import BookmarkDetailPanel from "@/components/BookmarkDetailPanel"
-
+import BookmarkDetailPanel from "@/features/marcadores/components/bookmark/BookmarkDetailPanel"
 import BookmarkGrid from "@/features/marcadores/components/BookmarkGrid"
 import { MarcadoresExplorerRail } from "@/features/marcadores/components/MarcadoresExplorerRail"
 import MarcadoresTreeView from "@/features/marcadores/components/MarcadoresTreeView"
-import type { TreeFlatRow } from "@/features/marcadores/components/MarcadoresTreeView"
-import type { Folder } from "@/contexts/DashboardContext"
-import type { Bookmark, CutItem, GridItem } from "@/features/marcadores/utils/types"
+import type { MarcadoresPageModel } from "@/features/marcadores/useMarcadoresPage"
 
-export function MarcadoresStackedPageSlot(props: {
-  primaryViewMode: "grid" | "tree"
-  flatList: GridItem[]
-  folders: Folder[]
-  filteredBookmarks: Bookmark[]
-  treeFlatRows: TreeFlatRow[]
-  treeCollapsedIds: Set<string>
-  toggleTreeFolderCollapse: (id: string) => void
-  cutItem: CutItem | null
-  handleAdd: () => void
-  handleDoubleClick: (item: GridItem) => void
-  handleDrop: (source: GridItem, target?: string | null) => void
-  setShowNewFolder: Dispatch<SetStateAction<boolean>>
-  detailBookmark: Bookmark | null
-  closeBookmarkDetailPanel: () => void
-  recordBookmarkOpened: (id: string) => Promise<void>
-  onBookmarkUpdate: (id: string, updates: Partial<Bookmark>) => Promise<void>
-  allTags: string[]
-  itemRefs: MutableRefObject<Map<number, HTMLDivElement>>
-  selectedIndex: number
-  setSelectedIndex: Dispatch<SetStateAction<number>>
-  selectMode: boolean
-  selectedIds: Set<string>
-  toggleSelect: (id: string) => void
-  setSelectedIds: Dispatch<SetStateAction<Set<string>>>
-  setSelectMode: Dispatch<SetStateAction<boolean>>
-  breadcrumbLabel: string
-}) {
+export function MarcadoresStackedPageSlot({ m }: { m: MarcadoresPageModel }) {
+  const scope = m.libraryPaneScope
+  const pane = scope.getState()
+
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-row overflow-hidden">
       <MarcadoresExplorerRail />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden md:flex-row">
-        {props.primaryViewMode === "grid" ? (
+        {m.primaryViewMode === "grid" ? (
           <BookmarkGrid
-            flatList={props.flatList}
-            selectedIndex={props.selectedIndex}
-            selectMode={props.selectMode}
-            selectedIds={props.selectedIds}
-            cutItem={props.cutItem}
-            onSelectIndex={props.setSelectedIndex}
-            onToggleSelect={props.toggleSelect}
-            onDoubleClick={props.handleDoubleClick}
-            onDrop={props.handleDrop}
-            onAddBookmark={props.handleAdd}
-            onNewFolder={() => props.setShowNewFolder(true)}
-            itemRefs={props.itemRefs}
-            setSelectedIds={props.setSelectedIds}
-            setSelectMode={props.setSelectMode}
+            flatList={m.flatList}
+            selectedIndex={pane.selectedIndex}
+            selectMode={pane.selectMode}
+            selectedIds={pane.selectedIds}
+            cutItem={pane.cutItem}
+            onAddBookmark={m.handleAdd}
+            onDoubleClick={m.handleDoubleClick}
+            onDrop={m.handleDrop}
+            onNewFolder={() => scope.bindings.setShowNewFolder(true)}
+            itemRefs={scope.itemRefs}
+            onSelectIndex={scope.bindings.setSelectedIndex}
+            onToggleSelect={m.toggleSelect}
           />
         ) : (
           <MarcadoresTreeView
-            folders={props.folders}
-            bookmarks={props.filteredBookmarks}
-            rows={props.treeFlatRows}
-            selectedIndex={props.selectedIndex}
-            selectMode={props.selectMode}
-            selectedIds={props.selectedIds}
-            cutItem={props.cutItem}
-            onSelectIndex={props.setSelectedIndex}
-            onToggleSelect={props.toggleSelect}
-            onDoubleClick={props.handleDoubleClick}
-            onDrop={props.handleDrop}
-            onToggleFolderCollapse={props.toggleTreeFolderCollapse}
-            collapsedIds={props.treeCollapsedIds}
-            onAddBookmark={props.handleAdd}
-            onNewFolder={() => props.setShowNewFolder(true)}
-            itemRefs={props.itemRefs}
-            currentLocationLabel={props.breadcrumbLabel}
+            folders={m.folders}
+            bookmarks={m.filteredBookmarks}
+            rows={m.treeFlatRows}
+            collapsedIds={m.treeCollapsedIds}
+            onToggleFolderCollapse={m.toggleTreeFolderCollapse}
+            selectedIndex={pane.selectedIndex}
+            selectMode={pane.selectMode}
+            selectedIds={pane.selectedIds}
+            cutItem={pane.cutItem}
+            onAddBookmark={m.handleAdd}
+            onDoubleClick={m.handleDoubleClick}
+            onDrop={m.handleDrop}
+            onNewFolder={() => scope.bindings.setShowNewFolder(true)}
+            itemRefs={scope.itemRefs}
+            onSelectIndex={scope.bindings.setSelectedIndex}
+            onToggleSelect={m.toggleSelect}
+            currentLocationLabel={m.breadcrumb.map((p) => p.label).join(" › ")}
           />
         )}
-        {props.detailBookmark ? (
-          <BookmarkDetailPanel
-            bookmark={props.detailBookmark}
-            onClose={props.closeBookmarkDetailPanel}
-            onTelemetryOpen={props.recordBookmarkOpened}
-            onUpdate={props.onBookmarkUpdate}
-            allTags={props.allTags}
-            folders={props.folders}
-            embedded
-          />
-        ) : null}
+        <BookmarkDetailPanel
+          bookmark={pane.detailBookmark}
+          onClose={m.closeBookmarkDetailPanel}
+          onUpdate={m.onBookmarkUpdate}
+          onTelemetryOpen={m.recordBookmarkOpened}
+          allTags={m.allTags}
+          folders={m.folders}
+        />
       </div>
     </div>
   )

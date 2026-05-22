@@ -5,7 +5,10 @@ import { useEffect, useMemo } from "react"
 import type { FlatFolder } from "@/features/marcadores/utils/types"
 
 import { MarcadoresDesktopLibraryPane } from "@/features/marcadores/desktop/MarcadoresDesktopLibraryPane"
-import { createDefaultDeskWindowUi, type DeskWindowUiState } from "@/features/marcadores/page/deskWindowUiState"
+import {
+  createDefaultDeskLibraryPaneUi,
+  type DeskLibraryPaneUiState,
+} from "@/features/marcadores/state/libraryPaneUiState"
 import { createDeskPaneScope, type DeskPaneUiBindings } from "@/features/marcadores/state/libraryPaneUiScope"
 import type { DesktopPaneDerivedEntry } from "@/features/marcadores/page/useMarcadoresPageBookmarksBootstrap"
 import type { GridItem } from "@/features/marcadores/utils/types"
@@ -22,8 +25,8 @@ export type MarcadoresDesktopLibraryPaneBodyProps = {
   deskFolderByWin: Record<string, string | null>
   setDeskFolderByWin: React.Dispatch<React.SetStateAction<Record<string, string | null>>>
   resolvedDeskLibPaneId: string | null
-  deskUiByWin: Record<string, DeskWindowUiState>
-  updateDeskUi: (winId: string, recipe: (s: DeskWindowUiState) => DeskWindowUiState) => void
+  deskUiByWin: Record<string, DeskLibraryPaneUiState>
+  updateDeskUi: (winId: string, recipe: (s: DeskLibraryPaneUiState) => DeskLibraryPaneUiState) => void
   toggleDeskTreeFolderCollapse: (winId: string, folderId: string) => void
   getDeskItemRefs: (winId: string) => React.MutableRefObject<Map<number, HTMLDivElement>>
   getDeskSearchRef: (winId: string) => React.RefObject<HTMLInputElement | null>
@@ -72,7 +75,7 @@ export function MarcadoresDesktopLibraryPaneBody(props: MarcadoresDesktopLibrary
   } = props
 
   const pane = desktopPaneDerived?.[winId]
-  const ui = deskUiByWin[winId] ?? createDefaultDeskWindowUi()
+  const ui = deskUiByWin[winId] ?? createDefaultDeskLibraryPaneUi()
   const paneScope = useMemo(
     () => createDeskPaneScope(winId, deskUiByWin, updateDeskUi, getDeskItemRefs, getDeskSearchRef),
     [winId, deskUiByWin, updateDeskUi, getDeskItemRefs, getDeskSearchRef]

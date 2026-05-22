@@ -3,7 +3,7 @@
 import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction } from "react"
 
 import type { Folder } from "@/contexts/DashboardContext"
-import { findFolderInTree, folderHasChildren } from "../utils"
+import { findFolderInTree, folderHasChildren } from "@/layouts/dashboard/sidebar/sidebarTreeUtils"
 
 type Params = {
   flatSidebarItems: (string | null)[]

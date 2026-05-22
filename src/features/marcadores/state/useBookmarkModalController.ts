@@ -3,14 +3,8 @@
 import { useCallback, useMemo } from "react"
 
 import type { DeskLibraryPaneUiState } from "@/features/marcadores/state/libraryPaneUiState"
-import type { LibraryPaneUiState } from "@/features/marcadores/state/libraryPaneUiState"
+import type { LibraryPaneUiScope } from "@/features/marcadores/state/libraryPaneUiScope"
 import type { Bookmark } from "@/features/marcadores/utils/types"
-
-type ModalSetters = {
-  setModalOpen: (open: boolean) => void
-  setEditingBookmark: (b: Bookmark | null) => void
-  setBookmarkModalNonce: React.Dispatch<React.SetStateAction<number>>
-}
 
 export type BookmarkModalController = {
   open: boolean
@@ -24,26 +18,26 @@ export type BookmarkModalController = {
 
 export function useBookmarkModalController(opts: {
   desktopWindowChrome: boolean
+  libraryPaneScope: LibraryPaneUiScope
   deskLibWinIds: string[]
   deskFolderByWin: Record<string, string | null>
   activeBrowseFolderId: string | null
-  globalUi: LibraryPaneUiState
-  globalSetters: ModalSetters
   deskUiByWin: Record<string, DeskLibraryPaneUiState>
   updateDeskUi: (winId: string, recipe: (s: DeskLibraryPaneUiState) => DeskLibraryPaneUiState) => void
   focusMain: () => void
 }): BookmarkModalController {
   const {
     desktopWindowChrome,
+    libraryPaneScope,
     deskLibWinIds,
     deskFolderByWin,
     activeBrowseFolderId,
-    globalUi,
-    globalSetters,
     deskUiByWin,
     updateDeskUi,
     focusMain,
   } = opts
+
+  const { bindings } = libraryPaneScope
 
   const hostWinId = useMemo(() => {
     if (!desktopWindowChrome) return null
@@ -54,6 +48,7 @@ export function useBookmarkModalController(opts: {
   }, [desktopWindowChrome, deskLibWinIds, deskUiByWin])
 
   const deskUi = hostWinId ? deskUiByWin[hostWinId] : null
+  const globalUi = libraryPaneScope.getState()
 
   const open = desktopWindowChrome ? Boolean(deskUi?.modalOpen) : globalUi.modalOpen
   const editing = desktopWindowChrome ? (deskUi?.editingBookmark ?? null) : globalUi.editingBookmark
@@ -61,7 +56,7 @@ export function useBookmarkModalController(opts: {
 
   const folderId = desktopWindowChrome && hostWinId ? (deskFolderByWin[hostWinId] ?? null) : activeBrowseFolderId
 
-  const patchModal = useCallback(
+  const patchDeskModal = useCallback(
     (recipe: (s: DeskLibraryPaneUiState) => DeskLibraryPaneUiState) => {
       if (!hostWinId) return
       updateDeskUi(hostWinId, recipe)
@@ -71,7 +66,7 @@ export function useBookmarkModalController(opts: {
 
   const openCreate = useCallback(() => {
     if (desktopWindowChrome && hostWinId) {
-      patchModal((s) => ({
+      patchDeskModal((s) => ({
         ...s,
         modalOpen: true,
         editingBookmark: null,
@@ -79,32 +74,32 @@ export function useBookmarkModalController(opts: {
       }))
       return
     }
-    globalSetters.setEditingBookmark(null)
-    globalSetters.setBookmarkModalNonce((n) => n + 1)
-    globalSetters.setModalOpen(true)
-  }, [desktopWindowChrome, globalSetters, hostWinId, patchModal])
+    bindings.setEditingBookmark(null)
+    bindings.setBookmarkModalNonce((n) => n + 1)
+    bindings.setModalOpen(true)
+  }, [bindings, desktopWindowChrome, hostWinId, patchDeskModal])
 
   const openEdit = useCallback(
     (bookmark: Bookmark) => {
       if (desktopWindowChrome && hostWinId) {
-        patchModal((s) => ({ ...s, modalOpen: true, editingBookmark: bookmark }))
+        patchDeskModal((s) => ({ ...s, modalOpen: true, editingBookmark: bookmark }))
         return
       }
-      globalSetters.setEditingBookmark(bookmark)
-      globalSetters.setModalOpen(true)
+      bindings.setEditingBookmark(bookmark)
+      bindings.setModalOpen(true)
     },
-    [desktopWindowChrome, globalSetters, hostWinId, patchModal]
+    [bindings, desktopWindowChrome, hostWinId, patchDeskModal]
   )
 
   const close = useCallback(() => {
     if (desktopWindowChrome && hostWinId) {
-      patchModal((s) => ({ ...s, modalOpen: false, editingBookmark: null }))
+      patchDeskModal((s) => ({ ...s, modalOpen: false, editingBookmark: null }))
     } else {
-      globalSetters.setModalOpen(false)
-      globalSetters.setEditingBookmark(null)
+      bindings.setModalOpen(false)
+      bindings.setEditingBookmark(null)
     }
     requestAnimationFrame(() => focusMain())
-  }, [desktopWindowChrome, focusMain, globalSetters, hostWinId, patchModal])
+  }, [bindings, desktopWindowChrome, focusMain, hostWinId, patchDeskModal])
 
   return {
     open,
