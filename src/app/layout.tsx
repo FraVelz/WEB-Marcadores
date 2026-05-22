@@ -88,7 +88,7 @@ export default async function RootLayout({
 
   return (
     <html lang="es" className={htmlClass} style={htmlStyle} suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
         <Script src="/appearance-init.js" strategy="beforeInteractive" />
 
         <AppAppearanceProvider initialAppearance={appearance}>{children}</AppAppearanceProvider>

@@ -96,7 +96,9 @@ export function DashboardCommandPalette() {
           </div>
           {bookmarkHits.length === 0 ? (
             <EmptyRow
-              text={query.trim().length < 2 ? "Escribe al menos 2 caracteres para buscar marcadores." : "Sin coincidencias"}
+              text={
+                query.trim().length < 2 ? "Escribe al menos 2 caracteres para buscar marcadores." : "Sin coincidencias"
+              }
             />
           ) : (
             bookmarkHits.map((b) => (

@@ -1,4 +1,1 @@
-export { DashboardShell, DashboardMobileLayout } from "./dashboard"
-export { DashboardLayoutChrome, DashboardMobileHeader, DashboardExplorerHeader } from "@/components/header"
-export { dashboardMobileTitle, dashboardNavItems, isMarcadoresRoute } from "@/components/header"
-export type { DashboardNavItem } from "@/components/header"
+export { default as DashboardShell } from "./dashboard/shell/DashboardShell"

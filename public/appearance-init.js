@@ -1,7 +1,7 @@
 /**
  * Arranque mínimo antes de la hidratación.
  * El servidor ya aplica tema (light/dark), paleta, selección y cristal en <html>.
- * Aquí solo: migración legacy, corrección de tema «system» y tapiz (localStorage).
+ * Aquí solo: migración legacy, corrección de tema «system» y tapiz en <html> (localStorage).
  * Constantes alineadas con src/lib/appAppearanceCookies.ts
  */
 ;(function () {
@@ -112,8 +112,8 @@
       return
     }
 
-    const body = document.body
-    if (!body) return
+    const root = document.documentElement
+    if (!root) return
 
     const veil =
       typeof stored.wallpaperVeil === "number" && Number.isFinite(stored.wallpaperVeil)
@@ -122,13 +122,11 @@
     const [r, g, b] = canvasRgbTriplet()
     const alpha = Math.min(0.98, Math.max(0, veil))
 
-    body.style.cssText = [
-      "background-color:transparent",
-      `background-image:linear-gradient(rgba(${r},${g},${b},${alpha}),rgba(${r},${g},${b},${alpha})),url(${stored.wallpaperDataUrl})`,
-      "background-size:cover,cover",
-      "background-attachment:fixed",
-      "background-repeat:no-repeat",
-    ].join(";")
+    root.classList.add("app-wallpaper")
+    root.style.setProperty(
+      "--app-wallpaper-image",
+      `linear-gradient(rgba(${r},${g},${b},${alpha}),rgba(${r},${g},${b},${alpha})),url(${stored.wallpaperDataUrl})`
+    )
   }
 
   try {

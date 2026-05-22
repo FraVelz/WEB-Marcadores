@@ -4,12 +4,12 @@ Composición del shell (drawer lateral, área principal, command palette). Las *
 
 ## Carpetas
 
-| Carpeta | Responsabilidad |
-|---------|-----------------|
-| `sidebar/` | Drawer móvil, backdrop, utilidades del árbol |
-| `shell/` | `DashboardShell` + `DashboardMobileLayout` |
-| `components/` | UI global del shell (command palette) |
-| `hooks/` | Atajos, viewport md, scroll lock |
+| Carpeta       | Responsabilidad                              |
+| ------------- | -------------------------------------------- |
+| `sidebar/`    | Drawer móvil, backdrop, utilidades del árbol |
+| `shell/`      | `DashboardShell` + `DashboardMobileLayout`   |
+| `components/` | UI global del shell (command palette)        |
+| `hooks/`      | Atajos, viewport md, scroll lock             |
 
 ## Cabeceras (en `src/components/header/`)
 

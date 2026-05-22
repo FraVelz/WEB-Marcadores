@@ -23,8 +23,7 @@ export type LibraryPaneUiState = {
   viewMode: "grid" | "tree"
 }
 
-/** Campos extra por ventana en modo escritorio. */
-export type DeskPaneUiExtras = {
+type DeskPaneUiExtras = {
   searchLibraryWide: boolean
   treeCollapsedIds: Set<string>
 }
@@ -62,9 +61,3 @@ export function createDefaultDeskLibraryPaneUi(): DeskLibraryPaneUiState {
     treeCollapsedIds: new Set(),
   }
 }
-
-/** @deprecated Usar `DeskLibraryPaneUiState` */
-export type DeskWindowUiState = DeskLibraryPaneUiState
-
-/** @deprecated Usar `createDefaultDeskLibraryPaneUi` */
-export { createDefaultDeskLibraryPaneUi as createDefaultDeskWindowUi }

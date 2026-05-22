@@ -4,7 +4,8 @@ import { useMemo } from "react"
 
 import type { DashboardContextType } from "@/contexts/dashboardContextContract"
 
-import { deriveAllDesktopPanes, type DesktopPaneDerivedEntry } from "@/features/marcadores/core/deriveDesktopPaneEntry"
+import { deriveAllDesktopPanes } from "@/features/marcadores/core/deriveDesktopPaneEntry"
+import type { DesktopPaneDerivedEntry } from "@/features/marcadores/core/deriveDesktopPaneEntry"
 import { useMarcadoresActions } from "@/features/marcadores/hooks/useMarcadoresActions"
 import { useMarcadoresData } from "@/features/marcadores/hooks/useMarcadoresData"
 import type { DeskLibraryPaneUiState } from "@/features/marcadores/state/libraryPaneUiState"
@@ -13,8 +14,6 @@ import { countDuplicateClusters } from "@/features/marcadores/insights/duplicate
 import type { Bookmark } from "@/features/marcadores/utils/types"
 
 type DashPick = Pick<DashboardContextType, "setFolders" | "refreshFolders" | "refreshTags">
-
-export type { DesktopPaneDerivedEntry } from "@/features/marcadores/core/deriveDesktopPaneEntry"
 
 export function useMarcadoresPageBookmarksBootstrap(p: {
   dash: DashPick

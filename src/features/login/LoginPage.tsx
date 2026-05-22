@@ -102,7 +102,10 @@ export function LoginPage({ demo }: { demo: boolean }) {
       </main>
 
       <section className="w-full max-w-xl lg:max-w-2xl" aria-labelledby="login-screenshots-title">
-        <h2 id="login-screenshots-title" className="text-app-fg-label mb-3 text-center text-xs font-medium tracking-wide uppercase lg:text-left">
+        <h2
+          id="login-screenshots-title"
+          className="text-app-fg-label mb-3 text-center text-xs font-medium tracking-wide uppercase lg:text-left"
+        >
           Apartados de la app
         </h2>
         <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -123,7 +126,9 @@ export function LoginPage({ demo }: { demo: boolean }) {
                   sizes="(max-width: 640px) 100vw, 320px"
                   className="aspect-[1830/1076] w-full object-cover object-top transition-opacity group-hover:opacity-95"
                 />
-                <p className="text-app-fg border-app-border-muted border-t px-3 py-2 text-sm font-medium">{shot.label}</p>
+                <p className="text-app-fg border-app-border-muted border-t px-3 py-2 text-sm font-medium">
+                  {shot.label}
+                </p>
               </Link>
             </li>
           ))}
