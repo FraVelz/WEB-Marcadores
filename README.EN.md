@@ -4,7 +4,7 @@
 
 **Published site:** [web-marcadores.vercel.app](https://web-marcadores.vercel.app) (default deployment if `NEXT_PUBLIC_SITE_URL` is unset; source on [GitHub](https://github.com/FraVelz/WEB-Marcadores)).
 
-![Screenshot](./public/screenshot.png)
+![Screenshot — Bookmarks](./public/screenshots/marcadores.png)
 
 Bookmark manager built with Next.js and Supabase. Organize links in folders, use shortcuts, and browse your collection with a dark explorer-style interface. You can use **demo mode** without configuring Supabase.
 
@@ -48,7 +48,11 @@ Without a valid `.env.local` or Supabase credentials, the app runs in demo mode 
 .
 ├── public/                          # static assets
 │   ├── favicon.svg
-│   └── screenshot.png               # README image
+│   └── screenshots/                 # per-section captures (login, README; OG via App Router)
+│       ├── marcadores.png
+│       ├── atajos.png
+│       ├── estadisticas.png
+│       └── perfil.png
 ├── src/app/                         # App Router
 │   ├── page.tsx                     # / login
 │   ├── layout.tsx

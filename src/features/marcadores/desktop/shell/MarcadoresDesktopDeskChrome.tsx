@@ -9,10 +9,10 @@ import { DesktopDraggableLibraryShortcut } from "@/features/marcadores/desktop/D
 import { useDeskDecorMarquee } from "@/features/marcadores/desktop/useDeskDecorMarquee"
 import { isBookmarkDragTransfer } from "@/features/marcadores/utils/parseDragPayload"
 
+import { DESKTOP_LIBRARY_SHORTCUT_KEY } from "./desktopShellConstants"
 import { cn } from "@/lib/utils"
 
 export type MarcadoresDesktopDeskChromeProps = {
-  workspaceId: string | null
   hostRef: React.RefObject<HTMLDivElement | null>
   deskCanvasDropHighlight: boolean
   setDeskCanvasDropHighlight: (v: boolean) => void
@@ -22,7 +22,6 @@ export type MarcadoresDesktopDeskChromeProps = {
 }
 
 export function MarcadoresDesktopDeskChrome({
-  workspaceId,
   hostRef,
   deskCanvasDropHighlight,
   setDeskCanvasDropHighlight,
@@ -34,7 +33,7 @@ export function MarcadoresDesktopDeskChrome({
   const wallpaperActive = Boolean(appearance.wallpaperDataUrl)
 
   const [libraryShortcutSelected, setLibraryShortcutSelected] = useState(false)
-  const shortcutStorageKey = `marcadores.deskLibraryShortcut.v1:${workspaceId ?? "default"}`
+  const shortcutStorageKey = DESKTOP_LIBRARY_SHORTCUT_KEY
 
   const { marquee, marqueePointerHandlers } = useDeskDecorMarquee()
   const mqLeft = marquee ? Math.min(marquee.x0, marquee.x1) : 0

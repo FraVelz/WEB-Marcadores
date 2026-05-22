@@ -1,6 +1,11 @@
 "use client"
 
+import Image from "next/image"
+import Link from "next/link"
+
+import { APP_SCREENSHOTS } from "@/lib/siteScreenshots"
 import { cn } from "@/lib/utils"
+
 import { useLogin } from "./useLogin"
 
 import type { LoginType } from "./types"
@@ -11,8 +16,8 @@ export function LoginPage({ demo }: { demo: boolean }) {
   ) as LoginType
 
   return (
-    <div className="bg-app-login-canvas flex min-h-screen items-center justify-center p-4">
-      <main className="border-app-login-border bg-app-login-card w-full max-w-md rounded-xl border px-5 py-6 shadow-xl sm:p-8">
+    <div className="bg-app-login-canvas flex min-h-screen flex-col items-center justify-center gap-8 p-4 lg:flex-row lg:items-start lg:gap-10 lg:py-10">
+      <main className="border-app-login-border bg-app-login-card w-full max-w-md shrink-0 rounded-xl border px-5 py-6 shadow-xl sm:p-8">
         <h1 className="text-app-fg mb-5 text-xl font-semibold sm:mb-6 sm:text-2xl">Marcadores</h1>
 
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
@@ -95,6 +100,35 @@ export function LoginPage({ demo }: { demo: boolean }) {
           </button>
         </div>
       </main>
+
+      <section className="w-full max-w-xl lg:max-w-2xl" aria-labelledby="login-screenshots-title">
+        <h2 id="login-screenshots-title" className="text-app-fg-label mb-3 text-center text-xs font-medium tracking-wide uppercase lg:text-left">
+          Apartados de la app
+        </h2>
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {APP_SCREENSHOTS.map((shot) => (
+            <li key={shot.id}>
+              <Link
+                href={demo ? "/demo" : shot.href}
+                className={cn(
+                  "border-app-login-border bg-app-login-card group block overflow-hidden rounded-lg border shadow-md",
+                  "hover:border-app-focus transition-colors"
+                )}
+              >
+                <Image
+                  src={shot.publicPath}
+                  alt={shot.alt}
+                  width={1830}
+                  height={1076}
+                  sizes="(max-width: 640px) 100vw, 320px"
+                  className="aspect-[1830/1076] w-full object-cover object-top transition-opacity group-hover:opacity-95"
+                />
+                <p className="text-app-fg border-app-border-muted border-t px-3 py-2 text-sm font-medium">{shot.label}</p>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   )
 }

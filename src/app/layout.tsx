@@ -49,21 +49,12 @@ export const metadata: Metadata = {
     description:
       "Organiza tus marcadores en carpetas, usa atajos y explora tu colección. " +
       "Interfaz oscura tipo explorador. Prueba el demo sin iniciar sesión.",
-    images: [
-      {
-        url: "/screenshot.png",
-        width: 1200,
-        height: 630,
-        alt: "Interfaz principal de Marcadores: explorador de carpetas, vista de marcadores y navegación",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Marcadores | Gestor de favoritos y carpetas",
     description:
       "Organiza tus marcadores en carpetas, usa atajos y explora tu colección. Prueba el demo sin iniciar sesión.",
-    images: ["/screenshot.png"],
   },
   robots: {
     index: true,

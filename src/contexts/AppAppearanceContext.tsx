@@ -72,7 +72,9 @@ export function AppAppearanceProvider({
   const [appearance, setAppearance] = useState<AppAppearanceState>(() => resolveInitialAppearance(initialAppearance))
 
   useLayoutEffect(() => {
-    syncDom(loadAppAppearanceFromStorage())
+    const fresh = loadAppAppearanceFromStorage()
+    setAppearance(fresh)
+    syncDom(fresh)
   }, [])
 
   useEffect(() => {

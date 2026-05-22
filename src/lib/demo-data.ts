@@ -26,18 +26,6 @@ export type DemoBookmark = {
   open_count?: number
 }
 
-export type DemoWorkspace = {
-  id: string
-  name: string
-  sort_order: number
-}
-
-export const DEMO_WORKSPACES: DemoWorkspace[] = [
-  { id: "demo-ws-personal", name: "Personal", sort_order: 0 },
-  { id: "demo-ws-design", name: "Diseño UI", sort_order: 1 },
-  { id: "demo-ws-dev", name: "Programación", sort_order: 2 },
-]
-
 export const DEMO_FOLDERS: DemoFolder[] = [
   // Pocas carpetas de ejemplo — datos genéricos de desarrollo web
   { id: "f1", parent_id: null, name: "Documentación", sort_order: 0 },

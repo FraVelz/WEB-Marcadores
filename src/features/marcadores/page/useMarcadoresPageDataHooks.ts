@@ -28,7 +28,6 @@ export function useMarcadoresPageDataHooks() {
     focusMain,
     editFolderRef,
     registerMarcadoresRuntime,
-    activeWorkspaceId,
   } = useDashboard()
 
   const wideViewport = useMatchMediaMd()
@@ -167,7 +166,6 @@ export function useMarcadoresPageDataHooks() {
     focusMain,
     editFolderRef,
     allTags,
-    activeWorkspaceId,
     marcadoresViewMode,
     desktopWindowChrome,
     stackedExplorerHeaderBar,

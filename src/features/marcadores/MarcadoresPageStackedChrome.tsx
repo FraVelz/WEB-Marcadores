@@ -3,7 +3,6 @@
 import DemoBanner from "@/features/marcadores/components/DemoBanner"
 import DeleteConfirmBanner from "@/features/marcadores/components/DeleteConfirmBanner"
 import MarcadoresBreadcrumb from "@/features/marcadores/components/MarcadoresBreadcrumb"
-import MarcadoresBrowseControls from "@/features/marcadores/components/MarcadoresBrowseControls"
 import MarcadoresToolbar from "@/features/marcadores/components/MarcadoresToolbar"
 import PasteErrorBanner from "@/features/marcadores/components/PasteErrorBanner"
 import type { MarcadoresPageModel } from "@/features/marcadores/useMarcadoresPage"
@@ -55,7 +54,14 @@ export function MarcadoresPageStackedChrome({ m }: { m: MarcadoresPageModel }) {
         showFullscreenToggle={!m.stackedExplorerHeaderBar}
       />
 
-      <MarcadoresBrowseControls duplicateClusterCount={m.duplicateClusterCount} />
+      {m.duplicateClusterCount > 0 ? (
+        <div className="border-app-border-muted bg-app-toolbar/40 border-b px-2 py-1.5">
+          <p className="text-app-fg-muted text-[11px] md:text-right">
+            Posibles duplicados:{" "}
+            <span className="text-app-accent font-medium">{m.duplicateClusterCount}</span>
+          </p>
+        </div>
+      ) : null}
 
       {pane.pasteError && <PasteErrorBanner message={pane.pasteError} />}
       {pane.deleteConfirmItem ? (

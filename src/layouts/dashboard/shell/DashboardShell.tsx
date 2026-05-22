@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { useAppAppearance } from "@/contexts/AppAppearanceContext"
 import { useDashboard } from "@/contexts/DashboardContext"
 import { DashboardCommandPalette } from "@/layouts/dashboard/components/DashboardCommandPalette"
+import { DashboardWallpaperBackdrop } from "@/layouts/dashboard/components/DashboardWallpaperBackdrop"
 import { useDashboardGlobalShortcuts } from "@/layouts/dashboard/hooks/useDashboardGlobalShortcuts"
 import { useFocusMainOnMarcadoresRoute } from "@/layouts/dashboard/hooks/useFocusMainOnMarcadoresRoute"
 import { DashboardMobileLayout } from "@/layouts/dashboard/shell/DashboardMobileLayout"
@@ -40,8 +41,12 @@ export default function DashboardShell({ children }: { children: React.ReactNode
 
   return (
     <>
+      {wallpaperActive ? <DashboardWallpaperBackdrop {...appearance} /> : null}
       <div
-        className={cn("flex min-h-dvh flex-col md:min-h-screen", wallpaperActive ? "bg-transparent" : "bg-app-canvas")}
+        className={cn(
+          "relative z-10 flex min-h-dvh flex-col md:min-h-screen",
+          wallpaperActive ? "bg-transparent" : "bg-app-canvas"
+        )}
       >
         <DashboardMobileLayout
           pathname={pathname}

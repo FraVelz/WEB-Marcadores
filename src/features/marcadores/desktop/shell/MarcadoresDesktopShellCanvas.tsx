@@ -7,7 +7,6 @@ import { MarcadoresDesktopDeskChrome } from "./MarcadoresDesktopDeskChrome"
 import type { MarcadoresDesktopShellCanvasProps } from "./MarcadoresDesktopShellCanvas.types"
 
 export function MarcadoresDesktopShellCanvas({
-  workspaceId,
   hostRef,
   canvas,
   deskCanvasDropHighlight,
@@ -44,7 +43,6 @@ export function MarcadoresDesktopShellCanvas({
 
   return (
     <MarcadoresDesktopDeskChrome
-      workspaceId={workspaceId}
       hostRef={hostRef}
       deskCanvasDropHighlight={deskCanvasDropHighlight}
       setDeskCanvasDropHighlight={setDeskCanvasDropHighlight}

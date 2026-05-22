@@ -3,10 +3,8 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 
 import { useDashboard } from "@/contexts/DashboardContext"
-import type { WorkspaceRow } from "@/features/marcadores/workspaces/workspaceTypes"
 
 import { cn } from "@/lib/utils"
 
@@ -17,9 +15,7 @@ function norm(s: string) {
 export function DashboardCommandPalette() {
   const id = useId()
   const inputRef = useRef<HTMLInputElement>(null)
-  const { push } = useRouter()
-  const { commandPaletteOpen, setCommandPaletteOpen, workspaces, setActiveWorkspaceId, marcadoresPalette } =
-    useDashboard()
+  const { commandPaletteOpen, setCommandPaletteOpen, marcadoresPalette } = useDashboard()
 
   const [query, setQuery] = useState("")
 
@@ -51,21 +47,9 @@ export function DashboardCommandPalette() {
     return out
   }, [marcadoresPalette, query])
 
-  const workspaceHits = useMemo(() => {
-    const q = norm(query)
-    if (!q || q.length < 1) return workspaces.slice().sort((a, b) => a.sort_order - b.sort_order)
-    return workspaces.filter((w) => norm(w.name).includes(q)).sort((a, b) => a.sort_order - b.sort_order)
-  }, [workspaces, query])
-
   const close = () => setCommandPaletteOpen(false)
 
   if (!commandPaletteOpen) return null
-
-  const selectWorkspace = (w: WorkspaceRow) => {
-    setActiveWorkspaceId(w.id)
-    push("/marcadores")
-    close()
-  }
 
   const selectBookmark = (b: { id: string; title: string; url: string }) => {
     window.open(b.url, "_blank", "noopener,noreferrer")
@@ -84,14 +68,14 @@ export function DashboardCommandPalette() {
       <div className="border-app-border bg-app-sidebar absolute top-[10vh] left-1/2 flex w-[min(640px,92vw)] -translate-x-1/2 flex-col rounded-xl border shadow-xl">
         <div className="border-app-border-muted border-b px-3 py-2">
           <label htmlFor={`${id}-input`} className="sr-only" id={`${id}-title`}>
-            Buscar workspaces y marcadores
+            Buscar marcadores
           </label>
           <input
             id={`${id}-input`}
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Workspace, marcador…"
+            placeholder="Marcador…"
             className="placeholder:text-app-fg-muted bg-app-hover text-app-fg focus:border-app-input-border focus:ring-app-focus w-full rounded-md border border-transparent px-3 py-2 text-sm outline-none focus:ring-1"
             onKeyDown={(e) => {
               if (e.key === "Escape") close()
@@ -107,31 +91,12 @@ export function DashboardCommandPalette() {
             <ShortcutPaletteLink title="Perfil" hint="Preferencias & cuenta" href="/perfil" onNavigate={close} />
           </div>
 
-          <div className="text-app-fg-muted mb-1 px-2 text-[11px] font-semibold tracking-wide uppercase">
-            Workspaces
-          </div>
-          {workspaceHits.length === 0 ? (
-            <EmptyRow text="Sin coincidencias" />
-          ) : (
-            workspaceHits.map((w) => (
-              <button
-                key={w.id}
-                type="button"
-                onClick={() => selectWorkspace(w)}
-                className="hover:bg-app-hover text-app-fg flex w-full items-center justify-between rounded-md p-2 text-left text-sm"
-              >
-                <span className="font-medium">{w.name}</span>
-                <span className="text-app-fg-muted text-xs">Seleccionar</span>
-              </button>
-            ))
-          )}
-
           <div className="text-app-fg-muted mt-3 mb-1 px-2 text-[11px] font-semibold tracking-wide uppercase">
             Marcadores
           </div>
           {bookmarkHits.length === 0 ? (
             <EmptyRow
-              text={query.trim().length < 2 ? "Escribe para buscar marcadores disponibles aquí." : "Sin coincidencias"}
+              text={query.trim().length < 2 ? "Escribe al menos 2 caracteres para buscar marcadores." : "Sin coincidencias"}
             />
           ) : (
             bookmarkHits.map((b) => (

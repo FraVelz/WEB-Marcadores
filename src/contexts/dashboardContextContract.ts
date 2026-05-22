@@ -1,8 +1,5 @@
 import type { ReactNode } from "react"
 
-import type { WorkspaceLayoutPayload } from "@/features/marcadores/workspaces/workspaceLayout"
-import type { WorkspaceRow } from "@/features/marcadores/workspaces/workspaceTypes"
-
 import type { Folder } from "@/contexts/dashboardTypes"
 
 export type ViewMode = "grid" | "hierarchical"
@@ -31,13 +28,6 @@ export type DashboardContextType = {
   folders: Folder[]
   setFolders: (folders: Folder[]) => void
   refreshFolders: () => void
-  workspaces: WorkspaceRow[]
-  activeWorkspaceId: string | null
-  setActiveWorkspaceId: (id: string | null) => void
-  workspaceLayout: WorkspaceLayoutPayload | null
-  workspacesLoading: boolean
-  reloadWorkspacesAndLayout: () => Promise<void>
-  persistWorkspaceLayout: (payload: WorkspaceLayoutPayload) => Promise<void>
 
   commandPaletteOpen: boolean
   setCommandPaletteOpen: React.Dispatch<React.SetStateAction<boolean>>

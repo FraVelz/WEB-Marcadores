@@ -5,13 +5,12 @@ import { useEffect } from "react"
 import { clampBounds } from "@/features/marcadores/desktop/desktopWindowGeometry"
 import type { DeskShellState } from "@/features/marcadores/desktop/marcadoresDeskShellReducer"
 
-import { MIN_CANVAS, desktopWmStorageKeyBase } from "./desktopShellConstants"
+import { DESKTOP_WM_STORAGE_KEY, LEGACY_DESKTOP_WM_STORAGE_KEY, MIN_CANVAS } from "./desktopShellConstants"
 import { defaultDetailBounds, mergeLibraryFrameRecord } from "./desktopShellGeometry"
 import { ensureLibFramesForIds, readParsedDeskLayout } from "./desktopShellHydrateParse"
 
 export function useDeskShellHydration(opts: {
   hostRef: React.RefObject<HTMLDivElement | null>
-  workspaceId: string | null
   setLibraryWindowIds: React.Dispatch<React.SetStateAction<string[]>>
   libIdsRef: React.MutableRefObject<string[]>
   applyDesk: (updater: (s: DeskShellState) => DeskShellState) => void
@@ -24,7 +23,6 @@ export function useDeskShellHydration(opts: {
 }) {
   const {
     hostRef,
-    workspaceId,
     setLibraryWindowIds,
     libIdsRef,
     applyDesk,
@@ -40,7 +38,7 @@ export function useDeskShellHydration(opts: {
     const el = hostRef.current
     if (!el) return
 
-    const lsKey = desktopWmStorageKeyBase(workspaceId)
+    const lsKey = DESKTOP_WM_STORAGE_KEY
     hydratedRef.current = false
 
     const apply = () => {
@@ -54,7 +52,11 @@ export function useDeskShellHydration(opts: {
 
       if (!hydratedRef.current) {
         hydratedRef.current = true
-        const { nextLibFrames, nextDetail, loadedLibIds } = readParsedDeskLayout(lsKey, w, h)
+        let parsed = readParsedDeskLayout(lsKey, w, h)
+        if (!parsed.loadedLibIds?.length) {
+          parsed = readParsedDeskLayout(LEGACY_DESKTOP_WM_STORAGE_KEY, w, h)
+        }
+        const { nextLibFrames, nextDetail, loadedLibIds } = parsed
         if (loadedLibIds?.length) setLibraryWindowIds(loadedLibIds)
         applyDesk((s) => ({
           ...s,
@@ -86,7 +88,7 @@ export function useDeskShellHydration(opts: {
     apply()
 
     return () => ro.disconnect()
-  }, [hostRef, hydratedRef, libIdsRef, applyDesk, setLibraryWindowIds, workspaceId])
+  }, [hostRef, hydratedRef, libIdsRef, applyDesk, setLibraryWindowIds])
 
   useEffect(() => {
     if (!deskReady) return
