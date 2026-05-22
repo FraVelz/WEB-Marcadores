@@ -4,22 +4,11 @@ import { createContext, use, useRef, useCallback, useReducer } from "react"
 
 import type { ReactNode } from "react"
 
-import { createClient } from "@/lib/supabase/client"
-
-import type { WorkspaceLayoutPayload } from "@/features/marcadores/workspaces/workspaceLayout"
-import type { WorkspaceRow } from "@/features/marcadores/workspaces/workspaceTypes"
-import { writeTabScopedItem } from "@/lib/tabScopedStorage"
 import { useSidebarTreeCollapse } from "@/layouts/dashboard/hooks/useSidebarTreeCollapse"
 
-import {
-  ACTIVE_WS_KEY,
-  layoutStorageKeyBase,
-  useDashboardWorkspaceBootstrap,
-} from "@/contexts/useDashboardWorkspaceBootstrap"
 import { useDashboardBookmarksTree } from "@/contexts/useDashboardBookmarksTree"
 import type { DashboardContextType, MarcadoresRuntimeSnap, ViewMode } from "@/contexts/dashboardContextContract"
 import { INITIAL_DASHBOARD_UI, dashboardUiReducer } from "@/contexts/dashboardUiReducer"
-import { INITIAL_DASHBOARD_WORKSPACE, dashboardWorkspaceReducer } from "@/contexts/dashboardWorkspaceReducer"
 
 export type { Folder } from "@/contexts/dashboardTypes"
 export type { MarcadoresRuntimeSnap, ViewMode } from "@/contexts/dashboardContextContract"
@@ -68,76 +57,6 @@ export function DashboardProvider({ children, demoMode }: { children: React.Reac
   const mainKeyDownRef = useRef<((e: React.KeyboardEvent) => void) | null>(null)
   const editFolderRef = useRef<((id: string, name: string) => void) | null>(null)
 
-  const [ws, dispatchWs] = useReducer(dashboardWorkspaceReducer, INITIAL_DASHBOARD_WORKSPACE)
-  const { workspaces, activeWorkspaceId, workspaceLayout, workspacesLoading } = ws
-
-  const setWorkspaces = useCallback((updater: React.SetStateAction<WorkspaceRow[]>) => {
-    dispatchWs({ type: "set_workspaces", updater })
-  }, [])
-
-  const setActiveWorkspaceIdState = useCallback((id: string | null) => {
-    dispatchWs({ type: "set_active_id", id })
-  }, [])
-
-  const setWorkspaceLayout = useCallback((updater: React.SetStateAction<WorkspaceLayoutPayload | null>) => {
-    dispatchWs({ type: "set_layout", updater })
-  }, [])
-
-  const setWorkspacesLoading = useCallback((updater: React.SetStateAction<boolean>) => {
-    dispatchWs({ type: "set_loading", updater })
-  }, [])
-
-  const setActiveWorkspaceId = useCallback(
-    (id: string | null) => {
-      setActiveWorkspaceIdState(id)
-      if (typeof window === "undefined" || id === null) return
-      try {
-        writeTabScopedItem(ACTIVE_WS_KEY, id)
-      } catch {
-        /* ignore quota */
-      }
-    },
-    [setActiveWorkspaceIdState]
-  )
-
-  const { reloadWorkspacesAndLayout } = useDashboardWorkspaceBootstrap({
-    demoMode,
-    setWorkspaces,
-    activeWorkspaceId,
-    setActiveWorkspaceId,
-    setWorkspaceLayout,
-    setWorkspacesLoading,
-    workspacesLoading,
-  })
-
-  const persistWorkspaceLayout = useCallback(
-    async (payload: WorkspaceLayoutPayload) => {
-      setWorkspaceLayout(payload)
-      if (!activeWorkspaceId) return
-
-      if (demoMode) {
-        try {
-          writeTabScopedItem(layoutStorageKeyBase(activeWorkspaceId, true), JSON.stringify(payload))
-        } catch {
-          /* ignore */
-        }
-        return
-      }
-
-      const supabase = createClient()
-      await supabase.from("workspace_layouts").upsert(
-        {
-          workspace_id: activeWorkspaceId,
-          payload,
-          revision: 1,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "workspace_id" }
-      )
-    },
-    [activeWorkspaceId, demoMode, setWorkspaceLayout]
-  )
-
   const setMainKeyDown = useCallback((handler: ((e: React.KeyboardEvent) => void) | null) => {
     mainKeyDownRef.current = handler
   }, [])
@@ -172,13 +91,6 @@ export function DashboardProvider({ children, demoMode }: { children: React.Reac
         folders,
         setFolders,
         refreshFolders,
-        workspaces,
-        activeWorkspaceId,
-        setActiveWorkspaceId,
-        workspaceLayout,
-        workspacesLoading,
-        reloadWorkspacesAndLayout,
-        persistWorkspaceLayout,
 
         commandPaletteOpen,
         setCommandPaletteOpen,

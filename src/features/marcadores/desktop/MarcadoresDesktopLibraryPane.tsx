@@ -70,7 +70,6 @@ export function MarcadoresDesktopLibraryPane(props: MarcadoresDesktopLibraryPane
       />
 
       <MarcadoresBrowseControls
-        variant="desk"
         searchLibraryWide={props.searchLibraryWide}
         setSearchLibraryWide={props.setSearchLibraryWide}
       />

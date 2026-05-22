@@ -31,7 +31,7 @@ Respetar **este orden y estos encabezados** (los títulos con emoji deben manten
 1. `#` — título: **Marcadores** (mismo nombre en ambos README salvo que acordéis otro nombre de producto)
 2. Línea con enlace bilingüe (regla anterior)
 3. **Sitio publicado** — una línea con la URL de despliegue vigente (p. ej. Vercel `web-marcadores.vercel.app` o la que indique `NEXT_PUBLIC_SITE_URL` / `src/app/layout.tsx`; mismo enlace en ambos idiomas, texto alrededor en el idioma de cada archivo)
-4. Imagen de captura (`./public/screenshot.png`) — `![Captura de pantalla]` / `![Screenshot]`
+4. Imagen de captura (`./public/screenshots/marcadores.png`) — `![Captura de pantalla]` / `![Screenshot]`
 5. Párrafo introductorio
 6. `## ✨ Características` / `## ✨ Features`
 7. `## 🛠️ Tecnologías` / `## 🛠️ Stack`

@@ -28,7 +28,6 @@ import {
 type PreMaxBox = React.MutableRefObject<WindowBounds | null>
 
 export type MarcadoresDesktopShellProps = {
-  workspaceId: string | null
   libraryWindowIds: string[]
   setLibraryWindowIds: React.Dispatch<React.SetStateAction<string[]>>
   onAddLibraryWindow: () => void
@@ -46,7 +45,6 @@ export type MarcadoresDesktopShellProps = {
 }
 
 export function MarcadoresDesktopShell({
-  workspaceId,
   libraryWindowIds,
   setLibraryWindowIds,
   onAddLibraryWindow,
@@ -110,7 +108,7 @@ export function MarcadoresDesktopShell({
   const zSeqRef = useRef(120)
   const hydratedRef = useRef(false)
 
-  useDeskPersistSchedule({ workspaceId, libraryWindowIds, libFrames, detailFrame })
+  useDeskPersistSchedule({ libraryWindowIds, libFrames, detailFrame })
 
   const { deskCanvasDropHighlight, setDeskCanvasDropHighlight } = useDeskCanvasDropHighlight()
 
@@ -118,7 +116,6 @@ export function MarcadoresDesktopShell({
 
   useDeskShellHydration({
     hostRef,
-    workspaceId,
     setLibraryWindowIds,
     libIdsRef,
     applyDesk,
@@ -184,7 +181,6 @@ export function MarcadoresDesktopShell({
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <MarcadoresDesktopShellCanvas
-        workspaceId={workspaceId}
         hostRef={hostRef}
         canvas={canvas}
         deskCanvasDropHighlight={deskCanvasDropHighlight}

@@ -319,13 +319,17 @@ function resolveCanvasRgbForWallpaperOverlay(): [number, number, number] | null 
   return tri ?? null
 }
 
-function buildWallpaperLayerStyle(state: Pick<AppAppearanceState, "wallpaperDataUrl" | "wallpaperVeil">): {
+export type WallpaperLayerStyle = {
   backgroundColor: string
   backgroundImage: string
   backgroundSize: string
   backgroundAttachment: string
   backgroundRepeat: string
-} | null {
+}
+
+function buildWallpaperLayerStyle(
+  state: Pick<AppAppearanceState, "wallpaperDataUrl" | "wallpaperVeil">
+): WallpaperLayerStyle | null {
   if (!state.wallpaperDataUrl) return null
 
   const veil = Number.isFinite(state.wallpaperVeil) ? state.wallpaperVeil : defaultAppAppearanceState.wallpaperVeil
@@ -341,6 +345,33 @@ function buildWallpaperLayerStyle(state: Pick<AppAppearanceState, "wallpaperData
   }
 }
 
+/** Estilos para una capa fija de tapiz (p. ej. detrás del dashboard). */
+export function wallpaperBackdropStyle(
+  state: Pick<AppAppearanceState, "wallpaperDataUrl" | "wallpaperVeil">
+): WallpaperLayerStyle | null {
+  return buildWallpaperLayerStyle(state)
+}
+
+function applyWallpaperLayerToElement(el: HTMLElement, layer: WallpaperLayerStyle | null): void {
+  if (!layer) {
+    clearWallpaperInlineFromElement(el)
+    return
+  }
+  el.style.backgroundColor = layer.backgroundColor
+  el.style.backgroundImage = layer.backgroundImage
+  el.style.backgroundSize = layer.backgroundSize
+  el.style.backgroundAttachment = layer.backgroundAttachment
+  el.style.backgroundRepeat = layer.backgroundRepeat
+}
+
+function clearWallpaperInlineFromElement(el: HTMLElement): void {
+  el.style.removeProperty("background-color")
+  el.style.removeProperty("background-image")
+  el.style.removeProperty("background-size")
+  el.style.removeProperty("background-attachment")
+  el.style.removeProperty("background-repeat")
+}
+
 /**
  * Misma capa que el `body` para nodos promovidos con Fullscreen API: el tapiz del body no llega al stack
  * detrás del elemento en pantalla completa (p. ej. host de explorador + escritorio en /marcadores).
@@ -350,46 +381,13 @@ export function applyWallpaperToHTMLElement(
   state: Pick<AppAppearanceState, "wallpaperDataUrl" | "wallpaperVeil">
 ): void {
   if (!el) return
-  const layer = buildWallpaperLayerStyle(state)
-  if (!layer) {
-    el.style.cssText = ""
-    return
-  }
-  el.style.cssText = [
-    `background-color: ${layer.backgroundColor}`,
-    `background-image: ${layer.backgroundImage}`,
-    `background-size: ${layer.backgroundSize}`,
-    `background-attachment: ${layer.backgroundAttachment}`,
-    `background-repeat: ${layer.backgroundRepeat}`,
-  ].join(";")
-}
-
-function clearWallpaperInlineFromBody(): void {
-  if (typeof document === "undefined") return
-  const el = document.body
-  el.style.removeProperty("background-color")
-  el.style.removeProperty("background-image")
-  el.style.removeProperty("background-size")
-  el.style.removeProperty("background-attachment")
-  el.style.removeProperty("background-repeat")
+  applyWallpaperLayerToElement(el, buildWallpaperLayerStyle(state))
 }
 
 /** Aplica tapiz al `body` (capa + velo según tema). Sin tapiz, solo quita estilos inline de fondo. */
 export function applyWallpaperToBody(state: Pick<AppAppearanceState, "wallpaperDataUrl" | "wallpaperVeil">): void {
   if (typeof document === "undefined") return
-  const el = document.body
-  const layer = buildWallpaperLayerStyle(state)
-  if (!layer) {
-    clearWallpaperInlineFromBody()
-    return
-  }
-  el.style.cssText = [
-    `background-color: ${layer.backgroundColor}`,
-    `background-image: ${layer.backgroundImage}`,
-    `background-size: ${layer.backgroundSize}`,
-    `background-attachment: ${layer.backgroundAttachment}`,
-    `background-repeat: ${layer.backgroundRepeat}`,
-  ].join(";")
+  applyWallpaperLayerToElement(document.body, buildWallpaperLayerStyle(state))
 }
 
 const MAX_IMG_BYTES = 2_500_000

@@ -4,7 +4,7 @@
 
 **Sitio publicado:** [web-marcadores.vercel.app](https://web-marcadores.vercel.app)
 
-![Captura de pantalla](./public/screenshot.png)
+![Captura de pantalla — Marcadores](./public/screenshots/marcadores.png)
 
 Gestor de marcadores y favoritos con Next.js y Supabase. Organiza enlaces en carpetas, usa atajos y recorre la colección con una interfaz oscura tipo explorador. Puedes usar **modo demo** sin configurar Supabase.
 
@@ -48,7 +48,11 @@ Sin `.env.local` o sin credenciales Supabase válidas se activa el modo demo (da
 .
 ├── public/                          # assets estáticos
 │   ├── favicon.svg
-│   └── screenshot.png               # imagen del README
+│   └── screenshots/                 # capturas por apartado (login, README, OG en /public)
+│       ├── marcadores.png
+│       ├── atajos.png
+│       ├── estadisticas.png
+│       └── perfil.png
 ├── src/app/                         # App Router
 │   ├── page.tsx                     # / login
 │   ├── layout.tsx

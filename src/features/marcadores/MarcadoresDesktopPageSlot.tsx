@@ -11,7 +11,6 @@ import type { Bookmark } from "@/features/marcadores/utils/types"
 type BodyField = MarcadoresDesktopLibraryPaneBodyProps
 
 export function MarcadoresDesktopPageSlot(props: {
-  workspaceId: string | null
   deskLibWinIds: string[]
   setDeskLibWinIds: Dispatch<SetStateAction<string[]>>
   addDeskLibraryWindow: () => void
@@ -36,8 +35,6 @@ export function MarcadoresDesktopPageSlot(props: {
 }) {
   return (
     <MarcadoresDesktopShell
-      key={props.workspaceId ?? "default"}
-      workspaceId={props.workspaceId}
       libraryWindowIds={props.deskLibWinIds}
       setLibraryWindowIds={props.setDeskLibWinIds}
       onAddLibraryWindow={props.addDeskLibraryWindow}

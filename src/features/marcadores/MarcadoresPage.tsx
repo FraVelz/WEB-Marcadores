@@ -23,7 +23,6 @@ export function MarcadoresPage() {
         desktopWindowChrome={m.desktopWindowChrome}
         desktopSlot={
           <MarcadoresDesktopPageSlot
-            workspaceId={m.activeWorkspaceId}
             deskLibWinIds={m.deskLibWinIds}
             setDeskLibWinIds={m.setDeskLibWinIds}
             addDeskLibraryWindow={m.addDeskLibraryWindow}
