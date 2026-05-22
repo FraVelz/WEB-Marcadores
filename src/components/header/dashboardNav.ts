@@ -6,8 +6,6 @@ export const dashboardNavItems = [
   { href: "/perfil", label: "Perfil" },
 ] as const
 
-export type DashboardNavItem = (typeof dashboardNavItems)[number]
-
 export function dashboardMobileTitle(pathname: string): string {
   const hit = dashboardNavItems.find((n) => pathname === n.href || pathname.startsWith(`${n.href}/`))
   return hit?.label ?? "Marcadores"

@@ -1,6 +1,16 @@
 "use client"
 
-import { createContext, use, useCallback, useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from "react"
+import {
+  createContext,
+  use,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react"
 
 import {
   type AppAppearanceState,
@@ -16,6 +26,8 @@ import {
   type AppThemePreset,
 } from "@/lib/appAppearance"
 
+const APPEARANCE_CHANGE_EVENT = "marcadores-appearance-change"
+
 type AppAppearanceContextValue = {
   appearance: AppAppearanceState
   setTheme: (t: AppThemePreset) => void
@@ -30,6 +42,50 @@ type AppAppearanceContextValue = {
 }
 
 const AppAppearanceContext = createContext<AppAppearanceContextValue | null>(null)
+
+function emitAppearanceChange(): void {
+  if (typeof window === "undefined") return
+  window.dispatchEvent(new Event(APPEARANCE_CHANGE_EVENT))
+}
+
+function subscribeAppearance(onStoreChange: () => void): () => void {
+  const notify = () => onStoreChange()
+  window.addEventListener(APPEARANCE_CHANGE_EVENT, notify)
+  window.addEventListener("visibilitychange", notify)
+  window.addEventListener("storage", notify)
+  return () => {
+    window.removeEventListener(APPEARANCE_CHANGE_EVENT, notify)
+    window.removeEventListener("visibilitychange", notify)
+    window.removeEventListener("storage", notify)
+  }
+}
+
+/** Clave estable para que `useSyncExternalStore` no re-renderice en bucle. */
+function appearanceSnapshotKey(state: AppAppearanceState): string {
+  const { wallpaperDataUrl, customColors, ...rest } = state
+  return JSON.stringify({
+    ...rest,
+    customColors,
+    wallpaperLen: wallpaperDataUrl?.length ?? 0,
+    wallpaperHead: wallpaperDataUrl?.slice(0, 96) ?? "",
+  })
+}
+
+let cachedSnapshot: AppAppearanceState = defaultAppAppearanceState
+let cachedSnapshotKey = ""
+
+function commitAppearanceSnapshot(next: AppAppearanceState): void {
+  cachedSnapshotKey = appearanceSnapshotKey(next)
+  cachedSnapshot = next
+}
+
+function readAppearanceSnapshot(): AppAppearanceState {
+  const fresh = loadAppAppearanceFromStorage()
+  const key = appearanceSnapshotKey(fresh)
+  if (key === cachedSnapshotKey) return cachedSnapshot
+  commitAppearanceSnapshot(fresh)
+  return cachedSnapshot
+}
 
 function syncDom(next: AppAppearanceState): void {
   if (typeof document === "undefined") return
@@ -47,16 +103,9 @@ function syncDom(next: AppAppearanceState): void {
 
 function persistState(next: AppAppearanceState): void {
   saveAppAppearanceToStorage(next)
+  commitAppearanceSnapshot(next)
   syncDom(next)
-}
-
-function reloadAppearanceFromClient(): AppAppearanceState {
-  return loadAppAppearanceFromStorage()
-}
-
-function resolveInitialAppearance(serverAppearance: AppAppearanceState): AppAppearanceState {
-  if (typeof window === "undefined") return serverAppearance
-  return loadAppAppearanceFromStorage()
+  emitAppearanceChange()
 }
 
 type AppAppearanceProviderProps = {
@@ -69,31 +118,17 @@ export function AppAppearanceProvider({
   children,
   initialAppearance = defaultAppAppearanceState,
 }: AppAppearanceProviderProps) {
-  const [appearance, setAppearance] = useState<AppAppearanceState>(() => resolveInitialAppearance(initialAppearance))
+  const serverSnapshotRef = useRef(initialAppearance)
+
+  const appearance = useSyncExternalStore(subscribeAppearance, readAppearanceSnapshot, () => serverSnapshotRef.current)
 
   useLayoutEffect(() => {
-    const fresh = loadAppAppearanceFromStorage()
-    setAppearance(fresh)
-    syncDom(fresh)
-  }, [])
-
-  useEffect(() => {
-    const onVisible = () => {
-      if (document.visibilityState !== "visible") return
-      const fresh = reloadAppearanceFromClient()
-      setAppearance(fresh)
-      syncDom(fresh)
-    }
-    document.addEventListener("visibilitychange", onVisible)
-    return () => document.removeEventListener("visibilitychange", onVisible)
-  }, [])
+    syncDom(appearance)
+  }, [appearance])
 
   const update = useCallback((updater: (prev: AppAppearanceState) => AppAppearanceState) => {
-    setAppearance((prev) => {
-      const next = updater(prev)
-      persistState(next)
-      return next
-    })
+    const next = updater(readAppearanceSnapshot())
+    persistState(next)
   }, [])
 
   useEffect(() => {
@@ -101,10 +136,8 @@ export function AppAppearanceProvider({
 
     const mq = window.matchMedia("(prefers-color-scheme: dark)")
     const onChange = () => {
-      const fresh = reloadAppearanceFromClient()
-      if (fresh.theme !== "system") return
-      setAppearance(fresh)
-      syncDom(fresh)
+      if (readAppearanceSnapshot().theme !== "system") return
+      syncDom(readAppearanceSnapshot())
     }
     mq.addEventListener("change", onChange)
     return () => mq.removeEventListener("change", onChange)
@@ -170,9 +203,7 @@ export function AppAppearanceProvider({
   )
 
   const resetAllAppearance = useCallback(() => {
-    const next = { ...defaultAppAppearanceState }
-    setAppearance(next)
-    persistState(next)
+    persistState({ ...defaultAppAppearanceState })
   }, [])
 
   const value = useMemo<AppAppearanceContextValue>(

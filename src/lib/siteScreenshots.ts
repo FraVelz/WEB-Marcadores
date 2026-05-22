@@ -29,5 +29,3 @@ export const APP_SCREENSHOTS = [
     alt: "Vista de Perfil: apariencia, imagen de fondo y cuenta de usuario",
   },
 ] as const
-
-export type AppScreenshot = (typeof APP_SCREENSHOTS)[number]

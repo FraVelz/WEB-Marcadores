@@ -2,9 +2,9 @@
 
 import { useCallback, useMemo } from "react"
 
-export type BrowseScopeMode = "global" | "desk"
+type BrowseScopeMode = "global" | "desk"
 
-export type BrowseScopeConfig = {
+type BrowseScopeConfig = {
   mode: BrowseScopeMode
   /** Carpeta activa (global o de la ventana enfocada). */
   folderId: string | null

@@ -17,7 +17,7 @@ export type DesktopPaneDerivedEntry = {
   focusFlatList: GridItem[]
 }
 
-export function deriveDesktopPaneEntry(
+function deriveDesktopPaneEntry(
   folders: FlatFolder[],
   baseVisible: Bookmark[],
   winFolderId: string | null,

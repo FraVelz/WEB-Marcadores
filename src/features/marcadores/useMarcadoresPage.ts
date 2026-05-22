@@ -45,8 +45,3 @@ export function useMarcadoresPage(): MarcadoresPageModel {
     bookmarkModal,
   }
 }
-
-export {
-  useMarcadoresPageDataHooks,
-  type MarcadoresPageCore,
-} from "@/features/marcadores/page/useMarcadoresPageDataHooks"

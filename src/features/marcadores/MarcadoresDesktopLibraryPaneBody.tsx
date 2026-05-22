@@ -10,7 +10,7 @@ import {
   type DeskLibraryPaneUiState,
 } from "@/features/marcadores/state/libraryPaneUiState"
 import { createDeskPaneScope, type DeskPaneUiBindings } from "@/features/marcadores/state/libraryPaneUiScope"
-import type { DesktopPaneDerivedEntry } from "@/features/marcadores/page/useMarcadoresPageBookmarksBootstrap"
+import type { DesktopPaneDerivedEntry } from "@/features/marcadores/core/deriveDesktopPaneEntry"
 import type { GridItem } from "@/features/marcadores/utils/types"
 
 type BreadcrumbSeg = { id: string | null; label: string }

@@ -357,11 +357,13 @@ function applyWallpaperLayerToElement(el: HTMLElement, layer: WallpaperLayerStyl
     clearWallpaperInlineFromElement(el)
     return
   }
-  el.style.backgroundColor = layer.backgroundColor
-  el.style.backgroundImage = layer.backgroundImage
-  el.style.backgroundSize = layer.backgroundSize
-  el.style.backgroundAttachment = layer.backgroundAttachment
-  el.style.backgroundRepeat = layer.backgroundRepeat
+  el.style.cssText = [
+    `background-color: ${layer.backgroundColor}`,
+    `background-image: ${layer.backgroundImage}`,
+    `background-size: ${layer.backgroundSize}`,
+    `background-attachment: ${layer.backgroundAttachment}`,
+    `background-repeat: ${layer.backgroundRepeat}`,
+  ].join(";")
 }
 
 function clearWallpaperInlineFromElement(el: HTMLElement): void {
@@ -384,10 +386,26 @@ export function applyWallpaperToHTMLElement(
   applyWallpaperLayerToElement(el, buildWallpaperLayerStyle(state))
 }
 
-/** Aplica tapiz al `body` (capa + velo según tema). Sin tapiz, solo quita estilos inline de fondo. */
+const WALLPAPER_HTML_CLASS = "app-wallpaper"
+const WALLPAPER_IMAGE_VAR = "--app-wallpaper-image"
+
+/** Tapiz en `html` + CSS (sin `body.style` inline → compatible con hidratación de React). */
 export function applyWallpaperToBody(state: Pick<AppAppearanceState, "wallpaperDataUrl" | "wallpaperVeil">): void {
   if (typeof document === "undefined") return
-  applyWallpaperLayerToElement(document.body, buildWallpaperLayerStyle(state))
+
+  const root = document.documentElement
+  const layer = buildWallpaperLayerStyle(state)
+
+  clearWallpaperInlineFromElement(document.body)
+
+  if (!layer) {
+    root.classList.remove(WALLPAPER_HTML_CLASS)
+    root.style.removeProperty(WALLPAPER_IMAGE_VAR)
+    return
+  }
+
+  root.classList.add(WALLPAPER_HTML_CLASS)
+  root.style.setProperty(WALLPAPER_IMAGE_VAR, layer.backgroundImage)
 }
 
 const MAX_IMG_BYTES = 2_500_000
