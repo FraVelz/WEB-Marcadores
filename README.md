@@ -6,15 +6,18 @@
 
 ![Captura de pantalla — Marcadores](./public/screenshots/marcadores.png)
 
-Gestor de marcadores y favoritos con Next.js y Supabase. Organiza enlaces en carpetas, usa atajos y recorre la colección con una interfaz oscura tipo explorador. Puedes usar **modo demo** sin configurar Supabase.
+Gestor de marcadores y favoritos con Next.js y Supabase. Organiza enlaces en carpetas, usa atajos y recorre la colección
+con una interfaz oscura tipo explorador. Puedes usar **modo demo** sin configurar Supabase.
 
-Con esta carpeta como raíz del workspace en Cursor, los comandos `/update-docs` y `/auto-commit` están en [`.cursor/commands/`](.cursor/commands/) para mantener documentación bilingüe y commits alineados al repo.
+Con esta carpeta como raíz del workspace en Cursor, los comandos `/update-docs` y `/auto-commit` están en
+[`.cursor/commands/`](.cursor/commands/) para mantener documentación bilingüe y commits alineados al repo.
 
 ## ✨ Características
 
 - Carpetas anidadas, cuadrícula de marcadores y panel de detalle con metadatos y etiquetas
 - Autenticación con Supabase y sesión SSR mediante `@supabase/ssr`
-- **Modo demo** sin `.env.local`: datos en memoria y acceso por botón en login o ruta `/demo` (en producción puedes forzar con `NEXT_PUBLIC_DEMO_MODE=true`)
+- **Modo demo** sin `.env.local`: datos en memoria y acceso por botón en login o ruta `/demo` (en producción puedes
+  forzar con `NEXT_PUBLIC_DEMO_MODE=true`)
 - Atajos de teclado y vistas de **Atajos** y **Perfil**
 - Interfaz coherente con Tailwind CSS v4
 
@@ -113,7 +116,7 @@ Copia `.env.example` a `.env.local` y rellena las variables si usas Supabase fue
 | `NEXT_PUBLIC_SITE_URL`          | URL del sitio (Open Graph; por defecto Vercel en código) |
 | `NEXT_PUBLIC_DEMO_MODE`         | `true` para forzar modo demo en producción               |
 
-**FraVelz**
+## FraVelz
 
 - **GitHub:** [@FraVelz](https://github.com/FraVelz)
 - **Repositorio:** [WEB-Marcadores](https://github.com/FraVelz/WEB-Marcadores)
@@ -126,4 +129,5 @@ Las mejoras y correcciones son bienvenidas mediante issues o pull requests en el
 
 Si te resulta útil el proyecto, una estrella en GitHub ayuda a darle visibilidad.
 
-> Este documento fue generado o actualizado con asistencia de inteligencia artificial. Última actualización: **10 de mayo de 2026**.
+> Este documento fue generado o actualizado con asistencia de inteligencia artificial. Última actualización: **10 de
+> mayo de 2026**.

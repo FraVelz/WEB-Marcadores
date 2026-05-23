@@ -2,19 +2,23 @@
 
 [Versión en español](./README.md)
 
-**Published site:** [web-marcadores.vercel.app](https://web-marcadores.vercel.app) (default deployment if `NEXT_PUBLIC_SITE_URL` is unset; source on [GitHub](https://github.com/FraVelz/WEB-Marcadores)).
+**Published site:** [web-marcadores.vercel.app](https://web-marcadores.vercel.app) (default deployment if
+`NEXT_PUBLIC_SITE_URL` is unset; source on [GitHub](https://github.com/FraVelz/WEB-Marcadores)).
 
 ![Screenshot — Bookmarks](./public/screenshots/marcadores.png)
 
-Bookmark manager built with Next.js and Supabase. Organize links in folders, use shortcuts, and browse your collection with a dark explorer-style interface. You can use **demo mode** without configuring Supabase.
+Bookmark manager built with Next.js and Supabase. Organize links in folders, use shortcuts, and browse your collection
+with a dark explorer-style interface. You can use **demo mode** without configuring Supabase.
 
-With this folder as the Cursor workspace root, the `/update-docs` and `/auto-commit` slash commands live in [`.cursor/commands/`](.cursor/commands/) to keep bilingual docs and commits aligned with the repo.
+With this folder as the Cursor workspace root, the `/update-docs` and `/auto-commit` slash commands live in
+[`.cursor/commands/`](.cursor/commands/) to keep bilingual docs and commits aligned with the repo.
 
 ## ✨ Features
 
 - Nested folders, bookmark grid, and a detail panel with metadata and tags
 - Supabase authentication and SSR session handling via `@supabase/ssr`
-- **Demo mode** without `.env.local`: in-memory data and access via the login button or `/demo` route (set `NEXT_PUBLIC_DEMO_MODE=true` in production to force it)
+- **Demo mode** without `.env.local`: in-memory data and access via the login button or `/demo` route (set
+  `NEXT_PUBLIC_DEMO_MODE=true` in production to force it)
 - Keyboard shortcuts plus **Shortcuts** and **Profile** views
 - Cohesive UI with Tailwind CSS v4
 
@@ -113,7 +117,7 @@ Copy `.env.example` to `.env.local` and fill in the variables when using Supabas
 | `NEXT_PUBLIC_SITE_URL`          | Site URL (Open Graph; default Vercel in code) |
 | `NEXT_PUBLIC_DEMO_MODE`         | `true` to force demo mode in production       |
 
-**FraVelz**
+## FraVelz
 
 - **GitHub:** [@FraVelz](https://github.com/FraVelz)
 - **Repository:** [WEB-Marcadores](https://github.com/FraVelz/WEB-Marcadores)

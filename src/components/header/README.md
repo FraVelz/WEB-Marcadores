@@ -1,6 +1,7 @@
 # Header global del dashboard
 
-Componentes compartidos por todas las rutas bajo `(dashboard)/`. El layout (`src/layouts/dashboard/shell`) solo los monta; las features registran slots en contexto (p. ej. herramientas de marcadores).
+Componentes compartidos por todas las rutas bajo `(dashboard)/`. El layout (`src/layouts/dashboard/shell`) solo los
+monta; las features registran slots en contexto (p. ej. herramientas de marcadores).
 
 | Archivo                       | Uso                                                |
 | ----------------------------- | -------------------------------------------------- |
