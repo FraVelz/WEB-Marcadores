@@ -1,0 +1,64 @@
+---
+description: Colocar componentes, hooks y utilidades según su alcance real (feature, ruta o global)
+alwaysApply: true
+---
+
+# Alcance de componentes y código compartido
+
+Coloca cada archivo donde **realmente se usa**. No crear piezas en `src/components/` si solo sirven a una feature o a una ruta.
+
+## Árbol de decisión
+
+1. **¿Solo una ruta de App Router?** → `src/app/.../_components/` (p. ej. detalle de proyecto, 404).
+2. **¿Solo una feature** (`hero`, `projects`, `about-me`, …)? → `src/features/<feature>/components/` (o `icons/`, `utils/` dentro de esa feature).
+3. **¿Solo la home / scroll horizontal?** → `src/features/PageFeature/components/`.
+4. **¿Cabecera, footer o shell de toda la app?** → `src/components/layout/`.
+5. **¿UI reutilizada en 2+ features o en layout + features?** → `src/components/ui/`.
+6. **¿Duda?** → Empezar en el scope más pequeño (feature o ruta). Subir a `components/ui` solo cuando haya **segundo consumidor** fuera de esa feature.
+
+## Mapa de carpetas
+
+| Alcance | Ubicación |
+|--------|-----------|
+| Una página / ruta | `src/app/.../_components/` |
+| Una sección del portfolio | `src/features/<nombre>/components/` |
+| Layout global (header, footer) | `src/components/layout/` |
+| UI transversal | `src/components/ui/` |
+| Datos de dominio (proyectos, certs) | `src/utils/data/` |
+| i18n, tema, URL del sitio | `src/lib/` |
+| Hooks usados en una sola feature | junto a esa feature (p. ej. `features/.../hooks/`) |
+| Hooks usados en varias features | `src/hooks/` |
+
+## Reglas para el agente
+
+- **Prohibido** meter en `src/components/ui/` o `src/components/layout/` algo que solo importa una feature o una página.
+- **Prohibido** crear “globales por si acaso” antes de comprobar usos.
+- Al extraer un componente, **mantener el import relativo al scope** (feature → feature; no promover sin necesidad).
+- Misma lógica para **hooks**, **utils** e **iconos** específicos de un dominio: van en la feature, no en `src/components/`.
+- Si refactorizas y el archivo pasa a usarse en otro sitio, **mover el archivo** al scope correcto y actualizar imports; no duplicar.
+
+## Ejemplos
+
+```tsx
+// ❌ Botón solo usado en ProjectsSection
+src/components/ui/ProjectsViewAllButton.tsx
+
+// ✅
+src/features/projects/components/ProjectsViewAllButton.tsx
+
+// ❌ Slider solo del about-me
+src/components/ui/AboutHistorySlider.tsx
+
+// ✅
+src/features/about-me/components/AboutHistorySlider.tsx
+
+// ✅ PanelReveal usado en hero, hobbies, projects, about-me
+src/components/ui/PanelReveal.tsx
+
+// ✅ Visor de imágenes solo en /projects/[slug]
+src/app/[lang]/projects/[slug]/_components/ListImageViewer/
+```
+
+## Antes de crear un archivo nuevo
+
+Preguntarse: **¿quién lo importa?** Si la respuesta es una sola carpeta (`features/hero`, `app/[lang]/certifications`, etc.), el archivo vive **ahí**, no en `components/` raíz.

@@ -1,34 +1,72 @@
-# Commit local del proyecto actual
+# Autocommit — WEB-Marcadores (Next.js + Supabase)
 
-Ejecuta un **solo commit en el repositorio local**. **No ejecutes `git push`** ni modifiques la configuración de git.
+Usar cuando el usuario pida **hacer commit** del trabajo actual. Mensajes **Conventional Commits**, coherentes con `git log` de este repo. **No** hacer `git push` salvo petición explícita.
+
+## Cuándo ejecutar
+
+- Invocación de **`/auto-commit`** o petición explícita de **commit** / **autocommit**.
+- **No** commitear si el usuario no lo pidió.
 
 ## Antes de commitear
 
-1. Revisa `git status` y `git diff` (staged y unstaged) para entender qué entra en el commit.
-2. Consulta `git log -20 --oneline` (o un rango razonable) y **imita el estilo de este repo**: prefijos como `feat`, `fix`, `docs`, `refactor`, `chore`, `delete`, y opcionalmente ámbito `tipo(ámbito):` (p. ej. `feat(global): …`), en línea con los mensajes recientes.
+1. `git status` — staged y unstaged.
+2. `git diff` — qué entra en el commit.
+3. `git log -15 --oneline` — tono reciente.
 
-## Mensaje: Conventional Commits
+**No** incluir `.env`, claves Supabase ni `.next/` salvo petición explícita.
 
-- **Idioma:** el mensaje del commit (título y cuerpo) va **siempre en inglés**.
-- Formato por línea: `<tipo>(<ámbito>): <acción>` — descripción en minúsculas, imperativa, sin punto final. Si no tiene ámbito claro: `<tipo>: <acción>`.
-- Tipos habituales aquí: `feat`, `fix`, `docs`, `refactor`, `chore`, `style`, `test`, `delete`.
-- En **un mismo commit**, cuando haga falta cubrir varios frentes, usa **una línea por tema** con ese patrón: la **primera** resume lo más importante; las **siguientes** (después de una línea en blanco) repiten `<tipo>(<ámbito>): <acción>` por cada bloque relevante del diff. Si los cambios son muy distintos, sigue valorando **commits separados**.
-- Pasa el mensaje con HEREDOC, por ejemplo:
+## Ámbitos (`scope`) habituales en este repo
+
+`marcadores`, `dashboard`, `auth`, `app`, `estadisticas`, `perfil`, `atajos`, `bookmark`, `appearance`, `supabase`, `readme`, `cursor`, `ci`, `layout`, `header`, `deps`.
+
+Rutas de referencia: `src/app/(dashboard)/`, `src/features/marcadores/`, `src/features/estadisticas/`, `src/components/`, `src/layouts/`, `src/lib/supabase/`, `README.md` / `README.EN.md`, `.cursor/`.
+
+## Formas de mensaje
+
+### A) Formato lista — varias áreas
+
+```text
+refactor(marcadores): unify useMarcadoresPage and remove legacy layers
+
+fix(app): cache appearance snapshot and prevent render loop
+docs(readme): align bilingual README with current routes
+```
+
+### B) Formato clásico — un tema
+
+```text
+feat(estadisticas): add bookmarks analytics page with kpis and css charts
+```
+
+## Tipos
+
+| Tipo | Uso aquí |
+| --- | --- |
+| `feat` | Marcadores, dashboard, demo, estadísticas |
+| `fix` | Auth, UI, hidratación, contraste |
+| `docs` | README bilingüe, `.cursor/commands/` |
+| `refactor` | Features, hooks, estado del escritorio |
+| `chore` / `style` | Deps, Prettier, ESLint |
+| `ci` | Workflows GitHub |
+
+## Commit
 
 ```bash
 git commit -m "$(cat <<'EOF'
-feat(marcadores): add desktop layout bar
+feat(app): persist appearance in cookies with ssr theme bootstrap
 
-fix(dashboard): fix shortcut collision on md viewport
-docs: update cursor commands
+chore(cursor): standardize update-docs and auto-commit commands
 EOF
 )"
 ```
 
-## Reglas estrictas
+## Reglas
 
-- Solo crear commit si hay cambios que incluir; no commits vacíos.
-- **No** añadir trailers `Co-authored-by` (ni variantes) ni mencionar Cursor en el mensaje del commit; el autor del commit es solo quien trabaja en el repo.
-- **Prohibido** push, force-push, reset destructivo, `--no-verify` / saltarse hooks, y cambiar `git config`, salvo que el usuario lo pida explícitamente en otro mensaje.
+- Mensaje en **inglés**; respuesta al chat en **español**.
+- Cumplir `.cursor/rules/git-commits.mdc` (sin coautoría IA).
+- Hook rechazado → nuevo commit; sin `--no-verify` salvo petición explícita.
+- Enmendar si el entorno inyecta `Co-authored-by: Cursor` (commit no publicado).
 
-Tras el commit, muestra `git status` para confirmar que el árbol quedó limpio respecto a lo commiteado.
+## Comandos relacionados
+
+- Documentación README: **`/update-docs`**.

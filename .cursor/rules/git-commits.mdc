@@ -1,0 +1,12 @@
+---
+description: Git commits by the agent — no AI co-author trailers
+alwaysApply: true
+---
+
+# Git commits
+
+When creating or amending commits on behalf of the user:
+
+- **Never** add `Co-authored-by:`, `Signed-off-by:` for Cursor, or any AI/IDE co-author line unless the user explicitly asks for it.
+- The commit message must contain only what the user requested (Conventional Commits subject/body, etc.).
+- If the environment injects `Co-authored-by: Cursor` after `git commit`, amend the last commit (only if not pushed) with the same message **without** that trailer, using a message file: `git commit --amend -F /path/to/msg.txt` and verify with `git log -1 --format=%B`.
