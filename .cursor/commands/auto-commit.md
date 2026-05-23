@@ -1,6 +1,7 @@
 # Autocommit — WEB-Marcadores (Next.js + Supabase)
 
-Usar cuando el usuario pida **hacer commit** del trabajo actual. Mensajes **Conventional Commits**, coherentes con `git log` de este repo. **No** hacer `git push` salvo petición explícita.
+Usar cuando el usuario pida **hacer commit** del trabajo actual. Mensajes **Conventional Commits**, coherentes con
+`git log` de este repo. **No** hacer `git push` salvo petición explícita.
 
 ## Cuándo ejecutar
 
@@ -17,9 +18,11 @@ Usar cuando el usuario pida **hacer commit** del trabajo actual. Mensajes **Conv
 
 ## Ámbitos (`scope`) habituales en este repo
 
-`marcadores`, `dashboard`, `auth`, `app`, `estadisticas`, `perfil`, `atajos`, `bookmark`, `appearance`, `supabase`, `readme`, `cursor`, `ci`, `layout`, `header`, `deps`.
+`marcadores`, `dashboard`, `auth`, `app`, `estadisticas`, `perfil`, `atajos`, `bookmark`, `appearance`, `supabase`,
+`readme`, `cursor`, `ci`, `layout`, `header`, `deps`.
 
-Rutas de referencia: `src/app/(dashboard)/`, `src/features/marcadores/`, `src/features/estadisticas/`, `src/components/`, `src/layouts/`, `src/lib/supabase/`, `README.md` / `README.EN.md`, `.cursor/`.
+Rutas de referencia: `src/app/(dashboard)/`, `src/features/marcadores/`, `src/features/estadisticas/`,
+`src/components/`, `src/layouts/`, `src/lib/supabase/`, `README.md` / `README.EN.md`, `.cursor/`.
 
 ## Formas de mensaje
 
@@ -40,14 +43,14 @@ feat(estadisticas): add bookmarks analytics page with kpis and css charts
 
 ## Tipos
 
-| Tipo | Uso aquí |
-| --- | --- |
-| `feat` | Marcadores, dashboard, demo, estadísticas |
-| `fix` | Auth, UI, hidratación, contraste |
-| `docs` | README bilingüe, `.cursor/commands/` |
-| `refactor` | Features, hooks, estado del escritorio |
-| `chore` / `style` | Deps, Prettier, ESLint |
-| `ci` | Workflows GitHub |
+| Tipo              | Uso aquí                                  |
+| ----------------- | ----------------------------------------- |
+| `feat`            | Marcadores, dashboard, demo, estadísticas |
+| `fix`             | Auth, UI, hidratación, contraste          |
+| `docs`            | README bilingüe, `.cursor/commands/`      |
+| `refactor`        | Features, hooks, estado del escritorio    |
+| `chore` / `style` | Deps, Prettier, ESLint                    |
+| `ci`              | Workflows GitHub                          |
 
 ## Commit
 

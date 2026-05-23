@@ -1,6 +1,7 @@
 # Layout del dashboard
 
-Composición del shell (drawer lateral, área principal, command palette). Las **cabeceras globales** están en `src/components/header/`.
+Composición del shell (drawer lateral, área principal, command palette). Las **cabeceras globales** están en
+`src/components/header/`.
 
 ## Carpetas
 
