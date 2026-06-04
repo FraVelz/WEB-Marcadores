@@ -20,8 +20,6 @@ export type DashboardContextType = {
   setAllTagsFromBookmarks: (rows: { tags?: string[] | null }[]) => void
   viewMode: ViewMode
   setViewMode: (m: ViewMode) => void
-  setMainKeyDown: (handler: ((e: React.KeyboardEvent) => void) | null) => void
-  mainKeyDownRef: React.MutableRefObject<((e: React.KeyboardEvent) => void) | null>
   editFolderRef: React.MutableRefObject<((id: string, name: string) => void) | null>
   selectedFolderId: string | null
   setSelectedFolderId: (id: string | null) => void

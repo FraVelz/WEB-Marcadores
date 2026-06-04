@@ -6,7 +6,7 @@ import type { MarcadoresKeyboardContext } from "./marcadoresKeyboard.types"
 
 const DD_TIMEOUT_MS = 400
 
-export function handleMarcadoresKeyDown(e: React.KeyboardEvent, ctx: MarcadoresKeyboardContext) {
+export function handleMarcadoresKeyDown(e: KeyboardEvent, ctx: MarcadoresKeyboardContext) {
   const {
     lastKeyRef,
     breadcrumb,

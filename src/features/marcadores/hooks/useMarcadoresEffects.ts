@@ -2,21 +2,20 @@
 
 import { useEffect, useEffectEvent } from "react"
 
+import { useHotkeys } from "@/lib/hotkeys/useHotkeys"
+
 type Params<T> = {
   searchValue: string
   selectedFolderId: string | null
   selectedIndex: number
   flatList: { type: string; bookmark?: T }[]
   infoPanelEnabled: boolean
-  modalOpen: boolean
   pasteError: string | null
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>
   setGridCols: React.Dispatch<React.SetStateAction<number>>
   setDetailBookmark: React.Dispatch<React.SetStateAction<T | null>>
   setPasteError: (v: string | null) => void
   setShowSearch: (v: boolean) => void
-  setMainKeyDown: (h: ((e: React.KeyboardEvent) => void) | null) => void
-  handleKeyDown: (e: React.KeyboardEvent) => void
   itemRefs: React.MutableRefObject<Map<number, HTMLDivElement>>
   searchRef: React.RefObject<HTMLInputElement | null>
 }
@@ -28,15 +27,12 @@ export function useMarcadoresEffects<T>(params: Params<T>) {
     selectedIndex,
     flatList,
     infoPanelEnabled,
-    modalOpen,
     pasteError,
     setSelectedIndex,
     setGridCols,
     setDetailBookmark,
     setPasteError,
     setShowSearch,
-    setMainKeyDown,
-    handleKeyDown,
     itemRefs,
     searchRef,
   } = params
@@ -71,23 +67,18 @@ export function useMarcadoresEffects<T>(params: Params<T>) {
     setDetailBookmark(next)
   }, [flatList, selectedIndex, infoPanelEnabled, setDetailBookmark])
   useEffect(() => {
-    const nextHandler = modalOpen ? null : handleKeyDown
-    setMainKeyDown(nextHandler)
-    return () => setMainKeyDown(null)
-  }, [modalOpen, handleKeyDown, setMainKeyDown])
-  useEffect(() => {
     if (!pasteError) return
     const t = setTimeout(() => clearPasteError(), 4000)
     return () => clearTimeout(t)
   }, [pasteError])
-  useEffect(() => {
-    const h = (e: KeyboardEvent) => {
-      if (e.ctrlKey && (e.key === "f" || e.key === "k")) {
-        e.preventDefault()
-        focusSearchShortcut()
-      }
-    }
-    window.addEventListener("keydown", h)
-    return () => window.removeEventListener("keydown", h)
-  }, [])
+
+  useHotkeys(
+    "ctrl+f,ctrl+k",
+    (event) => {
+      event.preventDefault()
+      focusSearchShortcut()
+    },
+    {},
+    []
+  )
 }

@@ -7,6 +7,7 @@ import { splitCommaTags } from "@/lib/comma-tags"
 import BookmarkFormBasicInfo from "./BookmarkFormBasicInfo"
 import BookmarkFormFolderSelect from "./BookmarkFormFolderSelect"
 import BookmarkFormTagsSection from "./BookmarkFormTagsSection"
+import { useHotkeys } from "@/lib/hotkeys/useHotkeys"
 
 export type BookmarkFormData = {
   title: string
@@ -54,13 +55,7 @@ export default function BookmarkModal({ onClose, onSubmit, initialData, allTags,
 
   const onCloseEvent = useEffectEvent(onClose)
 
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCloseEvent()
-    }
-    window.addEventListener("keydown", handleEscape)
-    return () => window.removeEventListener("keydown", handleEscape)
-  }, [])
+  useHotkeys("esc", () => onCloseEvent(), {}, [])
 
   useEffect(() => {
     requestAnimationFrame(() => firstInputRef.current?.focus())

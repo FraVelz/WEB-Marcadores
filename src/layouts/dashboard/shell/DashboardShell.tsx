@@ -22,7 +22,6 @@ export default function DashboardShell({ children }: { children: React.ReactNode
     sidebarRef,
     focusMain,
     focusSidebar,
-    mainKeyDownRef,
     setCommandPaletteOpen,
     marcadoresExplorerPanelRef,
   } = useDashboard()
@@ -48,12 +47,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
           wallpaperActive ? "bg-transparent" : "bg-app-canvas"
         )}
       >
-        <DashboardMobileLayout
-          pathname={pathname}
-          sidebarRef={sidebarRef}
-          mainRef={mainRef}
-          mainKeyDownRef={mainKeyDownRef}
-        >
+        <DashboardMobileLayout pathname={pathname} sidebarRef={sidebarRef} mainRef={mainRef}>
           {children}
         </DashboardMobileLayout>
       </div>

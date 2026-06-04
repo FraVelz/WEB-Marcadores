@@ -16,11 +16,10 @@ type Props = {
   children: React.ReactNode
   sidebarRef: React.RefObject<HTMLDivElement | null>
   mainRef: React.RefObject<HTMLElement | null>
-  mainKeyDownRef: React.MutableRefObject<((e: React.KeyboardEvent) => void) | null>
 }
 
 /** Composición del área principal: cabeceras globales, drawer lateral y contenido de ruta. */
-export function DashboardMobileLayout({ pathname, sidebarRef, children, mainRef, mainKeyDownRef }: Props) {
+export function DashboardMobileLayout({ pathname, children, sidebarRef, mainRef }: Props) {
   const wide = useMatchMediaMd()
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const { dashboardFullscreenHostRef } = useDashboard()
@@ -64,7 +63,6 @@ export function DashboardMobileLayout({ pathname, sidebarRef, children, mainRef,
             "flex min-h-0 flex-1 flex-col overflow-hidden outline-none focus:ring-0",
             wallpaperActive ? "bg-transparent" : "bg-app-canvas"
           )}
-          onKeyDown={(e) => mainKeyDownRef.current?.(e)}
         >
           {children}
         </main>
