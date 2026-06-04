@@ -4,6 +4,7 @@ import { cookies, headers } from "next/headers"
 
 import { resolveSiteUrl, rootLayoutMetadata } from "@/lib/metadata"
 import Script from "next/script"
+import { Analytics } from "@vercel/analytics/next"
 import { Geist, Geist_Mono } from "next/font/google"
 
 import { AppAppearanceProvider } from "@/contexts/AppAppearanceContext"
@@ -68,6 +69,7 @@ export default async function RootLayout({
         <Script src="/appearance-init.js" strategy="beforeInteractive" />
 
         <AppAppearanceProvider initialAppearance={appearance}>{children}</AppAppearanceProvider>
+        <Analytics />
       </body>
     </html>
   )
