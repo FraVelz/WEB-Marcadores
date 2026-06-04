@@ -7,7 +7,7 @@ import { useAppAppearance } from "@/contexts/AppAppearanceContext"
 
 import { DesktopDraggableLibraryShortcut } from "@/features/marcadores/desktop/DesktopDraggableLibraryShortcut"
 import { useDeskDecorMarquee } from "@/features/marcadores/desktop/useDeskDecorMarquee"
-import { isBookmarkDragTransfer } from "@/features/marcadores/utils/parseDragPayload"
+import { useBookmarkDeskCanvasTarget } from "@/lib/drag-and-drop"
 
 import { DESKTOP_LIBRARY_SHORTCUT_KEY } from "./desktopShellConstants"
 import { cn } from "@/lib/utils"
@@ -41,6 +41,8 @@ export function MarcadoresDesktopDeskChrome({
   const mqW = marquee ? Math.abs(marquee.x1 - marquee.x0) : 0
   const mqH = marquee ? Math.abs(marquee.y1 - marquee.y0) : 0
 
+  useBookmarkDeskCanvasTarget(hostRef, true, setDeskCanvasDropHighlight)
+
   return (
     <div
       ref={hostRef}
@@ -55,24 +57,6 @@ export function MarcadoresDesktopDeskChrome({
       onPointerDown={(e) => {
         if (e.target === e.currentTarget) setLibraryShortcutSelected(false)
         marqueePointerHandlers.onPointerDown(e)
-      }}
-      onDragEnter={(e) => {
-        if (!isBookmarkDragTransfer(e.dataTransfer)) return
-        setDeskCanvasDropHighlight(true)
-      }}
-      onDragOver={(e) => {
-        if (!isBookmarkDragTransfer(e.dataTransfer)) return
-        e.preventDefault()
-        setDeskCanvasDropHighlight(true)
-      }}
-      onDragLeave={(e) => {
-        const rt = e.relatedTarget as Node | null
-        if (rt && hostRef.current?.contains(rt)) return
-        setDeskCanvasDropHighlight(false)
-      }}
-      onDrop={(e) => {
-        setDeskCanvasDropHighlight(false)
-        e.preventDefault()
       }}
     >
       <div className="pointer-events-none absolute inset-0">

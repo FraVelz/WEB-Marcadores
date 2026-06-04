@@ -12,7 +12,7 @@ import {
   type ResizeEdge,
 } from "@/features/marcadores/desktop/desktopWindowGeometry"
 import type { WindowBounds } from "@/features/marcadores/desktop/windowTypes"
-import { isBookmarkDragTransfer } from "@/features/marcadores/utils/parseDragPayload"
+import { useBookmarkDragBubbleBlocker } from "@/lib/drag-and-drop"
 
 import { cn } from "@/lib/utils"
 
@@ -65,6 +65,9 @@ export function DesktopWindowFrame({
 }: Props) {
   const { w: cw, h: ch } = canvasSize
   const dragCleanupRef = useRef<(() => void) | null>(null)
+  const frameRef = useRef<HTMLDivElement | null>(null)
+
+  useBookmarkDragBubbleBlocker(frameRef, isolateBookmarkDragBubble, onDismissDesktopDropHighlight)
 
   const endDrag = useCallback(() => {
     dragCleanupRef.current?.()
@@ -139,26 +142,9 @@ export function DesktopWindowFrame({
     }
   }
 
-  const isolateBookmarkDragHandlers = isolateBookmarkDragBubble
-    ? {
-        onDragEnter: (e: React.DragEvent) => {
-          if (isBookmarkDragTransfer(e.dataTransfer)) {
-            e.stopPropagation()
-            onDismissDesktopDropHighlight?.()
-          }
-        },
-        onDragOver: (e: React.DragEvent) => {
-          if (isBookmarkDragTransfer(e.dataTransfer)) {
-            e.preventDefault()
-            e.stopPropagation()
-            onDismissDesktopDropHighlight?.()
-          }
-        },
-      }
-    : {}
-
   return (
     <div
+      ref={frameRef}
       className={cn(
         "border-app-border-muted absolute flex flex-col overflow-hidden rounded-lg border shadow-2xl",
         minimized && "hidden"
@@ -172,7 +158,6 @@ export function DesktopWindowFrame({
         backgroundColor: "color-mix(in srgb, var(--app-raised) var(--app-desk-window-solid-pct, 100%), transparent)",
       }}
       onPointerDown={() => onActivate()}
-      {...isolateBookmarkDragHandlers}
     >
       <DesktopWindowResizeHandles
         minimized={minimized}

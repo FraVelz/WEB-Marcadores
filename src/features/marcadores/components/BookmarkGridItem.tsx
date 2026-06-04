@@ -1,10 +1,9 @@
 "use client"
 
-import { memo, useId } from "react"
+import { memo, useCallback, useId, useRef } from "react"
 
 import { cn, cnLines } from "@/lib/utils"
-import { applyBookmarkDragPreview } from "../utils/bookmarkDragPreview"
-import { BOOKMARK_DRAG_MIME_TYPE, parseBookmarkDragPayload } from "../utils/parseDragPayload"
+import { useBookmarkDraggable, useBookmarkDropTarget } from "@/lib/drag-and-drop"
 import type { GridItem } from "../utils/types"
 import { FolderContent, LinkContent } from "./bookmarkGrid/BookmarkGridItemBodies"
 
@@ -44,42 +43,25 @@ function BookmarkGridItem({
   const selectControlId = useId()
   const isFolder = item.type === "folder"
   const targetFolderId = isFolder ? item.id : (item.bookmark.folder_id ?? null)
+  const nodeRef = useRef<HTMLDivElement | null>(null)
 
-  const handleDragStart = (e: React.DragEvent) => {
-    const payload = isFolder
-      ? { type: "folder" as const, id: item.id, name: item.label }
-      : { type: "link" as const, bookmark: { id: item.bookmark.id, url: item.bookmark.url } }
-    e.dataTransfer.setData(BOOKMARK_DRAG_MIME_TYPE, JSON.stringify(payload))
-    e.dataTransfer.effectAllowed = "move"
-    e.dataTransfer.setData("text/plain", isFolder ? item.label : item.bookmark.title)
-    applyBookmarkDragPreview(e)
-  }
+  const setNodeRef = useCallback(
+    (el: HTMLDivElement | null) => {
+      nodeRef.current = el
+      itemRef(el)
+    },
+    [itemRef]
+  )
 
-  const handleDragOver = (e: React.DragEvent) => {
-    if (!onDrop) return
-    e.preventDefault()
-    e.stopPropagation()
-    e.dataTransfer.dropEffect = "move"
-    onBookmarkDragHover?.()
-  }
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    if (!onDrop || !onBookmarkDragHoverLeave) return
-    const rt = e.relatedTarget as Node | null
-    if (rt && e.currentTarget.contains(rt)) return
-    onBookmarkDragHoverLeave()
-  }
-
-  const handleDrop = (e: React.DragEvent) => {
-    if (!onDrop) return
-    e.preventDefault()
-    e.stopPropagation()
-    onBookmarkDragHoverLeave?.()
-    const raw = e.dataTransfer.getData(BOOKMARK_DRAG_MIME_TYPE)
-    if (!raw) return
-    const sourceItem = parseBookmarkDragPayload(raw)
-    if (sourceItem) onDrop(sourceItem, targetFolderId)
-  }
+  useBookmarkDraggable(nodeRef, item)
+  useBookmarkDropTarget({
+    elementRef: nodeRef,
+    enabled: Boolean(onDrop),
+    targetFolderId,
+    onDrop,
+    onDragEnter: onBookmarkDragHover,
+    onDragLeave: onBookmarkDragHoverLeave,
+  })
 
   const activateFromKeyboard = (e: React.KeyboardEvent) => {
     if (e.target !== e.currentTarget) return
@@ -116,9 +98,8 @@ function BookmarkGridItem({
 
   return (
     <div
-      ref={itemRef}
+      ref={setNodeRef}
       data-bookmark-grid-item
-      draggable
       role="button"
       tabIndex={0}
       aria-pressed={selectMode && !isFolder ? isChecked : undefined}
@@ -129,10 +110,6 @@ function BookmarkGridItem({
       }}
       onKeyDown={activateFromKeyboard}
       onDoubleClick={() => onDoubleClick(item)}
-      onDragStart={handleDragStart}
-      onDragOver={onDrop ? handleDragOver : undefined}
-      onDragLeave={onDrop ? handleDragLeave : undefined}
-      onDrop={onDrop ? handleDrop : undefined}
     >
       {selectMode && !isFolder && (
         <label className="absolute top-3 left-3 z-10" htmlFor={selectControlId} onClick={(e) => e.stopPropagation()}>

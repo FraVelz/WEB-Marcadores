@@ -1,10 +1,10 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 
 import { APP_DROP_PANEL_OVERLAY_CLASS } from "../utils/dragDropUi"
-import { BOOKMARK_DRAG_MIME_TYPE, isBookmarkDragTransfer, parseBookmarkDragPayload } from "../utils/parseDragPayload"
 import type { Bookmark, CutItem, FlatFolder, GridItem } from "../utils/types"
+import { useBookmarkDragMonitor, useBookmarkDropPanel } from "@/lib/drag-and-drop"
 import { EmptyTreeState } from "./marcadoresTree/EmptyTreeState"
 import { TREE_DROP_PANEL_KEY, TREE_DROP_ROOT_KEY } from "./marcadoresTree/treeConstants"
 import { folderDestinationLine, rowTargetKey } from "./marcadoresTree/treeHelpers"
@@ -58,66 +58,32 @@ export default function MarcadoresTreeView({
   currentLocationLabel,
 }: Props) {
   const [dropPreview, setDropPreview] = useState<DropPreview | null>(null)
-
-  useEffect(() => {
-    const listener = () => setDropPreview(null)
-    window.addEventListener("dragend", listener)
-    return () => window.removeEventListener("dragend", listener)
-  }, [setDropPreview])
+  const panelRef = useRef<HTMLDivElement | null>(null)
 
   const clearDropPreview = useCallback(() => setDropPreview(null), [])
 
-  const handlePanelDragOver = useCallback(
-    (e: React.DragEvent) => {
-      if (!onDrop) return
-      if (!isBookmarkDragTransfer(e.dataTransfer)) return
-      if (e.target !== e.currentTarget) return
-      e.preventDefault()
-      e.dataTransfer.dropEffect = "move"
+  useBookmarkDragMonitor(clearDropPreview)
+
+  useBookmarkDropPanel({
+    elementRef: panelRef,
+    enabled: Boolean(onDrop),
+    onDrop,
+    onDragEnter: () => {
       setDropPreview({
         targetKey: TREE_DROP_PANEL_KEY,
         line: `Área vacía → carpeta abierta: ${currentLocationLabel}`,
       })
     },
-    [onDrop, currentLocationLabel]
-  )
-
-  const handlePanelDrop = useCallback(
-    (e: React.DragEvent) => {
-      if (!onDrop) return
-      if (!isBookmarkDragTransfer(e.dataTransfer)) return
-      if (e.target !== e.currentTarget) return
-      e.preventDefault()
-      clearDropPreview()
-      const raw = e.dataTransfer.getData(BOOKMARK_DRAG_MIME_TYPE)
-      if (!raw) return
-      const sourceItem = parseBookmarkDragPayload(raw)
-      if (sourceItem) onDrop(sourceItem, undefined)
-    },
-    [onDrop, clearDropPreview]
-  )
+    onDragLeave: clearDropPreview,
+  })
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-      <div
-        className="relative min-h-0 flex-1 overflow-auto p-3 sm:p-4"
-        onDragLeave={(e) => {
-          if (!onDrop) return
-          const rt = e.relatedTarget as Node | null
-          if (rt && e.currentTarget.contains(rt)) return
-          clearDropPreview()
-        }}
-        onDragOver={onDrop ? handlePanelDragOver : undefined}
-        onDrop={onDrop ? handlePanelDrop : undefined}
-      >
+      <div ref={panelRef} className="relative min-h-0 flex-1 overflow-auto p-3 sm:p-4">
         {onDrop && dropPreview?.targetKey === TREE_DROP_PANEL_KEY ? (
           <div className={APP_DROP_PANEL_OVERLAY_CLASS} aria-hidden />
         ) : null}
-        <div
-          className="relative mx-auto min-h-[120px] max-w-4xl space-y-0.5"
-          onDragOver={onDrop ? handlePanelDragOver : undefined}
-          onDrop={onDrop ? handlePanelDrop : undefined}
-        >
+        <div className="relative mx-auto min-h-[120px] max-w-4xl space-y-0.5">
           {onDrop && (
             <TreeRootDropRow
               dropActive={dropPreview?.targetKey === TREE_DROP_ROOT_KEY}

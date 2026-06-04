@@ -1,7 +1,9 @@
 "use client"
 
+import { useRef } from "react"
+
 import { cnLines } from "@/lib/utils"
-import { BOOKMARK_DRAG_MIME_TYPE, parseBookmarkDragPayload } from "../../utils/parseDragPayload"
+import { useBookmarkDropTarget } from "@/lib/drag-and-drop"
 import type { GridItem } from "../../utils/types"
 
 type Props = {
@@ -12,37 +14,19 @@ type Props = {
 }
 
 export function TreeRootDropRow({ dropActive, onDragHighlight, onDragClearHighlight, onDrop }: Props) {
-  const handleDragEnter = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if ([...e.dataTransfer.types].includes(BOOKMARK_DRAG_MIME_TYPE)) onDragHighlight()
-  }
+  const nodeRef = useRef<HTMLDivElement | null>(null)
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    e.dataTransfer.dropEffect = "move"
-    onDragHighlight()
-  }
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    const rt = e.relatedTarget as Node | null
-    if (rt && e.currentTarget.contains(rt)) return
-    onDragClearHighlight()
-  }
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    onDragClearHighlight()
-    const raw = e.dataTransfer.getData(BOOKMARK_DRAG_MIME_TYPE)
-    if (!raw) return
-    const sourceItem = parseBookmarkDragPayload(raw)
-    if (sourceItem) onDrop(sourceItem)
-  }
+  useBookmarkDropTarget({
+    elementRef: nodeRef,
+    targetFolderId: null,
+    onDrop: (source) => onDrop(source),
+    onDragEnter: onDragHighlight,
+    onDragLeave: onDragClearHighlight,
+  })
 
   return (
     <div
+      ref={nodeRef}
       className={cnLines(
         "mb-2 flex w-full items-center gap-2 rounded-lg border border-dashed px-3 py-2 text-left text-sm transition-colors",
         dropActive
@@ -56,10 +40,6 @@ export function TreeRootDropRow({ dropActive, onDragHighlight, onDragClearHighli
               "hover:border-app-input-border hover:bg-app-hover-strong/40"
             )
       )}
-      onDragEnter={handleDragEnter}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
     >
       <svg className="text-app-accent size-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
         <path
