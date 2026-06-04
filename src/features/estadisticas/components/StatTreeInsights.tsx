@@ -24,7 +24,13 @@ export function StatTreeInsights({ tree }: { tree: EstadisticasSnapshot["tree"] 
       </ul>
       <div>
         <p className="text-app-fg-muted mb-2 text-xs font-medium">Carpetas más profundas</p>
-        <StatBarChart rows={tree.deepestFolders} emptyLabel="Sin carpetas" valueSuffix="niv." />
+        <StatBarChart
+          caption="Carpetas más profundas por nivel"
+          rows={tree.deepestFolders}
+          emptyLabel="Sin carpetas"
+          valueSuffix="niv."
+          valueHeader="Nivel"
+        />
       </div>
     </div>
   )
