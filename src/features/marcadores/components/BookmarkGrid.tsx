@@ -4,9 +4,9 @@ import type { Dispatch, SetStateAction } from "react"
 import { useCallback, useEffect, useRef, useState } from "react"
 
 import { cn } from "@/lib/utils"
+import { useBookmarkDragMonitor, useBookmarkDropPanel } from "@/lib/drag-and-drop"
 import type { GridItem, CutItem } from "../utils/types"
 import { APP_DROP_PANEL_OVERLAY_CLASS } from "../utils/dragDropUi"
-import { BOOKMARK_DRAG_MIME_TYPE, isBookmarkDragTransfer, parseBookmarkDragPayload } from "../utils/parseDragPayload"
 import BookmarkGridItem from "./BookmarkGridItem"
 
 type Props = {
@@ -66,10 +66,18 @@ export default function BookmarkGrid({
     setDropItemIdx(null)
   }
 
-  useEffect(() => {
-    window.addEventListener("dragend", clearDropUi)
-    return () => window.removeEventListener("dragend", clearDropUi)
-  }, [])
+  useBookmarkDragMonitor(clearDropUi)
+
+  useBookmarkDropPanel({
+    elementRef: scrollRef,
+    enabled: Boolean(onDrop),
+    onDrop,
+    onDragEnter: () => {
+      setDropPanelSlot(true)
+      setDropItemIdx(null)
+    },
+    onDragLeave: clearDropUi,
+  })
 
   const marqueeCleanupRef = useRef<(() => void) | null>(null)
 
@@ -162,38 +170,6 @@ export default function BookmarkGrid({
     [flatList, itemRefs, onSelectIndex, setSelectedIds, setSelectMode]
   )
 
-  const panelDragOver =
-    onDrop &&
-    ((e: React.DragEvent) => {
-      if (!isBookmarkDragTransfer(e.dataTransfer)) return
-      if (e.target !== e.currentTarget) return
-      e.preventDefault()
-      e.dataTransfer.dropEffect = "move"
-      setDropPanelSlot(true)
-      setDropItemIdx(null)
-    })
-
-  const panelDragLeave =
-    onDrop &&
-    ((e: React.DragEvent) => {
-      const rt = e.relatedTarget as Node | null
-      if (rt && e.currentTarget.contains(rt)) return
-      setDropPanelSlot(false)
-      setDropItemIdx(null)
-    })
-
-  const panelDrop =
-    onDrop &&
-    ((e: React.DragEvent) => {
-      if (e.target !== e.currentTarget) return
-      e.preventDefault()
-      clearDropUi()
-      const raw = e.dataTransfer.getData(BOOKMARK_DRAG_MIME_TYPE)
-      if (!raw) return
-      const sourceItem = parseBookmarkDragPayload(raw)
-      if (sourceItem) onDrop(sourceItem, undefined)
-    })
-
   const showAppPanelDropFrame = Boolean(onDrop && dropPanelSlot && dropItemIdx === null)
 
   const marqueeStyle =
@@ -211,9 +187,6 @@ export default function BookmarkGrid({
       ref={scrollRef}
       className={cn("relative min-h-0 flex-1 overflow-auto p-3 sm:p-4", marqueeClient && "touch-none select-none")}
       onPointerDown={setSelectedIds && setSelectMode ? onSurfacePointerDown : undefined}
-      onDragLeave={panelDragLeave || undefined}
-      onDragOver={panelDragOver || undefined}
-      onDrop={panelDrop || undefined}
     >
       {marqueeStyle ? (
         <div
@@ -236,9 +209,6 @@ export default function BookmarkGrid({
         className={
           "relative grid min-h-[120px] gap-3 " + "[grid-template-columns:repeat(auto-fill,minmax(min(100%,15rem),1fr))]"
         }
-        onDragLeave={panelDragLeave || undefined}
-        onDragOver={panelDragOver || undefined}
-        onDrop={panelDrop || undefined}
       >
         {flatList.map((item, idx) => {
           const isFolder = item.type === "folder"
