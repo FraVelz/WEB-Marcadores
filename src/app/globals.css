@@ -235,3 +235,36 @@ html.app-wallpaper body {
     cursor: pointer;
   }
 }
+
+/** Barras de /estadisticas: `<meter>` nativo, sin chart.js ni canvas. */
+.stat-meter {
+  display: block;
+  height: 0.5rem;
+  appearance: none;
+  border: none;
+  border-radius: 9999px;
+  background: var(--app-canvas);
+}
+
+.stat-meter::-webkit-meter-bar {
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--app-canvas);
+}
+
+.stat-meter::-webkit-meter-optimum-value,
+.stat-meter::-webkit-meter-suboptimum-value,
+.stat-meter::-webkit-meter-even-less-good-value {
+  border-radius: 9999px;
+  background: var(--app-accent);
+}
+
+.stat-meter:-moz-meter-bar {
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--app-canvas);
+}
+
+.stat-meter:-moz-meter-optimum::-moz-meter-bar {
+  background: var(--app-accent);
+}

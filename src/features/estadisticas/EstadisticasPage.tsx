@@ -39,17 +39,32 @@ export function EstadisticasPage() {
 
         <div className="grid gap-10 lg:grid-cols-2">
           <StatSection title="Top dominios" hint="Sitios con más marcadores">
-            <StatBarChart rows={stats.topDomains} emptyLabel="Aún no hay enlaces" />
+            <StatBarChart
+              caption="Top dominios: marcadores por sitio web"
+              rows={stats.topDomains}
+              emptyLabel="Aún no hay enlaces"
+              valueHeader="Marcadores"
+            />
           </StatSection>
 
           <StatSection title="Por carpeta raíz" hint="Incluye subcarpetas bajo cada raíz">
-            <StatBarChart rows={stats.topRootFolders} emptyLabel="Sin carpetas con enlaces" />
+            <StatBarChart
+              caption="Marcadores por carpeta raíz"
+              rows={stats.topRootFolders}
+              emptyLabel="Sin carpetas con enlaces"
+              valueHeader="Marcadores"
+            />
           </StatSection>
         </div>
 
         <div className="grid gap-10 lg:grid-cols-2">
           <StatSection title="Etiquetas más usadas">
-            <StatBarChart rows={stats.topTags} emptyLabel="Ningún marcador tiene etiquetas" />
+            <StatBarChart
+              caption="Etiquetas más usadas en la biblioteca"
+              rows={stats.topTags}
+              emptyLabel="Ningún marcador tiene etiquetas"
+              valueHeader="Usos"
+            />
           </StatSection>
 
           <StatSection title="Más abiertos desde la app" hint="Según open_count al abrir enlace o panel">
@@ -58,7 +73,12 @@ export function EstadisticasPage() {
         </div>
 
         <StatSection title="Altas por mes" hint="Según created_at; últimos 14 meses con datos">
-          <StatBarChart rows={stats.createdByMonth} emptyLabel="Sin fechas de creación registradas" />
+          <StatBarChart
+            caption="Altas de marcadores por mes"
+            rows={stats.createdByMonth}
+            emptyLabel="Sin fechas de creación registradas"
+            valueHeader="Altas"
+          />
         </StatSection>
 
         <StatSection title="Árbol de carpetas" hint="Profundidad y carpetas sin enlaces">
