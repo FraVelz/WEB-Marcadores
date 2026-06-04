@@ -1,8 +1,10 @@
 "use client"
 
-import { useEffect, type Dispatch, type RefObject, type SetStateAction } from "react"
+import { type Dispatch, type RefObject, type SetStateAction } from "react"
 
 import { dashboardNavItems } from "@/components/header/dashboardNav"
+import { isTypingTarget } from "@/lib/hotkeys/ensureHotkeysFilter"
+import { useHotkeys } from "@/lib/hotkeys/useHotkeys"
 
 type Params = {
   pathname: string
@@ -14,6 +16,11 @@ type Params = {
   setCommandPaletteOpen: Dispatch<SetStateAction<boolean>>
 }
 
+const NAV_HOTKEYS = dashboardNavItems
+  .slice(0, 9)
+  .map((_, index) => `ctrl+${index + 1}`)
+  .join(",")
+
 export function useDashboardGlobalShortcuts({
   pathname,
   sidebarRef,
@@ -23,45 +30,48 @@ export function useDashboardGlobalShortcuts({
   push,
   setCommandPaletteOpen,
 }: Params) {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
-        const active = document.activeElement as HTMLElement | null
-        const tag = active?.tagName
-        if (tag === "INPUT" || tag === "TEXTAREA" || active?.closest?.('[role="dialog"][aria-modal="true"]')) return
-        e.preventDefault()
-        setCommandPaletteOpen((o) => !o)
-      }
+  useHotkeys(
+    "command+k,ctrl+k",
+    (event) => {
+      if (isTypingTarget(event.target)) return
+      if ((event.target as HTMLElement | null)?.closest?.('[role="dialog"][aria-modal="true"]')) return
+      event.preventDefault()
+      setCommandPaletteOpen((open) => !open)
+    },
+    {},
+    [setCommandPaletteOpen]
+  )
 
-      if (e.key === "n" && !e.ctrlKey && !e.metaKey && !e.altKey) {
+  useHotkeys(
+    "n",
+    (event) => {
+      if (isTypingTarget(event.target)) return
+      event.preventDefault()
+      if (pathname === "/marcadores") {
         const active = document.activeElement
-        if (
-          active?.tagName === "INPUT" ||
-          active?.tagName === "TEXTAREA" ||
-          (active as HTMLElement).closest?.('[role="dialog"]')
-        )
-          return
-        e.preventDefault()
-        if (pathname === "/marcadores") {
-          const inExplorer = marcadoresExplorerPanelRef?.current?.contains(active ?? null) ?? false
-          const inAsideNav = sidebarRef.current?.contains(active ?? null) ?? false
-          if (inExplorer || inAsideNav) focusMain()
-          else focusSidebar()
-        } else {
-          focusMain()
-        }
+        const inExplorer = marcadoresExplorerPanelRef?.current?.contains(active ?? null) ?? false
+        const inAsideNav = sidebarRef.current?.contains(active ?? null) ?? false
+        if (inExplorer || inAsideNav) focusMain()
+        else focusSidebar()
+      } else {
+        focusMain()
       }
+    },
+    {},
+    [pathname, focusMain, focusSidebar, sidebarRef, marcadoresExplorerPanelRef]
+  )
 
-      if (e.ctrlKey && /^[1-9]$/.test(e.key)) {
-        const idx = parseInt(e.key, 10) - 1
-        if (idx < dashboardNavItems.length) {
-          e.preventDefault()
-          push(dashboardNavItems[idx].href)
-        }
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [pathname, focusMain, focusSidebar, sidebarRef, marcadoresExplorerPanelRef, push, setCommandPaletteOpen])
+  useHotkeys(
+    NAV_HOTKEYS,
+    (event, handler) => {
+      const digit = handler.key
+      if (!/^[1-9]$/.test(digit)) return
+      const idx = parseInt(digit, 10) - 1
+      if (idx >= dashboardNavItems.length) return
+      event.preventDefault()
+      push(dashboardNavItems[idx].href)
+    },
+    {},
+    [push]
+  )
 }

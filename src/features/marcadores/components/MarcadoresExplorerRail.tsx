@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { useDashboard } from "@/contexts/DashboardContext"
 
 import ExplorerTree from "@/features/marcadores/components/explorer/ExplorerTree"
-import { useDashboardSidebarKeyboard } from "@/layouts/dashboard/hooks/useDashboardSidebarKeyboard"
+import { useDashboardSidebarHotkeys } from "@/layouts/dashboard/hooks/useDashboardSidebarHotkeys"
 
 import { cn } from "@/lib/utils"
 import { readTabScopedItem, writeTabScopedItem } from "@/lib/tabScopedStorage"
@@ -71,7 +71,9 @@ export function MarcadoresExplorerRail({ registerGlobalExplorerRef = true, folde
     }
   }, [registerGlobalExplorerRef, marcadoresExplorerPanelRef])
 
-  const handleExplorerKeyDown = useDashboardSidebarKeyboard({
+  useDashboardSidebarHotkeys({
+    elementRef: innerRef,
+    enabled: open,
     flatSidebarItems: explorerFlatSidebarItems,
     selectedFolderId,
     setSelectedFolderId,
@@ -116,7 +118,6 @@ export function MarcadoresExplorerRail({ registerGlobalExplorerRef = true, folde
             "flex min-h-0 w-[min(15rem,calc(100vw-4rem))] max-w-[16rem] min-w-[11rem] flex-col overflow-hidden outline-none md:w-[13.75rem]",
             "focus:ring-0"
           )}
-          onKeyDown={handleExplorerKeyDown}
         >
           <div className="border-app-border flex shrink-0 items-center justify-between gap-1 border-b px-2 py-1.5">
             <span className="text-app-fg-label truncate text-[11px] font-semibold tracking-wide uppercase">

@@ -1,4 +1,4 @@
-import type { Dispatch, KeyboardEvent, SetStateAction } from "react"
+import type { Dispatch, SetStateAction } from "react"
 
 import type { Bookmark, BreadcrumbPart, GridItem } from "../utils/types"
 

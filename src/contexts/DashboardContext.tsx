@@ -54,12 +54,7 @@ export function DashboardProvider({ children, demoMode }: { children: React.Reac
       dispatchUi({ type: "explorer_header_slot", updater: node })
     })
   }, [])
-  const mainKeyDownRef = useRef<((e: React.KeyboardEvent) => void) | null>(null)
   const editFolderRef = useRef<((id: string, name: string) => void) | null>(null)
-
-  const setMainKeyDown = useCallback((handler: ((e: React.KeyboardEvent) => void) | null) => {
-    mainKeyDownRef.current = handler
-  }, [])
 
   const focusMain = useCallback(() => {
     mainRef.current?.focus()
@@ -83,8 +78,6 @@ export function DashboardProvider({ children, demoMode }: { children: React.Reac
         setAllTagsFromBookmarks,
         viewMode,
         setViewMode,
-        setMainKeyDown,
-        mainKeyDownRef,
         editFolderRef,
         selectedFolderId,
         setSelectedFolderId,

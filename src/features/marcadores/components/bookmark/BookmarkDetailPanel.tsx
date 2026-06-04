@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect, useEffectEvent } from "react"
+import { useState, useRef, useEffectEvent } from "react"
 import Image from "next/image"
 
 import type { Bookmark } from "@/features/marcadores/utils/types"
@@ -10,6 +10,7 @@ import BookmarkDetailFolderSection from "./BookmarkDetailFolderSection"
 import BookmarkDetailTagsSection from "./BookmarkDetailTagsSection"
 
 import { cn } from "@/lib/utils"
+import { useHotkeys } from "@/lib/hotkeys/useHotkeys"
 
 type Folder = { id: string; parent_id: string | null; name: string; sort_order: number }
 
@@ -278,15 +279,15 @@ export default function BookmarkDetailPanel({
 }: Props) {
   const onCloseEvent = useEffectEvent(onClose)
 
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return
+  useHotkeys(
+    "esc",
+    () => {
       if (document.querySelector('[role="dialog"][aria-modal="true"]')) return
       onCloseEvent()
-    }
-    if (bookmark) window.addEventListener("keydown", handleEscape)
-    return () => window.removeEventListener("keydown", handleEscape)
-  }, [bookmark])
+    },
+    { enabled: Boolean(bookmark) },
+    [bookmark]
+  )
 
   if (!bookmark) return null
 

@@ -5,7 +5,7 @@ import { useEffect, type ReactNode } from "react"
 import { MarcadoresDesktopFloatingOverlays } from "@/features/marcadores/page/MarcadoresDesktopFloatingOverlays"
 import type { MarcadoresDesktopLibraryPaneBodyProps } from "@/features/marcadores/MarcadoresDesktopLibraryPaneBody"
 import { useMarcadoresEffects } from "@/features/marcadores/hooks/useMarcadoresEffects"
-import { useMarcadoresKeyboard } from "@/features/marcadores/hooks/useMarcadoresKeyboard"
+import { useMarcadoresMainHotkeys } from "@/features/marcadores/hooks/useMarcadoresMainHotkeys"
 import type { MarcadoresPageCore } from "@/features/marcadores/page/useMarcadoresPageDataHooks"
 
 type PaneBodyExtras = Omit<
@@ -18,7 +18,9 @@ export function useMarcadoresPageCommands(core: MarcadoresPageCore) {
   const pane = scope.getState()
   const b = scope.bindings
 
-  const handleKeyDown = useMarcadoresKeyboard({
+  useMarcadoresMainHotkeys({
+    mainRef: core.mainRef,
+    enabled: !pane.modalOpen,
     breadcrumb: core.breadcrumb,
     deleteConfirmItem: pane.deleteConfirmItem,
     setDeleteConfirmItem: b.setDeleteConfirmItem,
@@ -73,15 +75,12 @@ export function useMarcadoresPageCommands(core: MarcadoresPageCore) {
     selectedIndex: pane.selectedIndex,
     flatList: core.focusFlatList,
     infoPanelEnabled: pane.infoPanelEnabled,
-    modalOpen: pane.modalOpen,
     pasteError: pane.pasteError,
     setSelectedIndex: b.setSelectedIndex,
     setGridCols: b.setGridCols,
     setDetailBookmark: b.setDetailBookmark,
     setPasteError: b.setPasteError,
     setShowSearch: b.setShowSearch,
-    setMainKeyDown: core.setMainKeyDown,
-    handleKeyDown,
     itemRefs: scope.itemRefs,
     searchRef: scope.searchRef,
   })

@@ -1,16 +1,23 @@
 "use client"
 
-import { useCallback, useRef } from "react"
+import { useRef, type RefObject } from "react"
 
-import { handleMarcadoresKeyDown } from "./marcadoresKeyboardHandler"
-import type { MarcadoresKeyboardContext } from "./marcadoresKeyboard.types"
+import { handleMarcadoresKeyDown } from "@/features/marcadores/hooks/marcadoresKeyboardHandler"
+import type { MarcadoresKeyboardContext } from "@/features/marcadores/hooks/marcadoresKeyboard.types"
+import { MARCADORES_MAIN_HOTKEYS } from "@/lib/hotkeys"
+import { useHotkeysOnElement } from "@/lib/hotkeys/useHotkeysOnElement"
 
-export type Params = Omit<MarcadoresKeyboardContext, "lastKeyRef">
+export type Params = Omit<MarcadoresKeyboardContext, "lastKeyRef"> & {
+  mainRef: RefObject<HTMLElement | null>
+  enabled?: boolean
+}
 
-export function useMarcadoresKeyboard(params: Params) {
+export function useMarcadoresMainHotkeys(params: Params) {
   const lastKeyRef = useRef<{ key: string; time: number } | null>(null)
 
   const {
+    mainRef,
+    enabled = true,
     breadcrumb,
     deleteConfirmItem,
     setDeleteConfirmItem,
@@ -39,9 +46,11 @@ export function useMarcadoresKeyboard(params: Params) {
     openBookmarkTab,
   } = params
 
-  return useCallback(
-    (e: React.KeyboardEvent) =>
-      handleMarcadoresKeyDown(e, {
+  useHotkeysOnElement(
+    mainRef,
+    MARCADORES_MAIN_HOTKEYS,
+    (event) => {
+      handleMarcadoresKeyDown(event, {
         lastKeyRef,
         breadcrumb,
         deleteConfirmItem,
@@ -69,8 +78,11 @@ export function useMarcadoresKeyboard(params: Params) {
         onNewFolder,
         onEditItem,
         openBookmarkTab,
-      }),
+      })
+    },
+    { enabled },
     [
+      enabled,
       breadcrumb,
       deleteConfirmItem,
       setDeleteConfirmItem,
