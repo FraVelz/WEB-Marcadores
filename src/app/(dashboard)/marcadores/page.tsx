@@ -1,10 +1,11 @@
-import type { Metadata } from "next"
-
 import { MarcadoresPage } from "@/features/marcadores/MarcadoresPage"
+import { generateRouteMetadata } from "@/lib/generatePageMetadata"
 
-export const metadata: Metadata = {
-  title: "Marcadores",
-  description: "Gestiona carpetas, marcadores, búsqueda y vista de escritorio o explorador simple.",
-}
+export const generateMetadata = () =>
+  generateRouteMetadata({
+    title: "Marcadores",
+    description: "Gestiona carpetas, marcadores, búsqueda y vista de escritorio o explorador simple.",
+    path: "/marcadores",
+  })
 
 export default MarcadoresPage

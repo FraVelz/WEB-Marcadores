@@ -1,10 +1,11 @@
-import type { Metadata } from "next"
-
 import { PerfilPage } from "@/features/perfil/PerfilPage"
+import { generateRouteMetadata } from "@/lib/generatePageMetadata"
 
-export const metadata: Metadata = {
-  title: "Perfil",
-  description: "Tema, colores, imagen de fondo, transparencia del escritorio y cuenta de usuario.",
-}
+export const generateMetadata = () =>
+  generateRouteMetadata({
+    title: "Perfil",
+    description: "Tema, colores, imagen de fondo, transparencia del escritorio y cuenta de usuario.",
+    path: "/perfil",
+  })
 
 export default PerfilPage

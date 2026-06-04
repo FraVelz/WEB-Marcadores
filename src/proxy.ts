@@ -1,7 +1,9 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
-const dashboardPaths = ["/marcadores", "/atajos", "/perfil"]
+import { isMetadataAssetPath, isMetadataCrawler } from "@/lib/metadata"
+
+const dashboardPaths = ["/marcadores", "/atajos", "/perfil", "/estadisticas"]
 
 function isDemoMode(): boolean {
   if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") return true
@@ -14,8 +16,16 @@ function isDemoMode(): boolean {
 const DEMO_COOKIE = "demo_session"
 
 export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl
+  const userAgent = request.headers.get("user-agent")
+
+  // Previews sociales y rutas de imagen OG: no redirigir al login
+  if (isMetadataAssetPath(pathname) || isMetadataCrawler(userAgent)) {
+    return NextResponse.next({ request })
+  }
+
   // Siempre permitir /demo: redirigir a marcadores con cookie para modo demo
-  if (request.nextUrl.pathname === "/demo") {
+  if (pathname === "/demo") {
     const res = NextResponse.redirect(new URL("/marcadores", request.url))
     res.cookies.set(DEMO_COOKIE, "true", { path: "/", maxAge: 60 * 60 * 24 })
     return res
@@ -70,5 +80,13 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/demo", "/marcadores", "/marcadores/:path*", "/atajos", "/perfil"],
+  matcher: [
+    "/",
+    "/demo",
+    "/marcadores",
+    "/marcadores/:path*",
+    "/atajos",
+    "/perfil",
+    "/estadisticas",
+  ],
 }
