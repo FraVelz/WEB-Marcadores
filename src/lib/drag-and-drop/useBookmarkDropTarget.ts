@@ -11,6 +11,7 @@ import {
   readDropTargetFolderId,
   type BookmarkDropTargetData,
 } from "@/lib/drag-and-drop/bookmarkDragData"
+import { isInnermostDropTarget } from "@/lib/drag-and-drop/dropTargetUtils"
 
 type Params = {
   elementRef: RefObject<HTMLElement | null>
@@ -47,7 +48,8 @@ export function useBookmarkDropTarget({
 
     return dropTargetForElements({
       element,
-      canDrop: ({ source }) => isBookmarkDragSource(source),
+      canDrop: ({ source, element: dropElement }) =>
+        isBookmarkDragSource(source) && source.element !== dropElement,
       getData: (): BookmarkDropTargetData => ({
         bookmarkDropTarget: true,
         targetFolderId: targetFolderIdRef.current,
@@ -59,7 +61,8 @@ export function useBookmarkDropTarget({
       onDragLeave: () => {
         onDragLeaveRef.current?.()
       },
-      onDrop: ({ source, self }) => {
+      onDrop: ({ source, self, location }) => {
+        if (!isInnermostDropTarget(location, self)) return
         const sourceItem = dragDataToGridItem(source.data)
         if (!sourceItem) return
         const resolvedTarget = readDropTargetFolderId(self.data)

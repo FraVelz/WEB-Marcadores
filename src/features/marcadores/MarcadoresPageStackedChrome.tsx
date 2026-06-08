@@ -2,6 +2,7 @@
 
 import DemoBanner from "@/features/marcadores/components/DemoBanner"
 import DeleteConfirmBanner from "@/features/marcadores/components/DeleteConfirmBanner"
+import { MarcadoresGlobalAlertLayer } from "@/features/marcadores/components/MarcadoresGlobalAlertLayer"
 import MarcadoresBreadcrumb from "@/features/marcadores/components/MarcadoresBreadcrumb"
 import MarcadoresToolbar from "@/features/marcadores/components/MarcadoresToolbar"
 import PasteErrorBanner from "@/features/marcadores/components/PasteErrorBanner"
@@ -55,15 +56,19 @@ export function MarcadoresPageStackedChrome({ m }: { m: MarcadoresPageModel }) {
         duplicateClusterCount={m.duplicateClusterCount}
       />
 
-      {pane.pasteError && <PasteErrorBanner message={pane.pasteError} />}
-      {pane.deleteConfirmItem ? (
-        <DeleteConfirmBanner
-          item={pane.deleteConfirmItem}
-          onConfirm={() => m.onConfirmDelete(pane.deleteConfirmItem!)}
-          onCancel={() => b.setDeleteConfirmItem(null)}
-        />
+      {pane.pasteError || pane.deleteConfirmItem || m.demoMode ? (
+        <MarcadoresGlobalAlertLayer variant="stacked">
+          {pane.pasteError ? <PasteErrorBanner message={pane.pasteError} /> : null}
+          {pane.deleteConfirmItem ? (
+            <DeleteConfirmBanner
+              item={pane.deleteConfirmItem}
+              onConfirm={() => m.onConfirmDelete(pane.deleteConfirmItem!)}
+              onCancel={() => b.setDeleteConfirmItem(null)}
+            />
+          ) : null}
+          {m.demoMode ? <DemoBanner /> : null}
+        </MarcadoresGlobalAlertLayer>
       ) : null}
-      {m.demoMode && <DemoBanner />}
 
       <MarcadoresBreadcrumb breadcrumb={m.breadcrumb} onSelect={m.browseScope.setFolderId} />
     </>
