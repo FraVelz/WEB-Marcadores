@@ -2,6 +2,7 @@
 
 import * as RechartsPrimitive from "recharts";
 import { cn } from "@/lib/utils";
+import { use, type ComponentType, type ReactNode } from "react";
 import * as React from "react";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
@@ -41,8 +42,8 @@ function validateChartConfigColors(config: ChartConfig): void {
 export type ChartConfig = Record<
   string,
   {
-    label?: React.ReactNode;
-    icon?: React.ComponentType;
+    label?: ReactNode;
+    icon?: ComponentType;
     colors?: AtLeastOneThemeColor;
   }
 >;
@@ -54,7 +55,7 @@ interface ChartContextProps {
 const ChartContext = React.createContext<ChartContextProps | null>(null);
 
 export function useChart() {
-  const context = React.useContext(ChartContext);
+  const context = use(ChartContext);
 
   if (!context) {
     throw new Error("useChart must be used within a <ChartContainer />");
@@ -136,7 +137,7 @@ function LoadingIndicator({ isLoading }: { isLoading: boolean }) {
   return (
     <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
       <div className="text-primary bg-background flex items-center justify-center gap-2 rounded-md border px-2 py-0.5 text-sm">
-        <div className="border-border border-t-primary h-3 w-3 animate-spin rounded-full border" />
+        <div className="border-border border-t-primary size-3 animate-spin rounded-full border" />
         <span>Loading</span>
       </div>
     </div>
@@ -176,24 +177,20 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null;
   }
 
-  const generateCssVars = (theme: keyof typeof THEMES) =>
-    colorConfig
-      .flatMap(([key, itemConfig]) => {
-        const colorsArray = itemConfig.colors?.[theme];
-        if (!colorsArray || !Array.isArray(colorsArray) || colorsArray.length === 0) {
-          return [];
-        }
+  const generateCssVars = (theme: keyof typeof THEMES) => {
+    const lines: string[] = [];
+    for (const [key, itemConfig] of colorConfig) {
+      const colorsArray = itemConfig.colors?.[theme];
+      if (!colorsArray || !Array.isArray(colorsArray) || colorsArray.length === 0) continue;
 
-        // Get max count across all themes for this key
-        const maxCount = getColorsCount(itemConfig);
-
-        // Distribute colors evenly across all required slots
-        const distributedColors = distributeColors(colorsArray, maxCount);
-
-        return distributedColors.map((color, index) => `  --color-${key}-${index}: ${color};`);
-      })
-      .filter(Boolean)
-      .join("\n");
+      const maxCount = getColorsCount(itemConfig);
+      const distributedColors = distributeColors(colorsArray, maxCount);
+      for (const [index, color] of distributedColors.entries()) {
+        lines.push(`  --color-${key}-${index}: ${color};`);
+      }
+    }
+    return lines.join("\n");
+  };
 
   const css = Object.entries(THEMES)
     .map(
@@ -202,7 +199,13 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     )
     .join("\n");
 
-  return <style dangerouslySetInnerHTML={{ __html: css }} />;
+  // Scoped theme CSS variables for Recharts (generated from app chart config, not user HTML).
+  return (
+    <style
+      // eslint-disable-next-line react/no-danger -- static CSS vars from ChartConfig colors
+      dangerouslySetInnerHTML={{ __html: css }}
+    />
+  );
 };
 
 // Helper to extract item config from a payload.

@@ -1,13 +1,13 @@
 "use client"
 
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter"
-import { useEffect, useRef } from "react"
+import { useEffect } from "react"
 
 import { isBookmarkDragSource } from "@/lib/drag-and-drop/bookmarkDragData"
+import { useLiveRef } from "@/lib/hooks/useLiveRef"
 
 export function useBookmarkDragMonitor(onDragEnd: () => void) {
-  const onDragEndRef = useRef(onDragEnd)
-  onDragEndRef.current = onDragEnd
+  const onDragEndRef = useLiveRef(onDragEnd)
 
   useEffect(() => {
     return monitorForElements({

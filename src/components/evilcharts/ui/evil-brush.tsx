@@ -1,9 +1,17 @@
 "use client";
 
-import { motion, useMotionValue, useMotionValueEvent, useSpring, useTransform } from "motion/react";
+import {
+  domAnimation,
+  LazyMotion,
+  m,
+  useMotionValue,
+  useMotionValueEvent,
+  useSpring,
+  useTransform,
+} from "motion/react";
 import { ResponsiveContainer, AreaChart, Area, LineChart, Line, BarChart, Bar } from "recharts";
 import { ChartStyle, getColorsCount, type ChartConfig } from "@/components/evilcharts/ui/chart";
-import { useCallback, useEffect, type ComponentProps } from "react";
+import { useCallback, type ComponentProps } from "react";
 import type { MotionValue } from "motion/react";
 import { cn } from "@/lib/utils";
 import * as React from "react";
@@ -211,18 +219,21 @@ function EvilBrush({
   // mouse movements don't produce index changes (e.g., at boundaries)
   const lastCommittedRef = React.useRef<EvilBrushRange>(internalRange);
 
-  useEffect(() => {
-    if (!isControlled) {
-      setInternalRange((prev) => {
-        const adjusted = {
-          startIndex: Math.min(prev.startIndex, Math.max(0, totalPoints - 1)),
-          endIndex: Math.min(prev.endIndex, Math.max(0, totalPoints - 1)),
-        };
-        lastCommittedRef.current = adjusted;
-        return adjusted;
-      });
+  const [prevTotalPoints, setPrevTotalPoints] = React.useState(totalPoints);
+  if (!isControlled && totalPoints !== prevTotalPoints) {
+    setPrevTotalPoints(totalPoints);
+    const maxIndex = Math.max(0, totalPoints - 1);
+    const adjusted = {
+      startIndex: Math.min(internalRange.startIndex, maxIndex),
+      endIndex: Math.min(internalRange.endIndex, maxIndex),
+    };
+    if (
+      adjusted.startIndex !== internalRange.startIndex ||
+      adjusted.endIndex !== internalRange.endIndex
+    ) {
+      setInternalRange(adjusted);
     }
-  }, [totalPoints, isControlled]);
+  }
 
   // ── Clamping & committing ───────────────────────────────────────────────
 
@@ -289,18 +300,20 @@ function EvilBrush({
     commit,
   });
 
-  // Position always driven by internalRange (never lags behind controlled props)
-  const range = internalRange;
+  const [prevControlledRange, setPrevControlledRange] = React.useState({
+    start: controlledStart,
+    end: controlledEnd,
+  });
+  if (
+    isControlled &&
+    !isDragging &&
+    (controlledStart !== prevControlledRange.start || controlledEnd !== prevControlledRange.end)
+  ) {
+    setPrevControlledRange({ start: controlledStart, end: controlledEnd });
+    setInternalRange({ startIndex: controlledStart, endIndex: controlledEnd });
+  }
 
-  // Sync internalRange with controlled props when not dragging
-  useEffect(() => {
-    if (isControlled && !isDragging) {
-      const syncedRange = { startIndex: controlledStart, endIndex: controlledEnd };
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setInternalRange(syncedRange);
-      lastCommittedRef.current = syncedRange;
-    }
-  }, [isControlled, controlledStart, controlledEnd, isDragging]);
+  const range = internalRange;
 
   // ── Computed positions (%) ──────────────────────────────────────────────
 
@@ -342,6 +355,7 @@ function EvilBrush({
   if (totalPoints === 0) return null;
 
   return (
+    <LazyMotion features={domAnimation} strict>
     <div
       ref={containerRef}
       data-chart={skipStyle ? undefined : chartId}
@@ -367,18 +381,18 @@ function EvilBrush({
       </div>
 
       {/* Dim overlay – left */}
-      <motion.div
+      <m.div
         className="bg-background/70 pointer-events-none absolute inset-y-0 left-0 rounded-l-md backdrop-blur-[2px]"
         style={{ width: leftOverlayWidth }}
       />
       {/* Dim overlay – right */}
-      <motion.div
+      <m.div
         className="bg-background/70 pointer-events-none absolute inset-y-0 right-0 rounded-r-md backdrop-blur-[2px]"
         style={{ width: rightOverlayWidth }}
       />
 
       {/* Selected region – draggable to pan */}
-      <motion.div
+      <m.div
         className="absolute inset-y-0 cursor-grab touch-none rounded-sm border active:cursor-grabbing"
         style={{ left: leftPosition, width: selectedWidth }}
         {...bind("middle")}
@@ -400,6 +414,7 @@ function EvilBrush({
         bind={bind("right")}
       />
     </div>
+    </LazyMotion>
   );
 }
 
@@ -423,7 +438,7 @@ function BrushHandle({
   const isLeft = side === "left";
 
   return (
-    <motion.div className="absolute inset-y-0 z-10" style={{ left: position }}>
+    <m.div className="absolute inset-y-0 z-10" style={{ left: position }}>
       <div
         className={cn(
           "group absolute inset-y-0 flex w-3 cursor-ew-resize touch-none items-center justify-center after:absolute after:inset-y-0 after:-left-4 after:w-11 after:content-['']",
@@ -438,9 +453,9 @@ function BrushHandle({
           )}
         >
           <div className="flex flex-col gap-[2px]">
-            <div className="bg-background/70 h-[2px] w-[2px] rounded-full" />
-            <div className="bg-background/70 h-[2px] w-[2px] rounded-full" />
-            <div className="bg-background/70 h-[2px] w-[2px] rounded-full" />
+            <div className="bg-background/70 size-[2px] rounded-full" />
+            <div className="bg-background/70 size-[2px] rounded-full" />
+            <div className="bg-background/70 size-[2px] rounded-full" />
           </div>
         </div>
       </div>
@@ -455,7 +470,7 @@ function BrushHandle({
           {label}
         </div>
       )}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -484,16 +499,15 @@ function MiniChart({
   connectNulls?: boolean;
   barRadius?: number;
 }) {
-  const gradients = React.useMemo(
-    () =>
-      Object.entries(chartConfig)
-        .filter(([key]) => keys.includes(key))
-        .map(([dataKey, config]) => ({
-          dataKey,
-          colorsCount: getColorsCount(config),
-        })),
-    [chartConfig, keys],
-  );
+  const gradients = React.useMemo(() => {
+    const keySet = new Set(keys);
+    const entries: { dataKey: string; colorsCount: number }[] = [];
+    for (const [dataKey, config] of Object.entries(chartConfig)) {
+      if (!keySet.has(dataKey)) continue;
+      entries.push({ dataKey, colorsCount: getColorsCount(config) });
+    }
+    return entries;
+  }, [chartConfig, keys]);
 
   const dashArray =
     strokeVariant === "dashed" || strokeVariant === "animated-dashed" ? "4 4" : undefined;
@@ -517,7 +531,7 @@ function MiniChart({
           ) : (
             Array.from({ length: colorsCount }, (_, i) => (
               <stop
-                key={i}
+                key={`${dataKey}-offset-${String((i / (colorsCount - 1)) * 100)}`}
                 offset={`${(i / (colorsCount - 1)) * 100}%`}
                 stopColor={`var(--color-${dataKey}-${i}, var(--color-${dataKey}-0))`}
               />
@@ -660,13 +674,14 @@ function useEvilBrush<TData extends Record<string, unknown>>({
   // deferred value.  React can skip intermediate slices during fast drags.
   const deferredRange = React.useDeferredValue(range);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  const [prevDataLength, setPrevDataLength] = React.useState(data.length);
+  if (data.length !== prevDataLength) {
+    setPrevDataLength(data.length);
     setRange({
       startIndex: 0,
       endIndex: Math.max(0, data.length - 1),
     });
-  }, [data.length]);
+  }
 
   const visibleData = React.useMemo(
     () => data.slice(deferredRange.startIndex, deferredRange.endIndex + 1),

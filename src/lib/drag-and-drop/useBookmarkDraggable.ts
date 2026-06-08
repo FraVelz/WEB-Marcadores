@@ -1,9 +1,10 @@
 "use client"
 
 import { draggable } from "@atlaskit/pragmatic-drag-and-drop/element/adapter"
-import { useLayoutEffect, useRef, type RefObject } from "react"
+import { useLayoutEffect, type RefObject } from "react"
 
 import type { GridItem } from "@/features/marcadores/utils/types"
+import { useLiveRef } from "@/lib/hooks/useLiveRef"
 
 import { attachBookmarkDragPreview } from "@/lib/drag-and-drop/bookmarkDragPreview"
 import { gridItemToDragData } from "@/lib/drag-and-drop/bookmarkDragData"
@@ -13,8 +14,7 @@ export function useBookmarkDraggable(
   item: GridItem,
   enabled = true
 ) {
-  const itemRef = useRef(item)
-  itemRef.current = item
+  const itemRef = useLiveRef(item)
 
   useLayoutEffect(() => {
     const element = elementRef.current

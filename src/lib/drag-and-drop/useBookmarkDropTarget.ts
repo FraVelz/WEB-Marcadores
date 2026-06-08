@@ -1,9 +1,10 @@
 "use client"
 
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter"
-import { useLayoutEffect, useRef, type RefObject } from "react"
+import { useLayoutEffect, type RefObject } from "react"
 
 import type { GridItem } from "@/features/marcadores/utils/types"
+import { useLiveRef } from "@/lib/hooks/useLiveRef"
 
 import {
   dragDataToGridItem,
@@ -30,21 +31,14 @@ export function useBookmarkDropTarget({
   onDragEnter,
   onDragLeave,
 }: Params) {
-  const onDropRef = useRef(onDrop)
-  onDropRef.current = onDrop
-
-  const onDragEnterRef = useRef(onDragEnter)
-  onDragEnterRef.current = onDragEnter
-
-  const onDragLeaveRef = useRef(onDragLeave)
-  onDragLeaveRef.current = onDragLeave
-
-  const targetFolderIdRef = useRef(targetFolderId)
-  targetFolderIdRef.current = targetFolderId
+  const onDropRef = useLiveRef(onDrop)
+  const onDragEnterRef = useLiveRef(onDragEnter)
+  const onDragLeaveRef = useLiveRef(onDragLeave)
+  const targetFolderIdRef = useLiveRef(targetFolderId)
 
   useLayoutEffect(() => {
     const element = elementRef.current
-    if (!element || !enabled || !onDropRef.current) return
+    if (!element || !enabled || !onDrop) return
 
     return dropTargetForElements({
       element,
@@ -69,5 +63,5 @@ export function useBookmarkDropTarget({
         onDropRef.current?.(sourceItem, resolvedTarget)
       },
     })
-  }, [elementRef, enabled, targetFolderId])
+  }, [elementRef, enabled, onDrop, targetFolderId])
 }

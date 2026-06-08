@@ -1,17 +1,17 @@
 "use client"
 
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter"
-import { useLayoutEffect, useRef, type RefObject } from "react"
+import { useLayoutEffect, type RefObject } from "react"
 
 import { isBookmarkDragSource } from "@/lib/drag-and-drop/bookmarkDragData"
+import { useLiveRef } from "@/lib/hooks/useLiveRef"
 
 export function useBookmarkDeskCanvasTarget(
   elementRef: RefObject<HTMLElement | null>,
   enabled: boolean,
   setHighlighted: (value: boolean) => void
 ) {
-  const setHighlightedRef = useRef(setHighlighted)
-  setHighlightedRef.current = setHighlighted
+  const setHighlightedRef = useLiveRef(setHighlighted)
 
   useLayoutEffect(() => {
     const element = elementRef.current
