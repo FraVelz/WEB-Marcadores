@@ -89,7 +89,7 @@ export function MarcadoresExplorerRail({ registerGlobalExplorerRef = true, folde
   }
 
   return (
-    <div className="border-app-border bg-app-sidebar flex min-h-0 shrink-0 flex-col border-r md:min-h-0">
+    <div className="border-app-border bg-app-sidebar flex h-full max-h-full min-h-0 shrink-0 flex-col border-r">
       {!open ? (
         <div className="flex w-10 flex-col items-center gap-1 py-2">
           <button
@@ -115,7 +115,7 @@ export function MarcadoresExplorerRail({ registerGlobalExplorerRef = true, folde
           aria-label="Explorador de carpetas"
           data-marcadores-explorer-rail
           className={cn(
-            "flex min-h-0 w-[min(15rem,calc(100vw-4rem))] max-w-[16rem] min-w-[11rem] flex-col overflow-hidden outline-none md:w-[13.75rem]",
+            "flex h-full max-h-full min-h-0 w-[min(15rem,calc(100vw-4rem))] max-w-[16rem] min-w-[11rem] flex-col overflow-hidden outline-none md:w-[13.75rem]",
             "focus:ring-0"
           )}
         >

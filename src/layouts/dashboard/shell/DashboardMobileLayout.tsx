@@ -47,7 +47,7 @@ export function DashboardMobileLayout({ pathname, children, sidebarRef, mainRef 
         />
       ) : null}
 
-      <div ref={dashboardFullscreenHostRef} className="flex min-h-0 flex-1 flex-col md:min-h-screen">
+      <div ref={dashboardFullscreenHostRef} className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <DashboardLayoutChrome
           pathname={pathname}
           wideViewport={wide}

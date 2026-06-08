@@ -43,6 +43,7 @@ type Props = {
   treeToggleDisabled?: boolean
   /** false en ventanas del escritorio (el toggle vive en MarcadoresDesktopLayoutBar). */
   showFullscreenToggle?: boolean
+  duplicateClusterCount?: number
 }
 
 export default function MarcadoresToolbar(props: Props) {
@@ -115,6 +116,12 @@ export default function MarcadoresToolbar(props: Props) {
           />
         </div>
       )}
+      {props.duplicateClusterCount != null && props.duplicateClusterCount > 0 ? (
+        <p className="text-app-fg-muted ml-auto shrink-0 self-center text-[11px]">
+          Posibles duplicados:{" "}
+          <span className="text-app-accent font-medium">{props.duplicateClusterCount}</span>
+        </p>
+      ) : null}
     </div>
   )
 }

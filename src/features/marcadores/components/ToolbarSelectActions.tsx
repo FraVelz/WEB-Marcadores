@@ -20,7 +20,7 @@ export default function ToolbarSelectActions({
   onDelete,
 }: Props) {
   return (
-    <div className="ml-auto flex min-w-0 flex-shrink-0 flex-wrap items-center justify-end gap-1">
+    <div className="flex min-w-0 flex-shrink-0 flex-wrap items-center gap-1">
       <button
         onClick={() => {
           setSelectMode((m) => !m)
