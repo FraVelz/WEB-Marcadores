@@ -43,7 +43,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
       {wallpaperActive ? <DashboardWallpaperBackdrop {...appearance} /> : null}
       <div
         className={cn(
-          "relative z-10 flex min-h-dvh flex-col md:min-h-screen",
+          "relative z-10 flex h-dvh max-h-dvh flex-col overflow-hidden",
           wallpaperActive ? "bg-transparent" : "bg-app-canvas"
         )}
       >
