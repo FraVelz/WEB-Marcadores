@@ -12,12 +12,7 @@ type StatBarChartProps = {
   valueSuffix?: string
 }
 
-export function StatBarChart({
-  rows,
-  caption,
-  emptyLabel = "Sin datos",
-  valueSuffix,
-}: StatBarChartProps) {
+export function StatBarChart({ rows, caption, emptyLabel = "Sin datos", valueSuffix }: StatBarChartProps) {
   if (rows.length === 0) {
     return (
       <p className="text-app-fg-muted border-app-border-muted bg-app-raised rounded-xl border px-4 py-6 text-sm">

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useEffectEvent } from "react"
+import { useEffect } from "react"
 
 import { useHotkeys } from "@/lib/hotkeys/useHotkeys"
 
@@ -37,15 +37,6 @@ export function useMarcadoresEffects<T>(params: Params<T>) {
     searchRef,
   } = params
 
-  const focusSearchShortcut = useEffectEvent(() => {
-    setShowSearch(true)
-    setTimeout(() => searchRef.current?.focus(), 0)
-  })
-
-  const clearPasteError = useEffectEvent(() => {
-    setPasteError(null)
-  })
-
   useEffect(() => setSelectedIndex(0), [searchValue, selectedFolderId, setSelectedIndex])
   useEffect(() => {
     itemRefs.current.get(selectedIndex)?.scrollIntoView({ block: "nearest", behavior: "smooth" })
@@ -68,17 +59,18 @@ export function useMarcadoresEffects<T>(params: Params<T>) {
   }, [flatList, selectedIndex, infoPanelEnabled, setDetailBookmark])
   useEffect(() => {
     if (!pasteError) return
-    const t = setTimeout(() => clearPasteError(), 4000)
+    const t = setTimeout(() => setPasteError(null), 4000)
     return () => clearTimeout(t)
-  }, [pasteError])
+  }, [pasteError, setPasteError])
 
   useHotkeys(
     "ctrl+f,ctrl+k",
     (event) => {
       event.preventDefault()
-      focusSearchShortcut()
+      setShowSearch(true)
+      setTimeout(() => searchRef.current?.focus(), 0)
     },
     {},
-    []
+    [setShowSearch, searchRef]
   )
 }

@@ -22,13 +22,7 @@ type Params = {
 }
 
 /** Drop target for empty panel space (current browse folder). */
-export function useBookmarkDropPanel({
-  elementRef,
-  enabled = true,
-  onDrop,
-  onDragEnter,
-  onDragLeave,
-}: Params) {
+export function useBookmarkDropPanel({ elementRef, enabled = true, onDrop, onDragEnter, onDragLeave }: Params) {
   const onDropRef = useLiveRef(onDrop)
   const onDragEnterRef = useLiveRef(onDragEnter)
   const onDragLeaveRef = useLiveRef(onDragLeave)

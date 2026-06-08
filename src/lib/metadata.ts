@@ -27,8 +27,7 @@ export function isMetadataCrawler(userAgent: string | null): boolean {
 
 /** Rutas generadas por convención de metadata de Next (og:image, twitter:image, icon). */
 export function isMetadataAssetPath(pathname: string): boolean {
-  const asset =
-    /(?:^|\/)(?:opengraph-image|twitter-image|icon)(?:[-.][a-z0-9]+)*$/i
+  const asset = /(?:^|\/)(?:opengraph-image|twitter-image|icon)(?:[-.][a-z0-9]+)*$/i
   return asset.test(pathname)
 }
 

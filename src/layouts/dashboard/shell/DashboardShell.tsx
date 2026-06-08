@@ -17,14 +17,8 @@ export default function DashboardShell({ children }: { children: React.ReactNode
   const { appearance } = useAppAppearance()
   const wallpaperActive = Boolean(appearance.wallpaperDataUrl)
 
-  const {
-    mainRef,
-    sidebarRef,
-    focusMain,
-    focusSidebar,
-    setCommandPaletteOpen,
-    marcadoresExplorerPanelRef,
-  } = useDashboard()
+  const { mainRef, sidebarRef, focusMain, focusSidebar, setCommandPaletteOpen, marcadoresExplorerPanelRef } =
+    useDashboard()
 
   useFocusMainOnMarcadoresRoute(pathname, mainRef)
 

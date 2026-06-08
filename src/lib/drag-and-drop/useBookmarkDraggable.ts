@@ -9,11 +9,7 @@ import { useLiveRef } from "@/lib/hooks/useLiveRef"
 import { attachBookmarkDragPreview } from "@/lib/drag-and-drop/bookmarkDragPreview"
 import { gridItemToDragData } from "@/lib/drag-and-drop/bookmarkDragData"
 
-export function useBookmarkDraggable(
-  elementRef: RefObject<HTMLElement | null>,
-  item: GridItem,
-  enabled = true
-) {
+export function useBookmarkDraggable(elementRef: RefObject<HTMLElement | null>, item: GridItem, enabled = true) {
   const itemRef = useLiveRef(item)
 
   useLayoutEffect(() => {

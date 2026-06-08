@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useRef, useEffectEvent, useMemo } from "react"
+import { useEffect, useState, useRef, useMemo } from "react"
 import { buildFolderOptions } from "@/lib/bookmark-utils"
 import { cn } from "@/lib/utils"
 import { splitCommaTags } from "@/lib/comma-tags"
@@ -53,9 +53,7 @@ export default function BookmarkModal({ onClose, onSubmit, initialData, allTags,
   const modalContentRef = useRef<HTMLDivElement>(null)
   const tagInputRef = useRef<string>("")
 
-  const onCloseEvent = useEffectEvent(onClose)
-
-  useHotkeys("esc", () => onCloseEvent(), {}, [])
+  useHotkeys("esc", () => onClose(), {}, [onClose])
 
   useEffect(() => {
     requestAnimationFrame(() => firstInputRef.current?.focus())

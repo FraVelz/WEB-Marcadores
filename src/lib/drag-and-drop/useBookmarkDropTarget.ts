@@ -42,8 +42,7 @@ export function useBookmarkDropTarget({
 
     return dropTargetForElements({
       element,
-      canDrop: ({ source, element: dropElement }) =>
-        isBookmarkDragSource(source) && source.element !== dropElement,
+      canDrop: ({ source, element: dropElement }) => isBookmarkDragSource(source) && source.element !== dropElement,
       getData: (): BookmarkDropTargetData => ({
         bookmarkDropTarget: true,
         targetFolderId: targetFolderIdRef.current,

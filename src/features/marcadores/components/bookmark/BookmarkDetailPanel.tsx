@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffectEvent } from "react"
+import { useState, useRef } from "react"
 import Image from "next/image"
 
 import type { Bookmark } from "@/features/marcadores/utils/types"
@@ -277,16 +277,14 @@ export default function BookmarkDetailPanel({
   embedded = false,
   omitEmbeddedHeader = false,
 }: Props) {
-  const onCloseEvent = useEffectEvent(onClose)
-
   useHotkeys(
     "esc",
     () => {
       if (document.querySelector('[role="dialog"][aria-modal="true"]')) return
-      onCloseEvent()
+      onClose()
     },
     { enabled: Boolean(bookmark) },
-    [bookmark]
+    [bookmark, onClose]
   )
 
   if (!bookmark) return null

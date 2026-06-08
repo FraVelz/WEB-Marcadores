@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import {
   type ChartConfig,
@@ -6,16 +6,16 @@ import {
   getColorsCount,
   getLoadingData,
   LoadingIndicator,
-} from "@/components/evilcharts/ui/chart";
-import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/components/evilcharts/ui/evil-brush";
-import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/components/evilcharts/ui/legend";
+} from "@/components/evilcharts/ui/chart"
+import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/components/evilcharts/ui/evil-brush"
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/components/evilcharts/ui/legend"
 import {
   ChartTooltip,
   ChartTooltipContent,
   type TooltipRoundness,
   type TooltipVariant,
-} from "@/components/evilcharts/ui/tooltip";
-import { ChartDot, type DotVariant } from "@/components/evilcharts/ui/dot";
+} from "@/components/evilcharts/ui/tooltip"
+import { ChartDot, type DotVariant } from "@/components/evilcharts/ui/dot"
 import {
   Children,
   createContext,
@@ -30,7 +30,7 @@ import {
   type FC,
   type ReactElement,
   type ReactNode,
-} from "react";
+} from "react"
 import {
   Bar as RechartsBar,
   CartesianGrid,
@@ -38,24 +38,24 @@ import {
   Line as RechartsLine,
   XAxis as RechartsXAxis,
   YAxis as RechartsYAxis,
-} from "recharts";
-import { domAnimation, LazyMotion, m, useReducedMotion } from "motion/react";
+} from "recharts"
+import { domAnimation, LazyMotion, m, useReducedMotion } from "motion/react"
 
 // Constants
-const STROKE_WIDTH = 2;
-const DEFAULT_BAR_RADIUS = 4;
-const LOADING_DATA_KEY = "loading";
-const LOADING_ANIMATION_DURATION = 2000; // in milliseconds
-const REVEAL_DURATION = 1; // line intro wipe length, in seconds
-const REVEAL_EASE: [number, number, number, number] = [0, 0.7, 0.5, 1]; // intro easing
-const BAR_GROW_DURATION = 0.5; // per-bar grow-in length, in seconds
-const BAR_STAGGER = 0.05; // delay between consecutive bars, in seconds
+const STROKE_WIDTH = 2
+const DEFAULT_BAR_RADIUS = 4
+const LOADING_DATA_KEY = "loading"
+const LOADING_ANIMATION_DURATION = 2000 // in milliseconds
+const REVEAL_DURATION = 1 // line intro wipe length, in seconds
+const REVEAL_EASE: [number, number, number, number] = [0, 0.7, 0.5, 1] // intro easing
+const BAR_GROW_DURATION = 0.5 // per-bar grow-in length, in seconds
+const BAR_STAGGER = 0.05 // delay between consecutive bars, in seconds
 
-type CurveType = ComponentProps<typeof RechartsLine>["type"];
-type LineDotProp = ComponentProps<typeof RechartsLine>["dot"];
-type LineActiveDotProp = ComponentProps<typeof RechartsLine>["activeDot"];
-type StrokeVariant = "solid" | "dashed" | "animated-dashed";
-type BarVariant = "default" | "hatched" | "duotone" | "duotone-reverse" | "gradient" | "stripped";
+type CurveType = ComponentProps<typeof RechartsLine>["type"]
+type LineDotProp = ComponentProps<typeof RechartsLine>["dot"]
+type LineActiveDotProp = ComponentProps<typeof RechartsLine>["activeDot"]
+type StrokeVariant = "solid" | "dashed" | "animated-dashed"
+type BarVariant = "default" | "hatched" | "duotone" | "duotone-reverse" | "gradient" | "stripped"
 
 /**
  * Direction of the custom motion.dev intro. Recharts' own animation is
@@ -65,13 +65,8 @@ type BarVariant = "default" | "hatched" | "duotone" | "duotone-reverse" | "gradi
  * NOTE: the intro is a per-frame animation, heavier than a static chart.
  * `"none"` opts out — as does a device with the OS "reduce motion" preference.
  */
-type ComposedAnimationType =
-  | "none"
-  | "left-to-right"
-  | "right-to-left"
-  | "center-out"
-  | "edges-in";
-type RevealAnimationType = Exclude<ComposedAnimationType, "none">;
+type ComposedAnimationType = "none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in"
+type RevealAnimationType = Exclude<ComposedAnimationType, "none">
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared context
@@ -84,30 +79,28 @@ type RevealAnimationType = Exclude<ComposedAnimationType, "none">;
  * source of truth.
  */
 type ComposedChartContextValue = {
-  config: ChartConfig; // colors + labels for every bar and line series
-  curveType: CurveType; // default curve interpolation each <Line /> inherits
-  animationType: ComposedAnimationType; // default intro each <Bar />/<Line /> inherits
-  introStartedAt: number; // timestamp the chart mounted — anchors the one-shot intro
-  dataLength: number; // number of rows currently rendered
-  isLoading: boolean; // whether the chart shows its loading skeleton
-  hoveredIndex: number | null; // data index currently hovered, or null when none
-  selectedDataKey: string | null; // currently selected series, or null when none
-  selectDataKey: (dataKey: string | null) => void; // sets the selected series
-};
+  config: ChartConfig // colors + labels for every bar and line series
+  curveType: CurveType // default curve interpolation each <Line /> inherits
+  animationType: ComposedAnimationType // default intro each <Bar />/<Line /> inherits
+  introStartedAt: number // timestamp the chart mounted — anchors the one-shot intro
+  dataLength: number // number of rows currently rendered
+  isLoading: boolean // whether the chart shows its loading skeleton
+  hoveredIndex: number | null // data index currently hovered, or null when none
+  selectedDataKey: string | null // currently selected series, or null when none
+  selectDataKey: (dataKey: string | null) => void // sets the selected series
+}
 
-const ComposedChartContext = createContext<ComposedChartContextValue | null>(null);
+const ComposedChartContext = createContext<ComposedChartContextValue | null>(null)
 
 // Reads the chart context, throwing a helpful error when used outside <EvilComposedChart />
 function useComposedChart() {
-  const context = use(ComposedChartContext);
+  const context = use(ComposedChartContext)
 
   if (!context) {
-    throw new Error(
-      "Composed chart parts (<Bar />, <Line />, <XAxis />, …) must be used within <EvilComposedChart />",
-    );
+    throw new Error("Composed chart parts (<Bar />, <Line />, <XAxis />, …) must be used within <EvilComposedChart />")
   }
 
-  return context;
+  return context
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -116,37 +109,37 @@ function useComposedChart() {
 
 // Validates that every config key also exists on the data row type
 type ValidateConfigKeys<TData, TConfig> = {
-  [K in keyof TConfig]: K extends keyof TData ? ChartConfig[string] : never;
-};
+  [K in keyof TConfig]: K extends keyof TData ? ChartConfig[string] : never
+}
 
 type EvilComposedChartBaseProps<
   TData extends Record<string, unknown>,
   TConfig extends Record<string, ChartConfig[string]>,
 > = {
-  config: TConfig & ValidateConfigKeys<TData, TConfig>; // series colors + labels for bars and lines
-  data: TData[]; // rows rendered by the chart
-  children: ReactNode; // composed parts — <Bar />, <Line />, <XAxis />, <Legend />, …
-  className?: string; // extra classes for the chart container
-  chartProps?: ComponentProps<typeof RechartsComposedChart>; // escape hatch for the raw Recharts chart
-  curveType?: CurveType; // default curve interpolation for every <Line />
-  animationType?: ComposedAnimationType; // default intro for every <Bar /> and <Line />
-  barGap?: number; // gap between bars sharing a category
-  barCategoryGap?: number; // gap between bar categories
-  defaultSelectedDataKey?: string | null; // series selected on first render
-  onSelectionChange?: (selectedDataKey: string | null) => void; // fires when the selected series changes
-  isLoading?: boolean; // shows the animated loading skeleton
-  loadingBars?: number; // number of bars in the loading skeleton
-  showBrush?: boolean; // renders a zoom brush below the chart
-  xDataKey?: keyof TData & string; // x-axis key — only needed for the brush footer
-  brushHeight?: number; // height of the brush preview in pixels
-  brushFormatLabel?: (value: unknown, index: number) => string; // formats brush axis labels
-  onBrushChange?: (range: EvilBrushRange) => void; // fires when the brush range changes
-};
+  config: TConfig & ValidateConfigKeys<TData, TConfig> // series colors + labels for bars and lines
+  data: TData[] // rows rendered by the chart
+  children: ReactNode // composed parts — <Bar />, <Line />, <XAxis />, <Legend />, …
+  className?: string // extra classes for the chart container
+  chartProps?: ComponentProps<typeof RechartsComposedChart> // escape hatch for the raw Recharts chart
+  curveType?: CurveType // default curve interpolation for every <Line />
+  animationType?: ComposedAnimationType // default intro for every <Bar /> and <Line />
+  barGap?: number // gap between bars sharing a category
+  barCategoryGap?: number // gap between bar categories
+  defaultSelectedDataKey?: string | null // series selected on first render
+  onSelectionChange?: (selectedDataKey: string | null) => void // fires when the selected series changes
+  isLoading?: boolean // shows the animated loading skeleton
+  loadingBars?: number // number of bars in the loading skeleton
+  showBrush?: boolean // renders a zoom brush below the chart
+  xDataKey?: keyof TData & string // x-axis key — only needed for the brush footer
+  brushHeight?: number // height of the brush preview in pixels
+  brushFormatLabel?: (value: unknown, index: number) => string // formats brush axis labels
+  onBrushChange?: (range: EvilBrushRange) => void // fires when the brush range changes
+}
 
 type EvilComposedChartProps<
   TData extends Record<string, unknown>,
   TConfig extends Record<string, ChartConfig[string]>,
-> = EvilComposedChartBaseProps<TData, TConfig>;
+> = EvilComposedChartBaseProps<TData, TConfig>
 
 /**
  * Root of the composible composed chart. Owns the data, the shared context, the
@@ -177,26 +170,26 @@ export function EvilComposedChart<
   brushFormatLabel,
   onBrushChange,
 }: EvilComposedChartProps<TData, TConfig>) {
-  const chartId = useId().replace(/:/g, ""); // colon-free id keeps CSS/SVG selectors valid
+  const chartId = useId().replace(/:/g, "") // colon-free id keeps CSS/SVG selectors valid
   // Anchors the intro to a fixed moment so it plays exactly once — re-renders
   // and Recharts remounts read elapsed time from here instead of replaying.
-  const [introStartedAt] = useState(() => Date.now());
-  const [selectedDataKey, setSelectedDataKey] = useState<string | null>(null);
-  const activeSelectedDataKey = selectedDataKey ?? defaultSelectedDataKey;
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingBars);
-  const { visibleData, brushProps } = useEvilBrush({ data });
+  const [introStartedAt] = useState(() => Date.now())
+  const [selectedDataKey, setSelectedDataKey] = useState<string | null>(null)
+  const activeSelectedDataKey = selectedDataKey ?? defaultSelectedDataKey
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+  const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingBars)
+  const { visibleData, brushProps } = useEvilBrush({ data })
 
-  const displayData = showBrush && !isLoading ? visibleData : data;
+  const displayData = showBrush && !isLoading ? visibleData : data
 
   // Updates selection state and notifies the parent
   const selectDataKey = useCallback(
     (newSelectedDataKey: string | null) => {
-      setSelectedDataKey(newSelectedDataKey);
-      onSelectionChange?.(newSelectedDataKey);
+      setSelectedDataKey(newSelectedDataKey)
+      onSelectionChange?.(newSelectedDataKey)
     },
-    [onSelectionChange],
-  );
+    [onSelectionChange]
+  )
 
   const contextValue = useMemo<ComposedChartContextValue>(
     () => ({
@@ -220,56 +213,54 @@ export function EvilComposedChart<
       hoveredIndex,
       activeSelectedDataKey,
       selectDataKey,
-    ],
-  );
+    ]
+  )
 
   return (
     <LazyMotion features={domAnimation} strict>
       <ComposedChartContext value={contextValue}>
         <ChartContainer
-        className={className}
-        config={config}
-        footer={
-          showBrush &&
-          !isLoading && (
-            <EvilBrush
-              data={data}
-              chartConfig={config}
-              xDataKey={xDataKey}
-              variant="area"
-              curveType={curveType}
-              height={brushHeight}
-              formatLabel={brushFormatLabel}
-              skipStyle
-              className="mt-1"
-              {...brushProps}
-              onChange={(range) => {
-                brushProps.onChange(range);
-                onBrushChange?.(range);
-              }}
-            />
-          )
-        }
-      >
-        <LoadingIndicator isLoading={isLoading} />
-        <RechartsComposedChart
-          id={chartId}
-          accessibilityLayer
-          data={isLoading ? loadingData : displayData}
-          barGap={barGap}
-          barCategoryGap={barCategoryGap}
-          onMouseLeave={() => setHoveredIndex(null)}
-          {...chartProps}
+          className={className}
+          config={config}
+          footer={
+            showBrush &&
+            !isLoading && (
+              <EvilBrush
+                data={data}
+                chartConfig={config}
+                xDataKey={xDataKey}
+                variant="area"
+                curveType={curveType}
+                height={brushHeight}
+                formatLabel={brushFormatLabel}
+                skipStyle
+                className="mt-1"
+                {...brushProps}
+                onChange={(range) => {
+                  brushProps.onChange(range)
+                  onBrushChange?.(range)
+                }}
+              />
+            )
+          }
         >
-          {children}
-          {isLoading && (
-            <LoadingBar chartId={chartId} barRadius={DEFAULT_BAR_RADIUS} onShimmerExit={onShimmerExit} />
-          )}
-        </RechartsComposedChart>
+          <LoadingIndicator isLoading={isLoading} />
+          <RechartsComposedChart
+            id={chartId}
+            accessibilityLayer
+            data={isLoading ? loadingData : displayData}
+            barGap={barGap}
+            barCategoryGap={barCategoryGap}
+            onMouseLeave={() => setHoveredIndex(null)}
+            {...chartProps}
+          >
+            {children}
+            {isLoading && <LoadingBar chartId={chartId} barRadius={DEFAULT_BAR_RADIUS} onShimmerExit={onShimmerExit} />}
+          </RechartsComposedChart>
         </ChartContainer>
       </ComposedChartContext>
     </LazyMotion>
-  );
+  )
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -277,15 +268,15 @@ export function EvilComposedChart<
 // ─────────────────────────────────────────────────────────────────────────────
 
 type BarProps = {
-  dataKey: string; // series key — must exist on the data and config
-  variant?: BarVariant; // fill style for this bar only
-  radius?: number; // corner radius of the bar in pixels
-  glow?: boolean; // applies a soft neon glow to this bar
-  animationType?: ComposedAnimationType; // grow-in order — falls back to the chart default
-  isClickable?: boolean; // lets this bar be selected by clicking it
-  enableHoverHighlight?: boolean; // dims this bar when another column is hovered
-  barProps?: ComponentProps<typeof RechartsBar>; // escape hatch for raw Recharts Bar props
-};
+  dataKey: string // series key — must exist on the data and config
+  variant?: BarVariant // fill style for this bar only
+  radius?: number // corner radius of the bar in pixels
+  glow?: boolean // applies a soft neon glow to this bar
+  animationType?: ComposedAnimationType // grow-in order — falls back to the chart default
+  isClickable?: boolean // lets this bar be selected by clicking it
+  enableHoverHighlight?: boolean // dims this bar when another column is hovered
+  barProps?: ComponentProps<typeof RechartsBar> // escape hatch for raw Recharts Bar props
+}
 
 /**
  * A single bar series. Each <Bar /> is fully self-contained: it generates its
@@ -312,22 +303,20 @@ export function Bar({
     hoveredIndex,
     selectedDataKey,
     selectDataKey,
-  } = useComposedChart();
-  const id = useId().replace(/:/g, ""); // unique id scopes this bar's style defs
+  } = useComposedChart()
+  const id = useId().replace(/:/g, "") // unique id scopes this bar's style defs
   // Devices set to "reduce motion" skip the grow-in animation entirely
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useReducedMotion()
 
   // The root renders the skeleton bar while loading, so real bars step aside
-  if (isLoading) return null;
+  if (isLoading) return null
 
-  const isSelected = selectedDataKey === null || selectedDataKey === dataKey;
-  const filter = glow ? `url(#${id}-glow)` : undefined;
+  const isSelected = selectedDataKey === null || selectedDataKey === dataKey
+  const filter = glow ? `url(#${id}-glow)` : undefined
 
   // The grow-in is a per-frame animation — heavier than a static chart — so
   // `"none"` and the OS reduce-motion preference both opt out of it.
-  const revealType: ComposedAnimationType = shouldReduceMotion
-    ? "none"
-    : (animationType ?? defaultAnimation);
+  const revealType: ComposedAnimationType = shouldReduceMotion ? "none" : (animationType ?? defaultAnimation)
 
   return (
     <>
@@ -340,8 +329,8 @@ export function Bar({
         isAnimationActive={false}
         style={isClickable || enableHoverHighlight ? { cursor: "pointer" } : undefined}
         shape={(props: unknown) => {
-          const barShapeProps = props as BarShapeProps;
-          const index = typeof barShapeProps.index === "number" ? barShapeProps.index : -1;
+          const barShapeProps = props as BarShapeProps
+          const index = typeof barShapeProps.index === "number" ? barShapeProps.index : -1
 
           return (
             <CustomBar
@@ -364,11 +353,11 @@ export function Bar({
               dataLength={dataLength}
               introStartedAt={introStartedAt}
               onClick={() => {
-                if (!isClickable) return;
-                selectDataKey(selectedDataKey === dataKey ? null : dataKey);
+                if (!isClickable) return
+                selectDataKey(selectedDataKey === dataKey ? null : dataKey)
               }}
             />
-          );
+          )
         }}
         {...barProps}
       />
@@ -376,28 +365,26 @@ export function Bar({
         <VerticalColorGradient id={id} dataKey={dataKey} config={config} />
         {variant === "hatched" && <HatchedPattern id={id} dataKey={dataKey} />}
         {variant === "duotone" && <DuotonePattern id={id} dataKey={dataKey} config={config} />}
-        {variant === "duotone-reverse" && (
-          <DuotoneReversePattern id={id} dataKey={dataKey} config={config} />
-        )}
+        {variant === "duotone-reverse" && <DuotoneReversePattern id={id} dataKey={dataKey} config={config} />}
         {variant === "gradient" && <GradientPattern id={id} dataKey={dataKey} />}
         {variant === "stripped" && <StrippedPattern id={id} dataKey={dataKey} />}
         {glow && <BarGlowFilter id={id} />}
       </defs>
     </>
-  );
+  )
 }
 
 type LineProps = {
-  dataKey: string; // series key — must exist on the data and config
-  strokeVariant?: StrokeVariant; // stroke style for this line only
-  curveType?: CurveType; // curve interpolation — falls back to the chart default
-  animationType?: ComposedAnimationType; // intro reveal — falls back to the chart default
-  connectNulls?: boolean; // join segments across null/missing values
-  glow?: boolean; // applies a soft neon glow to this line
-  isClickable?: boolean; // lets this line be selected by clicking it
-  children?: ReactNode; // optional <Dot /> and <ActiveDot /> composition
-  lineProps?: ComponentProps<typeof RechartsLine>; // escape hatch for raw Recharts Line props
-};
+  dataKey: string // series key — must exist on the data and config
+  strokeVariant?: StrokeVariant // stroke style for this line only
+  curveType?: CurveType // curve interpolation — falls back to the chart default
+  animationType?: ComposedAnimationType // intro reveal — falls back to the chart default
+  connectNulls?: boolean // join segments across null/missing values
+  glow?: boolean // applies a soft neon glow to this line
+  isClickable?: boolean // lets this line be selected by clicking it
+  children?: ReactNode // optional <Dot /> and <ActiveDot /> composition
+  lineProps?: ComponentProps<typeof RechartsLine> // escape hatch for raw Recharts Line props
+}
 
 /**
  * A single line series. Each <Line /> is fully self-contained: it generates its
@@ -424,36 +411,34 @@ export function Line({
     isLoading,
     selectedDataKey,
     selectDataKey,
-  } = useComposedChart();
-  const id = useId().replace(/:/g, ""); // unique id scopes this line's style defs
+  } = useComposedChart()
+  const id = useId().replace(/:/g, "") // unique id scopes this line's style defs
   // Devices set to "reduce motion" skip the intro reveal entirely
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useReducedMotion()
 
   // The root renders the skeleton bar while loading, so real lines step aside
-  if (isLoading) return null;
+  if (isLoading) return null
 
-  const resolvedCurve = curveType ?? defaultCurve;
+  const resolvedCurve = curveType ?? defaultCurve
 
   // The reveal is an animated SVG mask — heavier than a static chart — so
   // `"none"` and the OS reduce-motion preference both opt out of it.
-  const revealType: ComposedAnimationType = shouldReduceMotion
-    ? "none"
-    : (animationType ?? defaultAnimation);
-  const maskId = revealType === "none" ? undefined : `${id}-reveal-mask`;
+  const revealType: ComposedAnimationType = shouldReduceMotion ? "none" : (animationType ?? defaultAnimation)
+  const maskId = revealType === "none" ? undefined : `${id}-reveal-mask`
 
-  const opacity = getOpacity(selectedDataKey, dataKey);
-  const hasSelection = selectedDataKey !== null;
-  const filter = glow ? `url(#${id}-glow)` : undefined;
+  const opacity = getOpacity(selectedDataKey, dataKey)
+  const hasSelection = selectedDataKey !== null
+  const filter = glow ? `url(#${id}-glow)` : undefined
 
-  const { dot, activeDot } = resolveDots(children, id, dataKey, opacity.dot, maskId);
+  const { dot, activeDot } = resolveDots(children, id, dataKey, opacity.dot, maskId)
 
-  const isAnimatedDashed = strokeVariant === "animated-dashed";
-  const isDashed = strokeVariant === "dashed" || isAnimatedDashed;
+  const isAnimatedDashed = strokeVariant === "animated-dashed"
+  const isDashed = strokeVariant === "dashed" || isAnimatedDashed
 
   const handleLineClick = () => {
-    if (!isClickable) return;
-    selectDataKey(selectedDataKey === dataKey ? null : dataKey);
-  };
+    if (!isClickable) return
+    selectDataKey(selectedDataKey === dataKey ? null : dataKey)
+  }
 
   return (
     <>
@@ -501,56 +486,44 @@ export function Line({
         {glow && <LineGlowFilter id={id} />}
       </defs>
     </>
-  );
+  )
 }
 
 type DotProps = {
-  variant?: DotVariant; // visual style of the point marker
-};
+  variant?: DotVariant // visual style of the point marker
+}
 
 /**
  * Declares a resting point marker for the <Line /> it is composed inside.
  * It renders nothing on its own — the parent <Line /> reads its variant and
  * wires it into the Recharts dot slot.
  */
-export const Dot: FC<DotProps> = () => null;
+export const Dot: FC<DotProps> = () => null
 
 /**
  * Declares the hovered/active point marker for the <Line /> it is composed
  * inside. Like <Dot />, it is a configuration slot and renders nothing itself.
  */
-export const ActiveDot: FC<DotProps> = () => null;
+export const ActiveDot: FC<DotProps> = () => null
 
-type XAxisProps = ComponentProps<typeof RechartsXAxis>;
+type XAxisProps = ComponentProps<typeof RechartsXAxis>
 
 /**
  * The horizontal category axis. Ships with the chart's flat default styling and
  * forwards every Recharts XAxis prop, so `dataKey`, `tickFormatter`, etc. are
  * passed straight through. Hidden automatically while the chart is loading.
  */
-export function XAxis({
-  tickLine = false,
-  axisLine = false,
-  tickMargin = 8,
-  minTickGap = 8,
-  ...props
-}: XAxisProps) {
-  const { isLoading } = useComposedChart();
+export function XAxis({ tickLine = false, axisLine = false, tickMargin = 8, minTickGap = 8, ...props }: XAxisProps) {
+  const { isLoading } = useComposedChart()
 
-  if (isLoading) return null;
+  if (isLoading) return null
 
   return (
-    <RechartsXAxis
-      tickLine={tickLine}
-      axisLine={axisLine}
-      tickMargin={tickMargin}
-      minTickGap={minTickGap}
-      {...props}
-    />
-  );
+    <RechartsXAxis tickLine={tickLine} axisLine={axisLine} tickMargin={tickMargin} minTickGap={minTickGap} {...props} />
+  )
 }
 
-type YAxisProps = ComponentProps<typeof RechartsYAxis>;
+type YAxisProps = ComponentProps<typeof RechartsYAxis>
 
 /**
  * The vertical value axis. Forwards every Recharts YAxis prop straight through.
@@ -564,9 +537,9 @@ export function YAxis({
   width = "auto",
   ...props
 }: YAxisProps) {
-  const { isLoading } = useComposedChart();
+  const { isLoading } = useComposedChart()
 
-  if (isLoading) return null;
+  if (isLoading) return null
 
   return (
     <RechartsYAxis
@@ -577,65 +550,58 @@ export function YAxis({
       width={width}
       {...props}
     />
-  );
+  )
 }
 
-type GridProps = ComponentProps<typeof CartesianGrid>;
+type GridProps = ComponentProps<typeof CartesianGrid>
 
 /**
  * The background grid lines. Defaults to horizontal-only dashed lines and
  * forwards every Recharts CartesianGrid prop for full control.
  */
 export function Grid({ vertical = false, strokeDasharray = "3 3", ...props }: GridProps) {
-  return <CartesianGrid vertical={vertical} strokeDasharray={strokeDasharray} {...props} />;
+  return <CartesianGrid vertical={vertical} strokeDasharray={strokeDasharray} {...props} />
 }
 
 type TooltipProps = {
-  variant?: TooltipVariant; // visual style of the tooltip surface
-  roundness?: TooltipRoundness; // border-radius of the tooltip
-  defaultIndex?: number; // data index shown by default with no hover
-  cursor?: boolean; // whether the vertical cursor line follows the pointer
-};
+  variant?: TooltipVariant // visual style of the tooltip surface
+  roundness?: TooltipRoundness // border-radius of the tooltip
+  defaultIndex?: number // data index shown by default with no hover
+  cursor?: boolean // whether the vertical cursor line follows the pointer
+}
 
 /**
  * The hover tooltip. Reads the chart's selection from context so its content
  * dims unselected series. Hidden automatically while the chart is loading.
  */
 export function Tooltip({ variant, roundness, defaultIndex, cursor = true }: TooltipProps) {
-  const { isLoading, selectedDataKey } = useComposedChart();
+  const { isLoading, selectedDataKey } = useComposedChart()
 
-  if (isLoading) return null;
+  if (isLoading) return null
 
   return (
     <ChartTooltip
       trigger="click"
       defaultIndex={defaultIndex}
       cursor={cursor ? { strokeDasharray: "3 3", strokeWidth: STROKE_WIDTH } : false}
-      content={
-        <ChartTooltipContent selected={selectedDataKey} roundness={roundness} variant={variant} />
-      }
+      content={<ChartTooltipContent selected={selectedDataKey} roundness={roundness} variant={variant} />}
     />
-  );
+  )
 }
 
 type LegendProps = {
-  variant?: ChartLegendVariant; // visual style of the legend indicators
-  align?: "left" | "center" | "right"; // horizontal placement
-  verticalAlign?: "top" | "middle" | "bottom"; // vertical placement
-  isClickable?: boolean; // lets each entry toggle selection of its series
-};
+  variant?: ChartLegendVariant // visual style of the legend indicators
+  align?: "left" | "center" | "right" // horizontal placement
+  verticalAlign?: "top" | "middle" | "bottom" // vertical placement
+  isClickable?: boolean // lets each entry toggle selection of its series
+}
 
 /**
  * The series legend. When `isClickable` is set, each entry toggles selection of
  * its series, driving the shared selection state read by every <Bar /> and <Line />.
  */
-export function Legend({
-  variant,
-  align = "right",
-  verticalAlign = "top",
-  isClickable = false,
-}: LegendProps) {
-  const { selectedDataKey, selectDataKey } = useComposedChart();
+export function Legend({ variant, align = "right", verticalAlign = "top", isClickable = false }: LegendProps) {
+  const { selectedDataKey, selectDataKey } = useComposedChart()
 
   return (
     <ChartLegend
@@ -650,7 +616,7 @@ export function Legend({
         />
       }
     />
-  );
+  )
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -660,11 +626,11 @@ export function Legend({
 // Returns stroke/dot opacity for a line — dims a series only when another is selected
 const getOpacity = (selectedDataKey: string | null, dataKey: string) => {
   if (selectedDataKey === null) {
-    return { stroke: 1, dot: 1 };
+    return { stroke: 1, dot: 1 }
   }
 
-  return selectedDataKey === dataKey ? { stroke: 1, dot: 1 } : { stroke: 0.3, dot: 0.3 };
-};
+  return selectedDataKey === dataKey ? { stroke: 1, dot: 1 } : { stroke: 0.3, dot: 0.3 }
+}
 
 // Returns the fill opacity for a bar, accounting for both selection and hover state
 const getBarOpacity = ({
@@ -675,21 +641,21 @@ const getBarOpacity = ({
   hoveredIndex,
   index,
 }: {
-  isClickable: boolean;
-  isSelected: boolean;
-  selectedDataKey: string | null;
-  enableHoverHighlight: boolean;
-  hoveredIndex: number | null;
-  index: number;
+  isClickable: boolean
+  isSelected: boolean
+  selectedDataKey: string | null
+  enableHoverHighlight: boolean
+  hoveredIndex: number | null
+  index: number
 }) => {
-  const clickOpacity = isClickable && selectedDataKey !== null ? (isSelected ? 1 : 0.3) : 1;
+  const clickOpacity = isClickable && selectedDataKey !== null ? (isSelected ? 1 : 0.3) : 1
 
   if (enableHoverHighlight && hoveredIndex !== null) {
-    return hoveredIndex === index ? clickOpacity : clickOpacity * 0.3;
+    return hoveredIndex === index ? clickOpacity : clickOpacity * 0.3
   }
 
-  return clickOpacity;
-};
+  return clickOpacity
+}
 
 // Pulls <Dot /> and <ActiveDot /> out of a line's children into Recharts dot slots.
 // When a `maskId` is given the resting dot is wired to the intro reveal mask so it
@@ -700,37 +666,29 @@ const resolveDots = (
   id: string,
   dataKey: string,
   dotOpacity: number,
-  maskId: string | undefined,
+  maskId: string | undefined
 ): { dot: LineDotProp; activeDot: LineActiveDotProp } => {
-  let dot: LineDotProp = false;
-  let activeDot: LineActiveDotProp = false;
+  let dot: LineDotProp = false
+  let activeDot: LineActiveDotProp = false
 
   Children.forEach(children, (child) => {
-    if (!isValidElement(child)) return;
+    if (!isValidElement(child)) return
 
     if (child.type === Dot) {
-      const { variant } = (child as ReactElement<DotProps>).props;
+      const { variant } = (child as ReactElement<DotProps>).props
       dot = (
-        <ChartDot
-          type={variant}
-          dataKey={dataKey}
-          chartId={`${id}-line`}
-          fillOpacity={dotOpacity}
-          maskId={maskId}
-        />
-      );
+        <ChartDot type={variant} dataKey={dataKey} chartId={`${id}-line`} fillOpacity={dotOpacity} maskId={maskId} />
+      )
     }
 
     if (child.type === ActiveDot) {
-      const { variant } = (child as ReactElement<DotProps>).props;
-      activeDot = (
-        <ChartDot type={variant} dataKey={dataKey} chartId={`${id}-line`} fillOpacity={dotOpacity} />
-      );
+      const { variant } = (child as ReactElement<DotProps>).props
+      activeDot = <ChartDot type={variant} dataKey={dataKey} chartId={`${id}-line`} fillOpacity={dotOpacity} />
     }
-  });
+  })
 
-  return { dot, activeDot };
-};
+  return { dot, activeDot }
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Custom bar shape
@@ -738,35 +696,35 @@ const resolveDots = (
 
 // Props Recharts passes to a bar's custom shape renderer
 type BarShapeProps = {
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-  fill?: string;
-  fillOpacity?: number;
-  dataKey?: string;
-  index?: number;
+  x?: number
+  y?: number
+  width?: number
+  height?: number
+  fill?: string
+  fillOpacity?: number
+  dataKey?: string
+  index?: number
   background?: {
-    x?: number;
-    y?: number;
-    width?: number;
-    height?: number;
-  };
-  [key: string]: unknown;
-};
+    x?: number
+    y?: number
+    width?: number
+    height?: number
+  }
+  [key: string]: unknown
+}
 
 type CustomBarProps = {
-  id: string; // unique id of the owning <Bar />
-  variant: BarVariant; // fill style of the bar
-  barRadius: number; // corner radius of the bar
-  filter?: string; // optional glow filter reference
-  isClickable?: boolean; // whether the bar is selectable by click
-  enableHoverHighlight?: boolean; // whether hovering a column dims the others
-  animationType?: ComposedAnimationType; // grow-in order for this bar
-  dataLength?: number; // total bars in the series — drives the stagger
-  introStartedAt?: number; // chart-mount timestamp anchoring the one-shot grow-in
-  onClick?: () => void; // fired when a clickable bar is clicked
-} & BarShapeProps;
+  id: string // unique id of the owning <Bar />
+  variant: BarVariant // fill style of the bar
+  barRadius: number // corner radius of the bar
+  filter?: string // optional glow filter reference
+  isClickable?: boolean // whether the bar is selectable by click
+  enableHoverHighlight?: boolean // whether hovering a column dims the others
+  animationType?: ComposedAnimationType // grow-in order for this bar
+  dataLength?: number // total bars in the series — drives the stagger
+  introStartedAt?: number // chart-mount timestamp anchoring the one-shot grow-in
+  onClick?: () => void // fired when a clickable bar is clicked
+} & BarShapeProps
 
 // Renders a single bar rectangle with its variant fill, glow, and hit area
 const CustomBar = ({
@@ -788,52 +746,47 @@ const CustomBar = ({
   introStartedAt = 0,
   onClick,
 }: CustomBarProps) => {
-  const cursorStyle = isClickable || enableHoverHighlight ? { cursor: "pointer" } : undefined;
-  const hitAreaX = background?.x ?? x;
-  const hitAreaY = background?.y ?? y;
-  const hitAreaWidth = background?.width ?? width;
-  const hitAreaHeight = background?.height ?? height;
+  const cursorStyle = isClickable || enableHoverHighlight ? { cursor: "pointer" } : undefined
+  const hitAreaX = background?.x ?? x
+  const hitAreaY = background?.y ?? y
+  const hitAreaWidth = background?.width ?? width
+  const hitAreaHeight = background?.height ?? height
 
   // motion.dev grow-in props for this bar — an empty object once it has finished
-  const grow = getBarGrowAnimation(animationType, index, dataLength, introStartedAt) ?? {};
+  const grow = getBarGrowAnimation(animationType, index, dataLength, introStartedAt) ?? {}
 
   const getFill = () => {
     switch (variant) {
       case "hatched":
-        return `url(#${id}-hatched)`;
+        return `url(#${id}-hatched)`
       case "duotone":
-        return `url(#${id}-duotone)`;
+        return `url(#${id}-duotone)`
       case "duotone-reverse":
-        return `url(#${id}-duotone-reverse)`;
+        return `url(#${id}-duotone-reverse)`
       case "gradient":
-        return `url(#${id}-gradient)`;
+        return `url(#${id}-gradient)`
       case "stripped":
-        return `url(#${id}-stripped)`;
+        return `url(#${id}-stripped)`
       default:
-        return `url(#${id}-bar-colors)`;
+        return `url(#${id}-bar-colors)`
     }
-  };
+  }
 
   // Full-height invisible rect — keeps the column hoverable even mid grow-in
   const hitArea = enableHoverHighlight ? (
     <rect x={hitAreaX} y={hitAreaY} width={hitAreaWidth} height={hitAreaHeight} fill="transparent" />
-  ) : null;
+  ) : null
 
   if (variant === "stripped") {
     return (
       <g style={cursorStyle} onClick={onClick}>
-        <m.g
-          {...grow}
-          filter={filter}
-          opacity={fillOpacity}
-          className="transition-opacity duration-200"
-        >
+        <m.g {...grow} filter={filter} opacity={fillOpacity} className="transition-opacity duration-200">
           <rect x={x} y={y} width={width} height={height} fill={getFill()} />
           <rect x={x} y={y} width={width} height={2} fill={`url(#${id}-bar-colors)`} />
         </m.g>
         {hitArea}
       </g>
-    );
+    )
   }
 
   return (
@@ -854,8 +807,8 @@ const CustomBar = ({
       </m.g>
       {hitArea}
     </g>
-  );
-};
+  )
+}
 
 /**
  * Builds the motion.dev grow-in animation for a single bar, or returns `null`
@@ -872,39 +825,39 @@ const getBarGrowAnimation = (
   animationType: ComposedAnimationType,
   index: number,
   dataLength: number,
-  introStartedAt: number,
+  introStartedAt: number
 ) => {
-  if (animationType === "none" || index < 0 || dataLength <= 0) return null;
+  if (animationType === "none" || index < 0 || dataLength <= 0) return null
 
-  const lastIndex = dataLength - 1;
-  const center = lastIndex / 2;
+  const lastIndex = dataLength - 1
+  const center = lastIndex / 2
 
   // How many bars this one waits behind before it starts growing
-  let step: number;
+  let step: number
   switch (animationType) {
     case "right-to-left":
-      step = lastIndex - index;
-      break;
+      step = lastIndex - index
+      break
     case "center-out":
-      step = Math.abs(index - center);
-      break;
+      step = Math.abs(index - center)
+      break
     case "edges-in":
-      step = center - Math.abs(index - center);
-      break;
+      step = center - Math.abs(index - center)
+      break
     default: // left-to-right
-      step = index;
+      step = index
   }
 
-  const startMs = step * BAR_STAGGER * 1000;
-  const durationMs = BAR_GROW_DURATION * 1000;
-  const endMs = startMs + durationMs;
-  const elapsed = Date.now() - introStartedAt;
+  const startMs = step * BAR_STAGGER * 1000
+  const durationMs = BAR_GROW_DURATION * 1000
+  const endMs = startMs + durationMs
+  const elapsed = Date.now() - introStartedAt
 
   // Already finished — render static so re-renders/remounts can't replay it
-  if (elapsed >= endMs) return null;
+  if (elapsed >= endMs) return null
 
   // Resume from wherever this bar should already be (0 before it starts)
-  const from = elapsed <= startMs ? 0 : (elapsed - startMs) / durationMs;
+  const from = elapsed <= startMs ? 0 : (elapsed - startMs) / durationMs
 
   return {
     initial: { scaleY: from },
@@ -915,15 +868,15 @@ const getBarGrowAnimation = (
       delay: Math.max(0, startMs - elapsed) / 1000,
     },
     style: { originY: 1 }, // grow upward from the baseline
-  };
-};
+  }
+}
 
 // motion `originX` for each single-rect line reveal — the edge the wipe grows from
 const SINGLE_REVEAL_ORIGIN: Record<Exclude<RevealAnimationType, "edges-in">, number> = {
   "left-to-right": 0,
   "right-to-left": 1,
   "center-out": 0.5,
-};
+}
 
 /**
  * Wipe mask driven by motion.dev, played once when a <Line /> mounts. The same
@@ -935,7 +888,7 @@ const RevealMask = ({ id, type }: { id: string; type: RevealAnimationType }) => 
     initial: { scaleX: 0 },
     animate: { scaleX: 1 },
     transition: { duration: REVEAL_DURATION, ease: REVEAL_EASE },
-  };
+  }
 
   return (
     <mask
@@ -950,25 +903,9 @@ const RevealMask = ({ id, type }: { id: string; type: RevealAnimationType }) => 
       {type === "edges-in" ? (
         <>
           {/* left half wipes inward from the left edge toward the centre */}
-          <m.rect
-            {...reveal}
-            x="0"
-            y="0"
-            width="50%"
-            height="100%"
-            fill="white"
-            style={{ originX: 0 }}
-          />
+          <m.rect {...reveal} x="0" y="0" width="50%" height="100%" fill="white" style={{ originX: 0 }} />
           {/* right half wipes inward from the right edge toward the centre */}
-          <m.rect
-            {...reveal}
-            x="50%"
-            y="0"
-            width="50%"
-            height="100%"
-            fill="white"
-            style={{ originX: 1 }}
-          />
+          <m.rect {...reveal} x="50%" y="0" width="50%" height="100%" fill="white" style={{ originX: 1 }} />
         </>
       ) : (
         <m.rect
@@ -982,17 +919,17 @@ const RevealMask = ({ id, type }: { id: string; type: RevealAnimationType }) => 
         />
       )}
     </mask>
-  );
-};
+  )
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Style definitions — one set per <Bar /> / <Line />, scoped to its unique id
 // ─────────────────────────────────────────────────────────────────────────────
 
 type StyleProps = {
-  id: string; // unique id of the owning series
-  dataKey: string; // series key the colors belong to
-};
+  id: string // unique id of the owning series
+  dataKey: string // series key the colors belong to
+}
 
 // Animated dashed-stroke effect, rendered as a child of the Recharts Line
 const AnimatedDashedStroke = () => {
@@ -1005,24 +942,14 @@ const AnimatedDashedStroke = () => {
         repeatCount="indefinite"
         keyTimes="0;0.5;1"
       />
-      <animate
-        attributeName="stroke-dashoffset"
-        values="0; -10"
-        dur="1s"
-        repeatCount="indefinite"
-        keyTimes="0;1"
-      />
+      <animate attributeName="stroke-dashoffset" values="0; -10" dur="1s" repeatCount="indefinite" keyTimes="0;1" />
     </>
-  );
-};
+  )
+}
 
 /** Vertical top-to-bottom color gradient — the fill source for every bar variant. */
-const VerticalColorGradient = ({
-  id,
-  dataKey,
-  config,
-}: StyleProps & { config: ChartConfig }) => {
-  const colorsCount = getColorsCount(config[dataKey] ?? {});
+const VerticalColorGradient = ({ id, dataKey, config }: StyleProps & { config: ChartConfig }) => {
+  const colorsCount = getColorsCount(config[dataKey] ?? {})
 
   return (
     <linearGradient id={`${id}-bar-colors`} x1="0" y1="0" x2="0" y2="1">
@@ -1033,27 +960,23 @@ const VerticalColorGradient = ({
         </>
       ) : (
         Array.from({ length: colorsCount }, (_, index) => {
-          const offset = `${(index / (colorsCount - 1)) * 100}%`;
+          const offset = `${(index / (colorsCount - 1)) * 100}%`
           return (
             <stop
               key={offset}
               offset={offset}
               stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
             />
-          );
+          )
         })
       )}
     </linearGradient>
-  );
-};
+  )
+}
 
 /** Horizontal left-to-right color gradient — the stroke source for a line series. */
-const HorizontalColorGradient = ({
-  id,
-  dataKey,
-  config,
-}: StyleProps & { config: ChartConfig }) => {
-  const colorsCount = getColorsCount(config[dataKey] ?? {});
+const HorizontalColorGradient = ({ id, dataKey, config }: StyleProps & { config: ChartConfig }) => {
+  const colorsCount = getColorsCount(config[dataKey] ?? {})
 
   return (
     <linearGradient id={`${id}-line-colors-${dataKey}`} x1="0" y1="0" x2="1" y2="0">
@@ -1064,19 +987,19 @@ const HorizontalColorGradient = ({
         </>
       ) : (
         Array.from({ length: colorsCount }, (_, index) => {
-          const offset = `${(index / (colorsCount - 1)) * 100}%`;
+          const offset = `${(index / (colorsCount - 1)) * 100}%`
           return (
             <stop
               key={offset}
               offset={offset}
               stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
             />
-          );
+          )
         })
       )}
     </linearGradient>
-  );
-};
+  )
+}
 
 /** Hatched diagonal-stripe fill for a bar, masked from the series color gradient. */
 const HatchedPattern = ({ id }: StyleProps) => {
@@ -1098,42 +1021,23 @@ const HatchedPattern = ({ id }: StyleProps) => {
         <rect width="100%" height="100%" fill={`url(#${id}-hatched-mask-pattern)`} />
       </mask>
       <pattern id={`${id}-hatched`} patternUnits="userSpaceOnUse" width="100%" height="100%">
-        <rect
-          width="100%"
-          height="100%"
-          fill={`url(#${id}-bar-colors)`}
-          mask={`url(#${id}-hatched-mask)`}
-        />
+        <rect width="100%" height="100%" fill={`url(#${id}-bar-colors)`} mask={`url(#${id}-hatched-mask)`} />
       </pattern>
     </>
-  );
-};
+  )
+}
 
 /** Two-tone fill that splits each bar into a light and a full-strength half. */
 const DuotonePattern = ({ id, dataKey, config }: StyleProps & { config: ChartConfig }) => {
-  const colorsCount = getColorsCount(config[dataKey] ?? {});
+  const colorsCount = getColorsCount(config[dataKey] ?? {})
 
   return (
     <>
-      <linearGradient
-        id={`${id}-duotone-mask-gradient`}
-        gradientUnits="objectBoundingBox"
-        x1="0"
-        y1="0"
-        x2="1"
-        y2="0"
-      >
+      <linearGradient id={`${id}-duotone-mask-gradient`} gradientUnits="objectBoundingBox" x1="0" y1="0" x2="1" y2="0">
         <stop offset="50%" stopColor="white" stopOpacity={0.4} />
         <stop offset="50%" stopColor="white" stopOpacity={1} />
       </linearGradient>
-      <linearGradient
-        id={`${id}-duotone-colors`}
-        gradientUnits="objectBoundingBox"
-        x1="0"
-        y1="0"
-        x2="0"
-        y2="1"
-      >
+      <linearGradient id={`${id}-duotone-colors`} gradientUnits="objectBoundingBox" x1="0" y1="0" x2="0" y2="1">
         {colorsCount === 1 ? (
           <>
             <stop offset="0%" stopColor={`var(--color-${dataKey}-0)`} />
@@ -1141,14 +1045,14 @@ const DuotonePattern = ({ id, dataKey, config }: StyleProps & { config: ChartCon
           </>
         ) : (
           Array.from({ length: colorsCount }, (_, index) => {
-            const offset = `${(index / (colorsCount - 1)) * 100}%`;
+            const offset = `${(index / (colorsCount - 1)) * 100}%`
             return (
               <stop
                 key={offset}
                 offset={offset}
                 stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
               />
-            );
+            )
           })
         )}
       </linearGradient>
@@ -1162,22 +1066,15 @@ const DuotonePattern = ({ id, dataKey, config }: StyleProps & { config: ChartCon
         width="1"
         height="1"
       >
-        <rect
-          x="0"
-          y="0"
-          width="1"
-          height="1"
-          fill={`url(#${id}-duotone-colors)`}
-          mask={`url(#${id}-duotone-mask)`}
-        />
+        <rect x="0" y="0" width="1" height="1" fill={`url(#${id}-duotone-colors)`} mask={`url(#${id}-duotone-mask)`} />
       </pattern>
     </>
-  );
-};
+  )
+}
 
 /** Two-tone fill mirrored from `duotone` — the full-strength half comes first. */
 const DuotoneReversePattern = ({ id, dataKey, config }: StyleProps & { config: ChartConfig }) => {
-  const colorsCount = getColorsCount(config[dataKey] ?? {});
+  const colorsCount = getColorsCount(config[dataKey] ?? {})
 
   return (
     <>
@@ -1192,14 +1089,7 @@ const DuotoneReversePattern = ({ id, dataKey, config }: StyleProps & { config: C
         <stop offset="50%" stopColor="white" stopOpacity={1} />
         <stop offset="50%" stopColor="white" stopOpacity={0.4} />
       </linearGradient>
-      <linearGradient
-        id={`${id}-duotone-reverse-colors`}
-        gradientUnits="objectBoundingBox"
-        x1="0"
-        y1="0"
-        x2="0"
-        y2="1"
-      >
+      <linearGradient id={`${id}-duotone-reverse-colors`} gradientUnits="objectBoundingBox" x1="0" y1="0" x2="0" y2="1">
         {colorsCount === 1 ? (
           <>
             <stop offset="0%" stopColor={`var(--color-${dataKey}-0)`} />
@@ -1207,25 +1097,19 @@ const DuotoneReversePattern = ({ id, dataKey, config }: StyleProps & { config: C
           </>
         ) : (
           Array.from({ length: colorsCount }, (_, index) => {
-            const offset = `${(index / (colorsCount - 1)) * 100}%`;
+            const offset = `${(index / (colorsCount - 1)) * 100}%`
             return (
               <stop
                 key={offset}
                 offset={offset}
                 stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
               />
-            );
+            )
           })
         )}
       </linearGradient>
       <mask id={`${id}-duotone-reverse-mask`} maskContentUnits="objectBoundingBox">
-        <rect
-          x="0"
-          y="0"
-          width="1"
-          height="1"
-          fill={`url(#${id}-duotone-reverse-mask-gradient)`}
-        />
+        <rect x="0" y="0" width="1" height="1" fill={`url(#${id}-duotone-reverse-mask-gradient)`} />
       </mask>
       <pattern
         id={`${id}-duotone-reverse`}
@@ -1244,8 +1128,8 @@ const DuotoneReversePattern = ({ id, dataKey, config }: StyleProps & { config: C
         />
       </pattern>
     </>
-  );
-};
+  )
+}
 
 /** Gradient fill for a bar that fades from visible at the top toward transparent. */
 const GradientPattern = ({ id }: StyleProps) => {
@@ -1259,16 +1143,11 @@ const GradientPattern = ({ id }: StyleProps) => {
         <rect width="100%" height="100%" fill={`url(#${id}-gradient-mask-gradient)`} />
       </mask>
       <pattern id={`${id}-gradient`} patternUnits="userSpaceOnUse" width="100%" height="100%">
-        <rect
-          width="100%"
-          height="100%"
-          fill={`url(#${id}-bar-colors)`}
-          mask={`url(#${id}-gradient-mask)`}
-        />
+        <rect width="100%" height="100%" fill={`url(#${id}-bar-colors)`} mask={`url(#${id}-gradient-mask)`} />
       </pattern>
     </>
-  );
-};
+  )
+}
 
 /** Low-opacity gradient fill paired with the solid top strip drawn by `CustomBar`. */
 const StrippedPattern = ({ id }: StyleProps) => {
@@ -1282,73 +1161,54 @@ const StrippedPattern = ({ id }: StyleProps) => {
         <rect width="100%" height="100%" fill={`url(#${id}-stripped-mask-gradient)`} />
       </mask>
       <pattern id={`${id}-stripped`} patternUnits="userSpaceOnUse" width="100%" height="100%">
-        <rect
-          width="100%"
-          height="100%"
-          fill={`url(#${id}-bar-colors)`}
-          mask={`url(#${id}-stripped-mask)`}
-        />
+        <rect width="100%" height="100%" fill={`url(#${id}-bar-colors)`} mask={`url(#${id}-stripped-mask)`} />
       </pattern>
     </>
-  );
-};
+  )
+}
 
 /** Soft outer-glow filter applied to a glowing bar. */
 const BarGlowFilter = ({ id }: { id: string }) => {
   return (
     <filter id={`${id}-glow`} x="-100%" y="-100%" width="300%" height="300%">
       <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
-      <feColorMatrix
-        in="blur"
-        type="matrix"
-        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.5 0"
-        result="glow"
-      />
+      <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.5 0" result="glow" />
       <feMerge>
         <feMergeNode in="glow" />
         <feMergeNode in="SourceGraphic" />
       </feMerge>
     </filter>
-  );
-};
+  )
+}
 
 /** Soft outer-glow filter applied to a glowing line. */
 const LineGlowFilter = ({ id }: { id: string }) => {
   return (
     <filter id={`${id}-glow`} x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
-      <feColorMatrix
-        in="blur"
-        type="matrix"
-        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 2 0"
-        result="glow"
-      />
+      <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 2 0" result="glow" />
       <feMerge>
         <feMergeNode in="glow" />
         <feMergeNode in="SourceGraphic" />
       </feMerge>
     </filter>
-  );
-};
+  )
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Loading skeleton
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Builds bell-curve eased gradient stops for the loading shimmer
-const generateEasedGradientStops = (
-  steps: number = 17,
-  minOpacity: number = 0.05,
-  maxOpacity: number = 0.9,
-) => {
+const generateEasedGradientStops = (steps: number = 17, minOpacity: number = 0.05, maxOpacity: number = 0.9) => {
   return Array.from({ length: steps }, (_, i) => {
-    const t = i / (steps - 1); // 0 to 1
+    const t = i / (steps - 1) // 0 to 1
     // Sine-based bell curve easing: peaks at center (t=0.5), smooth falloff at edges
-    const eased = Math.sin(t * Math.PI) ** 2;
-    const opacity = minOpacity + eased * (maxOpacity - minOpacity);
-    return { offset: `${(t * 100).toFixed(0)}%`, opacity: Number(opacity.toFixed(3)) };
-  });
-};
+    const eased = Math.sin(t * Math.PI) ** 2
+    const opacity = minOpacity + eased * (maxOpacity - minOpacity)
+    return { offset: `${(t * 100).toFixed(0)}%`, opacity: Number(opacity.toFixed(3)) }
+  })
+}
 
 /**
  * Hook to manage loading data with pixel-perfect shimmer synchronization.
@@ -1358,23 +1218,23 @@ const generateEasedGradientStops = (
  * timing drift issues from setTimeout/setInterval.
  */
 export function useLoadingData(isLoading: boolean, loadingBars: number = 12) {
-  const [loadingDataKey, setLoadingDataKey] = useState(false);
+  const [loadingDataKey, setLoadingDataKey] = useState(false)
 
   // Callback fired by motion.dev when the shimmer exits the visible area
   const onShimmerExit = useCallback(() => {
     if (isLoading) {
-      setLoadingDataKey((prev) => !prev);
+      setLoadingDataKey((prev) => !prev)
     }
-  }, [isLoading]);
+  }, [isLoading])
 
   const loadingData = useMemo(
     () => getLoadingData(loadingBars, 20, 80),
     // loadingDataKey toggle triggers re-computation when the shimmer exits
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loadingBars, loadingDataKey],
-  );
+    [loadingBars, loadingDataKey]
+  )
 
-  return { loadingData, onShimmerExit };
+  return { loadingData, onShimmerExit }
 }
 
 /**
@@ -1386,9 +1246,9 @@ const LoadingBar = ({
   barRadius,
   onShimmerExit,
 }: {
-  chartId: string;
-  barRadius: number;
-  onShimmerExit: () => void;
+  chartId: string
+  barRadius: number
+  onShimmerExit: () => void
 }) => {
   return (
     <>
@@ -1405,8 +1265,8 @@ const LoadingBar = ({
         <LoadingPattern chartId={chartId} onShimmerExit={onShimmerExit} />
       </defs>
     </>
-  );
-};
+  )
+}
 
 /**
  * Animated shimmer pattern for the loading skeleton.
@@ -1416,22 +1276,16 @@ const LoadingBar = ({
  * rect travels x from -1 to 2; onShimmerExit fires as it crosses x=1, letting the
  * data swap happen while the shimmer is off-screen for a seamless loop.
  */
-const LoadingPattern = ({
-  chartId,
-  onShimmerExit,
-}: {
-  chartId: string;
-  onShimmerExit: () => void;
-}) => {
-  const gradientStops = generateEasedGradientStops();
+const LoadingPattern = ({ chartId, onShimmerExit }: { chartId: string; onShimmerExit: () => void }) => {
+  const gradientStops = generateEasedGradientStops()
 
   // 1 (left buffer) + 1 (visible) + 1 (right buffer)
-  const patternWidth = 3;
-  const startX = -1;
-  const endX = 2;
+  const patternWidth = 3
+  const startX = -1
+  const endX = 2
 
   // Tracks the last x value to detect the exit threshold crossing
-  const lastXRef = useRef(startX);
+  const lastXRef = useRef(startX)
 
   return (
     <>
@@ -1464,15 +1318,15 @@ const LoadingPattern = ({
             repeatType: "loop",
           }}
           onUpdate={(latest) => {
-            const xValue = typeof latest.x === "number" ? latest.x : startX;
-            const lastX = lastXRef.current;
+            const xValue = typeof latest.x === "number" ? latest.x : startX
+            const lastX = lastXRef.current
 
             // Fire once per loop, when the shimmer fully exits the visible area
             if (xValue >= 1 && lastX < 1) {
-              onShimmerExit();
+              onShimmerExit()
             }
 
-            lastXRef.current = xValue;
+            lastXRef.current = xValue
           }}
         />
       </pattern>
@@ -1480,5 +1334,5 @@ const LoadingPattern = ({
         <rect width="100%" height="100%" fill={`url(#${chartId}-loading-pattern)`} />
       </mask>
     </>
-  );
-};
+  )
+}

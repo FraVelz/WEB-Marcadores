@@ -1,96 +1,88 @@
-"use client";
+"use client"
 
-import {
-  domAnimation,
-  LazyMotion,
-  m,
-  useMotionValue,
-  useMotionValueEvent,
-  useSpring,
-  useTransform,
-} from "motion/react";
-import { ResponsiveContainer, AreaChart, Area, LineChart, Line, BarChart, Bar } from "recharts";
-import { ChartStyle, getColorsCount, type ChartConfig } from "@/components/evilcharts/ui/chart";
-import { useCallback, type ComponentProps } from "react";
-import type { MotionValue } from "motion/react";
-import { cn } from "@/lib/utils";
-import * as React from "react";
+import { domAnimation, LazyMotion, m, useMotionValue, useMotionValueEvent, useSpring, useTransform } from "motion/react"
+import { ResponsiveContainer, AreaChart, Area, LineChart, Line, BarChart, Bar } from "recharts"
+import { ChartStyle, getColorsCount, type ChartConfig } from "@/components/evilcharts/ui/chart"
+import { useCallback, type ComponentProps } from "react"
+import type { MotionValue } from "motion/react"
+import { cn } from "@/lib/utils"
+import * as React from "react"
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
-type EvilBrushVariant = "line" | "area" | "bar";
-type CurveType = ComponentProps<typeof Area>["type"];
+type EvilBrushVariant = "line" | "area" | "bar"
+type CurveType = ComponentProps<typeof Area>["type"]
 
 interface EvilBrushRange {
-  startIndex: number;
-  endIndex: number;
+  startIndex: number
+  endIndex: number
 }
 
 interface EvilBrushProps {
   /** Full dataset – always rendered in the miniature chart */
-  data: Record<string, unknown>[];
+  data: Record<string, unknown>[]
   /** Chart config with colour definitions */
-  chartConfig: ChartConfig;
+  chartConfig: ChartConfig
   /** Data keys to plot (default: all keys from chartConfig) */
-  dataKeys?: string[];
+  dataKeys?: string[]
   /** X-axis data key – used for handle labels */
-  xDataKey?: string;
+  xDataKey?: string
   /** Visual variant of the mini chart */
-  variant?: EvilBrushVariant;
+  variant?: EvilBrushVariant
   /** Pixel height of the brush */
-  height?: number;
+  height?: number
   /** Extra className */
-  className?: string;
+  className?: string
   /** Whether areas/bars should be stacked in the mini chart */
-  stacked?: boolean;
+  stacked?: boolean
   /** Stroke variant for line / area strokes in the mini chart */
-  strokeVariant?: "solid" | "dashed" | "animated-dashed";
+  strokeVariant?: "solid" | "dashed" | "animated-dashed"
   /** Whether to connect null data points in line / area variants */
-  connectNulls?: boolean;
+  connectNulls?: boolean
   /** Radius for bar corners in the bar variant */
-  barRadius?: number;
+  barRadius?: number
 
   // ── Controlled mode ──────────────────────────────────────────────────
   /** Controlled start index */
-  startIndex?: number;
+  startIndex?: number
   /** Controlled end index */
-  endIndex?: number;
+  endIndex?: number
 
   // ── Uncontrolled mode ────────────────────────────────────────────────
   /** Initial start index (uncontrolled) */
-  defaultStartIndex?: number;
+  defaultStartIndex?: number
   /** Initial end index (uncontrolled) */
-  defaultEndIndex?: number;
+  defaultEndIndex?: number
 
   /** Fired whenever the visible range changes */
-  onChange?: (range: EvilBrushRange) => void;
+  onChange?: (range: EvilBrushRange) => void
   /** Format the handle label from the xDataKey value */
-  formatLabel?: (value: unknown, index: number) => string;
+  formatLabel?: (value: unknown, index: number) => string
   /** Curve type for line / area variants */
-  curveType?: CurveType;
+  curveType?: CurveType
   /** Minimum number of data points that must remain selected */
-  minSpan?: number;
+  minSpan?: number
   /** Whether to render labels on the handles */
-  showLabels?: boolean;
+  showLabels?: boolean
   /** Skip rendering own ChartStyle (when inside a ChartContainer that already provides CSS vars) */
-  skipStyle?: boolean;
+  skipStyle?: boolean
 }
 
 // ─── Spring config ──────────────────────────────────────────────────────────
 
-const SPRING_CONFIG = { stiffness: 300, damping: 35, mass: 0.8 };
+const SPRING_CONFIG = { stiffness: 300, damping: 35, mass: 0.8 }
 
 // ─── Pointer-capture drag hook ──────────────────────────────────────────────
 // Replaces raw addEventListener with the modern Pointer Events API.
 // setPointerCapture routes all pointer events to the originating element,
 // so we get mouse + touch + pen support with zero global listeners.
 
-type DragType = "left" | "right" | "middle";
+type DragType = "left" | "right" | "middle"
 
 interface DragState {
-  type: DragType;
-  originX: number;
-  originRange: EvilBrushRange;
+  type: DragType
+  originX: number
+  originRange: EvilBrushRange
 }
 
 function useBrushDrag({
@@ -99,69 +91,67 @@ function useBrushDrag({
   containerRef,
   commit,
 }: {
-  range: EvilBrushRange;
-  totalPoints: number;
-  containerRef: React.RefObject<HTMLDivElement | null>;
-  commit: (next: EvilBrushRange, mode?: DragType) => void;
+  range: EvilBrushRange
+  totalPoints: number
+  containerRef: React.RefObject<HTMLDivElement | null>
+  commit: (next: EvilBrushRange, mode?: DragType) => void
 }) {
-  const dragRef = React.useRef<DragState | null>(null);
-  const [isDragging, setIsDragging] = React.useState(false);
+  const dragRef = React.useRef<DragState | null>(null)
+  const [isDragging, setIsDragging] = React.useState(false)
 
   const toIndexDelta = useCallback(
     (px: number) => {
-      if (!containerRef.current || totalPoints <= 1) return 0;
-      return Math.round(
-        (px / containerRef.current.getBoundingClientRect().width) * (totalPoints - 1),
-      );
+      if (!containerRef.current || totalPoints <= 1) return 0
+      return Math.round((px / containerRef.current.getBoundingClientRect().width) * (totalPoints - 1))
     },
-    [totalPoints, containerRef],
-  );
+    [totalPoints, containerRef]
+  )
 
   const onPointerDown = useCallback(
     (e: React.PointerEvent, type: DragType) => {
-      e.preventDefault();
-      (e.target as HTMLElement).setPointerCapture(e.pointerId);
-      dragRef.current = { type, originX: e.clientX, originRange: { ...range } };
-      setIsDragging(true);
+      e.preventDefault()
+      ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+      dragRef.current = { type, originX: e.clientX, originRange: { ...range } }
+      setIsDragging(true)
     },
-    [range],
-  );
+    [range]
+  )
 
   const onPointerMove = useCallback(
     (e: React.PointerEvent) => {
-      const d = dragRef.current;
-      if (!d) return;
+      const d = dragRef.current
+      if (!d) return
 
-      const delta = toIndexDelta(e.clientX - d.originX);
-      const { type, originRange: o } = d;
+      const delta = toIndexDelta(e.clientX - d.originX)
+      const { type, originRange: o } = d
 
       if (type === "left") {
-        commit({ startIndex: o.startIndex + delta, endIndex: o.endIndex }, "left");
+        commit({ startIndex: o.startIndex + delta, endIndex: o.endIndex }, "left")
       } else if (type === "right") {
-        commit({ startIndex: o.startIndex, endIndex: o.endIndex + delta }, "right");
+        commit({ startIndex: o.startIndex, endIndex: o.endIndex + delta }, "right")
       } else {
-        const span = o.endIndex - o.startIndex;
-        let s = o.startIndex + delta;
-        let e2 = s + span;
+        const span = o.endIndex - o.startIndex
+        let s = o.startIndex + delta
+        let e2 = s + span
         if (s < 0) {
-          s = 0;
-          e2 = span;
+          s = 0
+          e2 = span
         }
         if (e2 > totalPoints - 1) {
-          e2 = totalPoints - 1;
-          s = Math.max(0, e2 - span);
+          e2 = totalPoints - 1
+          s = Math.max(0, e2 - span)
         }
-        commit({ startIndex: s, endIndex: e2 }, "middle");
+        commit({ startIndex: s, endIndex: e2 }, "middle")
       }
     },
-    [toIndexDelta, totalPoints, commit],
-  );
+    [toIndexDelta, totalPoints, commit]
+  )
 
   const onPointerUp = useCallback((e: React.PointerEvent) => {
-    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
-    dragRef.current = null;
-    setIsDragging(false);
-  }, []);
+    ;(e.target as HTMLElement).releasePointerCapture(e.pointerId)
+    dragRef.current = null
+    setIsDragging(false)
+  }, [])
 
   // Helper to bind all three pointer handlers for a given drag type
   const bind = useCallback(
@@ -170,10 +160,10 @@ function useBrushDrag({
       onPointerMove,
       onPointerUp,
     }),
-    [onPointerDown, onPointerMove, onPointerUp],
-  );
+    [onPointerDown, onPointerMove, onPointerUp]
+  )
 
-  return { isDragging, bind };
+  return { isDragging, bind }
 }
 
 // ─── EvilBrush ────────────────────────────────────────────────────────────
@@ -201,37 +191,34 @@ function EvilBrush({
   showLabels = true,
   skipStyle = false,
 }: EvilBrushProps) {
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const keys = React.useMemo(() => dataKeys ?? Object.keys(chartConfig), [dataKeys, chartConfig]);
-  const totalPoints = data.length;
-  const chartId = React.useId().replace(/:/g, "");
+  const containerRef = React.useRef<HTMLDivElement>(null)
+  const keys = React.useMemo(() => dataKeys ?? Object.keys(chartConfig), [dataKeys, chartConfig])
+  const totalPoints = data.length
+  const chartId = React.useId().replace(/:/g, "")
 
   // ── Controlled vs uncontrolled ──────────────────────────────────────────
 
-  const isControlled = controlledStart !== undefined && controlledEnd !== undefined;
+  const isControlled = controlledStart !== undefined && controlledEnd !== undefined
 
   const [internalRange, setInternalRange] = React.useState<EvilBrushRange>(() => ({
     startIndex: Math.max(0, Math.min(defaultStartIndex, totalPoints - 1)),
     endIndex: Math.max(0, Math.min(defaultEndIndex ?? totalPoints - 1, totalPoints - 1)),
-  }));
+  }))
 
   // Track the last committed range to avoid duplicate updates when small
   // mouse movements don't produce index changes (e.g., at boundaries)
-  const lastCommittedRef = React.useRef<EvilBrushRange>(internalRange);
+  const lastCommittedRef = React.useRef<EvilBrushRange>(internalRange)
 
-  const [prevTotalPoints, setPrevTotalPoints] = React.useState(totalPoints);
+  const [prevTotalPoints, setPrevTotalPoints] = React.useState(totalPoints)
   if (!isControlled && totalPoints !== prevTotalPoints) {
-    setPrevTotalPoints(totalPoints);
-    const maxIndex = Math.max(0, totalPoints - 1);
+    setPrevTotalPoints(totalPoints)
+    const maxIndex = Math.max(0, totalPoints - 1)
     const adjusted = {
       startIndex: Math.min(internalRange.startIndex, maxIndex),
       endIndex: Math.min(internalRange.endIndex, maxIndex),
-    };
-    if (
-      adjusted.startIndex !== internalRange.startIndex ||
-      adjusted.endIndex !== internalRange.endIndex
-    ) {
-      setInternalRange(adjusted);
+    }
+    if (adjusted.startIndex !== internalRange.startIndex || adjusted.endIndex !== internalRange.endIndex) {
+      setInternalRange(adjusted)
     }
   }
 
@@ -239,57 +226,57 @@ function EvilBrush({
 
   const clampRange = useCallback(
     (range: EvilBrushRange, mode?: DragType): EvilBrushRange => {
-      let { startIndex, endIndex } = range;
-      const maxIndex = Math.max(0, totalPoints - 1);
+      let { startIndex, endIndex } = range
+      const maxIndex = Math.max(0, totalPoints - 1)
 
-      startIndex = Math.max(0, Math.min(startIndex, maxIndex));
-      endIndex = Math.max(0, Math.min(endIndex, maxIndex));
+      startIndex = Math.max(0, Math.min(startIndex, maxIndex))
+      endIndex = Math.max(0, Math.min(endIndex, maxIndex))
 
       if (mode === "left") {
-        const maxStart = Math.max(0, endIndex - minSpan);
-        startIndex = Math.min(startIndex, maxStart);
-        return { startIndex, endIndex };
+        const maxStart = Math.max(0, endIndex - minSpan)
+        startIndex = Math.min(startIndex, maxStart)
+        return { startIndex, endIndex }
       }
 
       if (mode === "right") {
-        const minEnd = Math.min(maxIndex, startIndex + minSpan);
-        endIndex = Math.max(endIndex, minEnd);
-        return { startIndex, endIndex };
+        const minEnd = Math.min(maxIndex, startIndex + minSpan)
+        endIndex = Math.max(endIndex, minEnd)
+        return { startIndex, endIndex }
       }
 
       if (endIndex - startIndex < minSpan) {
-        endIndex = Math.min(startIndex + minSpan, maxIndex);
+        endIndex = Math.min(startIndex + minSpan, maxIndex)
         if (endIndex - startIndex < minSpan) {
-          startIndex = Math.max(0, endIndex - minSpan);
+          startIndex = Math.max(0, endIndex - minSpan)
         }
       }
-      return { startIndex, endIndex };
+      return { startIndex, endIndex }
     },
-    [totalPoints, minSpan],
-  );
+    [totalPoints, minSpan]
+  )
 
   const commit = useCallback(
     (next: EvilBrushRange, mode?: DragType) => {
-      const clamped = clampRange(next, mode);
-      const last = lastCommittedRef.current;
+      const clamped = clampRange(next, mode)
+      const last = lastCommittedRef.current
 
       // Only update if the range has actually changed — avoids unnecessary
       // re-renders when the brush is at a boundary and small mouse movements
       // don't produce index changes
       if (last.startIndex === clamped.startIndex && last.endIndex === clamped.endIndex) {
-        return;
+        return
       }
 
-      lastCommittedRef.current = clamped;
-      setInternalRange(clamped);
+      lastCommittedRef.current = clamped
+      setInternalRange(clamped)
       // Defer the parent callback — chart re-render happens at lower priority,
       // React can skip intermediate frames during fast drags
       React.startTransition(() => {
-        onChange?.(clamped);
-      });
+        onChange?.(clamped)
+      })
     },
-    [clampRange, onChange],
-  );
+    [clampRange, onChange]
+  )
 
   // ── Drag ────────────────────────────────────────────────────────────────
 
@@ -298,124 +285,124 @@ function EvilBrush({
     totalPoints,
     containerRef,
     commit,
-  });
+  })
 
   const [prevControlledRange, setPrevControlledRange] = React.useState({
     start: controlledStart,
     end: controlledEnd,
-  });
+  })
   if (
     isControlled &&
     !isDragging &&
     (controlledStart !== prevControlledRange.start || controlledEnd !== prevControlledRange.end)
   ) {
-    setPrevControlledRange({ start: controlledStart, end: controlledEnd });
-    setInternalRange({ startIndex: controlledStart, endIndex: controlledEnd });
+    setPrevControlledRange({ start: controlledStart, end: controlledEnd })
+    setInternalRange({ startIndex: controlledStart, endIndex: controlledEnd })
   }
 
-  const range = internalRange;
+  const range = internalRange
 
   // ── Computed positions (%) ──────────────────────────────────────────────
 
-  const leftPct = totalPoints > 1 ? (range.startIndex / (totalPoints - 1)) * 100 : 0;
-  const rightPct = totalPoints > 1 ? (range.endIndex / (totalPoints - 1)) * 100 : 100;
+  const leftPct = totalPoints > 1 ? (range.startIndex / (totalPoints - 1)) * 100 : 0
+  const rightPct = totalPoints > 1 ? (range.endIndex / (totalPoints - 1)) * 100 : 100
 
   // Drive all moving brush UI from the same springed edge values.
-  const leftTarget = useMotionValue(leftPct);
-  const rightTarget = useMotionValue(rightPct);
-  if (leftTarget.get() !== leftPct) leftTarget.set(leftPct);
-  if (rightTarget.get() !== rightPct) rightTarget.set(rightPct);
+  const leftTarget = useMotionValue(leftPct)
+  const rightTarget = useMotionValue(rightPct)
+  if (leftTarget.get() !== leftPct) leftTarget.set(leftPct)
+  if (rightTarget.get() !== rightPct) rightTarget.set(rightPct)
 
-  const leftSpring = useSpring(leftTarget, SPRING_CONFIG);
-  const rightSpring = useSpring(rightTarget, SPRING_CONFIG);
-  const leftPosition = useTransform(leftSpring, (v) => `${v}%`);
-  const rightPosition = useTransform(rightSpring, (v) => `${v}%`);
-  const leftOverlayWidth = useTransform(leftSpring, (v) => `${v}%`);
-  const rightOverlayWidth = useTransform(rightSpring, (v) => `${Math.max(0, 100 - v)}%`);
-  const selectedWidth = useMotionValue(`${Math.max(0, rightPct - leftPct)}%`);
+  const leftSpring = useSpring(leftTarget, SPRING_CONFIG)
+  const rightSpring = useSpring(rightTarget, SPRING_CONFIG)
+  const leftPosition = useTransform(leftSpring, (v) => `${v}%`)
+  const rightPosition = useTransform(rightSpring, (v) => `${v}%`)
+  const leftOverlayWidth = useTransform(leftSpring, (v) => `${v}%`)
+  const rightOverlayWidth = useTransform(rightSpring, (v) => `${Math.max(0, 100 - v)}%`)
+  const selectedWidth = useMotionValue(`${Math.max(0, rightPct - leftPct)}%`)
 
   const updateSelectedWidth = useCallback(() => {
-    selectedWidth.set(`${Math.max(0, rightSpring.get() - leftSpring.get())}%`);
-  }, [leftSpring, rightSpring, selectedWidth]);
+    selectedWidth.set(`${Math.max(0, rightSpring.get() - leftSpring.get())}%`)
+  }, [leftSpring, rightSpring, selectedWidth])
 
-  useMotionValueEvent(leftSpring, "change", updateSelectedWidth);
-  useMotionValueEvent(rightSpring, "change", updateSelectedWidth);
+  useMotionValueEvent(leftSpring, "change", updateSelectedWidth)
+  useMotionValueEvent(rightSpring, "change", updateSelectedWidth)
 
   const getLabel = useCallback(
     (idx: number) => {
-      if (!xDataKey) return String(idx);
-      const v = data[idx]?.[xDataKey];
-      return formatLabel ? formatLabel(v, idx) : String(v ?? idx);
+      if (!xDataKey) return String(idx)
+      const v = data[idx]?.[xDataKey]
+      return formatLabel ? formatLabel(v, idx) : String(v ?? idx)
     },
-    [data, xDataKey, formatLabel],
-  );
+    [data, xDataKey, formatLabel]
+  )
 
   // ── Render ──────────────────────────────────────────────────────────────
 
-  if (totalPoints === 0) return null;
+  if (totalPoints === 0) return null
 
   return (
     <LazyMotion features={domAnimation} strict>
-    <div
-      ref={containerRef}
-      data-chart={skipStyle ? undefined : chartId}
-      className={cn("group relative select-none", className)}
-      style={{ height }}
-    >
-      {!skipStyle && <ChartStyle id={chartId} config={chartConfig} />}
+      <div
+        ref={containerRef}
+        data-chart={skipStyle ? undefined : chartId}
+        className={cn("group relative select-none", className)}
+        style={{ height }}
+      >
+        {!skipStyle && <ChartStyle id={chartId} config={chartConfig} />}
 
-      {/* Mini chart – always shows all data */}
-      <div className="absolute inset-0 overflow-hidden rounded-md">
-        <MiniChart
-          data={data}
-          keys={keys}
-          chartConfig={chartConfig}
-          variant={variant}
-          curveType={curveType}
-          chartId={chartId}
-          stacked={stacked}
-          strokeVariant={strokeVariant === "animated-dashed" ? "dashed" : strokeVariant}
-          connectNulls={connectNulls}
-          barRadius={barRadius}
+        {/* Mini chart – always shows all data */}
+        <div className="absolute inset-0 overflow-hidden rounded-md">
+          <MiniChart
+            data={data}
+            keys={keys}
+            chartConfig={chartConfig}
+            variant={variant}
+            curveType={curveType}
+            chartId={chartId}
+            stacked={stacked}
+            strokeVariant={strokeVariant === "animated-dashed" ? "dashed" : strokeVariant}
+            connectNulls={connectNulls}
+            barRadius={barRadius}
+          />
+        </div>
+
+        {/* Dim overlay – left */}
+        <m.div
+          className="bg-background/70 pointer-events-none absolute inset-y-0 left-0 rounded-l-md backdrop-blur-[2px]"
+          style={{ width: leftOverlayWidth }}
+        />
+        {/* Dim overlay – right */}
+        <m.div
+          className="bg-background/70 pointer-events-none absolute inset-y-0 right-0 rounded-r-md backdrop-blur-[2px]"
+          style={{ width: rightOverlayWidth }}
+        />
+
+        {/* Selected region – draggable to pan */}
+        <m.div
+          className="absolute inset-y-0 cursor-grab touch-none rounded-sm border active:cursor-grabbing"
+          style={{ left: leftPosition, width: selectedWidth }}
+          {...bind("middle")}
+        />
+
+        {/* Left handle */}
+        <BrushHandle
+          side="left"
+          position={leftPosition}
+          label={showLabels ? getLabel(range.startIndex) : undefined}
+          bind={bind("left")}
+        />
+
+        {/* Right handle */}
+        <BrushHandle
+          side="right"
+          position={rightPosition}
+          label={showLabels ? getLabel(range.endIndex) : undefined}
+          bind={bind("right")}
         />
       </div>
-
-      {/* Dim overlay – left */}
-      <m.div
-        className="bg-background/70 pointer-events-none absolute inset-y-0 left-0 rounded-l-md backdrop-blur-[2px]"
-        style={{ width: leftOverlayWidth }}
-      />
-      {/* Dim overlay – right */}
-      <m.div
-        className="bg-background/70 pointer-events-none absolute inset-y-0 right-0 rounded-r-md backdrop-blur-[2px]"
-        style={{ width: rightOverlayWidth }}
-      />
-
-      {/* Selected region – draggable to pan */}
-      <m.div
-        className="absolute inset-y-0 cursor-grab touch-none rounded-sm border active:cursor-grabbing"
-        style={{ left: leftPosition, width: selectedWidth }}
-        {...bind("middle")}
-      />
-
-      {/* Left handle */}
-      <BrushHandle
-        side="left"
-        position={leftPosition}
-        label={showLabels ? getLabel(range.startIndex) : undefined}
-        bind={bind("left")}
-      />
-
-      {/* Right handle */}
-      <BrushHandle
-        side="right"
-        position={rightPosition}
-        label={showLabels ? getLabel(range.endIndex) : undefined}
-        bind={bind("right")}
-      />
-    </div>
     </LazyMotion>
-  );
+  )
 }
 
 // ─── Brush Handle ───────────────────────────────────────────────────────────
@@ -426,30 +413,30 @@ function BrushHandle({
   label,
   bind,
 }: {
-  side: "left" | "right";
-  position: MotionValue<string>;
-  label?: string;
+  side: "left" | "right"
+  position: MotionValue<string>
+  label?: string
   bind: {
-    onPointerDown: (e: React.PointerEvent) => void;
-    onPointerMove: (e: React.PointerEvent) => void;
-    onPointerUp: (e: React.PointerEvent) => void;
-  };
+    onPointerDown: (e: React.PointerEvent) => void
+    onPointerMove: (e: React.PointerEvent) => void
+    onPointerUp: (e: React.PointerEvent) => void
+  }
 }) {
-  const isLeft = side === "left";
+  const isLeft = side === "left"
 
   return (
     <m.div className="absolute inset-y-0 z-10" style={{ left: position }}>
       <div
         className={cn(
           "group absolute inset-y-0 flex w-3 cursor-ew-resize touch-none items-center justify-center after:absolute after:inset-y-0 after:-left-4 after:w-11 after:content-['']",
-          isLeft ? "" : "-translate-x-full",
+          isLeft ? "" : "-translate-x-full"
         )}
         {...bind}
       >
         <div
           className={cn(
             "bg-muted-foreground group-hover:bg-foreground relative flex h-4 w-1.5 items-center justify-center rounded-md transition-colors",
-            isLeft ? "-left-[5.5px]" : "-right-[5.5px]",
+            isLeft ? "-left-[5.5px]" : "-right-[5.5px]"
           )}
         >
           <div className="flex flex-col gap-[2px]">
@@ -464,14 +451,14 @@ function BrushHandle({
         <div
           className={cn(
             "bg-foreground text-background pointer-events-none absolute -bottom-3 -translate-y-1/2 rounded-[3px] px-1 py-px text-[8px] leading-tight font-medium whitespace-nowrap opacity-0 group-hover:opacity-100",
-            isLeft ? "left-1.5" : "right-1.5",
+            isLeft ? "left-1.5" : "right-1.5"
           )}
         >
           {label}
         </div>
       )}
     </m.div>
-  );
+  )
 }
 
 // ─── Mini Chart ─────────────────────────────────────────────────────────────
@@ -488,29 +475,28 @@ function MiniChart({
   connectNulls = false,
   barRadius,
 }: {
-  data: Record<string, unknown>[];
-  keys: string[];
-  chartConfig: ChartConfig;
-  variant: EvilBrushVariant;
-  curveType: CurveType;
-  chartId: string;
-  stacked: boolean;
-  strokeVariant?: "solid" | "dashed" | "animated-dashed";
-  connectNulls?: boolean;
-  barRadius?: number;
+  data: Record<string, unknown>[]
+  keys: string[]
+  chartConfig: ChartConfig
+  variant: EvilBrushVariant
+  curveType: CurveType
+  chartId: string
+  stacked: boolean
+  strokeVariant?: "solid" | "dashed" | "animated-dashed"
+  connectNulls?: boolean
+  barRadius?: number
 }) {
   const gradients = React.useMemo(() => {
-    const keySet = new Set(keys);
-    const entries: { dataKey: string; colorsCount: number }[] = [];
+    const keySet = new Set(keys)
+    const entries: { dataKey: string; colorsCount: number }[] = []
     for (const [dataKey, config] of Object.entries(chartConfig)) {
-      if (!keySet.has(dataKey)) continue;
-      entries.push({ dataKey, colorsCount: getColorsCount(config) });
+      if (!keySet.has(dataKey)) continue
+      entries.push({ dataKey, colorsCount: getColorsCount(config) })
     }
-    return entries;
-  }, [chartConfig, keys]);
+    return entries
+  }, [chartConfig, keys])
 
-  const dashArray =
-    strokeVariant === "dashed" || strokeVariant === "animated-dashed" ? "4 4" : undefined;
+  const dashArray = strokeVariant === "dashed" || strokeVariant === "animated-dashed" ? "4 4" : undefined
 
   const defsContent = (
     <>
@@ -536,7 +522,7 @@ function MiniChart({
                 stopColor={`var(--color-${dataKey}-${i}, var(--color-${dataKey}-0))`}
               />
             ))
-          );
+          )
 
         return (
           <React.Fragment key={dataKey}>
@@ -551,12 +537,7 @@ function MiniChart({
                 <mask id={`${chartId}-zm-fill-mask-${dataKey}`}>
                   <rect width="100%" height="100%" fill={`url(#${chartId}-zm-vertical-fade)`} />
                 </mask>
-                <pattern
-                  id={`${chartId}-zm-fill-${dataKey}`}
-                  patternUnits="userSpaceOnUse"
-                  width="100%"
-                  height="100%"
-                >
+                <pattern id={`${chartId}-zm-fill-${dataKey}`} patternUnits="userSpaceOnUse" width="100%" height="100%">
                   <rect
                     width="100%"
                     height="100%"
@@ -567,10 +548,10 @@ function MiniChart({
               </>
             )}
           </React.Fragment>
-        );
+        )
       })}
     </>
-  );
+  )
 
   if (variant === "line") {
     return (
@@ -594,19 +575,14 @@ function MiniChart({
           ))}
         </LineChart>
       </ResponsiveContainer>
-    );
+    )
   }
 
   if (variant === "bar") {
-    const r = barRadius ?? 3;
+    const r = barRadius ?? 3
     return (
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart
-          data={data}
-          margin={{ top: 2, right: 0, bottom: 0, left: 0 }}
-          barGap={2}
-          barSize={14}
-        >
+        <BarChart data={data} margin={{ top: 2, right: 0, bottom: 0, left: 0 }} barGap={2} barSize={14}>
           <defs>{defsContent}</defs>
           {keys.map((dk) => (
             <Bar
@@ -621,7 +597,7 @@ function MiniChart({
           ))}
         </BarChart>
       </ResponsiveContainer>
-    );
+    )
   }
 
   // Default: area
@@ -649,7 +625,7 @@ function MiniChart({
         ))}
       </AreaChart>
     </ResponsiveContainer>
-  );
+  )
 }
 
 // ─── useEvilBrush Hook ──────────────────────────────────────────────────────
@@ -659,34 +635,34 @@ function useEvilBrush<TData extends Record<string, unknown>>({
   defaultStartIndex = 0,
   defaultEndIndex,
 }: {
-  data: TData[];
-  defaultStartIndex?: number;
-  defaultEndIndex?: number;
+  data: TData[]
+  defaultStartIndex?: number
+  defaultEndIndex?: number
 }) {
   const [range, setRange] = React.useState<EvilBrushRange>({
     startIndex: defaultStartIndex,
     endIndex: defaultEndIndex ?? Math.max(0, data.length - 1),
-  });
+  })
 
   // Defer the range used for data slicing — the brush handles move at the
 
   // immediate `range` cadence while the expensive chart re-render uses the
   // deferred value.  React can skip intermediate slices during fast drags.
-  const deferredRange = React.useDeferredValue(range);
+  const deferredRange = React.useDeferredValue(range)
 
-  const [prevDataLength, setPrevDataLength] = React.useState(data.length);
+  const [prevDataLength, setPrevDataLength] = React.useState(data.length)
   if (data.length !== prevDataLength) {
-    setPrevDataLength(data.length);
+    setPrevDataLength(data.length)
     setRange({
       startIndex: 0,
       endIndex: Math.max(0, data.length - 1),
-    });
+    })
   }
 
   const visibleData = React.useMemo(
     () => data.slice(deferredRange.startIndex, deferredRange.endIndex + 1),
-    [data, deferredRange.startIndex, deferredRange.endIndex],
-  );
+    [data, deferredRange.startIndex, deferredRange.endIndex]
+  )
 
   return {
     range,
@@ -696,7 +672,7 @@ function useEvilBrush<TData extends Record<string, unknown>>({
       endIndex: range.endIndex,
       onChange: setRange,
     } satisfies Pick<EvilBrushProps, "startIndex" | "endIndex" | "onChange">,
-  };
+  }
 }
 
-export { EvilBrush, useEvilBrush, type EvilBrushProps, type EvilBrushRange, type EvilBrushVariant };
+export { EvilBrush, useEvilBrush, type EvilBrushProps, type EvilBrushRange, type EvilBrushVariant }

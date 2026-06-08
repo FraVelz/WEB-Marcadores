@@ -13,13 +13,7 @@ type StatPieChartProps = {
   valueSuffix?: string
 }
 
-export function StatPieChart({
-  caption,
-  slices,
-  config,
-  emptyLabel = "Sin datos",
-  valueSuffix,
-}: StatPieChartProps) {
+export function StatPieChart({ caption, slices, config, emptyLabel = "Sin datos", valueSuffix }: StatPieChartProps) {
   const visible = slices.filter((slice) => slice.value > 0)
 
   if (visible.length === 0) {
