@@ -40,7 +40,7 @@ function ChartLegendContent({
   return (
     <div
       className={cn(
-        "flex items-center gap-4 select-none",
+        "flex w-full min-w-0 flex-wrap items-center gap-x-3 gap-y-2 px-1 select-none",
         align === "left" && "justify-start",
         align === "center" && "justify-center",
         align === "right" && "justify-end",
@@ -69,7 +69,7 @@ function ChartLegendContent({
             <div
               key={key}
               className={cn(
-                "[&>svg]:text-muted-foreground flex items-center gap-1.5 transition-opacity [&>svg]:h-3 [&>svg]:w-3",
+                "[&>svg]:text-muted-foreground flex max-w-full min-w-0 items-center gap-1.5 transition-opacity [&>svg]:h-3 [&>svg]:w-3",
                 !isSelected && "opacity-30",
                 isClickable && "cursor-pointer",
               )}
@@ -88,7 +88,12 @@ function ChartLegendContent({
                   colorsCount={colorsCount}
                 />
               )}
-              {itemConfig?.label}
+              <span
+                className="text-muted-foreground max-w-[9.5rem] text-xs leading-tight break-words"
+                title={typeof itemConfig?.label === "string" ? itemConfig.label : undefined}
+              >
+                {itemConfig?.label}
+              </span>
             </div>
           );
         })}

@@ -307,20 +307,28 @@ type TooltipProps = {
 /**
  * The hover tooltip. Hidden automatically while the chart is loading.
  */
-export function Tooltip({ variant, roundness, defaultIndex }: TooltipProps) {
-  const { isLoading, nameKey } = usePieChart();
+export function Tooltip({ variant, roundness, defaultIndex: defaultIndexProp }: TooltipProps) {
+  const { isLoading, nameKey, data, selectedSector } = usePieChart();
 
   if (isLoading) return null;
 
+  const selectedIndex = selectedSector
+    ? data.findIndex((item) => (item[nameKey] as string) === selectedSector)
+    : -1;
+  const pinnedIndex = selectedIndex >= 0 ? selectedIndex : defaultIndexProp;
+
   return (
     <ChartTooltip
-      defaultIndex={defaultIndex}
+      trigger="click"
+      defaultIndex={pinnedIndex}
+      active={selectedIndex >= 0 ? true : undefined}
       content={
         <ChartTooltipContent
           nameKey={nameKey}
           hideLabel
           roundness={roundness}
           variant={variant}
+          selected={selectedSector}
         />
       }
     />

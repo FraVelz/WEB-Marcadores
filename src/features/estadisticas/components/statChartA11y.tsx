@@ -1,36 +1,13 @@
 import type { StatCountRow } from "@/features/estadisticas/computeEstadisticas"
 
-export function StatChartSrTable({
-  caption,
-  rows,
-  valueHeader,
-  valueSuffix,
-}: {
-  caption: string
-  rows: StatCountRow[]
-  valueHeader: string
-  valueSuffix?: string
-}) {
-  return (
-    <table className="sr-only">
-      <caption>{caption}</caption>
-      <thead>
-        <tr>
-          <th scope="col">Etiqueta</th>
-          <th scope="col">{valueHeader}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((row) => (
-          <tr key={`${row.label}::${row.hint ?? ""}`}>
-            <th scope="row">{row.label}</th>
-            <td>
-              {row.value.toLocaleString("es")}
-              {valueSuffix ? ` ${valueSuffix}` : ""}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  )
+export function buildStatChartAriaLabel(
+  caption: string,
+  rows: StatCountRow[],
+  options?: { valueSuffix?: string }
+): string {
+  const suffix = options?.valueSuffix ? ` ${options.valueSuffix}` : ""
+  const details = rows
+    .map((row) => `${row.label}: ${row.value.toLocaleString("es")}${suffix}`)
+    .join("; ")
+  return details ? `${caption}. ${details}` : caption
 }

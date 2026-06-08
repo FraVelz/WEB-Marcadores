@@ -1,18 +1,15 @@
 "use client"
 
-import { useId } from "react"
-
 import type { StatCountRow } from "@/features/estadisticas/computeEstadisticas"
 
-import { StatChartSrTable } from "@/features/estadisticas/components/statChartA11y"
+import { buildStatChartAriaLabel } from "@/features/estadisticas/components/statChartA11y"
 
 type StatBarChartProps = {
   rows: StatCountRow[]
-  /** Título accesible del gráfico (tabla oculta + figcaption). */
+  /** Título accesible del gráfico. */
   caption: string
   emptyLabel?: string
   valueSuffix?: string
-  valueHeader?: string
 }
 
 export function StatBarChart({
@@ -20,10 +17,7 @@ export function StatBarChart({
   caption,
   emptyLabel = "Sin datos",
   valueSuffix,
-  valueHeader = "Cantidad",
 }: StatBarChartProps) {
-  const captionId = useId()
-
   if (rows.length === 0) {
     return (
       <p className="text-app-fg-muted border-app-border-muted bg-app-raised rounded-xl border px-4 py-6 text-sm">
@@ -36,16 +30,10 @@ export function StatBarChart({
 
   return (
     <figure
-      className="border-app-border-muted bg-app-raised rounded-xl border p-3 sm:p-4"
-      aria-labelledby={captionId}
+      className="border-app-border-muted bg-app-raised relative overflow-hidden rounded-xl border p-3 sm:p-4"
+      aria-label={buildStatChartAriaLabel(caption, rows, { valueSuffix })}
     >
-      <figcaption id={captionId} className="sr-only">
-        {caption}
-      </figcaption>
-
-      <StatChartSrTable caption={caption} rows={rows} valueHeader={valueHeader} valueSuffix={valueSuffix} />
-
-      <ol className="flex flex-col gap-2.5" aria-hidden="true">
+      <ol className="flex flex-col gap-2.5">
         {rows.map((row) => (
           <li key={`${row.label}::${row.hint ?? ""}`}>
             <div className="mb-1 flex items-baseline justify-between gap-2 text-sm">

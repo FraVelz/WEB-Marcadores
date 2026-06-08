@@ -255,6 +255,11 @@ html.app-wallpaper body {
   }
 }
 
+/** Tooltips de Recharts fuera del flujo al desactivarse (scroll en /estadisticas). */
+[data-slot="chart"] .recharts-tooltip-wrapper {
+  pointer-events: none;
+}
+
 /** Barras de /estadisticas: `<meter>` nativo, sin chart.js ni canvas. */
 .stat-meter {
   display: block;
