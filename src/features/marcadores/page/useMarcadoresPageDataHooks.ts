@@ -81,9 +81,12 @@ export function useMarcadoresPageDataHooks() {
   const b = useMarcadoresPageBookmarksBootstrap({
     dash: { setFolders: setCtxFolders, refreshFolders, refreshTags },
     activeBrowseFolderId: browseScope.folderId,
+    dashboardSelectedFolderId: selectedFolderId,
+    setGlobalSelectedFolderId: setSelectedFolderId,
     desktopWindowChrome,
     deskLibWinIds,
     deskFolderByWin,
+    setDeskFolderByWin,
     deskUiByWin,
     setDetailBookmark: libraryPaneScope.bindings.setDetailBookmark,
     searchValue: desktopWindowChrome ? "" : paneUi.searchValue,

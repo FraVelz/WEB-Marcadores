@@ -106,7 +106,7 @@ export function MarcadoresDesktopLibraryPaneBody(props: MarcadoresDesktopLibrary
       getDeskItemRefs(winId).current.clear()
       updateDeskUi(winId, (s) => ({ ...s, selectedIndex: 0 }))
     })
-  }, [ui.viewMode, winId, getDeskItemRefs, updateDeskUi])
+  }, [paneFolderId, ui.viewMode, winId, getDeskItemRefs, updateDeskUi])
 
   useEffect(() => {
     if (panePrimaryMode !== "tree") return

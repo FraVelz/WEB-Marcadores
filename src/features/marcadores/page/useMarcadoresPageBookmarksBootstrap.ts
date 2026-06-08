@@ -18,9 +18,12 @@ type DashPick = Pick<DashboardContextType, "setFolders" | "refreshFolders" | "re
 export function useMarcadoresPageBookmarksBootstrap(p: {
   dash: DashPick
   activeBrowseFolderId: string | null
+  dashboardSelectedFolderId: string | null
+  setGlobalSelectedFolderId: (id: string | null) => void
   desktopWindowChrome: boolean
   deskLibWinIds: string[]
   deskFolderByWin: Record<string, string | null>
+  setDeskFolderByWin: React.Dispatch<React.SetStateAction<Record<string, string | null>>>
   deskUiByWin: Record<string, DeskLibraryPaneUiState>
   setDetailBookmark: React.Dispatch<React.SetStateAction<Bookmark | null>>
   searchValue: string
@@ -51,6 +54,10 @@ export function useMarcadoresPageBookmarksBootstrap(p: {
     refreshTags: p.dash.refreshTags,
     fetchData: data.fetchData,
     selectedFolderId: p.activeBrowseFolderId,
+    dashboardSelectedFolderId: p.dashboardSelectedFolderId,
+    setGlobalSelectedFolderId: p.setGlobalSelectedFolderId,
+    deskFolderByWin: p.deskFolderByWin,
+    setDeskFolderByWin: p.setDeskFolderByWin,
     setDetailBookmark: p.setDetailBookmark,
   })
 

@@ -4,6 +4,7 @@ import { useCallback } from "react"
 import { useDashboard } from "@/contexts/DashboardContext"
 import { createClient } from "@/lib/supabase/client"
 import { buildFolderTree } from "../utils/utils"
+import { repointBrowseAfterFolderDelete } from "../utils/folderBrowseRepoint"
 import { collectFolderSubtreeIds } from "../utils/folderDescendants"
 import type { Bookmark } from "../utils/types"
 
@@ -23,6 +24,10 @@ export function useMarcadoresActions({
   refreshTags,
   fetchData,
   selectedFolderId,
+  dashboardSelectedFolderId,
+  setGlobalSelectedFolderId,
+  deskFolderByWin,
+  setDeskFolderByWin,
   setDetailBookmark,
 }: UseMarcadoresActionsParams) {
   void bookmarks
@@ -99,6 +104,15 @@ export function useMarcadoresActions({
       const parentId = folders.find((f) => f.id === folderId)?.parent_id ?? null
       const descendantIds = collectFolderSubtreeIds(folders, folderId)
 
+      repointBrowseAfterFolderDelete({
+        deletedSubtreeIds: descendantIds,
+        fallbackParentId: parentId,
+        globalSelectedFolderId: dashboardSelectedFolderId,
+        setGlobalSelectedFolderId,
+        deskFolderByWin,
+        setDeskFolderByWin,
+      })
+
       if (demoMode) {
         setBookmarks((prev) =>
           prev.map((b) => (b.folder_id && descendantIds.has(b.folder_id) ? { ...b, folder_id: parentId } : b))
@@ -117,7 +131,20 @@ export function useMarcadoresActions({
       ])
       await fetchData()
     },
-    [demoMode, folders, supabase, setBookmarks, setFolders, setCtxFolders, refreshFolders, fetchData]
+    [
+      demoMode,
+      dashboardSelectedFolderId,
+      deskFolderByWin,
+      folders,
+      setDeskFolderByWin,
+      setGlobalSelectedFolderId,
+      supabase,
+      setBookmarks,
+      setFolders,
+      setCtxFolders,
+      refreshFolders,
+      fetchData,
+    ]
   )
 
   const handleBookmarkUpdate = useCallback(
