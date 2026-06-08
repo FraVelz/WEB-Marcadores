@@ -15,6 +15,8 @@ import {
   INITIAL_DESK_SHELL,
   type DeskShellState,
 } from "@/features/marcadores/desktop/marcadoresDeskShellReducer"
+import { MARCADORES_DESK_WINDOW_Z_START } from "@/features/marcadores/utils/layerZIndex"
+
 import {
   MarcadoresDesktopShellCanvas,
   MIN_CANVAS,
@@ -105,7 +107,7 @@ export function MarcadoresDesktopShell({
     libIdsRef.current = libraryWindowIds
   }, [libraryWindowIds])
 
-  const zSeqRef = useRef(120)
+  const zSeqRef = useRef(MARCADORES_DESK_WINDOW_Z_START)
   const hydratedRef = useRef(false)
 
   useDeskPersistSchedule({ libraryWindowIds, libFrames, detailFrame })

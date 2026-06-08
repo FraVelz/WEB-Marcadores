@@ -1,6 +1,8 @@
 "use client"
 
-import { useRef, type Dispatch, type MutableRefObject, type RefObject, type SetStateAction } from "react"
+import type { Dispatch, MutableRefObject, RefObject, SetStateAction } from "react"
+
+import { useLiveRef } from "@/lib/hooks/useLiveRef"
 
 import type { Folder } from "@/contexts/DashboardContext"
 import { findFolderInTree, folderHasChildren } from "@/layouts/dashboard/sidebar/sidebarTreeUtils"
@@ -34,14 +36,9 @@ export function useDashboardSidebarHotkeys(params: Params) {
     editFolderRef,
   } = params
 
-  const flatSidebarItemsRef = useRef(flatSidebarItems)
-  flatSidebarItemsRef.current = flatSidebarItems
-
-  const selectedFolderIdRef = useRef(selectedFolderId)
-  selectedFolderIdRef.current = selectedFolderId
-
-  const collapsedIdsRef = useRef(collapsedIds)
-  collapsedIdsRef.current = collapsedIds
+  const flatSidebarItemsRef = useLiveRef(flatSidebarItems)
+  const selectedFolderIdRef = useLiveRef(selectedFolderId)
+  const collapsedIdsRef = useLiveRef(collapsedIds)
 
   useHotkeysOnElement(
     elementRef,

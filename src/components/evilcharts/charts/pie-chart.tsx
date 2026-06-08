@@ -35,7 +35,7 @@ import {
   Sector,
   type PieSectorShapeProps,
 } from "recharts";
-import { motion } from "motion/react";
+import { domAnimation, LazyMotion, m } from "motion/react";
 
 // Constants
 const LOADING_SECTORS = 5;
@@ -120,7 +120,8 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
   onSelectionChange,
   isLoading = false,
 }: EvilPieChartProps<TData>) {
-  const [selectedSector, setSelectedSector] = useState<string | null>(defaultSelectedSector);
+  const [selectedSector, setSelectedSector] = useState<string | null>(null);
+  const activeSelectedSector = selectedSector ?? defaultSelectedSector;
 
   // Updates selection state and notifies the parent with the sector's value
   const selectSector = useCallback(
@@ -148,21 +149,23 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
       dataKey,
       nameKey,
       isLoading,
-      selectedSector,
+      selectedSector: activeSelectedSector,
       selectSector,
     }),
-    [config, data, dataKey, nameKey, isLoading, selectedSector, selectSector],
+    [config, data, dataKey, nameKey, isLoading, activeSelectedSector, selectSector],
   );
 
   return (
-    <PieChartContext value={contextValue}>
-      <ChartContainer className={className} config={config}>
-        <LoadingIndicator isLoading={isLoading} />
-        <RechartsPieChart id="evil-charts-pie-chart" accessibilityLayer {...chartProps}>
-          {children}
-        </RechartsPieChart>
-      </ChartContainer>
-    </PieChartContext>
+    <LazyMotion features={domAnimation} strict>
+      <PieChartContext value={contextValue}>
+        <ChartContainer className={className} config={config}>
+          <LoadingIndicator isLoading={isLoading} />
+          <RechartsPieChart id="evil-charts-pie-chart" accessibilityLayer {...chartProps}>
+            {children}
+          </RechartsPieChart>
+        </ChartContainer>
+      </PieChartContext>
+    </LazyMotion>
   );
 }
 
@@ -526,7 +529,7 @@ const AnimatedLoadingSector = (props: ComponentProps<typeof Sector> & { index?: 
   const delay = (index / LOADING_SECTORS) * (LOADING_ANIMATION_DURATION / 1000);
 
   return (
-    <motion.g
+    <m.g
       initial={{ opacity: 0.15 }}
       animate={{ opacity: [0.15, 0.5, 0.15] }}
       transition={{
@@ -537,6 +540,6 @@ const AnimatedLoadingSector = (props: ComponentProps<typeof Sector> & { index?: 
       }}
     >
       <Sector {...sectorProps} fill="currentColor" />
-    </motion.g>
+    </m.g>
   );
 };

@@ -4,9 +4,6 @@ import type { GridItem } from "@/features/marcadores/utils/types"
 
 export const BOOKMARK_DRAG_TYPE = "bookmark-item" as const
 
-/** @deprecated Use BOOKMARK_DRAG_TYPE — kept for legacy MIME checks. */
-export const BOOKMARK_DRAG_MIME_TYPE = "application/x-bookmark-item"
-
 export type BookmarkDragData = {
   bookmarkDragType: typeof BOOKMARK_DRAG_TYPE
   itemKind: "folder" | "link"
@@ -76,20 +73,6 @@ export function isBookmarkDragData(data: Record<string, unknown>): data is Bookm
 
 export function isBookmarkDragSource(source: Pick<ElementDragPayload, "data">): boolean {
   return isBookmarkDragData(source.data)
-}
-
-/** @deprecated Prefer isBookmarkDragSource with pragmatic-drag-and-drop. */
-export function isBookmarkDragTransfer(dt: DataTransfer): boolean {
-  return [...dt.types].includes(BOOKMARK_DRAG_MIME_TYPE)
-}
-
-/** @deprecated Prefer dragDataToGridItem. */
-export function parseBookmarkDragPayload(raw: string): GridItem | null {
-  try {
-    return dragDataToGridItem(JSON.parse(raw) as Record<string, unknown>)
-  } catch {
-    return null
-  }
 }
 
 export function readDropTargetFolderId(data: Record<string, unknown>): string | null | undefined {

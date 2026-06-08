@@ -1,10 +1,23 @@
 "use client"
 
+import dynamic from "next/dynamic"
+
 import { StatBarChart } from "@/features/estadisticas/components/StatBarChart"
-import { StatMonthlyComposedChart } from "@/features/estadisticas/components/StatMonthlyComposedChart"
 import { StatBookmarkList, StatDuplicateList } from "@/features/estadisticas/components/StatBookmarkList"
 import { StatKpiGrid } from "@/features/estadisticas/components/StatKpiGrid"
-import { StatPieChart } from "@/features/estadisticas/components/StatPieChart"
+
+const StatPieChart = dynamic(
+  () => import("@/features/estadisticas/components/StatPieChart").then((m) => ({ default: m.StatPieChart })),
+  { ssr: false }
+)
+
+const StatMonthlyComposedChart = dynamic(
+  () =>
+    import("@/features/estadisticas/components/StatMonthlyComposedChart").then((m) => ({
+      default: m.StatMonthlyComposedChart,
+    })),
+  { ssr: false }
+)
 import { statRowsToPieModel } from "@/features/estadisticas/components/statPieChartData"
 import { StatSection } from "@/features/estadisticas/components/StatSection"
 import { StatSegmentBreakdown } from "@/features/estadisticas/components/StatSegmentBreakdown"

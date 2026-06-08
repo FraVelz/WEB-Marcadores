@@ -1,4 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": ["public/appearance-init.js"]
+  "entry": ["public/appearance-init.js"],
+  "ignore": ["src/components/evilcharts/**"],
+  "ignoreExportsUsedInFile": true
 }

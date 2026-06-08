@@ -19,6 +19,50 @@ const variantMap: Record<TooltipVariant, string> = {
   "frosted-glass": "border-app-border bg-app-raised/90 text-app-fg backdrop-blur-sm",
 };
 
+type TooltipPayload = NonNullable<
+  React.ComponentProps<typeof RechartsPrimitive.DefaultTooltipContent>["payload"]
+>;
+
+type TooltipLabelProps = {
+  hideLabel: boolean;
+  payload: TooltipPayload;
+  label?: React.ReactNode;
+  labelFormatter?: RechartsPrimitive.DefaultTooltipContentProps<ValueType, NameType>["labelFormatter"];
+  labelClassName?: string;
+  labelKey?: string;
+};
+
+function TooltipLabel({
+  hideLabel,
+  payload,
+  label,
+  labelFormatter,
+  labelClassName,
+  labelKey,
+}: TooltipLabelProps) {
+  const { config } = useChart();
+
+  if (hideLabel || !payload.length) {
+    return null;
+  }
+
+  const [item] = payload;
+  const key = `${labelKey ?? item?.dataKey ?? item?.name ?? "value"}`;
+  const itemConfig = getPayloadConfigFromPayload(config, item, key);
+  const value =
+    !labelKey && typeof label === "string" ? (config[label]?.label ?? label) : itemConfig?.label;
+
+  if (labelFormatter) {
+    return <div className={cn("font-medium", labelClassName)}>{labelFormatter(value, payload)}</div>;
+  }
+
+  if (!value) {
+    return null;
+  }
+
+  return <div className={cn("font-medium", labelClassName)}>{value}</div>;
+}
+
 function ChartTooltipContent({
   active,
   payload,
@@ -51,30 +95,6 @@ function ChartTooltipContent({
   >) {
   const { config } = useChart();
 
-  const tooltipLabel = React.useMemo(() => {
-    if (hideLabel || !payload?.length) {
-      return null;
-    }
-
-    const [item] = payload;
-    const key = `${labelKey ?? item?.dataKey ?? item?.name ?? "value"}`;
-    const itemConfig = getPayloadConfigFromPayload(config, item, key);
-    const value =
-      !labelKey && typeof label === "string" ? (config[label]?.label ?? label) : itemConfig?.label;
-
-    if (labelFormatter) {
-      return (
-        <div className={cn("font-medium", labelClassName)}>{labelFormatter(value, payload)}</div>
-      );
-    }
-
-    if (!value) {
-      return null;
-    }
-
-    return <div className={cn("font-medium", labelClassName)}>{value}</div>;
-  }, [label, labelFormatter, payload, hideLabel, labelClassName, config, labelKey]);
-
   if (!active || !payload?.length) {
     return null;
   }
@@ -90,27 +110,33 @@ function ChartTooltipContent({
         className,
       )}
     >
-      {!nestLabel ? tooltipLabel : null}
+      {!nestLabel ? (
+        <TooltipLabel
+          hideLabel={hideLabel}
+          payload={payload}
+          label={label}
+          labelFormatter={labelFormatter}
+          labelClassName={labelClassName}
+          labelKey={labelKey}
+        />
+      ) : null}
       <div className="grid gap-1.5">
-        {payload
-          .filter((item) => item.type !== "none")
-          .map((item, index) => {
-            // For pie charts, item.name contains the sector name (e.g., "chrome")
-            // For radial charts, the name is in item.payload[nameKey]
-            // For other charts, item.name or item.dataKey contains the series name
+        {(() => {
+          const rows: React.ReactNode[] = [];
+          for (const item of payload) {
+            if (item.type === "none") continue;
+
             const payloadName =
               nameKey && item.payload
                 ? (item.payload as Record<string, unknown>)[nameKey]
                 : undefined;
             const key = `${payloadName ?? item.name ?? item.dataKey ?? "value"}`;
             const itemConfig = getPayloadConfigFromPayload(config, item, key);
-
-            // Get colors count for this item to determine gradient vs solid
             const colorsCount = itemConfig ? getColorsCount(itemConfig) : 1;
 
-            return (
+            rows.push(
               <div
-                key={index}
+                key={key}
                 className={cn(
                   "[&>svg]:text-app-fg-muted flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5",
                   indicator === "dot" && "items-center",
@@ -118,7 +144,7 @@ function ChartTooltipContent({
                 )}
               >
                 {formatter && item?.value !== undefined && item.name ? (
-                  formatter(item.value, item.name, item, index, item.payload)
+                  formatter(item.value, item.name, item, 0, item.payload)
                 ) : (
                   <>
                     {itemConfig?.icon ? (
@@ -127,66 +153,62 @@ function ChartTooltipContent({
                       !hideIndicator && (
                         <div
                           className={cn("shrink-0 rounded-[2px]", {
-                            "h-2.5 w-2.5": indicator === "dot",
+                            "size-2.5": indicator === "dot",
                             "w-1": indicator === "line",
-                            "w-0 border-[1.5px] border-dashed bg-transparent!":
-                              indicator === "dashed",
+                            "w-0 border-[1.5px] border-dashed bg-transparent": indicator === "dashed",
                             "my-0.5": nestLabel && indicator === "dashed",
                           })}
-                          style={getIndicatorColorStyle(key, colorsCount)}
+                          style={
+                            indicator === "dashed"
+                              ? { borderColor: `var(--color-${key}-0)` }
+                              : colorsCount <= 1
+                                ? { backgroundColor: `var(--color-${key}-0)` }
+                                : {
+                                    backgroundImage: `linear-gradient(to bottom, var(--color-${key}-0), var(--color-${key}-${colorsCount - 1}))`,
+                                  }
+                          }
                         />
                       )
                     )}
                     <div
                       className={cn(
-                        "flex flex-1 justify-between gap-4 leading-none",
+                        "flex flex-1 justify-between leading-none",
                         nestLabel ? "items-end" : "items-center",
                       )}
                     >
                       <div className="grid gap-1.5">
-                        {nestLabel ? tooltipLabel : null}
-                        <span className="text-app-fg-secondary">
-                          {itemConfig?.label ?? item.name}
-                        </span>
+                        {nestLabel ? (
+                          <TooltipLabel
+                            hideLabel={hideLabel}
+                            payload={payload}
+                            label={label}
+                            labelFormatter={labelFormatter}
+                            labelClassName={labelClassName}
+                            labelKey={labelKey}
+                          />
+                        ) : null}
+                        <span className="text-app-fg-muted">{itemConfig?.label ?? item.name}</span>
                       </div>
                       {item.value != null && (
                         <span className="text-app-fg font-mono font-medium tabular-nums">
-                          {typeof item.value === "number"
-                            ? item.value.toLocaleString("es")
-                            : String(item.value)}
+                          {item.value.toLocaleString()}
                         </span>
                       )}
                     </div>
                   </>
                 )}
-              </div>
+              </div>,
             );
-          })}
+          }
+          return rows;
+        })()}
       </div>
     </div>
   );
 }
 
-function getIndicatorColorStyle(dataKey: string, colorsCount: number): React.CSSProperties {
-  if (colorsCount <= 1) {
-    return { background: `var(--color-${dataKey}-0)` };
-  }
-
-  // Multiple colors: create linear gradient with evenly distributed stops
-  const stops = Array.from({ length: colorsCount }, (_, index) => {
-    const offset = (index / (colorsCount - 1)) * 100;
-    return `var(--color-${dataKey}-${index}) ${offset}%`;
-  }).join(", ");
-
-  return { background: `linear-gradient(to right, ${stops})` };
+function ChartTooltip(props: React.ComponentProps<typeof RechartsPrimitive.Tooltip>) {
+  return <RechartsPrimitive.Tooltip cursor={false} {...props} />;
 }
 
-const ChartTooltip = ({
-  animationDuration = 200,
-  ...props
-}: React.ComponentProps<typeof RechartsPrimitive.Tooltip>) => (
-  <RechartsPrimitive.Tooltip animationDuration={animationDuration} {...props} />
-);
-
-export { ChartTooltip, ChartTooltipContent };
-export type { TooltipRoundness, TooltipVariant };
+export { ChartTooltip, ChartTooltipContent, type TooltipRoundness, type TooltipVariant };

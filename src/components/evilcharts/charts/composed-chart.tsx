@@ -39,7 +39,7 @@ import {
   XAxis as RechartsXAxis,
   YAxis as RechartsYAxis,
 } from "recharts";
-import { motion, useReducedMotion } from "motion/react";
+import { domAnimation, LazyMotion, m, useReducedMotion } from "motion/react";
 
 // Constants
 const STROKE_WIDTH = 2;
@@ -181,7 +181,8 @@ export function EvilComposedChart<
   // Anchors the intro to a fixed moment so it plays exactly once — re-renders
   // and Recharts remounts read elapsed time from here instead of replaying.
   const [introStartedAt] = useState(() => Date.now());
-  const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
+  const [selectedDataKey, setSelectedDataKey] = useState<string | null>(null);
+  const activeSelectedDataKey = selectedDataKey ?? defaultSelectedDataKey;
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingBars);
   const { visibleData, brushProps } = useEvilBrush({ data });
@@ -206,7 +207,7 @@ export function EvilComposedChart<
       dataLength: displayData.length,
       isLoading,
       hoveredIndex,
-      selectedDataKey,
+      selectedDataKey: activeSelectedDataKey,
       selectDataKey,
     }),
     [
@@ -217,14 +218,15 @@ export function EvilComposedChart<
       displayData.length,
       isLoading,
       hoveredIndex,
-      selectedDataKey,
+      activeSelectedDataKey,
       selectDataKey,
     ],
   );
 
   return (
-    <ComposedChartContext value={contextValue}>
-      <ChartContainer
+    <LazyMotion features={domAnimation} strict>
+      <ComposedChartContext value={contextValue}>
+        <ChartContainer
         className={className}
         config={config}
         footer={
@@ -264,8 +266,9 @@ export function EvilComposedChart<
             <LoadingBar chartId={chartId} barRadius={DEFAULT_BAR_RADIUS} onShimmerExit={onShimmerExit} />
           )}
         </RechartsComposedChart>
-      </ChartContainer>
-    </ComposedChartContext>
+        </ChartContainer>
+      </ComposedChartContext>
+    </LazyMotion>
   );
 }
 
@@ -819,7 +822,7 @@ const CustomBar = ({
   if (variant === "stripped") {
     return (
       <g style={cursorStyle} onClick={onClick}>
-        <motion.g
+        <m.g
           {...grow}
           filter={filter}
           opacity={fillOpacity}
@@ -827,7 +830,7 @@ const CustomBar = ({
         >
           <rect x={x} y={y} width={width} height={height} fill={getFill()} />
           <rect x={x} y={y} width={width} height={2} fill={`url(#${id}-bar-colors)`} />
-        </motion.g>
+        </m.g>
         {hitArea}
       </g>
     );
@@ -835,7 +838,7 @@ const CustomBar = ({
 
   return (
     <g style={cursorStyle} onClick={onClick}>
-      <motion.g {...grow}>
+      <m.g {...grow}>
         <rect
           x={x}
           y={y}
@@ -848,7 +851,7 @@ const CustomBar = ({
           filter={filter}
           className="transition-opacity duration-200"
         />
-      </motion.g>
+      </m.g>
       {hitArea}
     </g>
   );
@@ -947,7 +950,7 @@ const RevealMask = ({ id, type }: { id: string; type: RevealAnimationType }) => 
       {type === "edges-in" ? (
         <>
           {/* left half wipes inward from the left edge toward the centre */}
-          <motion.rect
+          <m.rect
             {...reveal}
             x="0"
             y="0"
@@ -957,7 +960,7 @@ const RevealMask = ({ id, type }: { id: string; type: RevealAnimationType }) => 
             style={{ originX: 0 }}
           />
           {/* right half wipes inward from the right edge toward the centre */}
-          <motion.rect
+          <m.rect
             {...reveal}
             x="50%"
             y="0"
@@ -968,7 +971,7 @@ const RevealMask = ({ id, type }: { id: string; type: RevealAnimationType }) => 
           />
         </>
       ) : (
-        <motion.rect
+        <m.rect
           {...reveal}
           x="0"
           y="0"
@@ -1447,7 +1450,7 @@ const LoadingPattern = ({
         x="0"
         y="0"
       >
-        <motion.rect
+        <m.rect
           y="0"
           width="1"
           height="1"

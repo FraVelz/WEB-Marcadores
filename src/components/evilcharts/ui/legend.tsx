@@ -48,12 +48,11 @@ function ChartLegendContent({
         className,
       )}
     >
-      {payload
-        .filter((item) => item.type !== "none")
-        .map((item) => {
-          // For pie charts, item.value contains the sector name (e.g., "chrome")
-          // For radial charts, the name is in item.payload[nameKey]
-          // For other charts, item.dataKey contains the series name (e.g., "desktop")
+      {(() => {
+        const rows: React.ReactNode[] = [];
+        for (const item of payload) {
+          if (item.type === "none") continue;
+
           const payloadName =
             nameKey && item.payload
               ? (item.payload as Record<string, unknown>)[nameKey]
@@ -61,15 +60,15 @@ function ChartLegendContent({
           const key = `${payloadName ?? item.value ?? item.dataKey ?? "value"}`;
           const itemConfig = getPayloadConfigFromPayload(config, item, key);
           const isSelected = selected === null || selected === key;
-
-          // Get colors count for this item to determine gradient vs solid
           const colorsCount = itemConfig ? getColorsCount(itemConfig) : 1;
 
-          return (
-            <div
+          rows.push(
+            <button
               key={key}
+              type="button"
+              disabled={!isClickable}
               className={cn(
-                "[&>svg]:text-muted-foreground flex max-w-full min-w-0 items-center gap-1.5 transition-opacity [&>svg]:h-3 [&>svg]:w-3",
+                "[&>svg]:text-muted-foreground flex max-w-full min-w-0 items-center gap-1.5 border-0 bg-transparent p-0 text-left transition-opacity [&>svg]:h-3 [&>svg]:w-3",
                 !isSelected && "opacity-30",
                 isClickable && "cursor-pointer",
               )}
@@ -82,11 +81,7 @@ function ChartLegendContent({
               {itemConfig?.icon && !hideIcon ? (
                 <itemConfig.icon />
               ) : (
-                <LegendIndicator
-                  variant={variant}
-                  dataKey={key}
-                  colorsCount={colorsCount}
-                />
+                <LegendIndicator variant={variant} dataKey={key} colorsCount={colorsCount} />
               )}
               <span
                 className="text-muted-foreground max-w-[9.5rem] text-xs leading-tight break-words"
@@ -94,9 +89,11 @@ function ChartLegendContent({
               >
                 {itemConfig?.label}
               </span>
-            </div>
+            </button>,
           );
-        })}
+        }
+        return rows;
+      })()}
     </div>
   );
 }
@@ -120,15 +117,15 @@ function LegendIndicator({
 
   switch (variant) {
     case "square":
-      return <div className="h-2 w-2 shrink-0" style={fillStyle} />;
+      return <div className="size-2 shrink-0" style={fillStyle} />;
 
     case "circle":
-      return <div className="h-2 w-2 shrink-0 rounded-full" style={fillStyle} />;
+      return <div className="size-2 shrink-0 rounded-full" style={fillStyle} />;
 
     case "circle-outline":
       return (
         <div
-          className="h-2.5 w-2.5 shrink-0 rounded-full p-[1.5px]"
+          className="size-2.5 shrink-0 rounded-full p-[1.5px]"
           style={outlineStyle}
         />
       );
@@ -142,14 +139,14 @@ function LegendIndicator({
     case "rounded-square-outline":
       return (
         <div
-          className="h-2.5 w-2.5 shrink-0 rounded-[3px] p-[1.5px]"
+          className="size-2.5 shrink-0 rounded-[3px] p-[1.5px]"
           style={outlineStyle}
         />
       );
 
     case "rounded-square":
     default:
-      return <div className="h-2 w-2 shrink-0 rounded-[2px]" style={fillStyle} />;
+      return <div className="size-2 shrink-0 rounded-[2px]" style={fillStyle} />;
   }
 }
 
