@@ -1,4 +1,4 @@
-/** Rutas públicas y textos para capturas (login, README, metadata). */
+/** Capturas en `public/screenshots/` para la galería del login y el README (no metadatos OG). */
 export const APP_SCREENSHOTS = [
   {
     id: "marcadores",
