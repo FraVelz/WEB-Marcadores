@@ -3,6 +3,8 @@
 import { StatBarChart } from "@/features/estadisticas/components/StatBarChart"
 import { StatBookmarkList, StatDuplicateList } from "@/features/estadisticas/components/StatBookmarkList"
 import { StatKpiGrid } from "@/features/estadisticas/components/StatKpiGrid"
+import { StatPieChart } from "@/features/estadisticas/components/StatPieChart"
+import { statRowsToPieModel } from "@/features/estadisticas/components/statPieChartData"
 import { StatSection } from "@/features/estadisticas/components/StatSection"
 import { StatSegmentBreakdown } from "@/features/estadisticas/components/StatSegmentBreakdown"
 import { StatTreeInsights } from "@/features/estadisticas/components/StatTreeInsights"
@@ -14,6 +16,10 @@ export function EstadisticasPage() {
   if (loading) {
     return <div className="text-app-fg-label flex flex-1 items-center justify-center p-8">Cargando estadísticas…</div>
   }
+
+  const topDomainsPie = statRowsToPieModel(stats.topDomains)
+  const topRootFoldersPie = statRowsToPieModel(stats.topRootFolders)
+  const topTagsPie = statRowsToPieModel(stats.topTags)
 
   return (
     <div className="overflow-auto p-4 pb-12 text-center sm:p-6">
@@ -38,19 +44,21 @@ export function EstadisticasPage() {
         </StatSection>
 
         <div className="grid gap-10 lg:grid-cols-2">
-          <StatSection title="Top dominios" hint="Sitios con más marcadores">
-            <StatBarChart
+          <StatSection title="Top dominios" hint="Sitios con más marcadores (top 5 + otros)">
+            <StatPieChart
               caption="Top dominios: marcadores por sitio web"
-              rows={stats.topDomains}
+              slices={topDomainsPie.slices}
+              config={topDomainsPie.config}
               emptyLabel="Aún no hay enlaces"
               valueHeader="Marcadores"
             />
           </StatSection>
 
           <StatSection title="Por carpeta raíz" hint="Incluye subcarpetas bajo cada raíz">
-            <StatBarChart
+            <StatPieChart
               caption="Marcadores por carpeta raíz"
-              rows={stats.topRootFolders}
+              slices={topRootFoldersPie.slices}
+              config={topRootFoldersPie.config}
               emptyLabel="Sin carpetas con enlaces"
               valueHeader="Marcadores"
             />
@@ -58,10 +66,11 @@ export function EstadisticasPage() {
         </div>
 
         <div className="grid gap-10 lg:grid-cols-2">
-          <StatSection title="Etiquetas más usadas">
-            <StatBarChart
+          <StatSection title="Etiquetas más usadas" hint="Top 5 + resto agrupado">
+            <StatPieChart
               caption="Etiquetas más usadas en la biblioteca"
-              rows={stats.topTags}
+              slices={topTagsPie.slices}
+              config={topTagsPie.config}
               emptyLabel="Ningún marcador tiene etiquetas"
               valueHeader="Usos"
             />

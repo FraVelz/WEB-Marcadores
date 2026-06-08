@@ -76,6 +76,14 @@
 
   --app-surface-canvas: var(--app-canvas);
   --app-text-primary: var(--app-fg);
+
+  /* EvilCharts / primitives tipo shadcn */
+  --background: var(--app-raised);
+  --foreground: var(--app-fg);
+  --border: var(--app-border);
+  --primary: var(--app-accent);
+  --muted: var(--app-raised-muted);
+  --muted-foreground: var(--app-fg-muted);
 }
 
 html.dark {
@@ -137,11 +145,22 @@ html.dark {
 
   --app-surface-canvas: var(--app-canvas);
   --app-text-primary: var(--app-fg);
+
+  --background: var(--app-raised);
+  --foreground: var(--app-fg);
+  --border: var(--app-border);
+  --primary: var(--app-accent);
+  --muted: var(--app-raised-muted);
+  --muted-foreground: var(--app-fg-muted);
 }
 
 @theme inline {
   --color-background: var(--app-surface-canvas);
   --color-foreground: var(--app-text-primary);
+  --color-muted-foreground: var(--app-fg-muted);
+  --color-border: var(--app-border);
+  --color-primary: var(--app-accent);
+  --color-muted: var(--app-raised-muted);
 
   --color-app-canvas: var(--app-canvas);
   --color-app-sidebar: var(--app-sidebar);
