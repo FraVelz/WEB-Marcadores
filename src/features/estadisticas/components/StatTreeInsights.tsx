@@ -29,7 +29,6 @@ export function StatTreeInsights({ tree }: { tree: EstadisticasSnapshot["tree"] 
           rows={tree.deepestFolders}
           emptyLabel="Sin carpetas"
           valueSuffix="niv."
-          valueHeader="Nivel"
         />
       </div>
     </div>

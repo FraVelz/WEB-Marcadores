@@ -15,8 +15,8 @@ const roundnessMap: Record<TooltipRoundness, string> = {
 };
 
 const variantMap: Record<TooltipVariant, string> = {
-  default: "bg-background",
-  "frosted-glass": "bg-background/70 backdrop-blur-sm",
+  default: "border-app-border bg-app-raised text-app-fg shadow-xl",
+  "frosted-glass": "border-app-border bg-app-raised/90 text-app-fg backdrop-blur-sm",
 };
 
 function ChartTooltipContent({
@@ -76,8 +76,7 @@ function ChartTooltipContent({
   }, [label, labelFormatter, payload, hideLabel, labelClassName, config, labelKey]);
 
   if (!active || !payload?.length) {
-    // Empty tooltip - to prevent position getting 0.0 so it doesnt animate tooltip every time from 0.0 origin
-    return <span className="p-4" />;
+    return null;
   }
 
   const nestLabel = payload.length === 1 && indicator !== "dot";
@@ -85,7 +84,7 @@ function ChartTooltipContent({
   return (
     <div
       className={cn(
-        "border-border/50 grid min-w-32 items-start gap-1.5 border px-2.5 py-1.5 text-xs shadow-xl",
+        "grid min-w-32 items-start gap-1.5 border px-2.5 py-1.5 text-xs",
         roundnessMap[roundness],
         variantMap[variant],
         className,
@@ -113,9 +112,9 @@ function ChartTooltipContent({
               <div
                 key={index}
                 className={cn(
-                  "[&>svg]:text-muted-foreground flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5",
+                  "[&>svg]:text-app-fg-muted flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5",
                   indicator === "dot" && "items-center",
-                  selected != null && selected !== item.dataKey && "opacity-30",
+                  selected != null && selected !== key && "opacity-30",
                 )}
               >
                 {formatter && item?.value !== undefined && item.name ? (
@@ -146,14 +145,14 @@ function ChartTooltipContent({
                     >
                       <div className="grid gap-1.5">
                         {nestLabel ? tooltipLabel : null}
-                        <span className="text-muted-foreground">
+                        <span className="text-app-fg-secondary">
                           {itemConfig?.label ?? item.name}
                         </span>
                       </div>
                       {item.value != null && (
-                        <span className="text-foreground font-mono font-medium tabular-nums">
+                        <span className="text-app-fg font-mono font-medium tabular-nums">
                           {typeof item.value === "number"
-                            ? item.value.toLocaleString()
+                            ? item.value.toLocaleString("es")
                             : String(item.value)}
                         </span>
                       )}

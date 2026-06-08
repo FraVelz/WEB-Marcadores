@@ -50,7 +50,6 @@ export function EstadisticasPage() {
               slices={topDomainsPie.slices}
               config={topDomainsPie.config}
               emptyLabel="Aún no hay enlaces"
-              valueHeader="Marcadores"
             />
           </StatSection>
 
@@ -60,7 +59,6 @@ export function EstadisticasPage() {
               slices={topRootFoldersPie.slices}
               config={topRootFoldersPie.config}
               emptyLabel="Sin carpetas con enlaces"
-              valueHeader="Marcadores"
             />
           </StatSection>
         </div>
@@ -72,7 +70,6 @@ export function EstadisticasPage() {
               slices={topTagsPie.slices}
               config={topTagsPie.config}
               emptyLabel="Ningún marcador tiene etiquetas"
-              valueHeader="Usos"
             />
           </StatSection>
 
@@ -86,7 +83,6 @@ export function EstadisticasPage() {
             caption="Altas de marcadores por mes"
             rows={stats.createdByMonth}
             emptyLabel="Sin fechas de creación registradas"
-            valueHeader="Altas"
           />
         </StatSection>
 

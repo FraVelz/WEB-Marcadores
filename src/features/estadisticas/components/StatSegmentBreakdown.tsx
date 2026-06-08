@@ -15,7 +15,6 @@ export function StatSegmentBreakdown({ breakdown }: { breakdown: EstadisticasSna
       slices={slices}
       config={config}
       emptyLabel="Sin marcadores"
-      valueHeader="Marcadores"
     />
   )
 }
