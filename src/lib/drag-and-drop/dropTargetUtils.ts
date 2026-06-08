@@ -7,10 +7,7 @@ type DropLocation = {
 const NESTED_DROP_TARGET_ATTR = "[data-drop-target-for-element]"
 
 /** True when this target is the innermost drop target under the pointer. */
-export function isInnermostDropTarget(
-  location: DropLocation,
-  self: DropTargetRecord
-): boolean {
+export function isInnermostDropTarget(location: DropLocation, self: DropTargetRecord): boolean {
   return location.current.dropTargets[0]?.element === self.element
 }
 

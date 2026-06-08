@@ -1,7 +1,7 @@
-import { getPayloadConfigFromPayload, getColorsCount, useChart } from "@/components/evilcharts/ui/chart";
-import * as RechartsPrimitive from "recharts";
-import { cn } from "@/lib/utils";
-import * as React from "react";
+import { getPayloadConfigFromPayload, getColorsCount, useChart } from "@/components/evilcharts/ui/chart"
+import * as RechartsPrimitive from "recharts"
+import { cn } from "@/lib/utils"
+import * as React from "react"
 
 type ChartLegendVariant =
   | "square"
@@ -10,7 +10,7 @@ type ChartLegendVariant =
   | "rounded-square"
   | "rounded-square-outline"
   | "vertical-bar"
-  | "horizontal-bar";
+  | "horizontal-bar"
 
 function ChartLegendContent({
   className,
@@ -24,17 +24,17 @@ function ChartLegendContent({
   isClickable,
   variant = "rounded-square",
 }: React.ComponentProps<"div"> & {
-  hideIcon?: boolean;
-  nameKey?: string;
-  selected?: string | null;
-  isClickable?: boolean;
-  onSelectChange?: (selected: string | null) => void;
-  variant?: ChartLegendVariant;
+  hideIcon?: boolean
+  nameKey?: string
+  selected?: string | null
+  isClickable?: boolean
+  onSelectChange?: (selected: string | null) => void
+  variant?: ChartLegendVariant
 } & RechartsPrimitive.DefaultLegendContentProps) {
-  const { config } = useChart();
+  const { config } = useChart()
 
   if (!payload?.length) {
-    return null;
+    return null
   }
 
   return (
@@ -45,22 +45,19 @@ function ChartLegendContent({
         align === "center" && "justify-center",
         align === "right" && "justify-end",
         verticalAlign === "top" ? "pb-4" : "pt-4",
-        className,
+        className
       )}
     >
       {(() => {
-        const rows: React.ReactNode[] = [];
+        const rows: React.ReactNode[] = []
         for (const item of payload) {
-          if (item.type === "none") continue;
+          if (item.type === "none") continue
 
-          const payloadName =
-            nameKey && item.payload
-              ? (item.payload as Record<string, unknown>)[nameKey]
-              : undefined;
-          const key = `${payloadName ?? item.value ?? item.dataKey ?? "value"}`;
-          const itemConfig = getPayloadConfigFromPayload(config, item, key);
-          const isSelected = selected === null || selected === key;
-          const colorsCount = itemConfig ? getColorsCount(itemConfig) : 1;
+          const payloadName = nameKey && item.payload ? (item.payload as Record<string, unknown>)[nameKey] : undefined
+          const key = `${payloadName ?? item.value ?? item.dataKey ?? "value"}`
+          const itemConfig = getPayloadConfigFromPayload(config, item, key)
+          const isSelected = selected === null || selected === key
+          const colorsCount = itemConfig ? getColorsCount(itemConfig) : 1
 
           rows.push(
             <button
@@ -70,12 +67,12 @@ function ChartLegendContent({
               className={cn(
                 "[&>svg]:text-muted-foreground flex max-w-full min-w-0 items-center gap-1.5 border-0 bg-transparent p-0 text-left transition-opacity [&>svg]:h-3 [&>svg]:w-3",
                 !isSelected && "opacity-30",
-                isClickable && "cursor-pointer",
+                isClickable && "cursor-pointer"
               )}
               onClick={() => {
-                if (!isClickable) return;
+                if (!isClickable) return
 
-                onSelectChange?.(selected === key ? null : key);
+                onSelectChange?.(selected === key ? null : key)
               }}
             >
               {itemConfig?.icon && !hideIcon ? (
@@ -89,13 +86,13 @@ function ChartLegendContent({
               >
                 {itemConfig?.label}
               </span>
-            </button>,
-          );
+            </button>
+          )
         }
-        return rows;
+        return rows
       })()}
     </div>
-  );
+  )
 }
 
 // ---------------------------------------------------------------------------
@@ -108,45 +105,35 @@ function LegendIndicator({
   dataKey,
   colorsCount,
 }: {
-  variant: ChartLegendVariant;
-  dataKey: string;
-  colorsCount: number;
+  variant: ChartLegendVariant
+  dataKey: string
+  colorsCount: number
 }) {
-  const fillStyle = getLegendFillStyle(dataKey, colorsCount);
-  const outlineStyle = getLegendOutlineStyle(dataKey, colorsCount);
+  const fillStyle = getLegendFillStyle(dataKey, colorsCount)
+  const outlineStyle = getLegendOutlineStyle(dataKey, colorsCount)
 
   switch (variant) {
     case "square":
-      return <div className="size-2 shrink-0" style={fillStyle} />;
+      return <div className="size-2 shrink-0" style={fillStyle} />
 
     case "circle":
-      return <div className="size-2 shrink-0 rounded-full" style={fillStyle} />;
+      return <div className="size-2 shrink-0 rounded-full" style={fillStyle} />
 
     case "circle-outline":
-      return (
-        <div
-          className="size-2.5 shrink-0 rounded-full p-[1.5px]"
-          style={outlineStyle}
-        />
-      );
+      return <div className="size-2.5 shrink-0 rounded-full p-[1.5px]" style={outlineStyle} />
 
     case "vertical-bar":
-      return <div className="h-3 w-1 shrink-0 rounded-[2px]" style={fillStyle} />;
+      return <div className="h-3 w-1 shrink-0 rounded-[2px]" style={fillStyle} />
 
     case "horizontal-bar":
-      return <div className="h-1 w-3 shrink-0 rounded-[2px]" style={fillStyle} />;
+      return <div className="h-1 w-3 shrink-0 rounded-[2px]" style={fillStyle} />
 
     case "rounded-square-outline":
-      return (
-        <div
-          className="size-2.5 shrink-0 rounded-[3px] p-[1.5px]"
-          style={outlineStyle}
-        />
-      );
+      return <div className="size-2.5 shrink-0 rounded-[3px] p-[1.5px]" style={outlineStyle} />
 
     case "rounded-square":
     default:
-      return <div className="size-2 shrink-0 rounded-[2px]" style={fillStyle} />;
+      return <div className="size-2 shrink-0 rounded-[2px]" style={fillStyle} />
   }
 }
 
@@ -157,15 +144,15 @@ function LegendIndicator({
 /** Solid fill / gradient background for filled variants. */
 function getLegendFillStyle(dataKey: string, colorsCount: number): React.CSSProperties {
   if (colorsCount <= 1) {
-    return { backgroundColor: `var(--color-${dataKey}-0)` };
+    return { backgroundColor: `var(--color-${dataKey}-0)` }
   }
 
   const stops = Array.from({ length: colorsCount }, (_, i) => {
-    const offset = (i / (colorsCount - 1)) * 100;
-    return `var(--color-${dataKey}-${i}) ${offset}%`;
-  }).join(", ");
+    const offset = (i / (colorsCount - 1)) * 100
+    return `var(--color-${dataKey}-${i}) ${offset}%`
+  }).join(", ")
 
-  return { background: `linear-gradient(to right, ${stops})` };
+  return { background: `linear-gradient(to right, ${stops})` }
 }
 
 /**
@@ -176,31 +163,30 @@ function getLegendFillStyle(dataKey: string, colorsCount: number): React.CSSProp
  */
 function getLegendOutlineStyle(dataKey: string, colorsCount: number): React.CSSProperties {
   const maskStyle: React.CSSProperties = {
-    WebkitMask:
-      "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+    WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
     WebkitMaskComposite: "xor",
     mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
     maskComposite: "exclude",
-  };
+  }
 
   if (colorsCount <= 1) {
     return {
       backgroundColor: `var(--color-${dataKey}-0)`,
       ...maskStyle,
-    };
+    }
   }
 
   const stops = Array.from({ length: colorsCount }, (_, i) => {
-    const offset = (i / (colorsCount - 1)) * 100;
-    return `var(--color-${dataKey}-${i}) ${offset}%`;
-  }).join(", ");
+    const offset = (i / (colorsCount - 1)) * 100
+    return `var(--color-${dataKey}-${i}) ${offset}%`
+  }).join(", ")
 
   return {
     background: `linear-gradient(to right, ${stops})`,
     ...maskStyle,
-  };
+  }
 }
 
-const ChartLegend = RechartsPrimitive.Legend;
+const ChartLegend = RechartsPrimitive.Legend
 
-export { ChartLegend, ChartLegendContent, type ChartLegendVariant };
+export { ChartLegend, ChartLegendContent, type ChartLegendVariant }

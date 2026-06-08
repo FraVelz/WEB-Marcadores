@@ -1,7 +1,7 @@
-"use client";
+"use client"
 
-import { ZIndexLayer } from "recharts";
-import { useId } from "react";
+import { ZIndexLayer } from "recharts"
+import { useId } from "react"
 
 // ── Background Variant Types ─────────────────────────────────────────────────
 // To add a new variant:
@@ -20,17 +20,17 @@ export type BackgroundVariant =
   | "tiny-checkers"
   | "overlapping-circles"
   | "wiggle-lines"
-  | "bubbles";
+  | "bubbles"
 
 // ── Pattern Components ───────────────────────────────────────────────────────
 
-type PatternProps = { id: string };
+type PatternProps = { id: string }
 
 const DotsPattern = ({ id }: PatternProps) => (
   <pattern id={id} x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
     <circle className="text-border dark:text-border" cx="2" cy="2" r="1" fill="currentColor" />
   </pattern>
-);
+)
 
 const GridPattern = ({ id }: PatternProps) => (
   <pattern id={id} x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
@@ -42,7 +42,7 @@ const GridPattern = ({ id }: PatternProps) => (
       strokeWidth="0.5"
     />
   </pattern>
-);
+)
 
 const CrossHatchPattern = ({ id }: PatternProps) => (
   <pattern id={id} x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
@@ -54,18 +54,10 @@ const CrossHatchPattern = ({ id }: PatternProps) => (
       strokeWidth="0.5"
     />
   </pattern>
-);
+)
 
 const DiagonalLinesPattern = ({ id }: PatternProps) => (
-  <pattern
-    id={id}
-    x="0"
-    y="0"
-    width="6"
-    height="6"
-    patternUnits="userSpaceOnUse"
-    patternTransform="rotate(45)"
-  >
+  <pattern id={id} x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
     <line
       className="text-border dark:text-border"
       x1="0"
@@ -76,7 +68,7 @@ const DiagonalLinesPattern = ({ id }: PatternProps) => (
       strokeWidth="0.5"
     />
   </pattern>
-);
+)
 
 const PlusPattern = ({ id }: PatternProps) => (
   <pattern id={id} x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">
@@ -89,7 +81,7 @@ const PlusPattern = ({ id }: PatternProps) => (
       strokeLinecap="round"
     />
   </pattern>
-);
+)
 
 const FallingTrianglesPattern = ({ id }: PatternProps) => (
   <pattern id={id} x="0" y="0" width="18" height="36" patternUnits="userSpaceOnUse">
@@ -101,7 +93,7 @@ const FallingTrianglesPattern = ({ id }: PatternProps) => (
       fillOpacity="0.4"
     />
   </pattern>
-);
+)
 
 const FourPointedStarPattern = ({ id }: PatternProps) => (
   <pattern id={id} x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">
@@ -113,7 +105,7 @@ const FourPointedStarPattern = ({ id }: PatternProps) => (
       fillOpacity="0.4"
     />
   </pattern>
-);
+)
 
 const TinyCheckersPattern = ({ id }: PatternProps) => (
   <pattern id={id} x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
@@ -125,7 +117,7 @@ const TinyCheckersPattern = ({ id }: PatternProps) => (
       fillOpacity="0.2"
     />
   </pattern>
-);
+)
 
 const OverlappingCirclesPattern = ({ id }: PatternProps) => (
   <pattern id={id} x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
@@ -137,18 +129,10 @@ const OverlappingCirclesPattern = ({ id }: PatternProps) => (
       fillOpacity="0.4"
     />
   </pattern>
-);
+)
 
 const WiggleLinesPattern = ({ id }: PatternProps) => (
-  <pattern
-    id={id}
-    x="0"
-    y="0"
-    width="52"
-    height="26"
-    patternUnits="userSpaceOnUse"
-    patternTransform="scale(0.6)"
-  >
+  <pattern id={id} x="0" y="0" width="52" height="26" patternUnits="userSpaceOnUse" patternTransform="scale(0.6)">
     <path
       className="text-border dark:text-border"
       d="M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z"
@@ -156,18 +140,10 @@ const WiggleLinesPattern = ({ id }: PatternProps) => (
       fillOpacity="0.4"
     />
   </pattern>
-);
+)
 
 const BubblesPattern = ({ id }: PatternProps) => (
-  <pattern
-    id={id}
-    x="0"
-    y="0"
-    width="100"
-    height="100"
-    patternUnits="userSpaceOnUse"
-    patternTransform="scale(0.6667)"
-  >
+  <pattern id={id} x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse" patternTransform="scale(0.6667)">
     <path
       className="text-border dark:text-border"
       d="M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z"
@@ -176,7 +152,7 @@ const BubblesPattern = ({ id }: PatternProps) => (
       fillRule="evenodd"
     />
   </pattern>
-);
+)
 
 // ── Pattern Registry ─────────────────────────────────────────────────────────
 // Map variant names to pattern components
@@ -193,22 +169,22 @@ const PATTERN_MAP: Record<BackgroundVariant, React.FC<PatternProps>> = {
   "tiny-checkers": TinyCheckersPattern,
   "overlapping-circles": OverlappingCirclesPattern,
   "wiggle-lines": WiggleLinesPattern,
-};
+}
 
 // ── Main Component ───────────────────────────────────────────────────────────
 // Usage: Place <ChartBackground variant="dots" /> inside any Recharts chart component.
 // ZIndexLayer with zIndex={-1} ensures the background renders behind all chart content.
 
 interface ChartBackgroundProps {
-  variant: BackgroundVariant;
+  variant: BackgroundVariant
 }
 
 export function ChartBackground({ variant }: ChartBackgroundProps) {
-  const baseId = useId().replace(/:/g, "");
-  const patternId = `${baseId}-bg-${variant}`;
-  const maskId = `${baseId}-bg-edge-fade`;
-  const filterId = `${baseId}-bg-blur`;
-  const PatternComponent = PATTERN_MAP[variant];
+  const baseId = useId().replace(/:/g, "")
+  const patternId = `${baseId}-bg-${variant}`
+  const maskId = `${baseId}-bg-edge-fade`
+  const filterId = `${baseId}-bg-blur`
+  const PatternComponent = PATTERN_MAP[variant]
 
   return (
     <ZIndexLayer zIndex={-1}>
@@ -225,5 +201,5 @@ export function ChartBackground({ variant }: ChartBackgroundProps) {
       </defs>
       <rect width="100%" height="100%" fill={`url(#${patternId})`} mask={`url(#${maskId})`} />
     </ZIndexLayer>
-  );
+  )
 }

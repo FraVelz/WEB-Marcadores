@@ -35,11 +35,7 @@ type StatMonthlyComposedChartProps = {
   emptyLabel?: string
 }
 
-export function StatMonthlyComposedChart({
-  caption,
-  rows,
-  emptyLabel = "Sin datos",
-}: StatMonthlyComposedChartProps) {
+export function StatMonthlyComposedChart({ caption, rows, emptyLabel = "Sin datos" }: StatMonthlyComposedChartProps) {
   const data = useMemo<MonthDatum[]>(
     () =>
       rows.map((row) => ({
@@ -77,24 +73,10 @@ export function StatMonthlyComposedChart({
         barCategoryGap={12}
       >
         <Grid vertical={false} stroke="var(--app-border)" strokeOpacity={0.65} />
-        <XAxis
-          dataKey="month"
-          tickFormatter={formatMonthTick}
-          tick={{ fill: "var(--app-fg-muted)", fontSize: 11 }}
-        />
-        <YAxis
-          width={36}
-          tick={{ fill: "var(--app-fg-muted)", fontSize: 11 }}
-          allowDecimals={false}
-        />
+        <XAxis dataKey="month" tickFormatter={formatMonthTick} tick={{ fill: "var(--app-fg-muted)", fontSize: 11 }} />
+        <YAxis width={36} tick={{ fill: "var(--app-fg-muted)", fontSize: 11 }} allowDecimals={false} />
         <Tooltip variant="default" roundness="xl" />
-        <Bar
-          dataKey="altas"
-          variant="gradient"
-          radius={6}
-          isClickable
-          enableHoverHighlight
-        />
+        <Bar dataKey="altas" variant="gradient" radius={6} isClickable enableHoverHighlight />
       </EvilComposedChart>
     </figure>
   )

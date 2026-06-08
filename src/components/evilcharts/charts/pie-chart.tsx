@@ -1,19 +1,14 @@
-"use client";
+"use client"
 
-import {
-  type ChartConfig,
-  ChartContainer,
-  getColorsCount,
-  LoadingIndicator,
-} from "@/components/evilcharts/ui/chart";
-import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/components/evilcharts/ui/legend";
+import { type ChartConfig, ChartContainer, getColorsCount, LoadingIndicator } from "@/components/evilcharts/ui/chart"
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/components/evilcharts/ui/legend"
 import {
   ChartTooltip,
   ChartTooltipContent,
   type TooltipRoundness,
   type TooltipVariant,
-} from "@/components/evilcharts/ui/tooltip";
-import { ChartBackground, type BackgroundVariant } from "@/components/evilcharts/ui/background";
+} from "@/components/evilcharts/ui/tooltip"
+import { ChartBackground, type BackgroundVariant } from "@/components/evilcharts/ui/background"
 import {
   Children,
   createContext,
@@ -27,29 +22,29 @@ import {
   type FC,
   type ReactElement,
   type ReactNode,
-} from "react";
+} from "react"
 import {
   LabelList as RechartsLabelList,
   Pie as RechartsPie,
   PieChart as RechartsPieChart,
   Sector,
   type PieSectorShapeProps,
-} from "recharts";
-import { domAnimation, LazyMotion, m } from "motion/react";
+} from "recharts"
+import { domAnimation, LazyMotion, m } from "motion/react"
 
 // Constants
-const LOADING_SECTORS = 5;
-const LOADING_ANIMATION_DURATION = 2000; // full loading cycle duration in milliseconds
-const DEFAULT_INNER_RADIUS = 0;
-const DEFAULT_OUTER_RADIUS = "80%";
-const DEFAULT_CORNER_RADIUS = 0;
-const DEFAULT_PADDING_ANGLE = 0;
-const DEFAULT_START_ANGLE = 0;
-const DEFAULT_END_ANGLE = 360;
+const LOADING_SECTORS = 5
+const LOADING_ANIMATION_DURATION = 2000 // full loading cycle duration in milliseconds
+const DEFAULT_INNER_RADIUS = 0
+const DEFAULT_OUTER_RADIUS = "80%"
+const DEFAULT_CORNER_RADIUS = 0
+const DEFAULT_PADDING_ANGLE = 0
+const DEFAULT_START_ANGLE = 0
+const DEFAULT_END_ANGLE = 360
 // Stable empty-array reference so the `glowingSectors` default doesn't change every render
-const EMPTY_GLOWING_SECTORS: string[] = [];
+const EMPTY_GLOWING_SECTORS: string[] = []
 
-type LabelListProps = ComponentProps<typeof RechartsLabelList>;
+type LabelListProps = ComponentProps<typeof RechartsLabelList>
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared context
@@ -61,28 +56,26 @@ type LabelListProps = ComponentProps<typeof RechartsLabelList>;
  * Sub-components are composed freely — the provider is the single source of truth.
  */
 type PieChartContextValue = {
-  config: ChartConfig; // colors + labels for every sector
-  data: Record<string, unknown>[]; // rows rendered by the chart
-  dataKey: string; // key holding each sector's numeric value
-  nameKey: string; // key holding each sector's name
-  isLoading: boolean; // whether the chart shows its loading skeleton
-  selectedSector: string | null; // currently selected sector name, or null when none
-  selectSector: (sectorName: string | null) => void; // sets the selected sector
-};
+  config: ChartConfig // colors + labels for every sector
+  data: Record<string, unknown>[] // rows rendered by the chart
+  dataKey: string // key holding each sector's numeric value
+  nameKey: string // key holding each sector's name
+  isLoading: boolean // whether the chart shows its loading skeleton
+  selectedSector: string | null // currently selected sector name, or null when none
+  selectSector: (sectorName: string | null) => void // sets the selected sector
+}
 
-const PieChartContext = createContext<PieChartContextValue | null>(null);
+const PieChartContext = createContext<PieChartContextValue | null>(null)
 
 // Reads the chart context, throwing a helpful error when used outside <EvilPieChart />
 function usePieChart() {
-  const context = use(PieChartContext);
+  const context = use(PieChartContext)
 
   if (!context) {
-    throw new Error(
-      "Pie chart parts (<Pie />, <Tooltip />, …) must be used within <EvilPieChart />",
-    );
+    throw new Error("Pie chart parts (<Pie />, <Tooltip />, …) must be used within <EvilPieChart />")
   }
 
-  return context;
+  return context
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -90,17 +83,17 @@ function usePieChart() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 type EvilPieChartProps<TData extends Record<string, unknown>> = {
-  config: ChartConfig; // sector colors + labels
-  data: TData[]; // rows rendered by the chart
-  dataKey: keyof TData & string; // key holding each sector's numeric value
-  nameKey: keyof TData & string; // key holding each sector's name
-  children: ReactNode; // composed parts — <Pie />, <Tooltip />, <Legend />, …
-  className?: string; // extra classes for the chart container
-  chartProps?: ComponentProps<typeof RechartsPieChart>; // escape hatch for the raw Recharts chart
-  defaultSelectedSector?: string | null; // sector selected on first render
-  onSelectionChange?: (selection: { dataKey: string; value: number } | null) => void; // fires when the selected sector changes
-  isLoading?: boolean; // shows the animated loading skeleton
-};
+  config: ChartConfig // sector colors + labels
+  data: TData[] // rows rendered by the chart
+  dataKey: keyof TData & string // key holding each sector's numeric value
+  nameKey: keyof TData & string // key holding each sector's name
+  children: ReactNode // composed parts — <Pie />, <Tooltip />, <Legend />, …
+  className?: string // extra classes for the chart container
+  chartProps?: ComponentProps<typeof RechartsPieChart> // escape hatch for the raw Recharts chart
+  defaultSelectedSector?: string | null // sector selected on first render
+  onSelectionChange?: (selection: { dataKey: string; value: number } | null) => void // fires when the selected sector changes
+  isLoading?: boolean // shows the animated loading skeleton
+}
 
 /**
  * Root of the composible pie chart. Owns the data, the shared context, and the
@@ -120,27 +113,27 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
   onSelectionChange,
   isLoading = false,
 }: EvilPieChartProps<TData>) {
-  const [selectedSector, setSelectedSector] = useState<string | null>(null);
-  const activeSelectedSector = selectedSector ?? defaultSelectedSector;
+  const [selectedSector, setSelectedSector] = useState<string | null>(null)
+  const activeSelectedSector = selectedSector ?? defaultSelectedSector
 
   // Updates selection state and notifies the parent with the sector's value
   const selectSector = useCallback(
     (sectorName: string | null) => {
-      setSelectedSector(sectorName);
+      setSelectedSector(sectorName)
 
       if (sectorName === null) {
-        onSelectionChange?.(null);
-        return;
+        onSelectionChange?.(null)
+        return
       }
 
-      const selectedItem = data.find((item) => (item[nameKey] as string) === sectorName);
+      const selectedItem = data.find((item) => (item[nameKey] as string) === sectorName)
 
       if (selectedItem) {
-        onSelectionChange?.({ dataKey: sectorName, value: selectedItem[dataKey] as number });
+        onSelectionChange?.({ dataKey: sectorName, value: selectedItem[dataKey] as number })
       }
     },
-    [data, dataKey, nameKey, onSelectionChange],
-  );
+    [data, dataKey, nameKey, onSelectionChange]
+  )
 
   const contextValue = useMemo<PieChartContextValue>(
     () => ({
@@ -152,8 +145,8 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
       selectedSector: activeSelectedSector,
       selectSector,
     }),
-    [config, data, dataKey, nameKey, isLoading, activeSelectedSector, selectSector],
-  );
+    [config, data, dataKey, nameKey, isLoading, activeSelectedSector, selectSector]
+  )
 
   return (
     <LazyMotion features={domAnimation} strict>
@@ -166,7 +159,7 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
         </ChartContainer>
       </PieChartContext>
     </LazyMotion>
-  );
+  )
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -174,18 +167,18 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
 // ─────────────────────────────────────────────────────────────────────────────
 
 type PieProps = {
-  variant?: PieVariant; // fill style for the pie's sectors
-  innerRadius?: number | string; // inner radius — set above 0 for a donut
-  outerRadius?: number | string; // outer radius of the pie
-  cornerRadius?: number; // border-radius of each sector in pixels
-  paddingAngle?: number; // gap between sectors in degrees — negative overlaps them
-  startAngle?: number; // angle the pie starts drawing from
-  endAngle?: number; // angle the pie stops drawing at
-  isClickable?: boolean; // lets sectors be selected by clicking them
-  glowingSectors?: string[]; // sector names that render with a soft outer glow
-  children?: ReactNode; // optional <Label /> composition for sector labels
-  pieProps?: Omit<ComponentProps<typeof RechartsPie>, "data" | "dataKey" | "nameKey">; // escape hatch for raw Recharts Pie props
-};
+  variant?: PieVariant // fill style for the pie's sectors
+  innerRadius?: number | string // inner radius — set above 0 for a donut
+  outerRadius?: number | string // outer radius of the pie
+  cornerRadius?: number // border-radius of each sector in pixels
+  paddingAngle?: number // gap between sectors in degrees — negative overlaps them
+  startAngle?: number // angle the pie starts drawing from
+  endAngle?: number // angle the pie stops drawing at
+  isClickable?: boolean // lets sectors be selected by clicking them
+  glowingSectors?: string[] // sector names that render with a soft outer glow
+  children?: ReactNode // optional <Label /> composition for sector labels
+  pieProps?: Omit<ComponentProps<typeof RechartsPie>, "data" | "dataKey" | "nameKey"> // escape hatch for raw Recharts Pie props
+}
 
 /**
  * The pie series. Self-contained: it generates its own radial color gradients
@@ -207,8 +200,8 @@ export function Pie({
   children,
   pieProps,
 }: PieProps) {
-  const { config, data, dataKey, nameKey, isLoading, selectedSector, selectSector } = usePieChart();
-  const id = useId().replace(/:/g, ""); // unique id scopes this pie's style defs
+  const { config, data, dataKey, nameKey, isLoading, selectedSector, selectSector } = usePieChart()
+  const id = useId().replace(/:/g, "") // unique id scopes this pie's style defs
 
   if (isLoading) {
     return (
@@ -226,15 +219,15 @@ export function Pie({
         isAnimationActive={false}
         shape={(props) => <AnimatedLoadingSector {...props} />}
       />
-    );
+    )
   }
 
-  const label = resolveLabel(children, dataKey);
+  const label = resolveLabel(children, dataKey)
 
   const preparedData = data.map((item) => ({
     ...item,
     fill: `url(#${id}-colors-${item[nameKey] as string})`,
-  }));
+  }))
 
   return (
     <>
@@ -252,16 +245,15 @@ export function Pie({
         isAnimationActive
         style={isClickable ? { cursor: "pointer" } : undefined}
         onClick={(_, index) => {
-          if (!isClickable) return;
-          const clickedName = data[index]?.[nameKey] as string;
+          if (!isClickable) return
+          const clickedName = data[index]?.[nameKey] as string
           // Clicking the selected sector clears the selection, otherwise selects it
-          selectSector(selectedSector === clickedName ? null : clickedName);
+          selectSector(selectedSector === clickedName ? null : clickedName)
         }}
         shape={(props: PieSectorShapeProps) => {
-          const sectorName = data[props.index ?? 0]?.[nameKey] as string;
-          const isGlowing = glowingSectors.includes(sectorName);
-          const isDimmed =
-            isClickable && selectedSector !== null && selectedSector !== sectorName;
+          const sectorName = data[props.index ?? 0]?.[nameKey] as string
+          const isGlowing = glowingSectors.includes(sectorName)
+          const isDimmed = isClickable && selectedSector !== null && selectedSector !== sectorName
 
           return (
             <Sector
@@ -273,7 +265,7 @@ export function Pie({
               opacity={isDimmed ? 0.3 : 1}
               className="transition-opacity duration-200"
             />
-          );
+          )
         }}
         {...pieProps}
       >
@@ -281,44 +273,40 @@ export function Pie({
       </RechartsPie>
       <defs>
         <RadialColorGradient id={id} config={config} variant={variant} />
-        {glowingSectors.length > 0 && (
-          <GlowFilter id={id} glowingSectors={glowingSectors} />
-        )}
+        {glowingSectors.length > 0 && <GlowFilter id={id} glowingSectors={glowingSectors} />}
       </defs>
     </>
-  );
+  )
 }
 
 type LabelProps = {
-  dataKey?: string; // data key for the label text — defaults to the pie's value key
-  labelListProps?: Omit<LabelListProps, "dataKey">; // escape hatch for raw Recharts LabelList props
-};
+  dataKey?: string // data key for the label text — defaults to the pie's value key
+  labelListProps?: Omit<LabelListProps, "dataKey"> // escape hatch for raw Recharts LabelList props
+}
 
 /**
  * Declares per-sector labels for the <Pie /> it is composed inside. It renders
  * nothing on its own — the parent <Pie /> reads its props and wires them into a
  * Recharts LabelList drawn over the sectors.
  */
-export const Label: FC<LabelProps> = () => null;
+export const Label: FC<LabelProps> = () => null
 
 type TooltipProps = {
-  variant?: TooltipVariant; // visual style of the tooltip surface
-  roundness?: TooltipRoundness; // border-radius of the tooltip
-  defaultIndex?: number; // sector index shown by default with no hover
-};
+  variant?: TooltipVariant // visual style of the tooltip surface
+  roundness?: TooltipRoundness // border-radius of the tooltip
+  defaultIndex?: number // sector index shown by default with no hover
+}
 
 /**
  * The hover tooltip. Hidden automatically while the chart is loading.
  */
 export function Tooltip({ variant, roundness, defaultIndex: defaultIndexProp }: TooltipProps) {
-  const { isLoading, nameKey, data, selectedSector } = usePieChart();
+  const { isLoading, nameKey, data, selectedSector } = usePieChart()
 
-  if (isLoading) return null;
+  if (isLoading) return null
 
-  const selectedIndex = selectedSector
-    ? data.findIndex((item) => (item[nameKey] as string) === selectedSector)
-    : -1;
-  const pinnedIndex = selectedIndex >= 0 ? selectedIndex : defaultIndexProp;
+  const selectedIndex = selectedSector ? data.findIndex((item) => (item[nameKey] as string) === selectedSector) : -1
+  const pinnedIndex = selectedIndex >= 0 ? selectedIndex : defaultIndexProp
 
   return (
     <ChartTooltip
@@ -335,27 +323,22 @@ export function Tooltip({ variant, roundness, defaultIndex: defaultIndexProp }: 
         />
       }
     />
-  );
+  )
 }
 
 type LegendProps = {
-  variant?: ChartLegendVariant; // visual style of the legend indicators
-  align?: "left" | "center" | "right"; // horizontal placement
-  verticalAlign?: "top" | "middle" | "bottom"; // vertical placement
-  isClickable?: boolean; // lets each entry toggle selection of its sector
-};
+  variant?: ChartLegendVariant // visual style of the legend indicators
+  align?: "left" | "center" | "right" // horizontal placement
+  verticalAlign?: "top" | "middle" | "bottom" // vertical placement
+  isClickable?: boolean // lets each entry toggle selection of its sector
+}
 
 /**
  * The sector legend. When `isClickable` is set, each entry toggles selection of
  * its sector, driving the shared selection state read by the <Pie />.
  */
-export function Legend({
-  variant,
-  align = "center",
-  verticalAlign = "bottom",
-  isClickable = false,
-}: LegendProps) {
-  const { nameKey, selectedSector, selectSector } = usePieChart();
+export function Legend({ variant, align = "center", verticalAlign = "bottom", isClickable = false }: LegendProps) {
+  const { nameKey, selectedSector, selectSector } = usePieChart()
 
   return (
     <ChartLegend
@@ -371,19 +354,19 @@ export function Legend({
         />
       }
     />
-  );
+  )
 }
 
 type BackgroundProps = {
-  variant?: BackgroundVariant; // background pattern style
-};
+  variant?: BackgroundVariant // background pattern style
+}
 
 /**
  * An optional decorative pattern drawn behind the pie. Compose it before the
  * <Pie /> so it sits underneath the sectors.
  */
 export function Background({ variant = "dots" }: BackgroundProps) {
-  return <ChartBackground variant={variant} />;
+  return <ChartBackground variant={variant} />
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -392,12 +375,12 @@ export function Background({ variant = "dots" }: BackgroundProps) {
 
 // Pulls a <Label /> out of a pie's children into a Recharts LabelList element
 const resolveLabel = (children: ReactNode, valueKey: string): ReactNode => {
-  let label: ReactNode = null;
+  let label: ReactNode = null
 
   Children.forEach(children, (child) => {
-    if (!isValidElement(child) || child.type !== Label) return;
+    if (!isValidElement(child) || child.type !== Label) return
 
-    const { dataKey, labelListProps } = (child as ReactElement<LabelProps>).props;
+    const { dataKey, labelListProps } = (child as ReactElement<LabelProps>).props
 
     label = (
       <RechartsLabelList
@@ -409,17 +392,17 @@ const resolveLabel = (children: ReactNode, valueKey: string): ReactNode => {
         className="fill-background"
         {...labelListProps}
       />
-    );
-  });
+    )
+  })
 
-  return label;
-};
+  return label
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Style definitions — one set per <Pie />, scoped to its unique id
 // ─────────────────────────────────────────────────────────────────────────────
 
-type PieVariant = "gradient";
+type PieVariant = "gradient"
 
 /**
  * Radial-style color gradients, one per sector. Each sector's fill paints from
@@ -430,14 +413,14 @@ const RadialColorGradient = ({
   id,
   config,
 }: {
-  id: string; // unique id of the owning <Pie />
-  config: ChartConfig; // sector colors the gradients are built from
-  variant: PieVariant; // fill style — currently always a diagonal color gradient
+  id: string // unique id of the owning <Pie />
+  config: ChartConfig // sector colors the gradients are built from
+  variant: PieVariant // fill style — currently always a diagonal color gradient
 }) => {
   return (
     <>
       {Object.entries(config).map(([sectorKey, sectorConfig]) => {
-        const colorsCount = getColorsCount(sectorConfig);
+        const colorsCount = getColorsCount(sectorConfig)
 
         return (
           <linearGradient
@@ -455,30 +438,30 @@ const RadialColorGradient = ({
               </>
             ) : (
               Array.from({ length: colorsCount }, (_, index) => {
-                const offset = `${(index / (colorsCount - 1)) * 100}%`;
+                const offset = `${(index / (colorsCount - 1)) * 100}%`
                 return (
                   <stop
                     key={offset}
                     offset={offset}
                     stopColor={`var(--color-${sectorKey}-${index}, var(--color-${sectorKey}-0))`}
                   />
-                );
+                )
               })
             )}
           </linearGradient>
-        );
+        )
       })}
     </>
-  );
-};
+  )
+}
 
 /** Soft outer-glow SVG filter, one per glowing sector. */
 const GlowFilter = ({
   id,
   glowingSectors,
 }: {
-  id: string; // unique id of the owning <Pie />
-  glowingSectors: string[]; // sector names that should glow
+  id: string // unique id of the owning <Pie />
+  glowingSectors: string[] // sector names that should glow
 }) => {
   return (
     <>
@@ -492,12 +475,7 @@ const GlowFilter = ({
           height="300%"
         >
           <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
-          <feColorMatrix
-            in="blur"
-            type="matrix"
-            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.5 0"
-            result="glow"
-          />
+          <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.5 0" result="glow" />
           <feMerge>
             <feMergeNode in="glow" />
             <feMergeNode in="SourceGraphic" />
@@ -505,8 +483,8 @@ const GlowFilter = ({
         </filter>
       ))}
     </>
-  );
-};
+  )
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Loading skeleton
@@ -516,17 +494,17 @@ const GlowFilter = ({
 const LOADING_PIE_DATA = Array.from({ length: LOADING_SECTORS }, (_, i) => ({
   name: `loading${i}`,
   value: 100 / LOADING_SECTORS,
-}));
+}))
 
 /**
  * A single skeleton sector shown while the chart is loading. Each sector pulses
  * with a staggered delay, producing a wave that travels around the pie.
  */
 const AnimatedLoadingSector = (props: ComponentProps<typeof Sector> & { index?: number }) => {
-  const { index = 0, ...sectorProps } = props;
+  const { index = 0, ...sectorProps } = props
 
   // Staggered delay so the pulse sweeps around the circle
-  const delay = (index / LOADING_SECTORS) * (LOADING_ANIMATION_DURATION / 1000);
+  const delay = (index / LOADING_SECTORS) * (LOADING_ANIMATION_DURATION / 1000)
 
   return (
     <m.g
@@ -541,5 +519,5 @@ const AnimatedLoadingSector = (props: ComponentProps<typeof Sector> & { index?: 
     >
       <Sector {...sectorProps} fill="currentColor" />
     </m.g>
-  );
-};
+  )
+}

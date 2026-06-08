@@ -48,11 +48,7 @@ export function dragDataToGridItem(data: Record<string, unknown>): GridItem | nu
     }
   }
 
-  if (
-    data.itemKind === "link" &&
-    typeof data.bookmarkId === "string" &&
-    typeof data.bookmarkUrl === "string"
-  ) {
+  if (data.itemKind === "link" && typeof data.bookmarkId === "string" && typeof data.bookmarkUrl === "string") {
     return {
       type: "link",
       bookmark: {
