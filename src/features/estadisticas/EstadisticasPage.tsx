@@ -1,6 +1,7 @@
 "use client"
 
 import { StatBarChart } from "@/features/estadisticas/components/StatBarChart"
+import { StatMonthlyComposedChart } from "@/features/estadisticas/components/StatMonthlyComposedChart"
 import { StatBookmarkList, StatDuplicateList } from "@/features/estadisticas/components/StatBookmarkList"
 import { StatKpiGrid } from "@/features/estadisticas/components/StatKpiGrid"
 import { StatPieChart } from "@/features/estadisticas/components/StatPieChart"
@@ -79,7 +80,7 @@ export function EstadisticasPage() {
         </div>
 
         <StatSection title="Altas por mes" hint="Según created_at; últimos 14 meses con datos">
-          <StatBarChart
+          <StatMonthlyComposedChart
             caption="Altas de marcadores por mes"
             rows={stats.createdByMonth}
             emptyLabel="Sin fechas de creación registradas"
