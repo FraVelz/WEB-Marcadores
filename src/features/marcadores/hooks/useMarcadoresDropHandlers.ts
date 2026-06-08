@@ -36,6 +36,9 @@ function runDrop(
     handlePasteFolder(sourceItem.id, destId)
     return
   }
+  const sourceBookmark = bookmarks.find((b) => b.id === sourceItem.bookmark.id)
+  if (sourceBookmark && (sourceBookmark.folder_id ?? null) === destId) return
+
   const sameUrl = bookmarks.some(
     (b) => (b.folder_id || null) === destId && b.url === sourceItem.bookmark.url && b.id !== sourceItem.bookmark.id
   )

@@ -9,6 +9,8 @@ import { DesktopDraggableLibraryShortcut } from "@/features/marcadores/desktop/D
 import { useDeskDecorMarquee } from "@/features/marcadores/desktop/useDeskDecorMarquee"
 import { useBookmarkDeskCanvasTarget } from "@/lib/drag-and-drop"
 
+import { MarcadoresGlobalAlertLayer } from "@/features/marcadores/components/MarcadoresGlobalAlertLayer"
+
 import { DESKTOP_LIBRARY_SHORTCUT_KEY } from "./desktopShellConstants"
 import { cn } from "@/lib/utils"
 
@@ -81,12 +83,6 @@ export function MarcadoresDesktopDeskChrome({
         />
       ) : null}
 
-      {floatingOverlays ? (
-        <div className="pointer-events-none absolute top-0 right-0 left-0 z-[80] flex flex-col items-center gap-2 p-2">
-          <div className="pointer-events-auto flex w-full max-w-lg flex-col items-center gap-2">{floatingOverlays}</div>
-        </div>
-      ) : null}
-
       {deskCanvasDropHighlight ? (
         <div
           className={cn(
@@ -101,6 +97,10 @@ export function MarcadoresDesktopDeskChrome({
       ) : null}
 
       {children}
+
+      {floatingOverlays ? (
+        <MarcadoresGlobalAlertLayer variant="desk">{floatingOverlays}</MarcadoresGlobalAlertLayer>
+      ) : null}
     </div>
   )
 }

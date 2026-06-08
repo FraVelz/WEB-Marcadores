@@ -10,6 +10,7 @@ import {
   isBookmarkDragSource,
   type BookmarkDropTargetData,
 } from "@/lib/drag-and-drop/bookmarkDragData"
+import { canHostPanelBookmarkDrop, isInnermostDropTarget } from "@/lib/drag-and-drop/dropTargetUtils"
 
 type Params = {
   elementRef: RefObject<HTMLElement | null>
@@ -42,7 +43,8 @@ export function useBookmarkDropPanel({
 
     return dropTargetForElements({
       element,
-      canDrop: ({ source }) => isBookmarkDragSource(source),
+      canDrop: ({ source, input, element: panelElement }) =>
+        isBookmarkDragSource(source) && canHostPanelBookmarkDrop({ input, element: panelElement }),
       getData: (): BookmarkDropTargetData => ({
         bookmarkDropTarget: true,
       }),
@@ -53,7 +55,8 @@ export function useBookmarkDropPanel({
       onDragLeave: () => {
         onDragLeaveRef.current?.()
       },
-      onDrop: ({ source }) => {
+      onDrop: ({ source, self, location }) => {
+        if (!isInnermostDropTarget(location, self)) return
         const sourceItem = dragDataToGridItem(source.data)
         if (!sourceItem) return
         onDropRef.current?.(sourceItem, undefined)
