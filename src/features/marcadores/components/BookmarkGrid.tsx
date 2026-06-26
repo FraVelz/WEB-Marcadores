@@ -25,6 +25,8 @@ type Props = {
   /** Si se pasan, en el fondo de la cuadrícula se puede dibujar un rectángulo tipo Explorador de Windows. */
   setSelectedIds?: Dispatch<SetStateAction<Set<string>>>
   setSelectMode?: Dispatch<SetStateAction<boolean>>
+  searchQuery?: string
+  searchInDescription?: boolean
 }
 
 export default function BookmarkGrid({
@@ -42,6 +44,8 @@ export default function BookmarkGrid({
   itemRefs,
   setSelectedIds,
   setSelectMode,
+  searchQuery = "",
+  searchInDescription = true,
 }: Props) {
   const [dropPanelSlot, setDropPanelSlot] = useState(false)
   const [dropItemIdx, setDropItemIdx] = useState<number | null>(null)
@@ -248,6 +252,8 @@ export default function BookmarkGrid({
                     }
                   : undefined
               }
+              searchQuery={searchQuery}
+              searchInDescription={searchInDescription}
             />
           )
         })}

@@ -19,6 +19,7 @@ export function MarcadoresDesktopPageSlot(props: {
   closeDeskLibraryWindow: (id: string) => void
   floatingOverlays: ReactNode
   detailBookmark: Bookmark | null
+  detailSearchQuery?: string
   closeBookmarkDetailPanel: () => void
   recordBookmarkOpened: (id: string) => Promise<void>
   onBookmarkUpdate: (id: string, updates: Partial<Bookmark>) => Promise<void>
@@ -56,6 +57,7 @@ export function MarcadoresDesktopPageSlot(props: {
             folders={props.folders}
             embedded
             omitEmbeddedHeader
+            searchQuery={props.detailSearchQuery ?? ""}
           />
         ) : null
       }

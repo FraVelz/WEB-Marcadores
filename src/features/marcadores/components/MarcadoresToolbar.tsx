@@ -12,6 +12,10 @@ type Props = {
   setShowSearch: (v: boolean | ((prev: boolean) => boolean)) => void
   searchValue: string
   setSearchValue: (v: string) => void
+  searchInSubfolders: boolean
+  setSearchInSubfolders: (v: boolean) => void
+  searchInDescription: boolean
+  setSearchInDescription: (v: boolean) => void
   searchRef: React.RefObject<HTMLInputElement | null>
   focusMain?: () => void
   showNewFolder: boolean
@@ -60,44 +64,55 @@ export default function MarcadoresToolbar(props: Props) {
   }
 
   return (
-    <div className="border-app-border bg-app-toolbar flex flex-col gap-2 border-b px-2 py-1.5 md:flex-row md:flex-wrap md:items-center md:gap-x-1 md:gap-y-2 md:py-1">
-      <div className="flex min-w-0 flex-wrap items-center gap-1 md:flex-nowrap">
-        <ToolbarNavigationButtons
-          onNavigateUp={props.onNavigateUp}
-          onAddBookmark={props.onAddBookmark}
-          onNewFolder={() => props.setShowNewFolder(true)}
-          onDeleteFocused={props.onDeleteFocused}
-          hasFocusedItem={!!item && flatList.length > 0}
-          infoPanelEnabled={props.infoPanelEnabled}
-          onToggleInfoPanel={handleToggleInfoPanel}
-          showSearch={props.showSearch}
-          onToggleSearch={() => props.setShowSearch((s) => !s)}
-          treeView={props.treeView}
-          onToggleTreeView={props.onToggleTreeView}
-          treeToggleDisabled={props.treeToggleDisabled}
-          showFullscreenToggle={props.showFullscreenToggle}
-        />
-        <ToolbarSelectActions
-          selectMode={props.selectMode}
-          setSelectMode={props.setSelectMode}
-          selectedIds={props.selectedIds}
-          setSelectedIds={props.setSelectedIds}
-          onEdit={props.onEdit}
-          onDelete={props.onDelete}
-        />
+    <div className="border-app-border bg-app-toolbar flex flex-col gap-2 border-b px-2 py-1.5">
+      <div className="flex min-w-0 flex-wrap items-center gap-x-1 gap-y-1">
+        <div className="flex min-w-0 flex-wrap items-center gap-1 md:flex-nowrap">
+          <ToolbarNavigationButtons
+            onNavigateUp={props.onNavigateUp}
+            onAddBookmark={props.onAddBookmark}
+            onNewFolder={() => props.setShowNewFolder(true)}
+            onDeleteFocused={props.onDeleteFocused}
+            hasFocusedItem={!!item && flatList.length > 0}
+            infoPanelEnabled={props.infoPanelEnabled}
+            onToggleInfoPanel={handleToggleInfoPanel}
+            showSearch={props.showSearch}
+            onToggleSearch={() => props.setShowSearch((s) => !s)}
+            treeView={props.treeView}
+            onToggleTreeView={props.onToggleTreeView}
+            treeToggleDisabled={props.treeToggleDisabled}
+            showFullscreenToggle={props.showFullscreenToggle}
+          />
+          <ToolbarSelectActions
+            selectMode={props.selectMode}
+            setSelectMode={props.setSelectMode}
+            selectedIds={props.selectedIds}
+            setSelectedIds={props.setSelectedIds}
+            onEdit={props.onEdit}
+            onDelete={props.onDelete}
+          />
+        </div>
+        {props.duplicateClusterCount != null && props.duplicateClusterCount > 0 ? (
+          <p className="text-app-fg-muted ml-auto shrink-0 text-[11px]">
+            Posibles duplicados: <span className="text-app-accent font-medium">{props.duplicateClusterCount}</span>
+          </p>
+        ) : null}
       </div>
-      {props.showSearch && (
-        <div className="border-app-border-muted w-full min-w-0 shrink-0 border-t pt-2 md:min-w-[12rem] md:flex-1 md:border-t-0 md:pt-0">
+      {props.showSearch ? (
+        <div className="border-app-border-muted w-full min-w-0 border-t pt-2">
           <ToolbarSearchSection
             searchValue={props.searchValue}
             setSearchValue={props.setSearchValue}
+            searchInSubfolders={props.searchInSubfolders}
+            setSearchInSubfolders={props.setSearchInSubfolders}
+            searchInDescription={props.searchInDescription}
+            setSearchInDescription={props.setSearchInDescription}
             searchRef={props.searchRef}
             onEnter={props.focusMain}
           />
         </div>
-      )}
-      {props.showNewFolder && (
-        <div className="border-app-border-muted w-full min-w-0 shrink-0 border-t pt-2 md:border-t-0 md:pt-0">
+      ) : null}
+      {props.showNewFolder ? (
+        <div className="border-app-border-muted w-full min-w-0 border-t pt-2">
           <ToolbarNewFolderSection
             newFolderName={props.newFolderName}
             setNewFolderName={props.setNewFolderName}
@@ -105,9 +120,9 @@ export default function MarcadoresToolbar(props: Props) {
             onCancel={() => props.setShowNewFolder(false)}
           />
         </div>
-      )}
-      {props.editingFolder && (
-        <div className="border-app-border-muted w-full min-w-0 shrink-0 border-t pt-2 md:border-t-0 md:pt-0">
+      ) : null}
+      {props.editingFolder ? (
+        <div className="border-app-border-muted w-full min-w-0 border-t pt-2">
           <ToolbarRenameFolderSection
             folderName={props.renameFolderName}
             setFolderName={props.setRenameFolderName}
@@ -115,11 +130,6 @@ export default function MarcadoresToolbar(props: Props) {
             onCancel={() => props.setEditingFolder(null)}
           />
         </div>
-      )}
-      {props.duplicateClusterCount != null && props.duplicateClusterCount > 0 ? (
-        <p className="text-app-fg-muted ml-auto shrink-0 self-center text-[11px]">
-          Posibles duplicados: <span className="text-app-accent font-medium">{props.duplicateClusterCount}</span>
-        </p>
       ) : null}
     </div>
   )

@@ -85,7 +85,7 @@ export function useMarcadoresPageCommands(core: MarcadoresPageCore) {
     searchRef: scope.searchRef,
   })
 
-  const treeToggleDisabled = false
+  const treeToggleDisabled = pane.searchValue.trim() !== "" && pane.searchInSubfolders
 
   const toggleTreeMainView = () => {
     b.setViewMode((m) => (m === "grid" ? "tree" : "grid"))

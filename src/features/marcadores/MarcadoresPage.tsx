@@ -31,6 +31,7 @@ export function MarcadoresPage() {
             closeDeskLibraryWindow={m.closeDeskLibraryWindow}
             floatingOverlays={m.desktopFloatingOverlays}
             detailBookmark={pane.detailBookmark}
+            detailSearchQuery={pane.searchValue.trim()}
             closeBookmarkDetailPanel={m.closeBookmarkDetailPanel}
             recordBookmarkOpened={m.recordBookmarkOpened}
             onBookmarkUpdate={m.onBookmarkUpdate}

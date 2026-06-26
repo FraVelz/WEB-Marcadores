@@ -19,12 +19,13 @@ export type LibraryPaneUiState = {
   pasteError: string | null
   deleteConfirmItem: GridItem | null
   searchValue: string
+  searchInSubfolders: boolean
+  searchInDescription: boolean
   bookmarkModalNonce: number
   viewMode: "grid" | "tree"
 }
 
 type DeskPaneUiExtras = {
-  searchLibraryWide: boolean
   treeCollapsedIds: Set<string>
 }
 
@@ -49,6 +50,8 @@ export function createDefaultLibraryPaneUi(): LibraryPaneUiState {
     pasteError: null,
     deleteConfirmItem: null,
     searchValue: "",
+    searchInSubfolders: false,
+    searchInDescription: true,
     bookmarkModalNonce: 0,
     viewMode: "grid",
   }
@@ -57,7 +60,6 @@ export function createDefaultLibraryPaneUi(): LibraryPaneUiState {
 export function createDefaultDeskLibraryPaneUi(): DeskLibraryPaneUiState {
   return {
     ...createDefaultLibraryPaneUi(),
-    searchLibraryWide: false,
     treeCollapsedIds: new Set(),
   }
 }

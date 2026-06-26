@@ -29,6 +29,8 @@ type Props = {
   onToggleSelect: (id: string) => void
   onDoubleClick: (item: GridItem) => void
   onDrop?: (sourceItem: GridItem, targetFolderId?: string | null) => void
+  searchQuery?: string
+  searchInDescription?: boolean
 }
 
 export function TreeRow({
@@ -51,6 +53,8 @@ export function TreeRow({
   onToggleSelect,
   onDoubleClick,
   onDrop,
+  searchQuery = "",
+  searchInDescription = true,
 }: Props) {
   const selectControlId = useId()
   const isFolder = item.type === "folder"
@@ -152,7 +156,12 @@ export function TreeRow({
           onToggleFolderCollapse={onToggleFolderCollapse}
         />
       ) : (
-        <TreeLinkCell bookmark={item.bookmark} padForCheckbox={selectMode} />
+        <TreeLinkCell
+          bookmark={item.bookmark}
+          padForCheckbox={selectMode}
+          searchQuery={searchQuery}
+          searchInDescription={searchInDescription}
+        />
       )}
     </div>
   )

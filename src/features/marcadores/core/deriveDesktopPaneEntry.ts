@@ -2,9 +2,11 @@ import type { TreeFlatRow } from "@/features/marcadores/components/MarcadoresTre
 import type { DeskLibraryPaneUiState } from "@/features/marcadores/state/libraryPaneUiState"
 import { buildMarcadoresTreeFlatRows } from "@/features/marcadores/utils/buildMarcadoresTreeFlatRows"
 import {
-  buildDeskPaneGridItems,
-  filterBookmarksForDeskPane,
-} from "@/features/marcadores/utils/filterBookmarksForDeskPane"
+  buildSearchResultGridItems,
+  filterBookmarksBySearch,
+  isScopedSearchResultsActive,
+} from "@/features/marcadores/utils/bookmarkSearch"
+import { deriveBookmarkFields } from "@/features/marcadores/views/bookmarkDerived"
 import type { Bookmark, FlatFolder, GridItem } from "@/features/marcadores/utils/types"
 import { getFolderPath } from "@/features/marcadores/utils/utils"
 
@@ -23,12 +25,21 @@ function deriveDesktopPaneEntry(
   winFolderId: string | null,
   ui: DeskLibraryPaneUiState
 ): DesktopPaneDerivedEntry {
-  const filtered = filterBookmarksForDeskPane(baseVisible, ui.searchValue, ui.searchLibraryWide, winFolderId)
-  const flatList = buildDeskPaneGridItems(folders, filtered, ui.searchValue, ui.searchLibraryWide, winFolderId)
-  const globalResultsActive = ui.searchLibraryWide && ui.searchValue.trim() !== ""
+  const derivedRows = baseVisible.map((b) => ({ b, d: deriveBookmarkFields(b) }))
+  const searchOpts = {
+    query: ui.searchValue,
+    folderId: winFolderId,
+    folders,
+    searchInSubfolders: ui.searchInSubfolders,
+    searchInDescription: ui.searchInDescription,
+  }
+
+  const filtered = filterBookmarksBySearch(baseVisible, derivedRows, searchOpts)
+  const flatList = buildSearchResultGridItems(folders, filtered, searchOpts)
+  const scopedSearchActive = isScopedSearchResultsActive(searchOpts)
   const breadcrumb = getFolderPath(folders, winFolderId)
-  const treeFlatRows = globalResultsActive ? [] : buildMarcadoresTreeFlatRows(folders, filtered, ui.treeCollapsedIds)
-  const primaryViewMode: "grid" | "tree" = globalResultsActive ? "grid" : ui.viewMode
+  const treeFlatRows = scopedSearchActive ? [] : buildMarcadoresTreeFlatRows(folders, filtered, ui.treeCollapsedIds)
+  const primaryViewMode: "grid" | "tree" = scopedSearchActive ? "grid" : ui.viewMode
   const focusFlatList = primaryViewMode === "tree" ? treeFlatRows.map((r) => r.item) : flatList
 
   return {

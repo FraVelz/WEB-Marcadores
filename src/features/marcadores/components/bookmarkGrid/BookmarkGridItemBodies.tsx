@@ -1,8 +1,14 @@
 "use client"
 
 import Image from "next/image"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 
+import { SearchHighlightText } from "@/features/marcadores/components/SearchHighlightText"
+import {
+  descriptionMatchSnippet,
+  getBookmarkMatchFields,
+  shouldShowDescriptionSnippet,
+} from "@/features/marcadores/utils/bookmarkSearch"
 import { cn } from "@/lib/utils"
 
 import { getFavicon } from "../../utils/utils"
@@ -24,7 +30,19 @@ export function FolderContent({ label }: { label: string }) {
   )
 }
 
-export function LinkContent({ bookmark, locationLabel }: { bookmark: Bookmark; locationLabel?: string }) {
+type LinkContentProps = {
+  bookmark: Bookmark
+  locationLabel?: string
+  searchQuery?: string
+  searchInDescription?: boolean
+}
+
+export function LinkContent({
+  bookmark,
+  locationLabel,
+  searchQuery = "",
+  searchInDescription = true,
+}: LinkContentProps) {
   const favicon = getFavicon(bookmark.url)
   const [faviconError, setFaviconError] = useState(false)
   const hostname = (() => {
@@ -34,6 +52,18 @@ export function LinkContent({ bookmark, locationLabel }: { bookmark: Bookmark; l
       return bookmark.url
     }
   })()
+
+  const matchFields = useMemo(
+    () => getBookmarkMatchFields(bookmark, searchQuery, searchInDescription),
+    [bookmark, searchQuery, searchInDescription]
+  )
+
+  const descriptionSnippet = useMemo(() => {
+    if (!matchFields || !shouldShowDescriptionSnippet(bookmark, matchFields)) return null
+    return descriptionMatchSnippet(bookmark.description, searchQuery)
+  }, [bookmark, matchFields, searchQuery])
+
+  const highlight = searchQuery.trim() !== ""
 
   return (
     <>
@@ -63,13 +93,22 @@ export function LinkContent({ bookmark, locationLabel }: { bookmark: Bookmark; l
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <span className="text-app-fg line-clamp-2 font-medium">{bookmark.title}</span>
-        {locationLabel ? (
-          <p className="text-app-fg-secondary truncate text-xs" title={locationLabel}>
-            {locationLabel}
+        <span className="text-app-fg line-clamp-2 font-medium">
+          {highlight ? <SearchHighlightText text={bookmark.title || ""} query={searchQuery} /> : bookmark.title}
+        </span>
+        {descriptionSnippet ? (
+          <p className="text-app-fg-secondary line-clamp-1 text-xs">
+            <SearchHighlightText text={descriptionSnippet} query={searchQuery} />
           </p>
         ) : null}
-        <p className={cn("text-app-fg-label truncate text-xs", locationLabel && "opacity-90")}>{hostname}</p>
+        {locationLabel ? (
+          <p className="text-app-fg-secondary truncate text-xs" title={locationLabel}>
+            {highlight ? <SearchHighlightText text={locationLabel} query={searchQuery} /> : locationLabel}
+          </p>
+        ) : null}
+        <p className={cn("text-app-fg-label truncate text-xs", locationLabel && "opacity-90")}>
+          {highlight ? <SearchHighlightText text={hostname} query={searchQuery} /> : hostname}
+        </p>
       </div>
     </>
   )

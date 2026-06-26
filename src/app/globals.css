@@ -68,6 +68,8 @@
 
   --app-success-fg: #16a34a;
 
+  --app-search-highlight: color-mix(in srgb, var(--app-accent) 38%, transparent);
+
   /* Escritorio / ventanas (Marcadores escritorio tipo Windows) */
   --app-desktop: #cdd6e4;
   --app-window-chrome: #eef1f8;
@@ -138,6 +140,8 @@ html.dark {
   --app-empty-icon: #52525b;
 
   --app-success-fg: #4ade80;
+
+  --app-search-highlight: color-mix(in srgb, var(--app-accent) 42%, transparent);
 
   --app-desktop: #27272f;
   --app-window-chrome: #3f3f4a;
@@ -219,6 +223,8 @@ html.dark {
   --color-app-empty-icon: var(--app-empty-icon);
 
   --color-app-success-fg: var(--app-success-fg);
+
+  --color-app-search-highlight: var(--app-search-highlight);
 
   --color-app-desktop: var(--app-desktop);
   --color-app-window-chrome: var(--app-window-chrome);
