@@ -64,7 +64,12 @@ export async function proxy(request: NextRequest) {
 
     const isDashboard = dashboardPaths.some((p) => request.nextUrl.pathname.startsWith(p))
 
-    if (user && request.nextUrl.pathname === "/") {
+    if (user && !user.email_confirmed_at && isDashboard) {
+      await supabase.auth.signOut()
+      return NextResponse.redirect(new URL("/?verify=pending", request.url))
+    }
+
+    if (user && user.email_confirmed_at && request.nextUrl.pathname === "/") {
       return NextResponse.redirect(new URL("/marcadores", request.url))
     }
 

@@ -11,9 +11,8 @@ import { useLogin } from "./useLogin"
 import type { LoginType } from "./types"
 
 export function LoginPage({ demo }: { demo: boolean }) {
-  const { email, password, loading, error, setEmail, setPassword, handleDemo, handleLogin, handleSignUp } = useLogin(
-    demo
-  ) as LoginType
+  const { email, password, loading, error, info, setEmail, setPassword, handleDemo, handleLogin, handleSignUp } =
+    useLogin(demo) as LoginType
 
   return (
     <div className="bg-app-login-canvas flex min-h-screen flex-col items-center justify-center gap-8 p-4 lg:flex-row lg:items-start lg:gap-10 lg:py-10">
@@ -46,6 +45,12 @@ export function LoginPage({ demo }: { demo: boolean }) {
             )}
             required
           />
+
+          {info && (
+            <p className="border-app-warn-border bg-app-warn-surface text-app-warn-fg rounded-lg border px-3 py-2 text-sm">
+              {info}
+            </p>
+          )}
 
           {error && <p className="text-app-danger-fg text-sm">{error}</p>}
 
