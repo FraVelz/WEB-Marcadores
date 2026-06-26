@@ -5,11 +5,11 @@ import { cookies } from "next/headers"
 import { DashboardShell } from "@/layouts"
 import { DashboardProvider } from "@/contexts/DashboardContext"
 
-import { cookieHeaderFromRequestCookies, isDemoMode } from "@/lib/demo-data"
+import { resolveDashboardDemoMode } from "@/lib/resolve-dashboard-demo-mode"
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies()
-  const demoMode = isDemoMode(cookieHeaderFromRequestCookies(cookieStore))
+  const demoMode = await resolveDashboardDemoMode(cookieStore)
 
   return (
     <DashboardProvider demoMode={demoMode}>

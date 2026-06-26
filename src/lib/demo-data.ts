@@ -153,7 +153,14 @@ export const DEMO_TAGS = [
   "herramientas",
 ]
 
-/** Serializa cookies de `cookies()` (App Router) para pasarlas a `isDemoMode`. */
+/** Cookie que activa el modo demo en el dashboard sin auth real. */
+export const DEMO_SESSION_COOKIE = "demo_session"
+
+/** Borra la cookie demo en el navegador (p. ej. tras login real). */
+export function clearDemoSessionCookieClient(): void {
+  if (typeof document === "undefined") return
+  document.cookie = `${DEMO_SESSION_COOKIE}=; path=/; max-age=0; SameSite=Lax`
+}
 export function cookieHeaderFromRequestCookies(cookieStore: { getAll(): { name: string; value: string }[] }): string {
   return cookieStore
     .getAll()
@@ -174,11 +181,11 @@ export function isDemoMode(cookieHeader?: string): boolean {
 
   if (!url || !key || url === "" || key === "") return true
   if (cookieHeader !== undefined) {
-    return cookieHeader.includes("demo_session=true")
+    return cookieHeader.includes(`${DEMO_SESSION_COOKIE}=true`)
   }
 
   if (typeof document !== "undefined") {
-    return document.cookie.includes("demo_session=true")
+    return document.cookie.includes(`${DEMO_SESSION_COOKIE}=true`)
   }
 
   return false

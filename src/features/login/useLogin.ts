@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter, useSearchParams } from "next/navigation"
+import { clearDemoSessionCookieClient } from "@/lib/demo-data"
 import { authenticateWithEmailPassword } from "./authenticate-email"
 import { translateAuthError } from "./auth-error-messages"
 import type { LoginType } from "./types"
@@ -57,7 +58,9 @@ export function useLogin(demo: boolean): LoginType {
       return
     }
 
+    clearDemoSessionCookieClient()
     router.push("/marcadores")
+    router.refresh()
     setLoading(false)
   }
 
