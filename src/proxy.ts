@@ -1,11 +1,12 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
+import { DEMO_SESSION_COOKIE } from "@/lib/demo-data"
 import { isMetadataAssetPath, isMetadataCrawler } from "@/lib/metadata"
 
 const dashboardPaths = ["/marcadores", "/atajos", "/perfil", "/estadisticas"]
 
-function isDemoMode(): boolean {
+function isEnvDemoMode(): boolean {
   if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") return true
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -13,7 +14,13 @@ function isDemoMode(): boolean {
   return !url || !key || url === "" || key === ""
 }
 
-const DEMO_COOKIE = "demo_session"
+function clearDemoSessionCookie(response: NextResponse): void {
+  response.cookies.set(DEMO_SESSION_COOKIE, "", { path: "/", maxAge: 0 })
+}
+
+function hasDemoSessionCookie(request: NextRequest): boolean {
+  return request.cookies.get(DEMO_SESSION_COOKIE)?.value === "true"
+}
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -27,20 +34,16 @@ export async function proxy(request: NextRequest) {
   // Siempre permitir /demo: redirigir a marcadores con cookie para modo demo
   if (pathname === "/demo") {
     const res = NextResponse.redirect(new URL("/marcadores", request.url))
-    res.cookies.set(DEMO_COOKIE, "true", { path: "/", maxAge: 60 * 60 * 24 })
+    res.cookies.set(DEMO_SESSION_COOKIE, "true", { path: "/", maxAge: 60 * 60 * 24 })
     return res
   }
 
-  if (isDemoMode()) {
-    return NextResponse.next({ request })
-  }
-
-  // Si hay cookie demo_session, permitir acceso al dashboard sin auth
-  if (request.cookies.get(DEMO_COOKIE)?.value === "true") {
+  if (isEnvDemoMode()) {
     return NextResponse.next({ request })
   }
 
   const response = NextResponse.next({ request })
+  const isDashboard = dashboardPaths.some((p) => pathname.startsWith(p))
 
   try {
     const supabase = createServerClient(
@@ -62,23 +65,34 @@ export async function proxy(request: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser()
 
-    const isDashboard = dashboardPaths.some((p) => request.nextUrl.pathname.startsWith(p))
+    if (user?.email_confirmed_at) {
+      if (hasDemoSessionCookie(request)) {
+        clearDemoSessionCookie(response)
+      }
+
+      if (pathname === "/") {
+        return NextResponse.redirect(new URL("/marcadores", request.url))
+      }
+
+      return response
+    }
 
     if (user && !user.email_confirmed_at && isDashboard) {
       await supabase.auth.signOut()
       return NextResponse.redirect(new URL("/?verify=pending", request.url))
     }
 
-    if (user && user.email_confirmed_at && request.nextUrl.pathname === "/") {
-      return NextResponse.redirect(new URL("/marcadores", request.url))
+    if (hasDemoSessionCookie(request)) {
+      return NextResponse.next({ request })
     }
 
     if (!user && isDashboard) {
       return NextResponse.redirect(new URL("/", request.url))
     }
   } catch {
-    // NetworkError o fallo de conexión: permitir acceso (modo demo implícito)
-    // Evita que el proxy bloquee la app si Supabase no responde
+    if (hasDemoSessionCookie(request)) {
+      return NextResponse.next({ request })
+    }
   }
 
   return response
