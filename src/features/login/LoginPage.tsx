@@ -1,11 +1,9 @@
 "use client"
 
-import Image from "next/image"
-import Link from "next/link"
-
 import { APP_SCREENSHOTS } from "@/lib/siteScreenshots"
 import { cn } from "@/lib/utils"
 
+import { LoginScreenshotLink } from "./components/LoginScreenshotLink"
 import { useLogin } from "./useLogin"
 
 import type { LoginType } from "./types"
@@ -116,25 +114,12 @@ export function LoginPage({ demo }: { demo: boolean }) {
         <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {APP_SCREENSHOTS.map((shot) => (
             <li key={shot.id}>
-              <Link
+              <LoginScreenshotLink
                 href={demo ? "/demo" : shot.href}
-                className={cn(
-                  "border-app-login-border bg-app-login-card group block overflow-hidden rounded-lg border shadow-md",
-                  "hover:border-app-focus transition-colors"
-                )}
-              >
-                <Image
-                  src={shot.publicPath}
-                  alt={shot.alt}
-                  width={1830}
-                  height={1076}
-                  sizes="(max-width: 640px) 100vw, 320px"
-                  className="aspect-[1830/1076] w-full object-cover object-top transition-opacity group-hover:opacity-95"
-                />
-                <p className="text-app-fg border-app-border-muted border-t px-3 py-2 text-sm font-medium">
-                  {shot.label}
-                </p>
-              </Link>
+                label={shot.label}
+                alt={shot.alt}
+                publicPath={shot.publicPath}
+              />
             </li>
           ))}
         </ul>

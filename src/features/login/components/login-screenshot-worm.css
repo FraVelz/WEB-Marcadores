@@ -1,0 +1,27 @@
+@keyframes login-worm-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.login-screenshot-worm-ring {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 255deg,
+    var(--app-focus) 285deg,
+    var(--app-primary) 315deg,
+    transparent 345deg
+  );
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .login-screenshot-worm-ring {
+    animation: login-worm-spin 2.6s linear infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-screenshot-worm-ring {
+    background: conic-gradient(from 0deg, var(--app-focus), var(--app-primary), var(--app-focus));
+  }
+}
