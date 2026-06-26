@@ -28,9 +28,10 @@ export type LibraryPaneUiBindings = {
   setPasteError: Setter<string | null>
   setDeleteConfirmItem: Setter<LibraryPaneUiState["deleteConfirmItem"]>
   setSearchValue: Setter<string>
+  setSearchInSubfolders: Setter<boolean>
+  setSearchInDescription: Setter<boolean>
   setBookmarkModalNonce: Setter<number>
   setViewMode: Setter<"grid" | "tree">
-  setSearchLibraryWide?: Setter<boolean>
 }
 
 export type LibraryPaneUiScope = {
@@ -62,6 +63,8 @@ export function createLibraryPaneBindings(
     setPasteError: (a) => patch("pasteError", a),
     setDeleteConfirmItem: (a) => patch("deleteConfirmItem", a),
     setSearchValue: (a) => patch("searchValue", a),
+    setSearchInSubfolders: (a) => patch("searchInSubfolders", a),
+    setSearchInDescription: (a) => patch("searchInDescription", a),
     setBookmarkModalNonce: (a) => patch("bookmarkModalNonce", a),
     setViewMode: (a) => patch("viewMode", a),
   }
@@ -88,12 +91,9 @@ export function createDeskPaneScope(
     })
   }
 
-  const bindings: DeskPaneUiBindings = {
-    ...createLibraryPaneBindings(
-      patch as <Key extends keyof LibraryPaneUiState>(key: Key, action: SetStateAction<LibraryPaneUiState[Key]>) => void
-    ),
-    setSearchLibraryWide: (a) => patch("searchLibraryWide", a),
-  }
+  const bindings = createLibraryPaneBindings(
+    patch as <Key extends keyof LibraryPaneUiState>(key: Key, action: SetStateAction<LibraryPaneUiState[Key]>) => void
+  )
 
   return {
     getState: () => deskUiByWin[winId] ?? createDefaultDeskLibraryPaneUi(),
@@ -104,6 +104,4 @@ export function createDeskPaneScope(
   }
 }
 
-export type DeskPaneUiBindings = LibraryPaneUiBindings & {
-  setSearchLibraryWide: Setter<boolean>
-}
+export type DeskPaneUiBindings = LibraryPaneUiBindings

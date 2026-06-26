@@ -1,14 +1,27 @@
 "use client"
 
 import Image from "next/image"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 
+import { SearchHighlightText } from "@/features/marcadores/components/SearchHighlightText"
+import {
+  descriptionMatchSnippet,
+  getBookmarkMatchFields,
+  shouldShowDescriptionSnippet,
+} from "@/features/marcadores/utils/bookmarkSearch"
 import { cn } from "@/lib/utils"
 
 import { getFavicon } from "../../utils/utils"
 import type { Bookmark } from "../../utils/types"
 
-export function TreeLinkCell({ bookmark, padForCheckbox }: { bookmark: Bookmark; padForCheckbox: boolean }) {
+type Props = {
+  bookmark: Bookmark
+  padForCheckbox: boolean
+  searchQuery?: string
+  searchInDescription?: boolean
+}
+
+export function TreeLinkCell({ bookmark, padForCheckbox, searchQuery = "", searchInDescription = true }: Props) {
   const favicon = getFavicon(bookmark.url)
   const [faviconError, setFaviconError] = useState(false)
   const hostname = (() => {
@@ -18,6 +31,18 @@ export function TreeLinkCell({ bookmark, padForCheckbox }: { bookmark: Bookmark;
       return bookmark.url
     }
   })()
+
+  const matchFields = useMemo(
+    () => getBookmarkMatchFields(bookmark, searchQuery, searchInDescription),
+    [bookmark, searchQuery, searchInDescription]
+  )
+
+  const descriptionSnippet = useMemo(() => {
+    if (!matchFields || !shouldShowDescriptionSnippet(bookmark, matchFields)) return null
+    return descriptionMatchSnippet(bookmark.description, searchQuery)
+  }, [bookmark, matchFields, searchQuery])
+
+  const highlight = searchQuery.trim() !== ""
 
   return (
     <>
@@ -47,8 +72,17 @@ export function TreeLinkCell({ bookmark, padForCheckbox }: { bookmark: Bookmark;
         </div>
       )}
       <div className="min-w-0 flex-1 py-1">
-        <span className="text-app-fg font-medium">{bookmark.title}</span>
-        <p className="text-app-fg-label truncate text-xs">{hostname}</p>
+        <span className="text-app-fg font-medium">
+          {highlight ? <SearchHighlightText text={bookmark.title || ""} query={searchQuery} /> : bookmark.title}
+        </span>
+        {descriptionSnippet ? (
+          <p className="text-app-fg-secondary line-clamp-1 text-xs">
+            <SearchHighlightText text={descriptionSnippet} query={searchQuery} />
+          </p>
+        ) : null}
+        <p className="text-app-fg-label truncate text-xs">
+          {highlight ? <SearchHighlightText text={hostname} query={searchQuery} /> : hostname}
+        </p>
       </div>
     </>
   )

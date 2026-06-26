@@ -5,7 +5,6 @@ import { useMemo, useRef } from "react"
 import BookmarkGrid from "@/features/marcadores/components/BookmarkGrid"
 import MarcadoresBreadcrumb from "@/features/marcadores/components/MarcadoresBreadcrumb"
 import { MarcadoresExplorerRail } from "@/features/marcadores/components/MarcadoresExplorerRail"
-import MarcadoresBrowseControls from "@/features/marcadores/components/MarcadoresBrowseControls"
 import MarcadoresFooter from "@/features/marcadores/components/MarcadoresFooter"
 import MarcadoresToolbar from "@/features/marcadores/components/MarcadoresToolbar"
 import MarcadoresTreeView from "@/features/marcadores/components/MarcadoresTreeView"
@@ -37,6 +36,10 @@ export function MarcadoresDesktopLibraryPane(props: MarcadoresDesktopLibraryPane
         setShowSearch={props.setShowSearch}
         searchValue={props.searchValue}
         setSearchValue={props.setSearchValue}
+        searchInSubfolders={props.searchInSubfolders}
+        setSearchInSubfolders={props.setSearchInSubfolders}
+        searchInDescription={props.searchInDescription}
+        setSearchInDescription={props.setSearchInDescription}
         searchRef={props.searchRef}
         focusMain={props.focusMain}
         showNewFolder={props.showNewFolder}
@@ -69,11 +72,6 @@ export function MarcadoresDesktopLibraryPane(props: MarcadoresDesktopLibraryPane
         showFullscreenToggle={false}
       />
 
-      <MarcadoresBrowseControls
-        searchLibraryWide={props.searchLibraryWide}
-        setSearchLibraryWide={props.setSearchLibraryWide}
-      />
-
       <MarcadoresBreadcrumb breadcrumb={props.breadcrumb} onSelect={props.onSelectBreadcrumb} />
 
       <div className="flex min-h-0 flex-1 flex-row overflow-hidden">
@@ -98,6 +96,8 @@ export function MarcadoresDesktopLibraryPane(props: MarcadoresDesktopLibraryPane
               itemRefs={gridRefs}
               setSelectedIds={props.setSelectedIds}
               setSelectMode={props.setSelectMode}
+              searchQuery={props.searchValue.trim()}
+              searchInDescription={props.searchInDescription}
             />
           ) : (
             <MarcadoresTreeView
@@ -118,6 +118,8 @@ export function MarcadoresDesktopLibraryPane(props: MarcadoresDesktopLibraryPane
               onNewFolder={() => props.setShowNewFolder(true)}
               itemRefs={gridRefs}
               currentLocationLabel={props.currentLocationLabel}
+              searchQuery={props.searchValue.trim()}
+              searchInDescription={props.searchInDescription}
             />
           )}
         </div>

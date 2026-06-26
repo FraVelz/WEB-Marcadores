@@ -28,6 +28,8 @@ export function MarcadoresStackedPageSlot({ m }: { m: MarcadoresPageModel }) {
             itemRefs={scope.itemRefs}
             onSelectIndex={scope.bindings.setSelectedIndex}
             onToggleSelect={m.toggleSelect}
+            searchQuery={pane.searchValue.trim()}
+            searchInDescription={pane.searchInDescription}
           />
         ) : (
           <MarcadoresTreeView
@@ -48,6 +50,8 @@ export function MarcadoresStackedPageSlot({ m }: { m: MarcadoresPageModel }) {
             onSelectIndex={scope.bindings.setSelectedIndex}
             onToggleSelect={m.toggleSelect}
             currentLocationLabel={m.breadcrumb.map((p) => p.label).join(" › ")}
+            searchQuery={pane.searchValue.trim()}
+            searchInDescription={pane.searchInDescription}
           />
         )}
         <BookmarkDetailPanel
@@ -57,6 +61,7 @@ export function MarcadoresStackedPageSlot({ m }: { m: MarcadoresPageModel }) {
           onTelemetryOpen={m.recordBookmarkOpened}
           allTags={m.allTags}
           folders={m.folders}
+          searchQuery={pane.searchValue.trim()}
         />
       </div>
     </div>

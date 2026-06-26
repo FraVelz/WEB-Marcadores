@@ -32,13 +32,39 @@ function textContainsQuery(text: string, q: string): boolean {
   return text.indexOf(q) !== -1
 }
 
-/** Búsqueda en título, descripción, URL y etiquetas (una pasada, sin `.includes` en bucles anidados). */
-export function bookmarkDerivedMatchesSearchQuery(d: DerivedBookmarkFields, q: string): boolean {
-  if (textContainsQuery(d.lowerTitle, q)) return true
-  if (textContainsQuery(d.lowerDesc, q)) return true
-  if (textContainsQuery(d.lowerUrl, q)) return true
+export type BookmarkMatchFields = {
+  title: boolean
+  url: boolean
+  description: boolean
+  tags: boolean
+}
+
+/** Qué campos contienen la query (para resaltado y snippet de descripción). */
+export function bookmarkMatchedFields(
+  d: DerivedBookmarkFields,
+  q: string,
+  includeDescription: boolean
+): BookmarkMatchFields {
+  const title = textContainsQuery(d.lowerTitle, q)
+  const url = textContainsQuery(d.lowerUrl, q) || (d.host !== null && textContainsQuery(d.host, q))
+  let tags = false
   for (const tag of d.tagSetLower) {
-    if (textContainsQuery(tag, q)) return true
+    if (textContainsQuery(tag, q)) {
+      tags = true
+      break
+    }
   }
-  return false
+  const description = includeDescription && textContainsQuery(d.lowerDesc, q)
+  return { title, url, description, tags }
+}
+
+/** Búsqueda en título, URL, tags y opcionalmente descripción. */
+export function bookmarkDerivedMatchesSearchQuery(
+  d: DerivedBookmarkFields,
+  q: string,
+  options?: { includeDescription?: boolean }
+): boolean {
+  const includeDescription = options?.includeDescription ?? true
+  const fields = bookmarkMatchedFields(d, q, includeDescription)
+  return fields.title || fields.url || fields.tags || fields.description
 }

@@ -36,6 +36,8 @@ type Props = {
   itemRefs: React.MutableRefObject<Map<number, HTMLDivElement>>
   /** Texto de la carpeta abierta en la barra lateral / migas (destino del área vacía) */
   currentLocationLabel: string
+  searchQuery?: string
+  searchInDescription?: boolean
 }
 
 export default function MarcadoresTreeView({
@@ -56,6 +58,8 @@ export default function MarcadoresTreeView({
   onNewFolder,
   itemRefs,
   currentLocationLabel,
+  searchQuery = "",
+  searchInDescription = true,
 }: Props) {
   const [dropPreview, setDropPreview] = useState<DropPreview | null>(null)
   const panelRef = useRef<HTMLDivElement | null>(null)
@@ -147,6 +151,8 @@ export default function MarcadoresTreeView({
                       }
                     : undefined
                 }
+                searchQuery={searchQuery}
+                searchInDescription={searchInDescription}
               />
             )
           })}

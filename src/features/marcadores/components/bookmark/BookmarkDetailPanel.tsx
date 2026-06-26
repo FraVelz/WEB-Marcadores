@@ -5,6 +5,7 @@ import Image from "next/image"
 
 import type { Bookmark } from "@/features/marcadores/utils/types"
 
+import { SearchHighlightText } from "@/features/marcadores/components/SearchHighlightText"
 import { buildFolderOptions, getFaviconUrl, getFolderPathLabel } from "@/lib/bookmark-utils"
 import BookmarkDetailFolderSection from "./BookmarkDetailFolderSection"
 import BookmarkDetailTagsSection from "./BookmarkDetailTagsSection"
@@ -22,6 +23,8 @@ type Props = {
   allTags: string[]
   folders: Folder[]
   embedded?: boolean
+  /** Query debounced del buscador; resalta coincidencias en título, URL y descripción. */
+  searchQuery?: string
   /** Oculta la cabecera interna cuando el panel va dentro de un marco de ventana de escritorio */
   omitEmbeddedHeader?: boolean
 }
@@ -35,6 +38,7 @@ function BookmarkDetailPanelInner({
   folders,
   embedded = false,
   omitEmbeddedHeader = false,
+  searchQuery = "",
 }: Props & { bookmark: NonNullable<Props["bookmark"]> }) {
   const [newTag, setNewTag] = useState("")
   const [saving, setSaving] = useState(false)
@@ -60,6 +64,7 @@ function BookmarkDetailPanelInner({
     : null
   const folderOptions = buildFolderOptions(folders)
   const currentFolderPath = getFolderPathLabel(folders, bookmark.folder_id || null)
+  const highlight = searchQuery.trim() !== ""
 
   const handleTelemetry = () => {
     if (onTelemetryOpen) void onTelemetryOpen(bookmark.id)
@@ -159,7 +164,9 @@ function BookmarkDetailPanelInner({
               </div>
             )}
             <div className="min-w-0 flex-1">
-              <h2 className="text-app-fg font-semibold">{bookmark.title}</h2>
+              <h2 className="text-app-fg font-semibold">
+                {highlight ? <SearchHighlightText text={bookmark.title || ""} query={searchQuery} /> : bookmark.title}
+              </h2>
               <a
                 href={bookmark.url}
                 target="_blank"
@@ -171,7 +178,7 @@ function BookmarkDetailPanelInner({
                 onClick={handleTelemetry}
                 className="text-app-link mt-1 block truncate text-xs hover:underline"
               >
-                {bookmark.url}
+                {highlight ? <SearchHighlightText text={bookmark.url || ""} query={searchQuery} /> : bookmark.url}
               </a>
             </div>
           </div>
@@ -213,7 +220,13 @@ function BookmarkDetailPanelInner({
           {bookmark.description ? (
             <div>
               <div className="text-app-fg-label mb-1 text-xs font-medium">Descripción</div>
-              <p className="text-app-fg-secondary text-sm">{bookmark.description}</p>
+              <p className="text-app-fg-secondary text-sm">
+                {highlight ? (
+                  <SearchHighlightText text={bookmark.description} query={searchQuery} />
+                ) : (
+                  bookmark.description
+                )}
+              </p>
             </div>
           ) : null}
 
@@ -276,6 +289,7 @@ export default function BookmarkDetailPanel({
   folders,
   embedded = false,
   omitEmbeddedHeader = false,
+  searchQuery = "",
 }: Props) {
   useHotkeys(
     "esc",
@@ -300,6 +314,7 @@ export default function BookmarkDetailPanel({
       folders={folders}
       embedded={embedded}
       omitEmbeddedHeader={omitEmbeddedHeader}
+      searchQuery={searchQuery}
     />
   )
 }

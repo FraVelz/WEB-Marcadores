@@ -121,7 +121,7 @@ export function MarcadoresDesktopLibraryPaneBody(props: MarcadoresDesktopLibrary
     })
   }, [panePrimaryMode, paneTreeRows.length, winId, updateDeskUi])
 
-  const globalResultsActive = ui.searchLibraryWide && ui.searchValue.trim() !== ""
+  const globalResultsActive = ui.searchInSubfolders && ui.searchValue.trim() !== ""
 
   const toggleTreeMainView = () => {
     b.setViewMode((m) => (m === "grid" ? "tree" : "grid"))
@@ -141,6 +141,10 @@ export function MarcadoresDesktopLibraryPaneBody(props: MarcadoresDesktopLibrary
       setShowSearch={b.setShowSearch}
       searchValue={ui.searchValue}
       setSearchValue={b.setSearchValue}
+      searchInSubfolders={ui.searchInSubfolders}
+      setSearchInSubfolders={b.setSearchInSubfolders}
+      searchInDescription={ui.searchInDescription}
+      setSearchInDescription={b.setSearchInDescription}
       searchRef={getDeskSearchRef(winId)}
       focusMain={focusMain}
       showNewFolder={ui.showNewFolder}
@@ -173,8 +177,6 @@ export function MarcadoresDesktopLibraryPaneBody(props: MarcadoresDesktopLibrary
       treeView={ui.viewMode === "tree"}
       onToggleTreeView={treeToggleDisabled ? undefined : toggleTreeMainView}
       treeToggleDisabled={treeToggleDisabled}
-      searchLibraryWide={ui.searchLibraryWide}
-      setSearchLibraryWide={b.setSearchLibraryWide}
       breadcrumb={paneBreadcrumb}
       onSelectBreadcrumb={setPaneFolder}
       primaryViewMode={panePrimaryMode}

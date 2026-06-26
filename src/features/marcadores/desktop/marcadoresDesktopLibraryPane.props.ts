@@ -14,6 +14,10 @@ export type MarcadoresDesktopLibraryPaneProps = {
   setShowSearch: Dispatch<SetStateAction<boolean>>
   searchValue: string
   setSearchValue: (v: string) => void
+  searchInSubfolders: boolean
+  setSearchInSubfolders: Dispatch<SetStateAction<boolean>>
+  searchInDescription: boolean
+  setSearchInDescription: Dispatch<SetStateAction<boolean>>
   searchRef: RefObject<HTMLInputElement | null>
   focusMain?: () => void
 
@@ -47,9 +51,6 @@ export type MarcadoresDesktopLibraryPaneProps = {
   treeView: boolean
   onToggleTreeView?: () => void
   treeToggleDisabled?: boolean
-
-  searchLibraryWide: boolean
-  setSearchLibraryWide: Dispatch<SetStateAction<boolean>>
 
   breadcrumb: { id: string | null; label: string }[]
   onSelectBreadcrumb: (id: string | null) => void

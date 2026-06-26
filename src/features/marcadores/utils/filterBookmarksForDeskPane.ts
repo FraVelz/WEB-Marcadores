@@ -1,68 +1,44 @@
-import { buildMarcadoresFlatList } from "@/features/marcadores/hooks/useMarcadoresData"
+import {
+  buildSearchResultGridItems,
+  filterBookmarksBySearch,
+  type BookmarkSearchOptions,
+} from "@/features/marcadores/utils/bookmarkSearch"
 import type { Bookmark, FlatFolder, GridItem } from "@/features/marcadores/utils/types"
-import { getFolderPath } from "@/features/marcadores/utils/utils"
-import { deriveBookmarkFields } from "@/features/marcadores/views/bookmarkDerived"
 
-function bookmarkMatchesSearch(bookmark: Bookmark, q: string): boolean {
-  if (q === "") return true
-  const derived = deriveBookmarkFields(bookmark)
-  return (
-    derived.lowerTitle.includes(q) ||
-    derived.lowerDesc.includes(q) ||
-    derived.lowerUrl.includes(q) ||
-    [...derived.tagSetLower].some((t) => t.includes(q))
-  )
-}
-
-function folderPathCaption(folders: FlatFolder[], folderId: string | null | undefined): string {
-  const id = folderId ?? null
-  if (!id) return "Marcadores"
-  return getFolderPath(folders, id)
-    .map((p) => p.label)
-    .join(" › ")
-}
-
-/**
- * Texto + ámbito de búsqueda en ventanas de escritorio.
- * `searchLibraryWide`: todos los marcadores visibles; si no, solo la carpeta activa del panel.
- */
+/** @deprecated Usar bookmarkSearch.ts directamente. Mantenido para compatibilidad interna. */
 export function filterBookmarksForDeskPane(
   bookmarksVisible: Bookmark[],
+  derivedRows: { b: Bookmark; d: import("@/features/marcadores/views/bookmarkDerived").DerivedBookmarkFields }[],
   searchValue: string,
-  searchLibraryWide: boolean,
-  currentFolderId: string | null
+  searchInSubfolders: boolean,
+  searchInDescription: boolean,
+  currentFolderId: string | null,
+  folders: FlatFolder[]
 ): Bookmark[] {
-  const q = searchValue.trim().toLowerCase()
-  let pool: Bookmark[]
-  if (q === "") {
-    pool = bookmarksVisible
-  } else if (searchLibraryWide) {
-    pool = bookmarksVisible.filter((b) => bookmarkMatchesSearch(b, q))
-  } else {
-    pool = bookmarksVisible.filter((b) => (b.folder_id || null) === currentFolderId && bookmarkMatchesSearch(b, q))
+  const opts: BookmarkSearchOptions = {
+    query: searchValue,
+    folderId: currentFolderId,
+    folders,
+    searchInSubfolders,
+    searchInDescription,
   }
-
-  return pool
+  return filterBookmarksBySearch(bookmarksVisible, derivedRows, opts)
 }
 
-/** Lista de rejilla / árbol para un panel de escritorio (incluye etiquetas de ruta en búsqueda global). */
+/** @deprecated Usar buildSearchResultGridItems. */
 export function buildDeskPaneGridItems(
   folders: FlatFolder[],
   filteredBookmarks: Bookmark[],
   searchValue: string,
-  searchLibraryWide: boolean,
+  searchInSubfolders: boolean,
+  searchInDescription: boolean,
   selectedFolderId: string | null
 ): GridItem[] {
-  const q = searchValue.trim()
-  if (searchLibraryWide && q !== "") {
-    return filteredBookmarks
-      .slice()
-      .sort((a, b) => (a.title || "").localeCompare(b.title || ""))
-      .map((b) => ({
-        type: "link" as const,
-        bookmark: b,
-        locationLabel: folderPathCaption(folders, b.folder_id),
-      }))
-  }
-  return buildMarcadoresFlatList(folders, filteredBookmarks, selectedFolderId)
+  return buildSearchResultGridItems(folders, filteredBookmarks, {
+    query: searchValue,
+    folderId: selectedFolderId,
+    folders,
+    searchInSubfolders,
+    searchInDescription,
+  })
 }

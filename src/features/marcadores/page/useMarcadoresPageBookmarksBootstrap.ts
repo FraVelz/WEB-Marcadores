@@ -27,10 +27,19 @@ export function useMarcadoresPageBookmarksBootstrap(p: {
   deskUiByWin: Record<string, DeskLibraryPaneUiState>
   setDetailBookmark: React.Dispatch<React.SetStateAction<Bookmark | null>>
   searchValue: string
+  searchInSubfolders: boolean
+  searchInDescription: boolean
 }) {
-  const searchForData = p.desktopWindowChrome ? "" : p.searchValue
-
-  const data = useMarcadoresData(searchForData, p.activeBrowseFolderId, p.dash.setFolders)
+  const data = useMarcadoresData(
+    {
+      enabled: !p.desktopWindowChrome,
+      query: p.searchValue,
+      folderId: p.activeBrowseFolderId,
+      searchInSubfolders: p.searchInSubfolders,
+      searchInDescription: p.searchInDescription,
+    },
+    p.dash.setFolders
+  )
 
   const desktopPaneDerived = useMemo((): Record<string, DesktopPaneDerivedEntry> | null => {
     if (!p.desktopWindowChrome) return null

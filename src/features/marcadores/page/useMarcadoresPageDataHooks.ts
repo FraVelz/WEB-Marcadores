@@ -90,6 +90,8 @@ export function useMarcadoresPageDataHooks() {
     deskUiByWin,
     setDetailBookmark: libraryPaneScope.bindings.setDetailBookmark,
     searchValue: desktopWindowChrome ? "" : paneUi.searchValue,
+    searchInSubfolders: paneUi.searchInSubfolders,
+    searchInDescription: paneUi.searchInDescription,
   })
 
   const {

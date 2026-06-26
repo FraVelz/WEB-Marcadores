@@ -6,7 +6,12 @@ import { useDashboard } from "@/contexts/DashboardContext"
 import { createClient } from "@/lib/supabase/client"
 import { DEMO_BOOKMARKS, DEMO_FOLDERS } from "@/lib/demo-data"
 
-import { bookmarkDerivedMatchesSearchQuery, deriveBookmarkFields } from "../views/bookmarkDerived"
+import { deriveBookmarkFields } from "../views/bookmarkDerived"
+import {
+  buildSearchResultGridItems,
+  filterBookmarksBySearch,
+  type BookmarkSearchOptions,
+} from "../utils/bookmarkSearch"
 import { buildFoldersByParentIndex } from "../utils/folderIndex"
 import { buildFolderTree, getFolderPath } from "../utils/utils"
 import type { Bookmark, FlatFolder, GridItem } from "../utils/types"
@@ -44,9 +49,16 @@ export function buildMarcadoresFlatList(
   return [...subfolders, ...links]
 }
 
+export type MarcadoresDataSearchConfig = {
+  enabled: boolean
+  query: string
+  folderId: string | null
+  searchInSubfolders: boolean
+  searchInDescription: boolean
+}
+
 export function useMarcadoresData(
-  searchValue: string,
-  selectedFolderId: string | null,
+  search: MarcadoresDataSearchConfig,
   setCtxFolders: (folders: import("@/contexts/DashboardContext").Folder[]) => void
 ) {
   const { demoMode, setAllTagsFromBookmarks } = useDashboard()
@@ -86,24 +98,32 @@ export function useMarcadoresData(
     [bookmarksVisible]
   )
 
+  const searchOpts = useMemo(
+    (): BookmarkSearchOptions => ({
+      query: search.query,
+      folderId: search.folderId,
+      folders,
+      searchInSubfolders: search.searchInSubfolders,
+      searchInDescription: search.searchInDescription,
+    }),
+    [search.query, search.folderId, search.searchInSubfolders, search.searchInDescription, folders]
+  )
+
   const filteredBySearch = useMemo(() => {
-    const q = searchValue.trim().toLowerCase()
-    if (!q) return bookmarksVisible
-    const matched: typeof bookmarksVisible = []
-    for (const { b, d } of derivedRows) {
-      if (bookmarkDerivedMatchesSearchQuery(d, q)) matched.push(b)
-    }
-    return matched
-  }, [bookmarksVisible, derivedRows, searchValue])
+    if (!search.enabled) return bookmarksVisible
+    return filterBookmarksBySearch(bookmarksVisible, derivedRows, searchOpts)
+  }, [bookmarksVisible, derivedRows, search.enabled, searchOpts])
 
   const filteredBookmarks = filteredBySearch
 
-  const flatList = useMemo(
-    (): GridItem[] => buildMarcadoresFlatList(folders, filteredBookmarks, selectedFolderId),
-    [filteredBookmarks, folders, selectedFolderId]
-  )
+  const flatList = useMemo((): GridItem[] => {
+    if (!search.enabled) {
+      return buildMarcadoresFlatList(folders, bookmarksVisible, search.folderId)
+    }
+    return buildSearchResultGridItems(folders, filteredBookmarks, searchOpts)
+  }, [search.enabled, folders, bookmarksVisible, filteredBookmarks, searchOpts, search.folderId])
 
-  const breadcrumb = useMemo(() => getFolderPath(folders, selectedFolderId), [folders, selectedFolderId])
+  const breadcrumb = useMemo(() => getFolderPath(folders, search.folderId), [folders, search.folderId])
 
   return {
     bookmarks,
@@ -116,5 +136,6 @@ export function useMarcadoresData(
     filteredBookmarks,
     breadcrumb,
     libraryMatchesSearch: filteredBySearch,
+    searchOpts,
   }
 }

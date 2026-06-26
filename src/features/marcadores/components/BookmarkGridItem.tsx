@@ -22,6 +22,8 @@ type Props = {
   dropHighlight?: boolean
   onBookmarkDragHover?: () => void
   onBookmarkDragHoverLeave?: () => void
+  searchQuery?: string
+  searchInDescription?: boolean
 }
 
 function BookmarkGridItem({
@@ -39,6 +41,8 @@ function BookmarkGridItem({
   dropHighlight = false,
   onBookmarkDragHover,
   onBookmarkDragHoverLeave,
+  searchQuery = "",
+  searchInDescription = true,
 }: Props) {
   const selectControlId = useId()
   const isFolder = item.type === "folder"
@@ -130,7 +134,12 @@ function BookmarkGridItem({
       {isFolder ? (
         <FolderContent label={item.label} />
       ) : (
-        <LinkContent bookmark={item.bookmark} locationLabel={item.locationLabel} />
+        <LinkContent
+          bookmark={item.bookmark}
+          locationLabel={item.locationLabel}
+          searchQuery={searchQuery}
+          searchInDescription={searchInDescription}
+        />
       )}
     </div>
   )

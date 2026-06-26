@@ -20,6 +20,10 @@ export function MarcadoresPageStackedChrome({ m }: { m: MarcadoresPageModel }) {
         setShowSearch={b.setShowSearch}
         searchValue={pane.searchValue}
         setSearchValue={b.setSearchValue}
+        searchInSubfolders={pane.searchInSubfolders}
+        setSearchInSubfolders={b.setSearchInSubfolders}
+        searchInDescription={pane.searchInDescription}
+        setSearchInDescription={b.setSearchInDescription}
         searchRef={scope.searchRef}
         focusMain={m.focusMain}
         showNewFolder={pane.showNewFolder}
