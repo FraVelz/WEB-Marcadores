@@ -3,10 +3,7 @@
     "overrides": [
       {
         "files": ["src/components/evilcharts/**"],
-        "rules": [
-          "react-doctor/prefer-dynamic-import",
-          "react-doctor/rerender-state-only-in-handlers"
-        ]
+        "rules": ["react-doctor/prefer-dynamic-import", "react-doctor/rerender-state-only-in-handlers"]
       }
     ]
   }
