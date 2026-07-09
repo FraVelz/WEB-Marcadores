@@ -1,1 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 64"><defs><style>.cls-1{fill:#ef9014;}.cls-2{fill:#ebeff1;}.cls-3{fill:#ff2400;}</style></defs><title>Book Mark</title><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><path class="cls-1" d="M6,0H46a2,2,0,0,1,2,2V62a2,2,0,0,1-2,2H6a6,6,0,0,1-6-6V6A6,6,0,0,1,6,0Z"/><path class="cls-2" d="M6,4H48a0,0,0,0,1,0,0V8a0,0,0,0,1,0,0H6A2,2,0,0,1,4,6V6A2,2,0,0,1,6,4Z"/><path class="cls-3" d="M38,8H34V29.59a1,1,0,0,0,1.71.71l1.59-1.59a1,1,0,0,1,1.41,0l1.59,1.59A1,1,0,0,0,42,29.59V8Z"/></g></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Marcadores">
+  <rect width="32" height="32" rx="7" fill="#1d4ed8"/>
+  <g transform="translate(4, 4)">
+    <path fill="#ffffff" d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+  </g>
+</svg>

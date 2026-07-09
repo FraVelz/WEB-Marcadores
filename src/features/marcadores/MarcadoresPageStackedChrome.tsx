@@ -1,7 +1,6 @@
 "use client"
 
 import DemoBanner from "@/features/marcadores/components/DemoBanner"
-import DeleteConfirmBanner from "@/features/marcadores/components/DeleteConfirmBanner"
 import { MarcadoresContentHeader } from "@/features/marcadores/components/MarcadoresContentHeader"
 import { MarcadoresGlobalAlertLayer } from "@/features/marcadores/components/MarcadoresGlobalAlertLayer"
 import { MarcadoresSecondaryActions } from "@/features/marcadores/components/MarcadoresSecondaryActions"
@@ -60,16 +59,9 @@ export function MarcadoresPageStackedChrome({ m }: { m: MarcadoresPageModel }) {
         duplicateClusterCount={m.duplicateClusterCount}
       />
 
-      {pane.pasteError || pane.deleteConfirmItem || m.demoMode ? (
+      {pane.pasteError || m.demoMode ? (
         <MarcadoresGlobalAlertLayer variant="stacked">
           {pane.pasteError ? <PasteErrorBanner message={pane.pasteError} /> : null}
-          {pane.deleteConfirmItem ? (
-            <DeleteConfirmBanner
-              item={pane.deleteConfirmItem}
-              onConfirm={() => m.onConfirmDelete(pane.deleteConfirmItem!)}
-              onCancel={() => b.setDeleteConfirmItem(null)}
-            />
-          ) : null}
           {m.demoMode ? <DemoBanner /> : null}
         </MarcadoresGlobalAlertLayer>
       ) : null}

@@ -92,13 +92,7 @@ export function useMarcadoresPageCommands(core: MarcadoresPageCore) {
   }
 
   const desktopFloatingOverlays: ReactNode = core.desktopWindowChrome ? (
-    <MarcadoresDesktopFloatingOverlays
-      demoMode={core.demoMode}
-      pasteError={pane.pasteError}
-      deleteConfirmItem={pane.deleteConfirmItem}
-      onConfirmDelete={core.onConfirmDelete}
-      onCancelDelete={() => b.setDeleteConfirmItem(null)}
-    />
+    <MarcadoresDesktopFloatingOverlays demoMode={core.demoMode} pasteError={pane.pasteError} />
   ) : null
 
   const paneBody: PaneBodyExtras = {

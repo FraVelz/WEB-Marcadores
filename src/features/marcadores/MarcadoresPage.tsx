@@ -1,6 +1,7 @@
 "use client"
 
 import BookmarkModal from "@/features/marcadores/components/bookmark/BookmarkModal"
+import DeleteConfirmModal from "@/features/marcadores/components/DeleteConfirmModal"
 import MarcadoresFooter from "@/features/marcadores/components/MarcadoresFooter"
 import { MarcadoresDesktopPageSlot } from "@/features/marcadores/MarcadoresDesktopPageSlot"
 import { MarcadoresPageMainLayout } from "@/features/marcadores/MarcadoresPageMainLayout"
@@ -70,6 +71,17 @@ export function MarcadoresPage() {
           allTags={m.allTags}
           folders={m.folders}
           currentFolderId={modal.folderId}
+        />
+      ) : null}
+
+      {pane.deleteConfirmItem ? (
+        <DeleteConfirmModal
+          item={pane.deleteConfirmItem}
+          onConfirm={async () => {
+            await m.onConfirmDelete(pane.deleteConfirmItem!)
+            m.libraryPaneScope.bindings.setDeleteConfirmItem(null)
+          }}
+          onCancel={() => m.libraryPaneScope.bindings.setDeleteConfirmItem(null)}
         />
       ) : null}
     </div>
