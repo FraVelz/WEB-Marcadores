@@ -15,10 +15,7 @@ type LoginScreenshotLinkProps = {
 
 export function LoginScreenshotLink({ href, label, alt, publicPath }: LoginScreenshotLinkProps) {
   return (
-    <Link
-      href={href}
-      className={cn("group relative isolate block overflow-hidden rounded-lg shadow-md", FOCUS_RING)}
-    >
+    <Link href={href} className={cn("group relative isolate block overflow-hidden rounded-lg shadow-md", FOCUS_RING)}>
       <span
         aria-hidden
         className={cn(

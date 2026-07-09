@@ -23,7 +23,11 @@ type Props = {
   folderBookmarkCounts?: Map<string | null, number>
 }
 
-export function MarcadoresExplorerRail({ registerGlobalExplorerRef = true, folderSelection = null, folderBookmarkCounts }: Props) {
+export function MarcadoresExplorerRail({
+  registerGlobalExplorerRef = true,
+  folderSelection = null,
+  folderBookmarkCounts,
+}: Props) {
   const {
     folders,
     selectedFolderId: ctxFolderId,

@@ -37,7 +37,14 @@ function DetailPlaceholder() {
     <aside className="border-app-border bg-app-sidebar hidden w-full max-w-[20rem] min-w-[17.5rem] shrink-0 flex-col border-l md:flex">
       <div className="flex flex-1 flex-col items-center justify-center p-6 text-center">
         <div className="bg-app-hover mb-4 flex size-16 items-center justify-center rounded-2xl">
-          <svg className="text-app-fg-muted size-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+          <svg
+            className="text-app-fg-muted size-8"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            aria-hidden
+          >
             <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
@@ -64,9 +71,7 @@ function ActionIconButton({
   const className = cn(
     "flex size-10 items-center justify-center rounded-lg transition-colors",
     FOCUS_RING_ICON_BTN,
-    danger
-      ? "text-app-danger-fg hover:bg-app-danger/15"
-      : "text-app-fg-muted hover:bg-app-hover hover:text-app-fg"
+    danger ? "text-app-danger-fg hover:bg-app-danger/15" : "text-app-fg-muted hover:bg-app-hover hover:text-app-fg"
   )
 
   if (href) {
@@ -227,7 +232,14 @@ function BookmarkDetailPanelInner({
             )}
             aria-label={bookmark.is_favorite ? "Quitar de favoritos" : "Marcar favorito"}
           >
-            <svg className="size-5" viewBox="0 0 24 24" fill={bookmark.is_favorite ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.75" aria-hidden>
+            <svg
+              className="size-5"
+              viewBox="0 0 24 24"
+              fill={bookmark.is_favorite ? "currentColor" : "none"}
+              stroke="currentColor"
+              strokeWidth="1.75"
+              aria-hidden
+            >
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
             </svg>
           </button>
@@ -255,7 +267,7 @@ function BookmarkDetailPanelInner({
 
           {bookmark.description ? (
             <div>
-              <div className="text-app-fg-label mb-1 text-xs font-medium uppercase tracking-wide">Descripción</div>
+              <div className="text-app-fg-label mb-1 text-xs font-medium tracking-wide uppercase">Descripción</div>
               <p className="text-app-fg-secondary text-sm leading-relaxed">
                 {highlight ? (
                   <SearchHighlightText text={bookmark.description} query={searchQuery} />
@@ -268,16 +280,19 @@ function BookmarkDetailPanelInner({
 
           <div className="space-y-3">
             <div>
-              <div className="text-app-fg-label mb-1 text-xs font-medium uppercase tracking-wide">Carpeta</div>
+              <div className="text-app-fg-label mb-1 text-xs font-medium tracking-wide uppercase">Carpeta</div>
               <p className="text-app-fg text-sm">{currentFolderPath}</p>
             </div>
 
             {tags.length > 0 ? (
               <div>
-                <div className="text-app-fg-label mb-1.5 text-xs font-medium uppercase tracking-wide">Tags</div>
+                <div className="text-app-fg-label mb-1.5 text-xs font-medium tracking-wide uppercase">Tags</div>
                 <div className="flex flex-wrap gap-1.5">
                   {tags.map((tag) => (
-                    <span key={tag} className="bg-app-primary/10 text-app-primary rounded-full px-2.5 py-0.5 text-xs font-medium">
+                    <span
+                      key={tag}
+                      className="bg-app-primary/10 text-app-primary rounded-full px-2.5 py-0.5 text-xs font-medium"
+                    >
                       {tag}
                     </span>
                   ))}
@@ -287,7 +302,7 @@ function BookmarkDetailPanelInner({
 
             {created ? (
               <div>
-                <div className="text-app-fg-label mb-1 text-xs font-medium uppercase tracking-wide">Añadido</div>
+                <div className="text-app-fg-label mb-1 text-xs font-medium tracking-wide uppercase">Añadido</div>
                 <p className="text-app-fg-secondary text-sm">{created}</p>
               </div>
             ) : null}
@@ -316,19 +331,44 @@ function BookmarkDetailPanelInner({
 
         <div className="border-app-border mt-4 flex items-center justify-center gap-2 border-t pt-4">
           <ActionIconButton label="Abrir enlace" href={bookmark.url} onClick={handleTelemetry}>
-            <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3" strokeLinecap="round" strokeLinejoin="round" />
+            <svg
+              className="size-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              aria-hidden
+            >
+              <path
+                d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </ActionIconButton>
           <ActionIconButton label={copied ? "Copiado" : "Copiar URL"} onClick={() => void copyUrl()}>
-            <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+            <svg
+              className="size-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              aria-hidden
+            >
               <rect x="9" y="9" width="13" height="13" rx="2" />
               <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
             </svg>
           </ActionIconButton>
           {onEdit ? (
             <ActionIconButton label="Editar" onClick={onEdit}>
-              <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+              <svg
+                className="size-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                aria-hidden
+              >
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                 <path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
               </svg>
@@ -336,7 +376,14 @@ function BookmarkDetailPanelInner({
           ) : null}
           {onDelete ? (
             <ActionIconButton label="Eliminar" onClick={onDelete} danger>
-              <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+              <svg
+                className="size-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                aria-hidden
+              >
                 <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" strokeLinecap="round" />
               </svg>
             </ActionIconButton>

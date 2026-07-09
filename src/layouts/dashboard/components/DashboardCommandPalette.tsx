@@ -107,10 +107,7 @@ export function DashboardCommandPalette() {
                 key={b.id}
                 type="button"
                 onClick={() => selectBookmark(b)}
-                className={cn(
-                  "hover:bg-app-hover flex w-full items-start gap-3 rounded-md p-2 text-left",
-                  FOCUS_RING
-                )}
+                className={cn("hover:bg-app-hover flex w-full items-start gap-3 rounded-md p-2 text-left", FOCUS_RING)}
               >
                 <div className="min-w-0 flex-1">
                   <div className="text-app-fg truncate text-sm font-medium">{b.title}</div>
@@ -134,7 +131,10 @@ function ShortcutPaletteLink(props: { title: string; hint?: string; href: string
     <Link
       href={props.href}
       onClick={props.onNavigate}
-      className={cn("hover:bg-app-hover text-app-fg flex w-full items-center justify-between rounded-md p-2 text-sm no-underline", FOCUS_RING)}
+      className={cn(
+        "hover:bg-app-hover text-app-fg flex w-full items-center justify-between rounded-md p-2 text-sm no-underline",
+        FOCUS_RING
+      )}
     >
       <span className="font-medium">{props.title}</span>
       {props.hint ? <span className="text-app-fg-muted text-xs">{props.hint}</span> : null}

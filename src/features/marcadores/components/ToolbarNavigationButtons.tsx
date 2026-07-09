@@ -35,40 +35,22 @@ export default function ToolbarNavigationButtons({
   treeToggleDisabled = false,
   showFullscreenToggle = true,
 }: Props) {
-  const iconBtn = cn(
-    "text-app-fg-muted hover:bg-app-active hover:text-app-fg rounded p-1.5",
-    FOCUS_RING_ICON_BTN
-  )
+  const iconBtn = cn("text-app-fg-muted hover:bg-app-active hover:text-app-fg rounded p-1.5", FOCUS_RING_ICON_BTN)
 
   return (
     <>
-      <button
-        type="button"
-        onClick={onNavigateUp}
-        className={iconBtn}
-        title="Subir"
-      >
+      <button type="button" onClick={onNavigateUp} className={iconBtn} title="Subir">
         <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z" />
         </svg>
       </button>
       <div className="bg-app-active mx-1 h-5 w-px" />
-      <button
-        type="button"
-        onClick={onAddBookmark}
-        className={iconBtn}
-        title="Nuevo marcador"
-      >
+      <button type="button" onClick={onAddBookmark} className={iconBtn} title="Nuevo marcador">
         <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
           <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
         </svg>
       </button>
-      <button
-        type="button"
-        onClick={onNewFolder}
-        className={iconBtn}
-        title="Nueva carpeta"
-      >
+      <button type="button" onClick={onNewFolder} className={iconBtn} title="Nueva carpeta">
         <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
           <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
         </svg>
@@ -88,10 +70,7 @@ export default function ToolbarNavigationButtons({
       <button
         type="button"
         onClick={onToggleInfoPanel}
-        className={cn(
-          iconBtn,
-          infoPanelEnabled ? "bg-app-active text-app-fg" : ""
-        )}
+        className={cn(iconBtn, infoPanelEnabled ? "bg-app-active text-app-fg" : "")}
         title="Modo información (i)"
       >
         <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">

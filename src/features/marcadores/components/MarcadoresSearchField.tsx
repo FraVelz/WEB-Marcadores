@@ -74,18 +74,11 @@ export function MarcadoresSearchField({
           className={cn(
             "border-app-input-border bg-app-raised-muted text-app-fg w-full min-w-0 border text-sm",
             "placeholder-app-fg-label focus:border-app-focus focus:outline-none",
-            isPill
-              ? "rounded-full py-2.5 pr-11 pl-10 focus:ring-app-focus/20 focus:ring-2"
-              : "rounded py-1 pr-9 pl-2"
+            isPill ? "focus:ring-app-focus/20 rounded-full py-2.5 pr-11 pl-10 focus:ring-2" : "rounded py-1 pr-9 pl-2"
           )}
         />
 
-        <div
-          className={cn(
-            "absolute top-1/2 -translate-y-1/2",
-            isPill ? "right-2" : "right-1"
-          )}
-        >
+        <div className={cn("absolute top-1/2 -translate-y-1/2", isPill ? "right-2" : "right-1")}>
           <ToolbarSearchFilterMenu
             variant={variant}
             searchInSubfolders={searchInSubfolders}
