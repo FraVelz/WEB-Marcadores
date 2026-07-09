@@ -1,6 +1,5 @@
 "use client"
 
-import { DashboardExplorerHeader } from "@/components/header/DashboardExplorerHeader"
 import { DashboardMobileHeader } from "@/components/header/DashboardMobileHeader"
 
 type Props = {
@@ -12,20 +11,15 @@ type Props = {
 }
 
 /**
- * Cabeceras globales del dashboard: explorador (md+) y barra sticky (móvil).
- * Las features solo registran slots (p. ej. herramientas de marcadores vía contexto).
+ * Cabecera global del dashboard: solo barra sticky en móvil.
+ * En desktop la navegación vive en DashboardIconRail.
  */
 export function DashboardLayoutChrome({
   pathname,
-  wideViewport,
-  sidebarRef,
   mobileSidebarOpen,
   onOpenMobileSidebar,
 }: Props) {
   return (
-    <>
-      {wideViewport ? <DashboardExplorerHeader pathname={pathname} sidebarRef={sidebarRef} /> : null}
-      <DashboardMobileHeader pathname={pathname} sidebarOpen={mobileSidebarOpen} onOpenSidebar={onOpenMobileSidebar} />
-    </>
+    <DashboardMobileHeader pathname={pathname} sidebarOpen={mobileSidebarOpen} onOpenSidebar={onOpenMobileSidebar} />
   )
 }

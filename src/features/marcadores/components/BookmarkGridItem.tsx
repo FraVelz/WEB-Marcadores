@@ -5,7 +5,8 @@ import { memo, useCallback, useId, useRef } from "react"
 import { cn, cnLines } from "@/lib/utils"
 import { useBookmarkDraggable, useBookmarkDropTarget } from "@/lib/drag-and-drop"
 import type { GridItem } from "../utils/types"
-import { FolderContent, LinkContent } from "./bookmarkGrid/BookmarkGridItemBodies"
+import { FolderContent, LinkContent, resolveFolderName } from "./bookmarkGrid/BookmarkGridItemBodies"
+import type { FlatFolder } from "../utils/types"
 
 type Props = {
   item: GridItem
@@ -24,6 +25,8 @@ type Props = {
   onBookmarkDragHoverLeave?: () => void
   searchQuery?: string
   searchInDescription?: boolean
+  onToggleFavorite?: (id: string, isFavorite: boolean) => void
+  folders?: FlatFolder[]
 }
 
 function BookmarkGridItem({
@@ -43,6 +46,8 @@ function BookmarkGridItem({
   onBookmarkDragHoverLeave,
   searchQuery = "",
   searchInDescription = true,
+  onToggleFavorite,
+  folders = [],
 }: Props) {
   const selectControlId = useId()
   const isFolder = item.type === "folder"
@@ -86,15 +91,15 @@ function BookmarkGridItem({
       : undefined
 
   const baseClass = cn(
-    "relative flex items-center gap-3 rounded-lg border px-4 py-3 transition-colors",
+    "relative flex flex-col rounded-xl border p-4 transition-colors",
     isCut ? "border-app-cut-border bg-app-cut-surface border-dashed opacity-60" : "",
     !isCut &&
       !dropHighlight &&
       (isSelected
-        ? "border-app-focus bg-app-selection ring-app-focus ring-2"
+        ? "border-app-primary bg-app-list-selected ring-app-primary/30 ring-2"
         : cnLines(
-            "border-app-border-muted bg-app-raised/80",
-            "hover:border-app-input-border hover:bg-app-hover-strong/50"
+            "border-app-border bg-app-raised",
+            "hover:border-app-input-border hover:shadow-sm"
           )),
     dropFrameClass,
     selectMode && !isFolder ? "cursor-pointer" : ""
@@ -139,6 +144,12 @@ function BookmarkGridItem({
           locationLabel={item.locationLabel}
           searchQuery={searchQuery}
           searchInDescription={searchInDescription}
+          folderName={resolveFolderName(folders, item.bookmark.folder_id)}
+          onToggleFavorite={
+            onToggleFavorite
+              ? (isFavorite) => onToggleFavorite(item.bookmark.id, isFavorite)
+              : undefined
+          }
         />
       )}
     </div>

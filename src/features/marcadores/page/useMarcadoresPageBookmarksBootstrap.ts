@@ -29,6 +29,7 @@ export function useMarcadoresPageBookmarksBootstrap(p: {
   searchValue: string
   searchInSubfolders: boolean
   searchInDescription: boolean
+  bookmarkSort: import("@/features/marcadores/state/libraryPaneUiState").BookmarkSortOrder
 }) {
   const data = useMarcadoresData(
     {
@@ -37,6 +38,7 @@ export function useMarcadoresPageBookmarksBootstrap(p: {
       folderId: p.activeBrowseFolderId,
       searchInSubfolders: p.searchInSubfolders,
       searchInDescription: p.searchInDescription,
+      bookmarkSort: p.bookmarkSort,
     },
     p.dash.setFolders
   )

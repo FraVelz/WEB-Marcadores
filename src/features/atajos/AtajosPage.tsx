@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
 import { shortcutSections } from "./data"
+import { DashboardPageHeader } from "@/layouts/dashboard/components/DashboardPageHeader"
 import { cn } from "@/lib/utils"
 
 function Kbd({ className, children }: { className?: string; children: ReactNode }) {
@@ -55,15 +56,12 @@ function KeyCombo({ keys }: { keys: string }) {
 
 export function AtajosPage() {
   return (
-    <div className="overflow-auto p-4 pb-12 text-center sm:p-6">
-      <header className="mx-auto mb-6 max-w-3xl sm:mb-8">
-        <h1 className="text-app-fg text-xl font-semibold tracking-tight sm:text-2xl">Atajos de teclado</h1>
-
-        <p className="text-app-fg-secondary mt-2 text-sm leading-relaxed">
-          Referencia rápida de combinaciones. Las alternativas equivalentes se muestran como teclas separadas.
-        </p>
-      </header>
-
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <DashboardPageHeader
+        title="Atajos de teclado"
+        subtitle="Referencia rápida de combinaciones. Las alternativas equivalentes se muestran como teclas separadas."
+      />
+      <div className="overflow-auto p-4 pb-12 text-center sm:p-6">
       <div className="mx-auto flex max-w-3xl flex-col gap-10">
         {shortcutSections.map((section) => (
           <section key={section.title} className="scroll-mt-6">
@@ -102,6 +100,7 @@ export function AtajosPage() {
           </section>
         ))}
       </div>
+    </div>
     </div>
   )
 }

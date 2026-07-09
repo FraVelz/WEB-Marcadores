@@ -27,6 +27,8 @@ type Props = {
   setSelectMode?: Dispatch<SetStateAction<boolean>>
   searchQuery?: string
   searchInDescription?: boolean
+  onToggleFavorite?: (id: string, isFavorite: boolean) => void
+  folders?: import("../utils/types").FlatFolder[]
 }
 
 export default function BookmarkGrid({
@@ -46,6 +48,8 @@ export default function BookmarkGrid({
   setSelectMode,
   searchQuery = "",
   searchInDescription = true,
+  onToggleFavorite,
+  folders = [],
 }: Props) {
   const [dropPanelSlot, setDropPanelSlot] = useState(false)
   const [dropItemIdx, setDropItemIdx] = useState<number | null>(null)
@@ -209,11 +213,7 @@ export default function BookmarkGrid({
         />
       ) : null}
       {showAppPanelDropFrame ? <div className={APP_DROP_PANEL_OVERLAY_CLASS} aria-hidden /> : null}
-      <div
-        className={
-          "relative grid min-h-[120px] gap-3 " + "[grid-template-columns:repeat(auto-fill,minmax(min(100%,15rem),1fr))]"
-        }
-      >
+      <div className="relative grid min-h-[120px] grid-cols-1 gap-4 p-4 sm:grid-cols-2 lg:grid-cols-3">
         {flatList.map((item, idx) => {
           const isFolder = item.type === "folder"
           const isCut =
@@ -254,6 +254,8 @@ export default function BookmarkGrid({
               }
               searchQuery={searchQuery}
               searchInDescription={searchInDescription}
+              onToggleFavorite={onToggleFavorite}
+              folders={folders}
             />
           )
         })}

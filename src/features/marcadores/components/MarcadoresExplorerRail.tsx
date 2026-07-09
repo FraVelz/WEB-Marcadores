@@ -19,9 +19,10 @@ type Props = {
    */
   registerGlobalExplorerRef?: boolean
   folderSelection?: { folderId: string | null; onFolderChange: (id: string | null) => void } | null
+  folderBookmarkCounts?: Map<string | null, number>
 }
 
-export function MarcadoresExplorerRail({ registerGlobalExplorerRef = true, folderSelection = null }: Props) {
+export function MarcadoresExplorerRail({ registerGlobalExplorerRef = true, folderSelection = null, folderBookmarkCounts }: Props) {
   const {
     folders,
     selectedFolderId: ctxFolderId,
@@ -141,6 +142,7 @@ export function MarcadoresExplorerRail({ registerGlobalExplorerRef = true, folde
                 onSelect={setSelectedFolderId}
                 collapsedIds={explorerCollapsedIds}
                 onToggle={toggleExplorerCollapsed}
+                folderBookmarkCounts={folderBookmarkCounts}
               />
             </div>
           </div>

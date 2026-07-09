@@ -92,6 +92,7 @@ export function useMarcadoresPageDataHooks() {
     searchValue: desktopWindowChrome ? "" : paneUi.searchValue,
     searchInSubfolders: paneUi.searchInSubfolders,
     searchInDescription: paneUi.searchInDescription,
+    bookmarkSort: paneUi.bookmarkSort,
   })
 
   const {

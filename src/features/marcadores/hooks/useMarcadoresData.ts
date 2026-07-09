@@ -13,6 +13,7 @@ import {
   type BookmarkSearchOptions,
 } from "../utils/bookmarkSearch"
 import { buildFoldersByParentIndex } from "../utils/folderIndex"
+import type { BookmarkSortOrder } from "../state/libraryPaneUiState"
 import { buildFolderTree, getFolderPath } from "../utils/utils"
 import type { Bookmark, FlatFolder, GridItem } from "../utils/types"
 
@@ -28,11 +29,28 @@ function normalizeBookmarkRow(raw: Bookmark): Bookmark {
   }
 }
 
+/** Ordena marcadores según la preferencia del usuario. */
+export function sortBookmarksByOrder(bookmarks: Bookmark[], sort: BookmarkSortOrder): Bookmark[] {
+  const copy = [...bookmarks]
+  if (sort === "title") {
+    return copy.sort((a, b) => (a.title || "").localeCompare(b.title || ""))
+  }
+  if (sort === "recent") {
+    return copy.sort((a, b) => {
+      const da = a.opened_at || a.updated_at || a.created_at || ""
+      const db = b.opened_at || b.updated_at || b.created_at || ""
+      return db.localeCompare(da)
+    })
+  }
+  return copy.sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""))
+}
+
 /** Lista de elementos (grid) para una carpeta concreta. */
 export function buildMarcadoresFlatList(
   folders: FlatFolder[],
   viewFilteredBookmarks: Bookmark[],
-  selectedFolderId: string | null
+  selectedFolderId: string | null,
+  bookmarkSort: BookmarkSortOrder = "title"
 ): GridItem[] {
   const byParent = buildFoldersByParentIndex(folders)
   const parentId = selectedFolderId
@@ -42,10 +60,10 @@ export function buildMarcadoresFlatList(
     folderId: f.id,
     label: f.name,
   }))
-  const links = viewFilteredBookmarks
-    .filter((b) => (b.folder_id || null) === parentId)
-    .sort((a, b) => (a.title || "").localeCompare(b.title || ""))
-    .map((b) => ({ type: "link" as const, bookmark: b }))
+  const links = sortBookmarksByOrder(
+    viewFilteredBookmarks.filter((b) => (b.folder_id || null) === parentId),
+    bookmarkSort
+  ).map((b) => ({ type: "link" as const, bookmark: b }))
   return [...subfolders, ...links]
 }
 
@@ -55,6 +73,7 @@ export type MarcadoresDataSearchConfig = {
   folderId: string | null
   searchInSubfolders: boolean
   searchInDescription: boolean
+  bookmarkSort: BookmarkSortOrder
 }
 
 export function useMarcadoresData(
@@ -118,10 +137,10 @@ export function useMarcadoresData(
 
   const flatList = useMemo((): GridItem[] => {
     if (!search.enabled) {
-      return buildMarcadoresFlatList(folders, bookmarksVisible, search.folderId)
+      return buildMarcadoresFlatList(folders, bookmarksVisible, search.folderId, search.bookmarkSort)
     }
-    return buildSearchResultGridItems(folders, filteredBookmarks, searchOpts)
-  }, [search.enabled, folders, bookmarksVisible, filteredBookmarks, searchOpts, search.folderId])
+    return buildSearchResultGridItems(folders, filteredBookmarks, searchOpts, search.bookmarkSort)
+  }, [search.enabled, search.folderId, search.bookmarkSort, folders, bookmarksVisible, filteredBookmarks, searchOpts])
 
   const breadcrumb = useMemo(() => getFolderPath(folders, search.folderId), [folders, search.folderId])
 

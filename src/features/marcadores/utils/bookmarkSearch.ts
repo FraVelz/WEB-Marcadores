@@ -1,4 +1,4 @@
-import { buildMarcadoresFlatList } from "@/features/marcadores/hooks/useMarcadoresData"
+import { buildMarcadoresFlatList, sortBookmarksByOrder } from "@/features/marcadores/hooks/useMarcadoresData"
 import {
   bookmarkDerivedMatchesSearchQuery,
   bookmarkMatchedFields,
@@ -7,6 +7,7 @@ import {
   type DerivedBookmarkFields,
 } from "@/features/marcadores/views/bookmarkDerived"
 import { collectFolderSubtreeIds } from "@/features/marcadores/utils/folderDescendants"
+import type { BookmarkSortOrder } from "@/features/marcadores/state/libraryPaneUiState"
 import type { Bookmark, FlatFolder, GridItem } from "@/features/marcadores/utils/types"
 import { getFolderPath } from "@/features/marcadores/utils/utils"
 
@@ -80,26 +81,24 @@ export function filterBookmarksBySearch(
 export function buildSearchResultGridItems(
   folders: FlatFolder[],
   filteredBookmarks: Bookmark[],
-  opts: BookmarkSearchOptions
+  opts: BookmarkSearchOptions,
+  bookmarkSort: BookmarkSortOrder = "title"
 ): GridItem[] {
   const qNorm = normalizeQuery(opts.query)
 
   if (qNorm === "") {
-    return buildMarcadoresFlatList(folders, filteredBookmarks, opts.folderId)
+    return buildMarcadoresFlatList(folders, filteredBookmarks, opts.folderId, bookmarkSort)
   }
 
   if (opts.searchInSubfolders) {
-    return filteredBookmarks
-      .slice()
-      .sort((a, b) => (a.title || "").localeCompare(b.title || ""))
-      .map((b) => ({
-        type: "link" as const,
-        bookmark: b,
-        locationLabel: folderPathCaption(folders, b.folder_id),
-      }))
+    return sortBookmarksByOrder(filteredBookmarks, bookmarkSort).map((b) => ({
+      type: "link" as const,
+      bookmark: b,
+      locationLabel: folderPathCaption(folders, b.folder_id),
+    }))
   }
 
-  return buildMarcadoresFlatList(folders, filteredBookmarks, opts.folderId)
+  return buildMarcadoresFlatList(folders, filteredBookmarks, opts.folderId, bookmarkSort)
 }
 
 export function getBookmarkMatchFields(
