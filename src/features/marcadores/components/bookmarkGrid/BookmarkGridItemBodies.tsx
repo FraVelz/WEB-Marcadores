@@ -18,12 +18,12 @@ import type { Bookmark, FlatFolder } from "../../utils/types"
 export function FolderContent({ label }: { label: string }) {
   return (
     <div className="flex w-full flex-col items-center gap-3 py-2 text-center">
-      <div className="flex size-14 items-center justify-center rounded-xl bg-app-folder/15">
+      <div className="bg-app-folder/15 flex size-14 items-center justify-center rounded-xl">
         <svg className="text-app-folder size-9" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
           <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
         </svg>
       </div>
-      <div className="min-w-0 w-full">
+      <div className="w-full min-w-0">
         <span className="text-app-fg block truncate font-medium">{label}</span>
         <p className="text-app-fg-muted mt-0.5 text-xs">Carpeta</p>
       </div>
@@ -88,7 +88,14 @@ export function LinkContent({
             onToggleFavorite(!isFavorite)
           }}
         >
-          <svg className="size-4" viewBox="0 0 24 24" fill={isFavorite ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.75" aria-hidden>
+          <svg
+            className="size-4"
+            viewBox="0 0 24 24"
+            fill={isFavorite ? "currentColor" : "none"}
+            stroke="currentColor"
+            strokeWidth="1.75"
+            aria-hidden
+          >
             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
           </svg>
         </button>
@@ -112,7 +119,7 @@ export function LinkContent({
         </div>
       )}
 
-      <div className="min-w-0 w-full px-1">
+      <div className="w-full min-w-0 px-1">
         <span className="text-app-fg line-clamp-2 text-sm font-semibold">
           {highlight ? <SearchHighlightText text={bookmark.title || ""} query={searchQuery} /> : bookmark.title}
         </span>

@@ -66,9 +66,7 @@ function RailButton({ label, active, onClick, href, children }: RailButtonProps)
   const className = cn(
     "flex size-10 items-center justify-center rounded-lg transition-colors",
     FOCUS_RING_ICON_BTN,
-    active
-      ? "bg-app-primary text-white shadow-sm"
-      : "text-app-fg-muted hover:bg-app-hover hover:text-app-fg"
+    active ? "bg-app-primary text-white shadow-sm" : "text-app-fg-muted hover:bg-app-hover hover:text-app-fg"
   )
 
   if (href) {
@@ -117,10 +115,7 @@ export function DashboardIconRail() {
 
         <div className="bg-app-border my-2 h-px w-6" aria-hidden />
 
-        <RailButton
-          label="Buscar (Ctrl+K)"
-          onClick={() => setCommandPaletteOpen(true)}
-        >
+        <RailButton label="Buscar (Ctrl+K)" onClick={() => setCommandPaletteOpen(true)}>
           <SearchIcon />
         </RailButton>
 

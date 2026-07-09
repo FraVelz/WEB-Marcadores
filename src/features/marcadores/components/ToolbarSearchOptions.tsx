@@ -46,7 +46,7 @@ function SearchFilterOptionsPanel({
         />
         <span>
           <span className="text-app-fg font-medium">Buscar en subcarpetas</span>
-          <span className="text-app-fg-muted mt-0.5 block text-[11px] font-normal leading-snug">
+          <span className="text-app-fg-muted mt-0.5 block text-[11px] leading-snug font-normal">
             Incluye carpetas hijas; en la raíz busca en toda la biblioteca.
           </span>
         </span>
@@ -85,10 +85,7 @@ export function ToolbarSearchFilterMenu({
   const active = hasActiveFilters(searchInSubfolders, searchInDescription)
 
   useEffect(() => {
-    if (!open) {
-      setPanelStyle(null)
-      return
-    }
+    if (!open) return
 
     const updatePosition = () => {
       const button = buttonRef.current
@@ -156,12 +153,7 @@ export function ToolbarSearchFilterMenu({
         )}
       >
         <FilterIcon className={variant === "pill" ? "size-4" : "size-3.5"} />
-        {active ? (
-          <span
-            className="bg-app-accent absolute top-1 right-1 size-1.5 rounded-full"
-            aria-hidden
-          />
-        ) : null}
+        {active ? <span className="bg-app-accent absolute top-1 right-1 size-1.5 rounded-full" aria-hidden /> : null}
       </button>
 
       {open && panelStyle
@@ -194,12 +186,7 @@ type ChipsProps = {
   className?: string
 }
 
-export function ToolbarSearchFilterChips({
-  hasQuery,
-  searchInSubfolders,
-  searchInDescription,
-  className,
-}: ChipsProps) {
+export function ToolbarSearchFilterChips({ hasQuery, searchInSubfolders, searchInDescription, className }: ChipsProps) {
   if (!hasQuery) return null
 
   const labels: string[] = []

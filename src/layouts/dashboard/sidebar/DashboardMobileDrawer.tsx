@@ -29,10 +29,7 @@ export function DashboardMobileDrawer({ pathname, open, onClose, sidebarRef }: P
         <span className="text-app-fg-label text-xs font-medium tracking-wider uppercase">Explorador</span>
         <button
           type="button"
-          className={cn(
-            "text-app-fg-muted hover:bg-app-hover hover:text-app-fg rounded p-1",
-            FOCUS_RING_ICON_BTN
-          )}
+          className={cn("text-app-fg-muted hover:bg-app-hover hover:text-app-fg rounded p-1", FOCUS_RING_ICON_BTN)}
           aria-label="Cerrar menú"
           onClick={onClose}
         >

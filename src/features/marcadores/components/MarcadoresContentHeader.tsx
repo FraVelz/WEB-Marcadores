@@ -51,7 +51,7 @@ export function MarcadoresContentHeader({
           <p className="text-app-fg-muted mt-0.5 text-sm">Tus enlaces, organizados</p>
         </div>
 
-        <div className="mx-auto w-full min-w-0 max-w-xl flex-1">
+        <div className="mx-auto w-full max-w-xl min-w-0 flex-1">
           <MarcadoresSearchField
             searchValue={searchValue}
             setSearchValue={setSearchValue}
@@ -92,9 +92,7 @@ export function MarcadoresContentHeader({
                 className={cn(
                   "rounded-md p-2 transition-colors",
                   FOCUS_RING_ICON_BTN,
-                  viewMode === "grid"
-                    ? "bg-app-primary text-white shadow-sm"
-                    : "text-app-fg-muted hover:text-app-fg"
+                  viewMode === "grid" ? "bg-app-primary text-white shadow-sm" : "text-app-fg-muted hover:text-app-fg"
                 )}
                 title="Vista cuadrícula"
                 onClick={() => viewMode !== "grid" && onToggleViewMode()}
@@ -109,9 +107,7 @@ export function MarcadoresContentHeader({
                 className={cn(
                   "rounded-md p-2 transition-colors",
                   FOCUS_RING_ICON_BTN,
-                  viewMode === "tree"
-                    ? "bg-app-primary text-white shadow-sm"
-                    : "text-app-fg-muted hover:text-app-fg"
+                  viewMode === "tree" ? "bg-app-primary text-white shadow-sm" : "text-app-fg-muted hover:text-app-fg"
                 )}
                 title="Vista árbol"
                 onClick={() => viewMode !== "tree" && onToggleViewMode()}

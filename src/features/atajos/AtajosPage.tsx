@@ -62,45 +62,45 @@ export function AtajosPage() {
         subtitle="Referencia rápida de combinaciones. Las alternativas equivalentes se muestran como teclas separadas."
       />
       <div className="overflow-auto p-4 pb-12 text-center sm:p-6">
-      <div className="mx-auto flex max-w-3xl flex-col gap-10">
-        {shortcutSections.map((section) => (
-          <section key={section.title} className="scroll-mt-6">
-            <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
-              <h2 className="text-app-fg text-base font-semibold">{section.title}</h2>
+        <div className="mx-auto flex max-w-3xl flex-col gap-10">
+          {shortcutSections.map((section) => (
+            <section key={section.title} className="scroll-mt-6">
+              <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+                <h2 className="text-app-fg text-base font-semibold">{section.title}</h2>
 
-              {section.hint ? (
-                <p className="text-app-fg-muted max-w-xl text-xs leading-snug sm:text-right">{section.hint}</p>
-              ) : null}
-            </div>
+                {section.hint ? (
+                  <p className="text-app-fg-muted max-w-xl text-xs leading-snug sm:text-right">{section.hint}</p>
+                ) : null}
+              </div>
 
-            <ul
-              className="border-app-border-muted divide-app-border-muted bg-app-raised divide-y overflow-hidden rounded-xl border"
-              role="list"
-            >
-              {section.rows.map((row) => (
-                <li key={`${section.title}::${row.keys}::${row.desc}`} className="group relative">
-                  <div
-                    aria-hidden
-                    className={cn(
-                      "from-app-hover pointer-events-none absolute inset-y-0 left-0 z-0 w-0 bg-gradient-to-r from-55% to-transparent",
-                      "motion-safe:transition-[width] motion-safe:duration-300 motion-safe:ease-out",
-                      "group-hover:w-full"
-                    )}
-                  />
-                  <div className="relative z-[1] flex flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-center sm:gap-6 sm:py-3">
-                    <div className="sm:w-[min(42%,14rem)] sm:flex-shrink-0">
-                      <KeyCombo keys={row.keys} />
+              <ul
+                className="border-app-border-muted divide-app-border-muted bg-app-raised divide-y overflow-hidden rounded-xl border"
+                role="list"
+              >
+                {section.rows.map((row) => (
+                  <li key={`${section.title}::${row.keys}::${row.desc}`} className="group relative">
+                    <div
+                      aria-hidden
+                      className={cn(
+                        "from-app-hover pointer-events-none absolute inset-y-0 left-0 z-0 w-0 bg-gradient-to-r from-55% to-transparent",
+                        "motion-safe:transition-[width] motion-safe:duration-300 motion-safe:ease-out",
+                        "group-hover:w-full"
+                      )}
+                    />
+                    <div className="relative z-[1] flex flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-center sm:gap-6 sm:py-3">
+                      <div className="sm:w-[min(42%,14rem)] sm:flex-shrink-0">
+                        <KeyCombo keys={row.keys} />
+                      </div>
+
+                      <p className="text-app-fg-secondary text-sm leading-snug sm:min-w-0 sm:flex-1">{row.desc}</p>
                     </div>
-
-                    <p className="text-app-fg-secondary text-sm leading-snug sm:min-w-0 sm:flex-1">{row.desc}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
       </div>
-    </div>
     </div>
   )
 }

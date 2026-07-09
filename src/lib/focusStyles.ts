@@ -1,6 +1,5 @@
 /** Foco teclado estándar — outline, sin outline-none */
-export const FOCUS_RING =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-app-focus"
+export const FOCUS_RING = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-app-focus"
 
 /** Variante compacta para icon buttons (toolbar, rail) */
 export const FOCUS_RING_ICON_BTN =

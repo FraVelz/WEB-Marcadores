@@ -42,7 +42,10 @@ export default function DeleteConfirmModal({ item, onConfirm, onCancel }: Props)
 
   return (
     <div
-      className={cn("bg-app-overlay fixed inset-0 flex items-center justify-center p-4", MARCADORES_GLOBAL_ALERT_Z_CLASS)}
+      className={cn(
+        "bg-app-overlay fixed inset-0 flex items-center justify-center p-4",
+        MARCADORES_GLOBAL_ALERT_Z_CLASS
+      )}
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
@@ -58,9 +61,7 @@ export default function DeleteConfirmModal({ item, onConfirm, onCancel }: Props)
         onClick={onCancel}
       />
       <div
-        className={cn(
-          "border-app-border bg-app-raised relative z-10 w-full max-w-md rounded-xl border p-6 shadow-xl"
-        )}
+        className={cn("border-app-border bg-app-raised relative z-10 w-full max-w-md rounded-xl border p-6 shadow-xl")}
       >
         <div className="flex items-start gap-4">
           <div

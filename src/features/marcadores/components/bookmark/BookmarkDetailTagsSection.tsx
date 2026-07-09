@@ -42,10 +42,7 @@ export default function BookmarkDetailTagsSection({
               type="button"
               onClick={() => onRemoveTag(tag)}
               disabled={saving}
-              className={cn(
-                "hover:bg-app-active hover:text-app-fg rounded disabled:opacity-50",
-                FOCUS_RING_ICON_BTN
-              )}
+              className={cn("hover:bg-app-active hover:text-app-fg rounded disabled:opacity-50", FOCUS_RING_ICON_BTN)}
               aria-label={`Quitar ${tag}`}
             >
               ×

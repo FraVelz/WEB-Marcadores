@@ -22,10 +22,7 @@ export function MarcadoresStackedPageSlot({ m }: { m: MarcadoresPageModel }) {
   const scope = m.libraryPaneScope
   const pane = scope.getState()
 
-  const folderBookmarkCounts = useMemo(
-    () => buildFolderBookmarkCounts(m.bookmarks),
-    [m.bookmarks]
-  )
+  const folderBookmarkCounts = useMemo(() => buildFolderBookmarkCounts(m.bookmarks), [m.bookmarks])
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-row overflow-hidden">

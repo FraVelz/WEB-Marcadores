@@ -14,11 +14,7 @@ type Props = {
  * Cabecera global del dashboard: solo barra sticky en móvil.
  * En desktop la navegación vive en DashboardIconRail.
  */
-export function DashboardLayoutChrome({
-  pathname,
-  mobileSidebarOpen,
-  onOpenMobileSidebar,
-}: Props) {
+export function DashboardLayoutChrome({ pathname, mobileSidebarOpen, onOpenMobileSidebar }: Props) {
   return (
     <DashboardMobileHeader pathname={pathname} sidebarOpen={mobileSidebarOpen} onOpenSidebar={onOpenMobileSidebar} />
   )

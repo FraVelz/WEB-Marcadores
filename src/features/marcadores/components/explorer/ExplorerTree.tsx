@@ -32,7 +32,7 @@ function rowClass(isSelected: boolean) {
   return cn(
     "flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm transition-colors",
     isSelected
-      ? cn(KEYBOARD_SELECTED, "font-medium text-app-fg")
+      ? cn(KEYBOARD_SELECTED, "text-app-fg font-medium")
       : cn("text-app-fg-secondary hover:bg-app-hover hover:text-app-fg", FOCUS_RING_ICON_BTN)
   )
 }
@@ -69,11 +69,7 @@ function TreeLevel({
               </span>
               <FolderIcon />
               <span className="min-w-0 flex-1 truncate">{folder.name}</span>
-              {count ? (
-                <span className="text-app-fg-muted shrink-0 text-xs tabular-nums">
-                  {count}
-                </span>
-              ) : null}
+              {count ? <span className="text-app-fg-muted shrink-0 text-xs tabular-nums">{count}</span> : null}
             </button>
             {hasChildren && !isCollapsed ? (
               <TreeLevel
@@ -110,11 +106,7 @@ export default function ExplorerTree({
           <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
         </svg>
         <span className="min-w-0 flex-1 truncate">Todos</span>
-        {rootCount ? (
-          <span className="text-app-fg-muted shrink-0 text-xs tabular-nums">
-            {rootCount}
-          </span>
-        ) : null}
+        {rootCount ? <span className="text-app-fg-muted shrink-0 text-xs tabular-nums">{rootCount}</span> : null}
       </button>
       <TreeLevel
         folders={folders}

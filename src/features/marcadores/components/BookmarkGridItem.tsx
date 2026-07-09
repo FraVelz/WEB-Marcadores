@@ -98,10 +98,7 @@ function BookmarkGridItem({
       !dropHighlight &&
       (isSelected
         ? KEYBOARD_SELECTED
-        : cnLines(
-            "border-app-border bg-app-raised",
-            "hover:border-app-input-border hover:shadow-sm"
-          )),
+        : cnLines("border-app-border bg-app-raised", "hover:border-app-input-border hover:shadow-sm")),
     dropFrameClass,
     selectMode && !isFolder ? "cursor-pointer" : ""
   )
@@ -150,9 +147,7 @@ function BookmarkGridItem({
           searchInDescription={searchInDescription}
           folderName={resolveFolderName(folders, item.bookmark.folder_id)}
           onToggleFavorite={
-            onToggleFavorite
-              ? (isFavorite) => onToggleFavorite(item.bookmark.id, isFavorite)
-              : undefined
+            onToggleFavorite ? (isFavorite) => onToggleFavorite(item.bookmark.id, isFavorite) : undefined
           }
         />
       )}
