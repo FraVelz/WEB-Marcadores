@@ -2,9 +2,8 @@
 
 import { cn } from "@/lib/utils"
 
-import { useDebouncedSearchInput } from "@/features/marcadores/hooks/useDebouncedSearchInput"
 import type { BookmarkSortOrder } from "@/features/marcadores/state/libraryPaneUiState"
-import ToolbarSearchOptions from "./ToolbarSearchOptions"
+import { MarcadoresSearchField } from "./MarcadoresSearchField"
 
 type Props = {
   searchValue: string
@@ -43,56 +42,30 @@ export function MarcadoresContentHeader({
   treeToggleDisabled = false,
   onEnter,
 }: Props) {
-  const { draft, setDraft, flush } = useDebouncedSearchInput({
-    query: searchValue,
-    onQueryChange: setSearchValue,
-  })
-
-  const placeholder = searchInDescription ? "Buscar en título, descripción, URL, tags…" : "Buscar en título, URL, tags…"
-
   return (
     <header className="border-app-border bg-app-toolbar shrink-0 border-b px-4 py-4 md:px-6">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-6">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-6">
         <div className="shrink-0">
           <h1 className="text-app-fg text-xl font-semibold tracking-tight">Marcadores</h1>
           <p className="text-app-fg-muted mt-0.5 text-sm">Tus enlaces, organizados</p>
         </div>
 
-        <div className="relative mx-auto w-full min-w-0 max-w-xl flex-1">
-          <svg
-            className="text-app-fg-muted pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            aria-hidden
-          >
-            <circle cx="11" cy="11" r="7" />
-            <path d="m20 20-3.5-3.5" strokeLinecap="round" />
-          </svg>
-          <input
-            ref={searchRef}
-            type="search"
-            placeholder={placeholder}
-            data-no-vim
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onBlur={flush}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault()
-                flush()
-                onEnter?.()
-              }
-            }}
-            className={cn(
-              "border-app-input-border bg-app-raised-muted text-app-fg w-full rounded-full border py-2.5 pr-4 pl-10 text-sm",
-              "placeholder-app-fg-label focus:border-app-focus focus:ring-app-focus/20 focus:ring-2 focus:outline-none"
-            )}
+        <div className="mx-auto w-full min-w-0 max-w-xl flex-1">
+          <MarcadoresSearchField
+            searchValue={searchValue}
+            setSearchValue={setSearchValue}
+            searchRef={searchRef}
+            searchInSubfolders={searchInSubfolders}
+            setSearchInSubfolders={setSearchInSubfolders}
+            searchInDescription={searchInDescription}
+            setSearchInDescription={setSearchInDescription}
+            onEnter={onEnter}
+            variant="pill"
+            chipsClassName="justify-center lg:justify-start"
           />
         </div>
 
-        <div className="flex shrink-0 items-center justify-end gap-2">
+        <div className="flex shrink-0 items-center justify-end gap-2 lg:pt-1">
           <select
             value={bookmarkSort}
             onChange={(e) => setBookmarkSort(e.target.value as BookmarkSortOrder)}
@@ -147,15 +120,6 @@ export function MarcadoresContentHeader({
             </div>
           ) : null}
         </div>
-      </div>
-
-      <div className="mt-3 flex justify-center lg:justify-start lg:pl-[calc(50%-12rem)]">
-        <ToolbarSearchOptions
-          searchInSubfolders={searchInSubfolders}
-          setSearchInSubfolders={setSearchInSubfolders}
-          searchInDescription={searchInDescription}
-          setSearchInDescription={setSearchInDescription}
-        />
       </div>
     </header>
   )

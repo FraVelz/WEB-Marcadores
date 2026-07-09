@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import type { ReactNode } from "react"
 
 import { useDashboard } from "@/contexts/DashboardContext"
+import { AppLogoMark } from "@/components/brand/AppLogoMark"
 import { dashboardNavItems, isMarcadoresRoute } from "@/components/header/dashboardNav"
 import { useMarcadoresViewMode, type MarcadoresViewMode } from "@/features/marcadores/hooks/useMarcadoresViewMode"
 import { cn } from "@/lib/utils"
@@ -100,11 +101,7 @@ export function DashboardIconRail() {
       className="border-app-border bg-app-sidebar hidden w-[52px] shrink-0 flex-col items-center border-r py-3 md:flex"
       aria-label="Navegación global"
     >
-      <div className="mb-3 flex size-9 items-center justify-center rounded-lg bg-app-primary text-white">
-        <svg className="size-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-        </svg>
-      </div>
+      <AppLogoMark className="mb-3" />
 
       <nav className="flex flex-1 flex-col items-center gap-1">
         {dashboardNavItems.map((item) => {
