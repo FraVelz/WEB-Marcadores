@@ -1,5 +1,7 @@
 import type { Bookmark, CutItem, GridItem } from "@/features/marcadores/utils/types"
 
+export type BookmarkSortOrder = "recent" | "title" | "created"
+
 /** Estado compartido de un panel de biblioteca (simple o ventana de escritorio). */
 export type LibraryPaneUiState = {
   selectedIndex: number
@@ -21,6 +23,7 @@ export type LibraryPaneUiState = {
   searchValue: string
   searchInSubfolders: boolean
   searchInDescription: boolean
+  bookmarkSort: BookmarkSortOrder
   bookmarkModalNonce: number
   viewMode: "grid" | "tree"
 }
@@ -39,7 +42,7 @@ export function createDefaultLibraryPaneUi(): LibraryPaneUiState {
     modalOpen: false,
     editingBookmark: null,
     detailBookmark: null,
-    showSearch: false,
+    showSearch: true,
     infoPanelEnabled: true,
     gridCols: 3,
     newFolderName: "",
@@ -52,6 +55,7 @@ export function createDefaultLibraryPaneUi(): LibraryPaneUiState {
     searchValue: "",
     searchInSubfolders: false,
     searchInDescription: true,
+    bookmarkSort: "recent",
     bookmarkModalNonce: 0,
     viewMode: "grid",
   }

@@ -23,6 +23,7 @@ import { StatSection } from "@/features/estadisticas/components/StatSection"
 import { StatSegmentBreakdown } from "@/features/estadisticas/components/StatSegmentBreakdown"
 import { StatTreeInsights } from "@/features/estadisticas/components/StatTreeInsights"
 import { useEstadisticasData } from "@/features/estadisticas/hooks/useEstadisticasData"
+import { DashboardPageHeader } from "@/layouts/dashboard/components/DashboardPageHeader"
 
 export function EstadisticasPage() {
   const { loading, stats, demoMode } = useEstadisticasData()
@@ -36,17 +37,16 @@ export function EstadisticasPage() {
   const topTagsPie = statRowsToPieModel(stats.topTags)
 
   return (
-    <div className="overflow-auto p-4 pb-12 text-center sm:p-6">
-      <header className="mx-auto mb-6 max-w-5xl sm:mb-8">
-        <h1 className="text-app-fg text-xl font-semibold tracking-tight sm:text-2xl">Estadísticas</h1>
-
-        <p className="text-app-fg-secondary mt-2 text-sm leading-relaxed">
-          Resumen de tu biblioteca de marcadores: uso, organización e higiene de datos.
-          {demoMode ? (
-            <span className="text-app-fg-muted mt-1 block text-xs">Modo demo: métricas sobre datos de ejemplo.</span>
-          ) : null}
-        </p>
-      </header>
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <DashboardPageHeader
+        title="Estadísticas"
+        subtitle={
+          demoMode
+            ? "Resumen de tu biblioteca (modo demo con datos de ejemplo)."
+            : "Resumen de tu biblioteca de marcadores: uso, organización e higiene de datos."
+        }
+      />
+      <div className="overflow-auto p-4 pb-12 text-center sm:p-6">
 
       <div className="mx-auto flex max-w-5xl flex-col gap-10">
         <StatSection title="Resumen" hint="Solo enlaces no archivados salvo donde se indica">
@@ -131,6 +131,7 @@ export function EstadisticasPage() {
           </div>
         </StatSection>
       </div>
+    </div>
     </div>
   )
 }

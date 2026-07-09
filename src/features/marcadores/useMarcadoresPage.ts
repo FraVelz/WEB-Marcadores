@@ -24,7 +24,7 @@ export function useMarcadoresPage(): MarcadoresPageModel {
 
   useMarcadoresExplorerHeaderSlot({
     variant: "simple",
-    active: core.stackedExplorerHeaderBar,
+    active: false,
     registerExplorerWideHeaderEnd,
   })
 

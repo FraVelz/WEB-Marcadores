@@ -4,6 +4,7 @@ import type { MutableRefObject, RefObject, SetStateAction } from "react"
 
 import {
   createDefaultDeskLibraryPaneUi,
+  type BookmarkSortOrder,
   type DeskLibraryPaneUiState,
   type LibraryPaneUiState,
 } from "@/features/marcadores/state/libraryPaneUiState"
@@ -30,6 +31,7 @@ export type LibraryPaneUiBindings = {
   setSearchValue: Setter<string>
   setSearchInSubfolders: Setter<boolean>
   setSearchInDescription: Setter<boolean>
+  setBookmarkSort: Setter<BookmarkSortOrder>
   setBookmarkModalNonce: Setter<number>
   setViewMode: Setter<"grid" | "tree">
 }
@@ -65,6 +67,7 @@ export function createLibraryPaneBindings(
     setSearchValue: (a) => patch("searchValue", a),
     setSearchInSubfolders: (a) => patch("searchInSubfolders", a),
     setSearchInDescription: (a) => patch("searchInDescription", a),
+    setBookmarkSort: (a) => patch("bookmarkSort", a),
     setBookmarkModalNonce: (a) => patch("bookmarkModalNonce", a),
     setViewMode: (a) => patch("viewMode", a),
   }

@@ -7,7 +7,8 @@ import { useCallback, useEffect, useMemo, useReducer, useRef } from "react"
 import { useDashboard } from "@/contexts/DashboardContext"
 
 import type { MarcadoresDesktopLibraryPaneShareProps } from "@/features/marcadores/MarcadoresDesktopLibraryPaneBody"
-import { useMarcadoresExplorerHeaderSlot } from "@/features/marcadores/hooks/useMarcadoresExplorerHeaderSlot"
+import { MarcadoresDesktopLayoutBar } from "@/features/marcadores/desktop/MarcadoresDesktopLayoutBar"
+import { MarcadoresDesktopTaskStrip } from "@/features/marcadores/desktop/MarcadoresDesktopTaskStrip"
 import type { WindowBounds } from "@/features/marcadores/desktop/windowTypes"
 import {
   applyDeskPatch,
@@ -60,7 +61,7 @@ export function MarcadoresDesktopShell({
   onCloseDetail,
   onRequestCloseLibraryWindow,
 }: MarcadoresDesktopShellProps) {
-  const { registerExplorerWideHeaderEnd, focusMain } = useDashboard()
+  const { focusMain } = useDashboard()
   const hostRef = useRef<HTMLDivElement>(null)
 
   const [desk, dispatchDesk] = useReducer(deskShellReducer, INITIAL_DESK_SHELL)
@@ -167,21 +168,21 @@ export function MarcadoresDesktopShell({
   const deskSurfaceReady = deskReady && canvas.w >= MIN_CANVAS && canvas.h >= MIN_CANVAS
   const canTileTwoColumns = libraryWindowIds.length === 2
 
-  useMarcadoresExplorerHeaderSlot({
-    variant: "desk",
-    registerExplorerWideHeaderEnd,
-    desktopWm,
-    canTileTwoColumns,
-    tileTwoColumns,
-    deskSurfaceReady,
-    minimizeAllWindows: minimizeAllAndFocusMain,
-    restoreMinimizedWindows,
-    maximizeAllWindows,
-    restoreWindowSizes,
-  })
-
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <div className="border-app-border bg-app-toolbar flex shrink-0 items-center gap-2 overflow-x-auto border-b px-3 py-1.5">
+        <MarcadoresDesktopTaskStrip surfaces={desktopWm.tasks} onFocusTask={desktopWm.focusTask} />
+        <MarcadoresDesktopLayoutBar
+          canTileTwoColumns={canTileTwoColumns}
+          onTileTwoColumns={tileTwoColumns}
+          deskSurfaceReady={deskSurfaceReady}
+          onMinimizeAll={minimizeAllAndFocusMain}
+          onRestoreMinimized={restoreMinimizedWindows}
+          onMaximizeAll={maximizeAllWindows}
+          onRestoreWindowSizes={restoreWindowSizes}
+          inlineInExplorerHeader
+        />
+      </div>
       <MarcadoresDesktopShellCanvas
         hostRef={hostRef}
         canvas={canvas}

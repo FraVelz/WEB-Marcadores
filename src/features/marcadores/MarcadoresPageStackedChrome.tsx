@@ -2,9 +2,10 @@
 
 import DemoBanner from "@/features/marcadores/components/DemoBanner"
 import DeleteConfirmBanner from "@/features/marcadores/components/DeleteConfirmBanner"
+import { MarcadoresContentHeader } from "@/features/marcadores/components/MarcadoresContentHeader"
 import { MarcadoresGlobalAlertLayer } from "@/features/marcadores/components/MarcadoresGlobalAlertLayer"
+import { MarcadoresSecondaryActions } from "@/features/marcadores/components/MarcadoresSecondaryActions"
 import MarcadoresBreadcrumb from "@/features/marcadores/components/MarcadoresBreadcrumb"
-import MarcadoresToolbar from "@/features/marcadores/components/MarcadoresToolbar"
 import PasteErrorBanner from "@/features/marcadores/components/PasteErrorBanner"
 import type { MarcadoresPageModel } from "@/features/marcadores/useMarcadoresPage"
 
@@ -15,48 +16,47 @@ export function MarcadoresPageStackedChrome({ m }: { m: MarcadoresPageModel }) {
 
   return (
     <>
-      <MarcadoresToolbar
-        showSearch={pane.showSearch}
-        setShowSearch={b.setShowSearch}
+      <MarcadoresContentHeader
         searchValue={pane.searchValue}
         setSearchValue={b.setSearchValue}
+        searchRef={scope.searchRef}
         searchInSubfolders={pane.searchInSubfolders}
         setSearchInSubfolders={b.setSearchInSubfolders}
         searchInDescription={pane.searchInDescription}
         setSearchInDescription={b.setSearchInDescription}
-        searchRef={scope.searchRef}
-        focusMain={m.focusMain}
-        showNewFolder={pane.showNewFolder}
-        setShowNewFolder={b.setShowNewFolder}
-        newFolderName={pane.newFolderName}
-        setNewFolderName={b.setNewFolderName}
-        editingFolder={pane.editingFolder}
-        setEditingFolder={b.setEditingFolder}
-        renameFolderName={pane.renameFolderName}
-        setRenameFolderName={b.setRenameFolderName}
-        onRenameFolder={m.onRenameFolder}
+        bookmarkSort={pane.bookmarkSort}
+        setBookmarkSort={b.setBookmarkSort}
+        viewMode={pane.viewMode}
+        onToggleViewMode={m.toggleTreeMainView}
+        treeToggleDisabled={m.treeToggleDisabled}
+        onEnter={m.focusMain}
+      />
+
+      <MarcadoresSecondaryActions
         onNavigateUp={() => m.browseScope.setFolderId(null)}
         onAddBookmark={m.handleAdd}
+        onNewFolder={() => b.setShowNewFolder(true)}
         onDeleteFocused={() => {
           const item = m.focusFlatList[pane.selectedIndex]
           if (item) b.setDeleteConfirmItem(item)
         }}
-        onCreateFolder={m.onCreateFolder}
+        hasFocusedItem={m.focusFlatList.length > 0 && !!m.focusFlatList[pane.selectedIndex]}
         selectMode={pane.selectMode}
         setSelectMode={b.setSelectMode}
         selectedIds={pane.selectedIds}
         setSelectedIds={b.setSelectedIds}
         onEdit={m.handleEdit}
         onDelete={m.onDelete}
-        infoPanelEnabled={pane.infoPanelEnabled}
-        setInfoPanelEnabled={b.setInfoPanelEnabled}
-        flatList={m.focusFlatList}
-        selectedIndex={pane.selectedIndex}
-        setDetailBookmark={b.setDetailBookmark}
-        treeView={pane.viewMode === "tree"}
-        onToggleTreeView={m.treeToggleDisabled ? undefined : m.toggleTreeMainView}
-        treeToggleDisabled={m.treeToggleDisabled}
-        showFullscreenToggle={!m.stackedExplorerHeaderBar}
+        showNewFolder={pane.showNewFolder}
+        setShowNewFolder={b.setShowNewFolder}
+        newFolderName={pane.newFolderName}
+        setNewFolderName={b.setNewFolderName}
+        onCreateFolder={m.onCreateFolder}
+        editingFolder={pane.editingFolder}
+        setEditingFolder={b.setEditingFolder}
+        renameFolderName={pane.renameFolderName}
+        setRenameFolderName={b.setRenameFolderName}
+        onRenameFolder={m.onRenameFolder}
         duplicateClusterCount={m.duplicateClusterCount}
       />
 

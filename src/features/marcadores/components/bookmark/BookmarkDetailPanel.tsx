@@ -20,13 +20,66 @@ type Props = {
   onClose: () => void
   onUpdate: (id: string, updates: Partial<Bookmark>) => Promise<void>
   onTelemetryOpen?: (id: string) => Promise<void>
+  onEdit?: () => void
+  onDelete?: () => void
   allTags: string[]
   folders: Folder[]
   embedded?: boolean
-  /** Query debounced del buscador; resalta coincidencias en título, URL y descripción. */
+  /** Muestra columna vacía en desktop aunque no haya marcador seleccionado */
+  persistent?: boolean
   searchQuery?: string
-  /** Oculta la cabecera interna cuando el panel va dentro de un marco de ventana de escritorio */
   omitEmbeddedHeader?: boolean
+}
+
+function DetailPlaceholder() {
+  return (
+    <aside className="border-app-border bg-app-sidebar hidden w-full max-w-[20rem] min-w-[17.5rem] shrink-0 flex-col border-l md:flex">
+      <div className="flex flex-1 flex-col items-center justify-center p-6 text-center">
+        <div className="bg-app-hover mb-4 flex size-16 items-center justify-center rounded-2xl">
+          <svg className="text-app-fg-muted size-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+        <p className="text-app-fg font-medium">Selecciona un marcador</p>
+        <p className="text-app-fg-muted mt-1 text-sm">Aquí verás los detalles del enlace</p>
+      </div>
+    </aside>
+  )
+}
+
+function ActionIconButton({
+  label,
+  onClick,
+  href,
+  danger,
+  children,
+}: {
+  label: string
+  onClick?: () => void
+  href?: string
+  danger?: boolean
+  children: React.ReactNode
+}) {
+  const className = cn(
+    "flex size-10 items-center justify-center rounded-lg transition-colors",
+    danger
+      ? "text-app-danger-fg hover:bg-app-danger/15"
+      : "text-app-fg-muted hover:bg-app-hover hover:text-app-fg"
+  )
+
+  if (href) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={className} aria-label={label} title={label}>
+        {children}
+      </a>
+    )
+  }
+
+  return (
+    <button type="button" className={className} aria-label={label} title={label} onClick={onClick}>
+      {children}
+    </button>
+  )
 }
 
 function BookmarkDetailPanelInner({
@@ -34,9 +87,12 @@ function BookmarkDetailPanelInner({
   onClose,
   onUpdate,
   onTelemetryOpen,
+  onEdit,
+  onDelete,
   allTags,
   folders,
   embedded = false,
+  persistent = false,
   omitEmbeddedHeader = false,
   searchQuery = "",
 }: Props & { bookmark: NonNullable<Props["bookmark"]> }) {
@@ -44,6 +100,7 @@ function BookmarkDetailPanelInner({
   const [saving, setSaving] = useState(false)
   const [moveFolderId, setMoveFolderId] = useState(bookmark.folder_id || "")
   const [faviconBroken, setFaviconBroken] = useState(false)
+  const [copied, setCopied] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
 
   const tags = bookmark.tags || []
@@ -53,13 +110,8 @@ function BookmarkDetailPanelInner({
         day: "numeric",
         month: "short",
         year: "numeric",
-      })
-    : null
-  const opened = bookmark.opened_at
-    ? new Date(bookmark.opened_at).toLocaleDateString("es", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
       })
     : null
   const folderOptions = buildFolderOptions(folders)
@@ -99,29 +151,29 @@ function BookmarkDetailPanelInner({
     setSaving(false)
   }
 
-  const toggleArchived = async () => {
-    setSaving(true)
-    const archived = bookmark.archived_at ? null : new Date().toISOString()
-    await onUpdate(bookmark.id, { archived_at: archived })
-    setSaving(false)
+  const copyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(bookmark.url)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      /* ignore */
+    }
   }
 
   const panelContent = (
-    <div
+    <aside
       ref={panelRef}
-      role="dialog"
-      aria-modal={embedded ? false : true}
-      aria-label={embedded ? "Propiedades del marcador" : "Detalle del marcador"}
+      role="complementary"
+      aria-label="Detalle del marcador"
       data-no-vim
       onKeyDown={(e) => e.stopPropagation()}
       className={
         embedded
           ? cn(
-              "border-app-border bg-app-sidebar flex max-h-none min-h-0 flex-col overflow-hidden",
-              "fixed inset-0 z-[45] h-dvh shadow-none md:relative md:inset-auto md:z-auto",
-              omitEmbeddedHeader
-                ? "h-full min-h-0 w-full max-w-none border-0 md:h-full md:max-h-full"
-                : "md:h-full md:max-h-full md:min-h-0 md:max-w-[320px] md:min-w-[280px] md:border-l md:shadow-none"
+              "border-app-border bg-app-sidebar flex max-h-none min-h-0 flex-col overflow-hidden border-l",
+              "fixed inset-0 z-[45] h-dvh w-full shadow-xl md:relative md:inset-auto md:z-auto md:h-full md:max-h-full md:w-full md:max-w-[20rem] md:min-w-[17.5rem] md:shadow-none",
+              persistent ? "hidden md:flex" : ""
             )
           : cn(
               "border-app-border-muted bg-app-raised fixed top-0 right-0 z-50 h-full max-h-dvh w-full max-w-full border-l shadow-xl",
@@ -129,16 +181,13 @@ function BookmarkDetailPanelInner({
             )
       }
     >
-      <div className="flex h-full min-h-0 flex-col p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] md:pt-4 md:pb-4">
+      <div className="flex h-full min-h-0 flex-col p-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.25rem,env(safe-area-inset-bottom))] md:pt-5 md:pb-5">
         {!omitEmbeddedHeader ? (
-          <div className="border-app-border mb-4 flex items-center justify-between border-b pb-2">
-            <h3 className="text-app-fg-label text-xs font-semibold tracking-wider uppercase">
-              {embedded ? "Propiedades" : "Detalle"}
-            </h3>
+          <div className="mb-5 flex items-center justify-end md:hidden">
             <button
               type="button"
               onClick={onClose}
-              className="text-app-fg-label hover:bg-app-hover hover:text-app-fg rounded p-1"
+              className="text-app-fg-muted hover:bg-app-hover hover:text-app-fg rounded-lg p-2"
               aria-label="Cerrar"
             >
               ✕
@@ -146,65 +195,96 @@ function BookmarkDetailPanelInner({
           </div>
         ) : null}
 
-        <div className="flex flex-1 flex-col gap-4 overflow-y-auto">
-          <div className="flex items-start gap-3">
-            {favicon && !faviconBroken ? (
-              <Image
-                src={favicon}
-                alt=""
-                width={40}
-                height={40}
-                className="size-10 shrink-0 rounded"
-                unoptimized
-                onError={() => setFaviconBroken(true)}
-              />
-            ) : (
-              <div className="bg-app-hover flex size-10 shrink-0 items-center justify-center rounded">
-                <span className="text-app-fg-muted text-xs">⋯</span>
-              </div>
-            )}
-            <div className="min-w-0 flex-1">
-              <h2 className="text-app-fg font-semibold">
-                {highlight ? <SearchHighlightText text={bookmark.title || ""} query={searchQuery} /> : bookmark.title}
-              </h2>
-              <a
-                href={bookmark.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                onAuxClick={(e) => {
-                  if (e.button !== 1) return
-                  handleTelemetry()
-                }}
-                onClick={handleTelemetry}
-                className="text-app-link mt-1 block truncate text-xs hover:underline"
-              >
-                {highlight ? <SearchHighlightText text={bookmark.url || ""} query={searchQuery} /> : bookmark.url}
-              </a>
+        <div className="mb-6 flex flex-col items-center gap-3 text-center">
+          {favicon && !faviconBroken ? (
+            <Image
+              src={favicon}
+              alt=""
+              width={64}
+              height={64}
+              className="size-16 rounded-2xl"
+              unoptimized
+              onError={() => setFaviconBroken(true)}
+            />
+          ) : (
+            <div className="bg-app-hover flex size-16 items-center justify-center rounded-2xl">
+              <span className="text-app-fg-muted text-lg">⋯</span>
             </div>
+          )}
+          <button
+            type="button"
+            disabled={saving}
+            onClick={() => void toggleFavorite()}
+            className={cn(
+              "rounded-full p-1.5 transition-colors",
+              bookmark.is_favorite ? "text-amber-400" : "text-app-fg-muted hover:text-amber-400"
+            )}
+            aria-label={bookmark.is_favorite ? "Quitar de favoritos" : "Marcar favorito"}
+          >
+            <svg className="size-5" viewBox="0 0 24 24" fill={bookmark.is_favorite ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.75" aria-hidden>
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
+          <div className="text-center">
+            <h2 className="text-app-fg text-lg font-semibold">
+              {highlight ? <SearchHighlightText text={bookmark.title || ""} query={searchQuery} /> : bookmark.title}
+            </h2>
+            <a
+              href={bookmark.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onAuxClick={(e) => {
+                if (e.button !== 1) return
+                handleTelemetry()
+              }}
+              onClick={handleTelemetry}
+              className="text-app-link mt-2 block truncate text-sm hover:underline"
+            >
+              {highlight ? <SearchHighlightText text={bookmark.url || ""} query={searchQuery} /> : bookmark.url}
+            </a>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              disabled={saving}
-              onClick={() => void toggleFavorite()}
-              className={cn(
-                "rounded-md border px-2 py-1 text-xs transition-colors",
-                bookmark.is_favorite
-                  ? "border-app-accent bg-app-selection ring-app-focus ring-1"
-                  : "border-app-border-muted bg-app-toolbar hover:border-app-accent"
-              )}
-            >
-              {bookmark.is_favorite ? "Favorito ★" : "Marcar favorito"}
-            </button>
-            <button
-              type="button"
-              disabled={saving}
-              onClick={() => void toggleArchived()}
-              className="border-app-border-muted bg-app-toolbar hover:border-app-accent rounded-md border px-2 py-1 text-xs"
-            >
-              {bookmark.archived_at ? "Restaurar" : "Archivar"}
-            </button>
+          {bookmark.description ? (
+            <div>
+              <div className="text-app-fg-label mb-1 text-xs font-medium uppercase tracking-wide">Descripción</div>
+              <p className="text-app-fg-secondary text-sm leading-relaxed">
+                {highlight ? (
+                  <SearchHighlightText text={bookmark.description} query={searchQuery} />
+                ) : (
+                  bookmark.description
+                )}
+              </p>
+            </div>
+          ) : null}
+
+          <div className="space-y-3">
+            <div>
+              <div className="text-app-fg-label mb-1 text-xs font-medium uppercase tracking-wide">Carpeta</div>
+              <p className="text-app-fg text-sm">{currentFolderPath}</p>
+            </div>
+
+            {tags.length > 0 ? (
+              <div>
+                <div className="text-app-fg-label mb-1.5 text-xs font-medium uppercase tracking-wide">Tags</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {tags.map((tag) => (
+                    <span key={tag} className="bg-app-primary/10 text-app-primary rounded-full px-2.5 py-0.5 text-xs font-medium">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            {created ? (
+              <div>
+                <div className="text-app-fg-label mb-1 text-xs font-medium uppercase tracking-wide">Añadido</div>
+                <p className="text-app-fg-secondary text-sm">{created}</p>
+              </div>
+            ) : null}
           </div>
 
           <BookmarkDetailFolderSection
@@ -217,25 +297,6 @@ function BookmarkDetailPanelInner({
             bookmarkFolderId={bookmark.folder_id || null}
           />
 
-          {bookmark.description ? (
-            <div>
-              <div className="text-app-fg-label mb-1 text-xs font-medium">Descripción</div>
-              <p className="text-app-fg-secondary text-sm">
-                {highlight ? (
-                  <SearchHighlightText text={bookmark.description} query={searchQuery} />
-                ) : (
-                  bookmark.description
-                )}
-              </p>
-            </div>
-          ) : null}
-
-          <div className="text-app-fg-muted space-y-1 text-xs">
-            {created && <p>Añadido: {created}</p>}
-            <p>Aperturas: {bookmark.open_count ?? 0}</p>
-            {opened ? <p>Última apertura: {opened}</p> : <p>Nunca abierto desde la app</p>}
-          </div>
-
           <BookmarkDetailTagsSection
             tags={tags}
             newTag={newTag}
@@ -247,22 +308,36 @@ function BookmarkDetailPanelInner({
           />
         </div>
 
-        <div className="border-app-border-muted mt-4 flex gap-2 border-t pt-4">
-          <a
-            href={bookmark.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={handleTelemetry}
-            className={cn(
-              "bg-app-primary flex-1 rounded-lg py-2 text-center text-sm font-medium text-white no-underline",
-              "hover:bg-app-primary-hover"
-            )}
-          >
-            Abrir
-          </a>
+        <div className="border-app-border mt-4 flex items-center justify-center gap-2 border-t pt-4">
+          <ActionIconButton label="Abrir enlace" href={bookmark.url} onClick={handleTelemetry}>
+            <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </ActionIconButton>
+          <ActionIconButton label={copied ? "Copiado" : "Copiar URL"} onClick={() => void copyUrl()}>
+            <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+              <rect x="9" y="9" width="13" height="13" rx="2" />
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+            </svg>
+          </ActionIconButton>
+          {onEdit ? (
+            <ActionIconButton label="Editar" onClick={onEdit}>
+              <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
+            </ActionIconButton>
+          ) : null}
+          {onDelete ? (
+            <ActionIconButton label="Eliminar" onClick={onDelete} danger>
+              <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+                <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" strokeLinecap="round" />
+              </svg>
+            </ActionIconButton>
+          ) : null}
         </div>
       </div>
-    </div>
+    </aside>
   )
 
   if (embedded) return panelContent
@@ -285,9 +360,12 @@ export default function BookmarkDetailPanel({
   onClose,
   onUpdate,
   onTelemetryOpen,
+  onEdit,
+  onDelete,
   allTags,
   folders,
   embedded = false,
+  persistent = false,
   omitEmbeddedHeader = false,
   searchQuery = "",
 }: Props) {
@@ -297,11 +375,14 @@ export default function BookmarkDetailPanel({
       if (document.querySelector('[role="dialog"][aria-modal="true"]')) return
       onClose()
     },
-    { enabled: Boolean(bookmark) },
-    [bookmark, onClose]
+    { enabled: Boolean(bookmark) && !persistent },
+    [bookmark, onClose, persistent]
   )
 
-  if (!bookmark) return null
+  if (!bookmark) {
+    if (persistent && embedded) return <DetailPlaceholder />
+    return null
+  }
 
   return (
     <BookmarkDetailPanelInner
@@ -310,9 +391,12 @@ export default function BookmarkDetailPanel({
       onClose={onClose}
       onUpdate={onUpdate}
       onTelemetryOpen={onTelemetryOpen}
+      onEdit={onEdit}
+      onDelete={onDelete}
       allTags={allTags}
       folders={folders}
       embedded={embedded}
+      persistent={persistent}
       omitEmbeddedHeader={omitEmbeddedHeader}
       searchQuery={searchQuery}
     />

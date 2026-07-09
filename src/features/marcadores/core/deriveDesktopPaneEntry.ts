@@ -35,7 +35,7 @@ function deriveDesktopPaneEntry(
   }
 
   const filtered = filterBookmarksBySearch(baseVisible, derivedRows, searchOpts)
-  const flatList = buildSearchResultGridItems(folders, filtered, searchOpts)
+  const flatList = buildSearchResultGridItems(folders, filtered, searchOpts, ui.bookmarkSort)
   const scopedSearchActive = isScopedSearchResultsActive(searchOpts)
   const breadcrumb = getFolderPath(folders, winFolderId)
   const treeFlatRows = scopedSearchActive ? [] : buildMarcadoresTreeFlatRows(folders, filtered, ui.treeCollapsedIds)
