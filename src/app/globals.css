@@ -36,6 +36,8 @@
   --app-primary-hover: #1e40af;
   --app-accent: #1d4ed8;
   --app-focus: #2563eb;
+  --app-focus-ring: color-mix(in srgb, var(--app-focus) 35%, transparent);
+  --app-focus-offset: var(--app-canvas);
   --app-link: #1d4ed8;
 
   --app-danger: #dc2626;
@@ -119,6 +121,9 @@ html.dark {
   --app-primary: #1d4ed8;
   --app-primary-hover: #2563eb;
   --app-accent: #3b82f6;
+  --app-focus: #3b82f6;
+  --app-focus-ring: color-mix(in srgb, var(--app-focus) 40%, transparent);
+  --app-focus-offset: var(--app-canvas);
   --app-link: #3b82f6;
 
   --app-danger-fg: #f87171;
@@ -194,6 +199,8 @@ html.dark {
   --color-app-primary-hover: var(--app-primary-hover);
   --color-app-accent: var(--app-accent);
   --color-app-focus: var(--app-focus);
+  --color-app-focus-ring: var(--app-focus-ring);
+  --color-app-focus-offset: var(--app-focus-offset);
   --color-app-link: var(--app-link);
 
   --color-app-danger: var(--app-danger);
@@ -260,6 +267,19 @@ html.app-wallpaper body {
 @layer base {
   button:enabled {
     cursor: pointer;
+  }
+
+  :where(
+    a,
+    button,
+    input,
+    select,
+    textarea,
+    [role="button"],
+    [tabindex]:not([tabindex="-1"])
+  ):focus-visible {
+    outline: 2px solid var(--app-focus);
+    outline-offset: 2px;
   }
 }
 

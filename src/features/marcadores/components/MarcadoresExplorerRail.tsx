@@ -8,6 +8,7 @@ import ExplorerTree from "@/features/marcadores/components/explorer/ExplorerTree
 import { useDashboardSidebarHotkeys } from "@/layouts/dashboard/hooks/useDashboardSidebarHotkeys"
 
 import { cn } from "@/lib/utils"
+import { FOCUS_RING_ICON_BTN, HOTKEY_SCOPE_FOCUS } from "@/lib/focusStyles"
 import { readTabScopedItem, writeTabScopedItem } from "@/lib/tabScopedStorage"
 
 const OPEN_KEY = "marcadores_explorer_rail_open"
@@ -95,7 +96,10 @@ export function MarcadoresExplorerRail({ registerGlobalExplorerRef = true, folde
         <div className="flex w-10 flex-col items-center gap-1 py-2">
           <button
             type="button"
-            className="text-app-fg-muted hover:bg-app-hover hover:text-app-fg rounded p-2 text-xs"
+            className={cn(
+              "text-app-fg-muted hover:bg-app-hover hover:text-app-fg rounded p-2 text-xs",
+              FOCUS_RING_ICON_BTN
+            )}
             aria-label="Mostrar carpetas"
             title="Mostrar carpetas"
             onClick={() => persistOpen(true)}
@@ -116,8 +120,8 @@ export function MarcadoresExplorerRail({ registerGlobalExplorerRef = true, folde
           aria-label="Explorador de carpetas"
           data-marcadores-explorer-rail
           className={cn(
-            "flex h-full max-h-full min-h-0 w-[min(15rem,calc(100vw-4rem))] max-w-[16rem] min-w-[11rem] flex-col overflow-hidden outline-none md:w-[13.75rem]",
-            "focus:ring-0"
+            "flex h-full max-h-full min-h-0 w-[min(15rem,calc(100vw-4rem))] max-w-[16rem] min-w-[11rem] flex-col overflow-hidden md:w-[13.75rem]",
+            HOTKEY_SCOPE_FOCUS
           )}
         >
           <div className="border-app-border flex shrink-0 items-center justify-between gap-1 border-b px-2 py-1.5">
@@ -126,7 +130,10 @@ export function MarcadoresExplorerRail({ registerGlobalExplorerRef = true, folde
             </span>
             <button
               type="button"
-              className="text-app-fg-muted hover:bg-app-hover hover:text-app-fg shrink-0 rounded px-2 py-0.5 text-xs"
+              className={cn(
+                "text-app-fg-muted hover:bg-app-hover hover:text-app-fg shrink-0 rounded px-2 py-0.5 text-xs",
+                FOCUS_RING_ICON_BTN
+              )}
               aria-label="Ocultar panel de carpetas"
               title="Ocultar"
               onClick={() => persistOpen(false)}

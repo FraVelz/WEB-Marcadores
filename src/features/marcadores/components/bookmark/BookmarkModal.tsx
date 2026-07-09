@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useMemo } from "react"
 import { buildFolderOptions } from "@/lib/bookmark-utils"
+import { FOCUS_RING } from "@/lib/focusStyles"
 import { cn } from "@/lib/utils"
 import { splitCommaTags } from "@/lib/comma-tags"
 import BookmarkFormBasicInfo from "./BookmarkFormBasicInfo"
@@ -170,6 +171,7 @@ export default function BookmarkModal({ onClose, onSubmit, initialData, allTags,
               disabled={submitting}
               className={cn(
                 "border-app-input-border text-app-fg-secondary rounded-lg border px-4 py-2",
+                FOCUS_RING,
                 "hover:bg-app-raised-muted disabled:opacity-50"
               )}
             >
@@ -180,6 +182,7 @@ export default function BookmarkModal({ onClose, onSubmit, initialData, allTags,
               disabled={submitting}
               className={cn(
                 "bg-app-primary rounded-lg px-4 py-2 font-medium text-white disabled:opacity-50",
+                FOCUS_RING,
                 "hover:bg-app-primary-hover"
               )}
             >

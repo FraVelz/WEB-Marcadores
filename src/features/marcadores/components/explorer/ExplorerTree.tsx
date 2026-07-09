@@ -3,6 +3,7 @@
 import type { Folder } from "@/contexts/DashboardContext"
 
 import { cn } from "@/lib/utils"
+import { FOCUS_RING_ICON_BTN, KEYBOARD_SELECTED } from "@/lib/focusStyles"
 
 type Props = {
   folders: Folder[]
@@ -31,8 +32,8 @@ function rowClass(isSelected: boolean) {
   return cn(
     "flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm transition-colors",
     isSelected
-      ? "bg-app-primary font-medium text-white shadow-sm"
-      : "text-app-fg-secondary hover:bg-app-hover hover:text-app-fg"
+      ? cn(KEYBOARD_SELECTED, "font-medium text-app-fg")
+      : cn("text-app-fg-secondary hover:bg-app-hover hover:text-app-fg", FOCUS_RING_ICON_BTN)
   )
 }
 
@@ -63,13 +64,13 @@ function TreeLevel({
               className={rowClass(isSelected)}
               style={{ paddingLeft: `${10 + depth * 12}px` }}
             >
-              <span className={cn("w-4 shrink-0 text-xs", isSelected ? "text-white/80" : "text-app-fg-muted")}>
+              <span className="text-app-fg-muted w-4 shrink-0 text-xs">
                 {hasChildren ? (isCollapsed ? "▶" : "▼") : " "}
               </span>
               <FolderIcon />
               <span className="min-w-0 flex-1 truncate">{folder.name}</span>
               {count ? (
-                <span className={cn("shrink-0 text-xs tabular-nums", isSelected ? "text-white/75" : "text-app-fg-muted")}>
+                <span className="text-app-fg-muted shrink-0 text-xs tabular-nums">
                   {count}
                 </span>
               ) : null}
@@ -110,7 +111,7 @@ export default function ExplorerTree({
         </svg>
         <span className="min-w-0 flex-1 truncate">Todos</span>
         {rootCount ? (
-          <span className={cn("shrink-0 text-xs tabular-nums", !selectedFolderId ? "text-white/75" : "text-app-fg-muted")}>
+          <span className="text-app-fg-muted shrink-0 text-xs tabular-nums">
             {rootCount}
           </span>
         ) : null}

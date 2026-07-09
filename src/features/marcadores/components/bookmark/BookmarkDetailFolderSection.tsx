@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { FOCUS_RING } from "@/lib/focusStyles"
 
 type FolderOption = { id: string; label: string }
 
@@ -54,7 +55,10 @@ export default function BookmarkDetailFolderSection({
             type="button"
             onClick={onMove}
             disabled={saving || moveFolderId === (bookmarkFolderId || "")}
-            className="bg-app-hover text-app-fg hover:bg-app-active shrink-0 rounded px-2 py-1 text-xs disabled:opacity-50"
+            className={cn(
+              "bg-app-hover text-app-fg hover:bg-app-active shrink-0 rounded px-2 py-1 text-xs disabled:opacity-50",
+              FOCUS_RING
+            )}
           >
             Mover
           </button>

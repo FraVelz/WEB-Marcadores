@@ -2,6 +2,8 @@
 
 import { MarcadoresViewModeToggle } from "@/features/marcadores/components/MarcadoresViewModeToggle"
 import { dashboardMobileTitle, isMarcadoresRoute } from "@/components/header/dashboardNav"
+import { FOCUS_RING_ICON_BTN } from "@/lib/focusStyles"
+import { cn } from "@/lib/utils"
 
 type Props = {
   pathname: string
@@ -15,7 +17,10 @@ export function DashboardMobileHeader({ pathname, sidebarOpen, onOpenSidebar }: 
     <header className="border-app-border bg-app-toolbar sticky top-0 z-20 flex shrink-0 items-center gap-2 border-b px-3 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] md:hidden">
       <button
         type="button"
-        className="text-app-fg-secondary hover:bg-app-active hover:text-app-fg rounded p-2"
+        className={cn(
+          "text-app-fg-secondary hover:bg-app-active hover:text-app-fg rounded p-2",
+          FOCUS_RING_ICON_BTN
+        )}
         aria-label="Abrir menú"
         aria-expanded={sidebarOpen}
         onClick={onOpenSidebar}

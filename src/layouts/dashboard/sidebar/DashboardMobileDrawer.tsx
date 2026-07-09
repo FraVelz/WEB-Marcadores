@@ -2,6 +2,7 @@
 
 import { DashboardShellNav } from "@/components/header/DashboardShellNav"
 import { cn } from "@/lib/utils"
+import { FOCUS_RING_ICON_BTN, HOTKEY_SCOPE_FOCUS } from "@/lib/focusStyles"
 import { isMarcadoresRoute } from "@/components/header/dashboardNav"
 
 type Props = {
@@ -28,7 +29,10 @@ export function DashboardMobileDrawer({ pathname, open, onClose, sidebarRef }: P
         <span className="text-app-fg-label text-xs font-medium tracking-wider uppercase">Explorador</span>
         <button
           type="button"
-          className="text-app-fg-muted hover:bg-app-hover hover:text-app-fg rounded p-1"
+          className={cn(
+            "text-app-fg-muted hover:bg-app-hover hover:text-app-fg rounded p-1",
+            FOCUS_RING_ICON_BTN
+          )}
           aria-label="Cerrar menú"
           onClick={onClose}
         >
@@ -39,7 +43,8 @@ export function DashboardMobileDrawer({ pathname, open, onClose, sidebarRef }: P
         ref={sidebarRef}
         tabIndex={0}
         className={cn(
-          "outline-app-focus flex min-h-0 shrink-0 flex-col focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+          HOTKEY_SCOPE_FOCUS,
+          "flex min-h-0 shrink-0 flex-col",
           isMarcadores ? "min-h-0 overflow-y-auto" : "flex-1 overflow-y-auto"
         )}
       >

@@ -4,6 +4,7 @@ import { clampBounds, TITLE_H } from "@/features/marcadores/desktop/desktopWindo
 import type { WindowBounds } from "@/features/marcadores/desktop/windowTypes"
 
 import { cn } from "@/lib/utils"
+import { FOCUS_RING_ICON_BTN } from "@/lib/focusStyles"
 
 type Props = {
   title: string
@@ -69,7 +70,10 @@ export function DesktopWindowTitleChrome({
           <button
             type="button"
             data-window-control
-            className="text-app-fg-muted hover:bg-app-hover flex size-7 items-center justify-center rounded"
+            className={cn(
+              "text-app-fg-muted hover:bg-app-hover flex size-7 items-center justify-center rounded",
+              FOCUS_RING_ICON_BTN
+            )}
             aria-label="Minimizar"
             onClick={(e) => {
               e.stopPropagation()
@@ -84,7 +88,10 @@ export function DesktopWindowTitleChrome({
           <button
             type="button"
             data-window-control
-            className="text-app-fg-muted hover:bg-app-hover flex size-7 items-center justify-center rounded"
+            className={cn(
+              "text-app-fg-muted hover:bg-app-hover flex size-7 items-center justify-center rounded",
+              FOCUS_RING_ICON_BTN
+            )}
             aria-label={maximized ? "Restaurar" : "Maximizar"}
             onClick={(e) => {
               e.stopPropagation()
@@ -106,7 +113,10 @@ export function DesktopWindowTitleChrome({
           <button
             type="button"
             data-window-control
-            className="hover:bg-app-danger text-app-fg-muted flex size-7 items-center justify-center rounded hover:text-white"
+            className={cn(
+              "hover:bg-app-danger text-app-fg-muted flex size-7 items-center justify-center rounded hover:text-white",
+              FOCUS_RING_ICON_BTN
+            )}
             aria-label="Cerrar"
             onClick={(e) => {
               e.stopPropagation()

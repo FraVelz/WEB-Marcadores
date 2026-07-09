@@ -11,6 +11,7 @@ import BookmarkDetailFolderSection from "./BookmarkDetailFolderSection"
 import BookmarkDetailTagsSection from "./BookmarkDetailTagsSection"
 
 import { cn } from "@/lib/utils"
+import { FOCUS_RING, FOCUS_RING_ICON_BTN } from "@/lib/focusStyles"
 import { useHotkeys } from "@/lib/hotkeys/useHotkeys"
 
 type Folder = { id: string; parent_id: string | null; name: string; sort_order: number }
@@ -62,6 +63,7 @@ function ActionIconButton({
 }) {
   const className = cn(
     "flex size-10 items-center justify-center rounded-lg transition-colors",
+    FOCUS_RING_ICON_BTN,
     danger
       ? "text-app-danger-fg hover:bg-app-danger/15"
       : "text-app-fg-muted hover:bg-app-hover hover:text-app-fg"
@@ -187,7 +189,10 @@ function BookmarkDetailPanelInner({
             <button
               type="button"
               onClick={onClose}
-              className="text-app-fg-muted hover:bg-app-hover hover:text-app-fg rounded-lg p-2"
+              className={cn(
+                "text-app-fg-muted hover:bg-app-hover hover:text-app-fg rounded-lg p-2",
+                FOCUS_RING_ICON_BTN
+              )}
               aria-label="Cerrar"
             >
               ✕
@@ -217,6 +222,7 @@ function BookmarkDetailPanelInner({
             onClick={() => void toggleFavorite()}
             className={cn(
               "rounded-full p-1.5 transition-colors",
+              FOCUS_RING_ICON_BTN,
               bookmark.is_favorite ? "text-amber-400" : "text-app-fg-muted hover:text-amber-400"
             )}
             aria-label={bookmark.is_favorite ? "Quitar de favoritos" : "Marcar favorito"}
@@ -241,7 +247,7 @@ function BookmarkDetailPanelInner({
                 handleTelemetry()
               }}
               onClick={handleTelemetry}
-              className="text-app-link mt-2 block truncate text-sm hover:underline"
+              className={cn("text-app-link mt-2 block truncate text-sm hover:underline", FOCUS_RING)}
             >
               {highlight ? <SearchHighlightText text={bookmark.url || ""} query={searchQuery} /> : bookmark.url}
             </a>

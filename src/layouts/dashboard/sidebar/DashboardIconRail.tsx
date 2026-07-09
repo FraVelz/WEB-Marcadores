@@ -9,6 +9,7 @@ import { AppLogoMark } from "@/components/brand/AppLogoMark"
 import { dashboardNavItems, isMarcadoresRoute } from "@/components/header/dashboardNav"
 import { useMarcadoresViewMode, type MarcadoresViewMode } from "@/features/marcadores/hooks/useMarcadoresViewMode"
 import { cn } from "@/lib/utils"
+import { FOCUS_RING_ICON_BTN } from "@/lib/focusStyles"
 
 const NAV_ICONS: Record<(typeof dashboardNavItems)[number]["href"], ReactNode> = {
   "/marcadores": (
@@ -64,6 +65,7 @@ type RailButtonProps = {
 function RailButton({ label, active, onClick, href, children }: RailButtonProps) {
   const className = cn(
     "flex size-10 items-center justify-center rounded-lg transition-colors",
+    FOCUS_RING_ICON_BTN,
     active
       ? "bg-app-primary text-white shadow-sm"
       : "text-app-fg-muted hover:bg-app-hover hover:text-app-fg"

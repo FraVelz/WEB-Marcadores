@@ -5,6 +5,7 @@ import { useEffect, useId, useRef, useState } from "react"
 import { MARCADORES_GLOBAL_ALERT_Z_CLASS } from "@/features/marcadores/utils/layerZIndex"
 import type { GridItem } from "@/features/marcadores/utils/types"
 import { useHotkeys } from "@/lib/hotkeys/useHotkeys"
+import { FOCUS_RING } from "@/lib/focusStyles"
 import { cn } from "@/lib/utils"
 
 type Props = {
@@ -93,6 +94,7 @@ export default function DeleteConfirmModal({ item, onConfirm, onCancel }: Props)
             onClick={onCancel}
             className={cn(
               "border-app-input-border text-app-fg-secondary rounded-lg border px-4 py-2 text-sm",
+              FOCUS_RING,
               "hover:bg-app-raised-muted disabled:opacity-50"
             )}
           >
@@ -104,6 +106,7 @@ export default function DeleteConfirmModal({ item, onConfirm, onCancel }: Props)
             onClick={() => void handleConfirm()}
             className={cn(
               "bg-app-danger hover:bg-app-danger-hover rounded-lg px-4 py-2 text-sm font-medium text-white",
+              FOCUS_RING,
               "disabled:opacity-50"
             )}
           >

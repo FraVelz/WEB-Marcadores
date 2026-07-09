@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { FOCUS_RING_ICON_BTN } from "@/lib/focusStyles"
 
 import type { GridItem } from "../../utils/types"
 
@@ -21,6 +22,7 @@ export function TreeFolderRowContent({
         type="button"
         className={cn(
           "text-app-fg-label flex size-7 shrink-0 items-center justify-center rounded text-xs",
+          FOCUS_RING_ICON_BTN,
           !hasKids && "pointer-events-none invisible"
         )}
         aria-label={collapsedIds.has(item.id) ? "Expandir carpeta" : "Contraer carpeta"}

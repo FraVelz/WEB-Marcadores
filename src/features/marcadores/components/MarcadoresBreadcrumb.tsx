@@ -1,6 +1,8 @@
 "use client"
 
 import type { BreadcrumbPart } from "../utils/types"
+import { FOCUS_RING_ICON_BTN } from "@/lib/focusStyles"
+import { cn } from "@/lib/utils"
 
 type Props = {
   breadcrumb: BreadcrumbPart[]
@@ -16,7 +18,10 @@ export default function MarcadoresBreadcrumb({ breadcrumb, onSelect }: Props) {
           <button
             type="button"
             onClick={() => onSelect(part.id)}
-            className="text-app-fg-secondary hover:bg-app-active hover:text-app-fg rounded px-1.5 py-0.5 text-sm"
+            className={cn(
+              "text-app-fg-secondary hover:bg-app-active hover:text-app-fg rounded px-1.5 py-0.5 text-sm",
+              FOCUS_RING_ICON_BTN
+            )}
           >
             {part.label}
           </button>

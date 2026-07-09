@@ -3,6 +3,7 @@ import Link from "next/link"
 import { dashboardNavItems } from "@/components/header/dashboardNav"
 
 import { cn } from "@/lib/utils"
+import { FOCUS_RING } from "@/lib/focusStyles"
 
 type DashboardShellNavProps = {
   pathname: string
@@ -34,6 +35,7 @@ export function DashboardShellNav({ pathname, onNavigate, toolbar, compact }: Da
             onClick={onNavigate}
             className={cn(
               "flex shrink-0 snap-start items-center gap-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-colors",
+              FOCUS_RING,
               compact ? "min-h-8 px-2 py-1" : "min-h-9 px-2.5 py-2",
               active ? "bg-app-nav-active text-app-fg" : "text-app-fg-secondary hover:bg-app-hover hover:text-app-fg"
             )}

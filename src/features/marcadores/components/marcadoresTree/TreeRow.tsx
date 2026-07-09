@@ -3,6 +3,7 @@
 import { useCallback, useId, useRef } from "react"
 
 import { cn, cnLines } from "@/lib/utils"
+import { FOCUS_RING_INSET, KEYBOARD_SELECTED } from "@/lib/focusStyles"
 import { useBookmarkDraggable, useBookmarkDropTarget } from "@/lib/drag-and-drop"
 import type { Bookmark, FlatFolder, GridItem } from "../../utils/types"
 import { TreeFolderRowContent } from "./TreeFolderRowContent"
@@ -94,7 +95,7 @@ export function TreeRow({
     !isCut &&
       !dropActive &&
       (isSelected
-        ? "border-app-focus bg-app-selection ring-app-focus ring-2"
+        ? KEYBOARD_SELECTED
         : cnLines(
             "border-app-border-muted bg-app-raised/80",
             "hover:border-app-input-border hover:bg-app-hover-strong/50"
@@ -119,10 +120,13 @@ export function TreeRow({
       tabIndex={0}
       aria-pressed={selectMode && !isFolder ? isChecked : undefined}
       style={{ paddingLeft: padLeft }}
-      className={baseClass}
+      className={cn(baseClass, !isSelected && FOCUS_RING_INSET)}
       onClick={() => {
         if (!isFolder && selectMode) onToggleSelect(item.bookmark.id)
         else onSelect(idx)
+      }}
+      onFocus={(e) => {
+        if (e.target === e.currentTarget) onSelect(idx)
       }}
       onKeyDown={activateFromKeyboard}
       onDoubleClick={() => onDoubleClick(item)}

@@ -1,6 +1,7 @@
 "use client"
 
 import { APP_SCREENSHOTS } from "@/lib/siteScreenshots"
+import { FOCUS_RING } from "@/lib/focusStyles"
 import { cn } from "@/lib/utils"
 
 import { LoginScreenshotLink } from "./components/LoginScreenshotLink"
@@ -58,6 +59,7 @@ export function LoginPage({ demo }: { demo: boolean }) {
               disabled={loading}
               className={cn(
                 "bg-app-primary flex-1 rounded-lg px-4 py-2 font-medium text-white",
+                FOCUS_RING,
                 "hover:bg-app-primary-hover cursor-pointer disabled:opacity-50"
               )}
             >
@@ -73,6 +75,7 @@ export function LoginPage({ demo }: { demo: boolean }) {
               disabled={loading}
               className={cn(
                 "border-app-input-border text-app-fg-secondary rounded-lg border px-4 py-2",
+                FOCUS_RING,
                 "hover:bg-app-raised-muted cursor-pointer disabled:opacity-50"
               )}
             >
@@ -96,6 +99,7 @@ export function LoginPage({ demo }: { demo: boolean }) {
             }}
             className={cn(
               "bg-app-login-demo-btn mt-3 w-full cursor-pointer rounded-lg py-2 font-medium text-white",
+              FOCUS_RING,
               "hover:bg-app-login-demo-btn-hover"
             )}
           >
