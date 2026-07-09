@@ -1,6 +1,7 @@
 "use client"
 
 import { cnLines } from "@/lib/utils"
+import { FOCUS_RING } from "@/lib/focusStyles"
 
 export function EmptyTreeState({ onAddBookmark, onNewFolder }: { onAddBookmark: () => void; onNewFolder: () => void }) {
   return (
@@ -12,7 +13,10 @@ export function EmptyTreeState({ onAddBookmark, onNewFolder }: { onAddBookmark: 
       <button
         type="button"
         onClick={onAddBookmark}
-        className="bg-app-primary hover:bg-app-primary-hover mt-2 rounded px-4 py-2 text-sm text-white"
+        className={cnLines(
+          "bg-app-primary hover:bg-app-primary-hover mt-2 rounded px-4 py-2 text-sm text-white",
+          FOCUS_RING
+        )}
       >
         Agregar marcador
       </button>
@@ -21,6 +25,7 @@ export function EmptyTreeState({ onAddBookmark, onNewFolder }: { onAddBookmark: 
         onClick={onNewFolder}
         className={cnLines(
           "border-app-input-border text-app-fg-secondary mt-2 rounded border px-4 py-2 text-sm",
+          FOCUS_RING,
           "hover:bg-app-raised-muted"
         )}
       >

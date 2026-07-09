@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { FOCUS_RING_ICON_BTN } from "@/lib/focusStyles"
 
 import ToolbarNewFolderSection from "./ToolbarNewFolderSection"
 import ToolbarRenameFolderSection from "./ToolbarRenameFolderSection"
@@ -56,7 +57,10 @@ export function MarcadoresSecondaryActions({
   onRenameFolder,
   duplicateClusterCount,
 }: Props) {
-  const iconBtn = "text-app-fg-muted hover:bg-app-hover hover:text-app-fg rounded-lg p-2 transition-colors"
+  const iconBtn = cn(
+    "text-app-fg-muted hover:bg-app-hover hover:text-app-fg rounded-lg p-2 transition-colors",
+    FOCUS_RING_ICON_BTN
+  )
 
   return (
     <div className="border-app-border bg-app-toolbar/60 flex flex-col gap-2 border-b px-3 py-1.5 md:px-4">

@@ -2,6 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 
 import { cn } from "@/lib/utils"
+import { FOCUS_RING } from "@/lib/focusStyles"
 
 import "./login-screenshot-worm.css"
 
@@ -16,10 +17,7 @@ export function LoginScreenshotLink({ href, label, alt, publicPath }: LoginScree
   return (
     <Link
       href={href}
-      className={cn(
-        "group relative isolate block overflow-hidden rounded-lg shadow-md",
-        "focus-visible:ring-app-focus focus-visible:ring-2 focus-visible:outline-none"
-      )}
+      className={cn("group relative isolate block overflow-hidden rounded-lg shadow-md", FOCUS_RING)}
     >
       <span
         aria-hidden

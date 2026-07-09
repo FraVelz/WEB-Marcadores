@@ -12,6 +12,7 @@ import {
 } from "@/lib/appAppearance"
 
 import { cn } from "@/lib/utils"
+import { FOCUS_RING } from "@/lib/focusStyles"
 
 const THEME_LABELS: Record<AppThemePreset, string> = {
   light: "Claro",
@@ -135,6 +136,7 @@ export function AppearanceSettings() {
                 onClick={() => setTheme(t)}
                 className={cn(
                   "rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
+                  FOCUS_RING,
                   appearance.theme === t
                     ? "border-app-accent bg-app-selection text-app-fg ring-app-focus ring-1"
                     : "border-app-input-border text-app-fg-secondary hover:bg-app-hover"
@@ -176,7 +178,10 @@ export function AppearanceSettings() {
               />
               <button
                 type="button"
-                className="text-app-fg-muted hover:bg-app-hover hover:text-app-fg rounded-lg px-2 py-1.5 text-xs"
+                className={cn(
+                  "text-app-fg-muted hover:bg-app-hover hover:text-app-fg rounded-lg px-2 py-1.5 text-xs",
+                  FOCUS_RING
+                )}
                 onClick={() => setTextSelection(null)}
               >
                 Usar tema
@@ -242,7 +247,10 @@ export function AppearanceSettings() {
               })}
               <button
                 type="button"
-                className="text-app-fg-muted hover:bg-app-hover hover:text-app-fg rounded-lg px-2 py-1.5 text-xs"
+                className={cn(
+                  "text-app-fg-muted hover:bg-app-hover hover:text-app-fg rounded-lg px-2 py-1.5 text-xs",
+                  FOCUS_RING
+                )}
                 onClick={() => resetCustomColors()}
               >
                 Restaurar valores por defecto del tema para colores
@@ -258,14 +266,22 @@ export function AppearanceSettings() {
             servidor.
           </p>
           <div className="flex flex-wrap items-center gap-3">
-            <label className="border-app-input-border hover:bg-app-hover inline-flex cursor-pointer rounded-lg border px-4 py-2 text-sm font-medium transition-colors">
+            <label
+              className={cn(
+                "border-app-input-border hover:bg-app-hover inline-flex cursor-pointer rounded-lg border px-4 py-2 text-sm font-medium transition-colors",
+                FOCUS_RING
+              )}
+            >
               <input type="file" accept="image/*" className="sr-only" onChange={onPickWallpaper} />
               Elegir imagen
             </label>
             {appearance.wallpaperDataUrl ? (
               <button
                 type="button"
-                className="text-app-danger-fg hover:bg-app-danger-surface rounded-lg px-3 py-2 text-sm font-medium"
+                className={cn(
+                  "text-app-danger-fg hover:bg-app-danger-surface rounded-lg px-3 py-2 text-sm font-medium",
+                  FOCUS_RING
+                )}
                 onClick={() => {
                   setWallpaperMessage(null)
                   setWallpaper(null)
@@ -325,7 +341,10 @@ export function AppearanceSettings() {
         <div className="border-app-border-muted flex flex-wrap gap-2 border-t pt-5">
           <button
             type="button"
-            className="border-app-input-border text-app-fg-secondary hover:bg-app-hover rounded-lg border px-4 py-2 text-sm"
+            className={cn(
+              "border-app-input-border text-app-fg-secondary hover:bg-app-hover rounded-lg border px-4 py-2 text-sm",
+              FOCUS_RING
+            )}
             onClick={() => void resetAllAppearance()}
           >
             Restablecer toda la apariencia

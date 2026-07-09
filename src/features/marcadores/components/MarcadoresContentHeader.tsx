@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { FOCUS_RING_ICON_BTN } from "@/lib/focusStyles"
 
 import type { BookmarkSortOrder } from "@/features/marcadores/state/libraryPaneUiState"
 import { MarcadoresSearchField } from "./MarcadoresSearchField"
@@ -90,6 +91,7 @@ export function MarcadoresContentHeader({
                 aria-pressed={viewMode === "grid"}
                 className={cn(
                   "rounded-md p-2 transition-colors",
+                  FOCUS_RING_ICON_BTN,
                   viewMode === "grid"
                     ? "bg-app-primary text-white shadow-sm"
                     : "text-app-fg-muted hover:text-app-fg"
@@ -106,6 +108,7 @@ export function MarcadoresContentHeader({
                 aria-pressed={viewMode === "tree"}
                 className={cn(
                   "rounded-md p-2 transition-colors",
+                  FOCUS_RING_ICON_BTN,
                   viewMode === "tree"
                     ? "bg-app-primary text-white shadow-sm"
                     : "text-app-fg-muted hover:text-app-fg"

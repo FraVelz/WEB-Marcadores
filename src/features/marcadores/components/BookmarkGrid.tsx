@@ -4,6 +4,7 @@ import type { Dispatch, SetStateAction } from "react"
 import { useCallback, useEffect, useRef, useState } from "react"
 
 import { cn } from "@/lib/utils"
+import { FOCUS_RING } from "@/lib/focusStyles"
 import { useBookmarkDragMonitor, useBookmarkDropPanel } from "@/lib/drag-and-drop"
 import type { GridItem, CutItem } from "../utils/types"
 import { APP_DROP_PANEL_OVERLAY_CLASS } from "../utils/dragDropUi"
@@ -319,7 +320,10 @@ function EmptyState({ onAddBookmark, onNewFolder }: { onAddBookmark: () => void;
       <p className="text-sm">Esta carpeta está vacía</p>
       <button
         onClick={onAddBookmark}
-        className="bg-app-primary hover:bg-app-primary-hover mt-2 rounded px-4 py-2 text-sm text-white"
+        className={cn(
+          "bg-app-primary hover:bg-app-primary-hover mt-2 rounded px-4 py-2 text-sm text-white",
+          FOCUS_RING
+        )}
       >
         Agregar marcador
       </button>
@@ -327,6 +331,7 @@ function EmptyState({ onAddBookmark, onNewFolder }: { onAddBookmark: () => void;
         onClick={onNewFolder}
         className={cn(
           "border-app-input-border text-app-fg-secondary mt-2 rounded border px-4 py-2 text-sm",
+          FOCUS_RING,
           "hover:bg-app-raised-muted"
         )}
       >

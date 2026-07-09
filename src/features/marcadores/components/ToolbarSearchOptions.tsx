@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 
 import { cn } from "@/lib/utils"
+import { FOCUS_RING_ICON_BTN } from "@/lib/focusStyles"
 
 type FilterProps = {
   searchInSubfolders: boolean
@@ -147,6 +148,7 @@ export function ToolbarSearchFilterMenu({
         onClick={() => setOpen((value) => !value)}
         className={cn(
           "relative rounded-md transition-colors",
+          FOCUS_RING_ICON_BTN,
           variant === "pill"
             ? "text-app-fg-muted hover:text-app-fg hover:bg-app-hover p-1.5"
             : "text-app-fg-muted hover:text-app-fg hover:bg-app-hover p-1",

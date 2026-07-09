@@ -9,6 +9,7 @@ import { DashboardIconRail, DashboardMobileDrawer, MobileDrawerBackdrop } from "
 import { useBodyScrollLock } from "@/layouts/dashboard/hooks/useBodyScrollLock"
 import { useMatchMediaMd } from "@/lib/hooks/useMatchMediaMd"
 import { applyWallpaperToHTMLElement } from "@/lib/appAppearance"
+import { HOTKEY_SCOPE_FOCUS } from "@/lib/focusStyles"
 import { cn } from "@/lib/utils"
 
 type Props = {
@@ -63,7 +64,8 @@ export function DashboardMobileLayout({ pathname, children, sidebarRef, mainRef 
             ref={mainRef}
             tabIndex={0}
             className={cn(
-              "flex min-h-0 flex-1 flex-col overflow-hidden outline-none focus:ring-0",
+              "flex min-h-0 flex-1 flex-col overflow-hidden",
+              HOTKEY_SCOPE_FOCUS,
               wallpaperActive ? "bg-transparent" : "bg-app-canvas"
             )}
           >

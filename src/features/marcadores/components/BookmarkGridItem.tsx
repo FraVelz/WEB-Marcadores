@@ -3,6 +3,7 @@
 import { memo, useCallback, useId, useRef } from "react"
 
 import { cn, cnLines } from "@/lib/utils"
+import { FOCUS_RING_INSET, KEYBOARD_SELECTED } from "@/lib/focusStyles"
 import { useBookmarkDraggable, useBookmarkDropTarget } from "@/lib/drag-and-drop"
 import type { GridItem } from "../utils/types"
 import { FolderContent, LinkContent, resolveFolderName } from "./bookmarkGrid/BookmarkGridItemBodies"
@@ -96,7 +97,7 @@ function BookmarkGridItem({
     !isCut &&
       !dropHighlight &&
       (isSelected
-        ? "border-app-primary bg-app-list-selected ring-app-primary/30 ring-2"
+        ? KEYBOARD_SELECTED
         : cnLines(
             "border-app-border bg-app-raised",
             "hover:border-app-input-border hover:shadow-sm"
@@ -112,10 +113,13 @@ function BookmarkGridItem({
       role="button"
       tabIndex={0}
       aria-pressed={selectMode && !isFolder ? isChecked : undefined}
-      className={cn(baseClass, "z-[1] cursor-grab active:cursor-grabbing")}
+      className={cn(baseClass, "z-[1] cursor-grab active:cursor-grabbing", !isSelected && FOCUS_RING_INSET)}
       onClick={() => {
         if (selectMode && !isFolder) onToggleSelect(item.bookmark.id)
         else onSelect(idx)
+      }}
+      onFocus={(e) => {
+        if (e.target === e.currentTarget) onSelect(idx)
       }}
       onKeyDown={activateFromKeyboard}
       onDoubleClick={() => onDoubleClick(item)}

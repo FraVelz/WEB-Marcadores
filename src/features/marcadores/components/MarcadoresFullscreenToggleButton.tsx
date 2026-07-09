@@ -3,6 +3,7 @@
 import type { RefObject } from "react"
 
 import { useDashboardFullscreenToggle } from "@/features/marcadores/hooks/useDashboardFullscreenToggle"
+import { DESKTOP_LAYOUT_TOOL_BTN_ROW, FOCUS_RING_ICON_BTN } from "@/lib/focusStyles"
 import { cn } from "@/lib/utils"
 
 type Props = {
@@ -26,8 +27,8 @@ export function MarcadoresFullscreenToggleButton({ fullscreenTargetRef, variant 
       type="button"
       className={cn(
         variant === "labeled"
-          ? "text-app-fg-muted hover:bg-app-active hover:text-app-fg focus-visible:ring-app-focus inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs font-medium outline-none focus-visible:ring-2"
-          : "text-app-fg-muted hover:bg-app-active hover:text-app-fg rounded p-1.5",
+          ? cn(DESKTOP_LAYOUT_TOOL_BTN_ROW, "text-app-fg-muted hover:bg-app-active hover:text-app-fg")
+          : cn("text-app-fg-muted hover:bg-app-active hover:text-app-fg rounded p-1.5", FOCUS_RING_ICON_BTN),
         className
       )}
       title={title}

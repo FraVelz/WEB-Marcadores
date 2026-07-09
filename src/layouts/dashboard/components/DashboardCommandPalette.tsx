@@ -7,6 +7,7 @@ import Link from "next/link"
 import { useDashboard } from "@/contexts/DashboardContext"
 
 import { cn } from "@/lib/utils"
+import { FOCUS_RING } from "@/lib/focusStyles"
 
 function norm(s: string) {
   return s.trim().toLowerCase()
@@ -108,7 +109,7 @@ export function DashboardCommandPalette() {
                 onClick={() => selectBookmark(b)}
                 className={cn(
                   "hover:bg-app-hover flex w-full items-start gap-3 rounded-md p-2 text-left",
-                  "focus-visible:ring-app-focus outline-none focus-visible:ring-2"
+                  FOCUS_RING
                 )}
               >
                 <div className="min-w-0 flex-1">
@@ -133,7 +134,7 @@ function ShortcutPaletteLink(props: { title: string; hint?: string; href: string
     <Link
       href={props.href}
       onClick={props.onNavigate}
-      className="hover:bg-app-hover text-app-fg flex w-full items-center justify-between rounded-md p-2 text-sm no-underline"
+      className={cn("hover:bg-app-hover text-app-fg flex w-full items-center justify-between rounded-md p-2 text-sm no-underline", FOCUS_RING)}
     >
       <span className="font-medium">{props.title}</span>
       {props.hint ? <span className="text-app-fg-muted text-xs">{props.hint}</span> : null}

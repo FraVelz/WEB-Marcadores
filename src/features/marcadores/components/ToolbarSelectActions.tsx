@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { FOCUS_RING } from "@/lib/focusStyles"
 
 type Props = {
   selectMode: boolean
@@ -28,6 +29,7 @@ export default function ToolbarSelectActions({
         }}
         className={cn(
           "rounded px-2 py-1 text-xs",
+          FOCUS_RING,
           selectMode ? "bg-app-active text-app-fg" : "text-app-fg-muted hover:bg-app-active hover:text-app-fg"
         )}
       >
@@ -40,6 +42,7 @@ export default function ToolbarSelectActions({
             disabled={selectedIds.size !== 1}
             className={cn(
               "text-app-fg-muted rounded px-2 py-1 text-xs disabled:opacity-50",
+              FOCUS_RING,
               "hover:bg-app-active hover:text-app-fg"
             )}
           >
@@ -47,7 +50,7 @@ export default function ToolbarSelectActions({
           </button>
           <button
             onClick={onDelete}
-            className={cn("text-app-danger-fg rounded px-2 py-1 text-xs", "hover:bg-app-danger/20")}
+            className={cn("text-app-danger-fg rounded px-2 py-1 text-xs", FOCUS_RING, "hover:bg-app-danger/20")}
           >
             Eliminar ({selectedIds.size})
           </button>

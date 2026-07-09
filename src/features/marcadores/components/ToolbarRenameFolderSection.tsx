@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { FOCUS_RING } from "@/lib/focusStyles"
 
 type Props = {
   folderName: string
@@ -28,11 +29,14 @@ export default function ToolbarRenameFolderSection({ folderName, setFolderName, 
       />
       <button
         onClick={onRename}
-        className="bg-app-primary hover:bg-app-primary-hover rounded px-2 py-1 text-sm text-white"
+        className={cn("bg-app-primary hover:bg-app-primary-hover rounded px-2 py-1 text-sm text-white", FOCUS_RING)}
       >
         Renombrar
       </button>
-      <button onClick={onCancel} className="text-app-fg-muted hover:bg-app-active rounded px-2 py-1 text-sm">
+      <button
+        onClick={onCancel}
+        className={cn("text-app-fg-muted hover:bg-app-active rounded px-2 py-1 text-sm", FOCUS_RING)}
+      >
         Cancelar
       </button>
     </div>

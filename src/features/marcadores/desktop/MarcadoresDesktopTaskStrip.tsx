@@ -3,6 +3,7 @@
 import type { DesktopSurfaceTask } from "@/features/marcadores/desktop/windowTypes"
 
 import { cn } from "@/lib/utils"
+import { FOCUS_RING, KEYBOARD_SELECTED } from "@/lib/focusStyles"
 
 type Props = {
   surfaces: DesktopSurfaceTask[]
@@ -28,10 +29,10 @@ export function MarcadoresDesktopTaskStrip({ surfaces, onFocusTask }: Props) {
             onClick={() => onFocusTask(task.id)}
             title={task.minimized ? "Minimizada — clic para recuperar y enfocar" : "Enfocar esta ventana"}
             className={cn(
-              "border-app-border-muted flex max-w-[min(18rem,calc(100vw-14rem))] shrink-0 items-center gap-1.5 rounded-md border px-2 py-1 text-left transition-colors outline-none select-none",
-              "focus-visible:ring-app-focus focus-visible:ring-2",
+              "border-app-border-muted flex max-w-[min(18rem,calc(100vw-14rem))] shrink-0 items-center gap-1.5 rounded-md border px-2 py-1 text-left transition-colors select-none",
+              FOCUS_RING,
               task.isFocused
-                ? "border-app-accent bg-app-selection shadow-sm"
+                ? cn(KEYBOARD_SELECTED, "shadow-sm")
                 : "bg-app-toolbar/95 hover:border-app-accent-muted hover:bg-app-hover dark:bg-app-raised/80",
               task.minimized ? "opacity-75" : "opacity-100"
             )}

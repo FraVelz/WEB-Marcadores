@@ -1,6 +1,7 @@
 "use client"
 
 import { MarcadoresFullscreenToggleButton } from "@/features/marcadores/components/MarcadoresFullscreenToggleButton"
+import { FOCUS_RING_ICON_BTN } from "@/lib/focusStyles"
 import { cn } from "@/lib/utils"
 
 type Props = {
@@ -34,12 +35,17 @@ export default function ToolbarNavigationButtons({
   treeToggleDisabled = false,
   showFullscreenToggle = true,
 }: Props) {
+  const iconBtn = cn(
+    "text-app-fg-muted hover:bg-app-active hover:text-app-fg rounded p-1.5",
+    FOCUS_RING_ICON_BTN
+  )
+
   return (
     <>
       <button
         type="button"
         onClick={onNavigateUp}
-        className="text-app-fg-muted hover:bg-app-active hover:text-app-fg rounded p-1.5"
+        className={iconBtn}
         title="Subir"
       >
         <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
@@ -50,7 +56,7 @@ export default function ToolbarNavigationButtons({
       <button
         type="button"
         onClick={onAddBookmark}
-        className="text-app-fg-muted hover:bg-app-active hover:text-app-fg rounded p-1.5"
+        className={iconBtn}
         title="Nuevo marcador"
       >
         <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
@@ -60,7 +66,7 @@ export default function ToolbarNavigationButtons({
       <button
         type="button"
         onClick={onNewFolder}
-        className="text-app-fg-muted hover:bg-app-active hover:text-app-fg rounded p-1.5"
+        className={iconBtn}
         title="Nueva carpeta"
       >
         <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
@@ -71,7 +77,7 @@ export default function ToolbarNavigationButtons({
         <button
           type="button"
           onClick={onDeleteFocused}
-          className="text-app-fg-muted hover:bg-app-danger/15 hover:text-app-danger-fg rounded p-1.5"
+          className={cn(iconBtn, "hover:bg-app-danger/15 hover:text-app-danger-fg")}
           title="Eliminar (dd)"
         >
           <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
@@ -83,8 +89,8 @@ export default function ToolbarNavigationButtons({
         type="button"
         onClick={onToggleInfoPanel}
         className={cn(
-          "rounded p-1.5",
-          infoPanelEnabled ? "bg-app-active text-app-fg" : "text-app-fg-muted hover:bg-app-active hover:text-app-fg"
+          iconBtn,
+          infoPanelEnabled ? "bg-app-active text-app-fg" : ""
         )}
         title="Modo información (i)"
       >
@@ -97,10 +103,7 @@ export default function ToolbarNavigationButtons({
         <button
           type="button"
           onClick={onToggleTreeView}
-          className={cn(
-            "rounded p-1.5",
-            treeView ? "bg-app-active text-app-fg" : "text-app-fg-muted hover:bg-app-active hover:text-app-fg"
-          )}
+          className={cn(iconBtn, treeView ? "bg-app-active text-app-fg" : "")}
           title={treeView ? "Vista cuadrícula" : "Vista árbol en el contenido principal"}
         >
           {treeView ? (
@@ -117,10 +120,7 @@ export default function ToolbarNavigationButtons({
       <button
         type="button"
         onClick={onToggleSearch}
-        className={cn(
-          "rounded p-1.5",
-          showSearch ? "bg-app-active text-app-fg" : "text-app-fg-muted hover:bg-app-active hover:text-app-fg"
-        )}
+        className={cn(iconBtn, showSearch ? "bg-app-active text-app-fg" : "")}
         title="Buscar (Ctrl+F)"
       >
         <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">

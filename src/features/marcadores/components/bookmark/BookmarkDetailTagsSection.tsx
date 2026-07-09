@@ -1,6 +1,7 @@
 "use client"
 
 import TagAutocomplete from "@/features/marcadores/components/bookmark/TagAutocomplete"
+import { FOCUS_RING_ICON_BTN } from "@/lib/focusStyles"
 import { cn } from "@/lib/utils"
 
 type Props = {
@@ -41,7 +42,10 @@ export default function BookmarkDetailTagsSection({
               type="button"
               onClick={() => onRemoveTag(tag)}
               disabled={saving}
-              className="hover:bg-app-active hover:text-app-fg rounded disabled:opacity-50"
+              className={cn(
+                "hover:bg-app-active hover:text-app-fg rounded disabled:opacity-50",
+                FOCUS_RING_ICON_BTN
+              )}
               aria-label={`Quitar ${tag}`}
             >
               ×

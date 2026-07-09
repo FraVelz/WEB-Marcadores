@@ -4,6 +4,7 @@ import { useAuthActions, useBookmarkCount, useChangePassword, useUser } from "..
 import { useDashboard } from "@/contexts/DashboardContext"
 
 import { cn } from "@/lib/utils"
+import { FOCUS_RING } from "@/lib/focusStyles"
 
 import { AppearanceSettings } from "./AppearanceSettings"
 
@@ -35,6 +36,7 @@ export function SectionsClient() {
               onClick={() => void signOut()}
               className={cn(
                 "border-app-input-border text-app-fg-secondary mt-4 rounded-lg border px-4 py-2",
+                FOCUS_RING,
                 "hover:bg-app-raised-muted cursor-pointer"
               )}
             >
@@ -69,6 +71,7 @@ export function SectionsClient() {
             disabled={loading}
             className={cn(
               "bg-app-primary mt-3 rounded-lg px-4 py-2 font-medium text-white",
+              FOCUS_RING,
               "hover:bg-app-primary-hover cursor-pointer disabled:opacity-50"
             )}
           >

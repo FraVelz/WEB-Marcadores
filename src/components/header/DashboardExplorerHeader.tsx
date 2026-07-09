@@ -5,6 +5,8 @@ import { MarcadoresViewModeToggle } from "@/features/marcadores/components/Marca
 
 import { DashboardShellNav } from "@/components/header/DashboardShellNav"
 import { isMarcadoresRoute } from "@/components/header/dashboardNav"
+import { HOTKEY_SCOPE_FOCUS } from "@/lib/focusStyles"
+import { cn } from "@/lib/utils"
 
 type Props = {
   pathname: string
@@ -22,7 +24,10 @@ export function DashboardExplorerHeader({ pathname, sidebarRef }: Props) {
       <div
         ref={sidebarRef}
         tabIndex={0}
-        className="outline-app-focus flex min-h-0 max-w-[42vw] min-w-0 shrink flex-col focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 md:max-w-none md:flex-[0_1_auto]"
+        className={cn(
+          HOTKEY_SCOPE_FOCUS,
+          "flex min-h-0 max-w-[42vw] min-w-0 shrink flex-col md:max-w-none md:flex-[0_1_auto]"
+        )}
       >
         <DashboardShellNav pathname={pathname} toolbar compact />
       </div>

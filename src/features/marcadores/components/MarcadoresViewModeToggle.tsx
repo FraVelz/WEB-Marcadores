@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { FOCUS_RING } from "@/lib/focusStyles"
 
 import { type MarcadoresViewMode, useMarcadoresViewMode } from "@/features/marcadores/hooks/useMarcadoresViewMode"
 
@@ -38,6 +39,7 @@ export function MarcadoresViewModeToggle({ className, compact }: MarcadoresViewM
             aria-checked={selected}
             className={cn(
               "rounded px-2 font-medium whitespace-nowrap transition-colors",
+              FOCUS_RING,
               compact ? "min-h-7 py-1 text-[10px]" : "min-h-8 py-1.5 text-xs",
               selected
                 ? "bg-app-nav-active text-app-fg shadow-sm"

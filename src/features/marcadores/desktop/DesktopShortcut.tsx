@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { FOCUS_RING, KEYBOARD_SELECTED } from "@/lib/focusStyles"
 
 type Props = {
   label: string
@@ -16,10 +17,9 @@ export function DesktopShortcut({ label, icon, onDoubleClick, selected, classNam
     <button
       type="button"
       className={cn(
-        "border-app-border-muted text-app-fg hover:bg-app-hover focus-visible:ring-app-focus group flex w-[6.75rem] flex-col items-center gap-1.5 rounded-md border p-2 text-center shadow-none outline-none focus-visible:ring-2",
-        selected
-          ? "border-sky-500/55 bg-sky-500/[0.12] shadow-[inset_0_0_0_1px_rgb(56_189_248_/_0.35)] dark:border-amber-300/45 dark:bg-amber-400/[0.1] dark:shadow-[inset_0_0_0_1px_rgb(251_191_36_/_0.25)]"
-          : "border-transparent",
+        "border-app-border-muted text-app-fg hover:bg-app-hover group flex w-[6.75rem] flex-col items-center gap-1.5 rounded-md border p-2 text-center shadow-none",
+        FOCUS_RING,
+        selected ? KEYBOARD_SELECTED : "border-transparent",
         className
       )}
       onDoubleClick={(e) => {

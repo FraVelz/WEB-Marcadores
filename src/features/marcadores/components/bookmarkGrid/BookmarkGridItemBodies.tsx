@@ -10,6 +10,7 @@ import {
   shouldShowDescriptionSnippet,
 } from "@/features/marcadores/utils/bookmarkSearch"
 import { cn } from "@/lib/utils"
+import { FOCUS_RING_ICON_BTN } from "@/lib/focusStyles"
 
 import { getFavicon } from "../../utils/utils"
 import type { Bookmark, FlatFolder } from "../../utils/types"
@@ -78,6 +79,7 @@ export function LinkContent({
           type="button"
           className={cn(
             "absolute top-3 right-3 rounded-md p-1 transition-colors",
+            FOCUS_RING_ICON_BTN,
             isFavorite ? "text-amber-400" : "text-app-fg-muted hover:text-amber-400"
           )}
           aria-label={isFavorite ? "Quitar de favoritos" : "Marcar favorito"}
