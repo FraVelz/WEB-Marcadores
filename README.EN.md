@@ -7,8 +7,6 @@
 
 ![Screenshot — Bookmarks](./public/screenshots/marcadores.png)
 
-![Mobile explorer — stacked navigation](./public/screenshots/marcadores-mobile.png)
-
 Bookmark manager built with Next.js and Supabase. Organize links in folders, use shortcuts, and browse your collection
 with a dark explorer-style interface. You can use **demo mode** without configuring Supabase.
 
