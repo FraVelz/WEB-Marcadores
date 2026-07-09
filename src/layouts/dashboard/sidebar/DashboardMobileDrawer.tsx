@@ -45,7 +45,7 @@ export function DashboardMobileDrawer({ pathname, open, onClose, sidebarRef }: P
           isMarcadores ? "min-h-0 overflow-y-auto" : "flex-1 overflow-y-auto"
         )}
       >
-        <DashboardShellNav pathname={pathname} onNavigate={onClose} toolbar />
+        <DashboardShellNav pathname={pathname} onNavigate={onClose} toolbar stacked />
       </div>
     </aside>
   )

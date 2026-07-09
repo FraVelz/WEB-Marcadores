@@ -12,18 +12,25 @@ type DashboardShellNavProps = {
   toolbar?: boolean
   /** Menos padding vertical (cabecera compacta junto a otras herramientas). */
   compact?: boolean
+  /** Drawer móvil: enlaces en columna sin scroll horizontal. */
+  stacked?: boolean
 }
 
 /** Navegación principal del dashboard (cabecera explorador y drawer móvil). */
-export function DashboardShellNav({ pathname, onNavigate, toolbar, compact }: DashboardShellNavProps) {
+export function DashboardShellNav({ pathname, onNavigate, toolbar, compact, stacked }: DashboardShellNavProps) {
   return (
     <nav
       aria-label="Navegación principal"
       className={cn(
-        "flex shrink-0 flex-nowrap gap-1 overscroll-x-contain",
-        toolbar && compact ? "px-1 py-0.5" : "px-2 py-2",
-        !toolbar && "border-app-border border-b",
-        "snap-x overflow-x-auto md:snap-none [&::-webkit-scrollbar]:h-1"
+        "flex shrink-0 gap-1",
+        stacked
+          ? "flex-col overflow-visible px-2 py-2"
+          : cn(
+              "snap-x flex-nowrap overflow-x-auto overscroll-x-contain px-2 py-2 md:snap-none [&::-webkit-scrollbar]:h-1",
+              toolbar && compact && "px-1 py-0.5",
+              !toolbar && "border-app-border border-b"
+            ),
+        stacked && !toolbar && "border-app-border border-b"
       )}
     >
       {dashboardNavItems.map((item) => {
@@ -34,7 +41,8 @@ export function DashboardShellNav({ pathname, onNavigate, toolbar, compact }: Da
             href={item.href}
             onClick={onNavigate}
             className={cn(
-              "flex shrink-0 snap-start items-center gap-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-colors",
+              "flex items-center gap-1.5 rounded-md text-xs font-medium transition-colors",
+              stacked ? "w-full" : "shrink-0 snap-start whitespace-nowrap",
               FOCUS_RING,
               compact ? "min-h-8 px-2 py-1" : "min-h-9 px-2.5 py-2",
               active ? "bg-app-nav-active text-app-fg" : "text-app-fg-secondary hover:bg-app-hover hover:text-app-fg"

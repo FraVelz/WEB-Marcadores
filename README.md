@@ -6,6 +6,8 @@
 
 ![Captura de pantalla — Marcadores](./public/screenshots/marcadores.png)
 
+![Explorador móvil — navegación apilada](./public/screenshots/marcadores-mobile.png)
+
 Gestor de marcadores y favoritos con Next.js y Supabase. Organiza enlaces en carpetas, usa atajos y recorre la colección
 con una interfaz oscura tipo explorador. Puedes usar **modo demo** sin configurar Supabase.
 
@@ -53,6 +55,7 @@ Sin `.env.local` o sin credenciales Supabase válidas se activa el modo demo (da
 │   ├── favicon.svg
 │   └── screenshots/                 # capturas por apartado (login, README, OG en /public)
 │       ├── marcadores.png
+│       ├── marcadores-mobile.png
 │       ├── atajos.png
 │       ├── estadisticas.png
 │       └── perfil.png
