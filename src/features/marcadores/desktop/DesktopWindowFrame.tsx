@@ -1,7 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { useCallback, useRef } from "react"
+import { useRef } from "react"
 
 import { DesktopWindowResizeHandles } from "@/features/marcadores/desktop/DesktopWindowResizeHandles"
 import { DesktopWindowTitleChrome } from "@/features/marcadores/desktop/DesktopWindowTitleChrome"
@@ -69,48 +69,45 @@ export function DesktopWindowFrame({
 
   useBookmarkDragBubbleBlocker(frameRef, isolateBookmarkDragBubble, onDismissDesktopDropHighlight)
 
-  const endDrag = useCallback(() => {
+  const endDrag = () => {
     dragCleanupRef.current?.()
     dragCleanupRef.current = null
-  }, [])
+  }
 
   const visualBounds = maximized && !minimized && cw > 0 && ch > 0 ? maxInset(cw, ch) : clampBounds(bounds, cw, ch)
 
-  const handleToggleMinimize = useCallback(() => {
+  const handleToggleMinimize = () => {
     if (!minimized) {
       onWillBecomeMinimized?.()
     }
     onToggleMinimize()
-  }, [minimized, onToggleMinimize, onWillBecomeMinimized])
+  }
 
-  const attachWindowDrag = useCallback(
-    (kind: "move" | ResizeEdge, orig: WindowBounds, startX: number, startY: number) => {
-      endDrag()
+  const attachWindowDrag = (kind: "move" | ResizeEdge, orig: WindowBounds, startX: number, startY: number) => {
+    endDrag()
 
-      const onMove = (e: PointerEvent) => {
-        const dx = e.clientX - startX
-        const dy = e.clientY - startY
-        if (kind === "move") {
-          onBoundsChange(clampBounds({ x: orig.x + dx, y: orig.y + dy, w: orig.w, h: orig.h }, cw, ch))
-        } else {
-          onBoundsChange(resizeBoundsByEdge(orig, kind, dx, dy, cw, ch))
-        }
+    const onMove = (e: PointerEvent) => {
+      const dx = e.clientX - startX
+      const dy = e.clientY - startY
+      if (kind === "move") {
+        onBoundsChange(clampBounds({ x: orig.x + dx, y: orig.y + dy, w: orig.w, h: orig.h }, cw, ch))
+      } else {
+        onBoundsChange(resizeBoundsByEdge(orig, kind, dx, dy, cw, ch))
       }
+    }
 
-      const onUp = () => endDrag()
+    const onUp = () => endDrag()
 
-      window.addEventListener("pointermove", onMove)
-      window.addEventListener("pointerup", onUp)
-      window.addEventListener("pointercancel", onUp)
+    window.addEventListener("pointermove", onMove)
+    window.addEventListener("pointerup", onUp)
+    window.addEventListener("pointercancel", onUp)
 
-      dragCleanupRef.current = () => {
-        window.removeEventListener("pointermove", onMove)
-        window.removeEventListener("pointerup", onUp)
-        window.removeEventListener("pointercancel", onUp)
-      }
-    },
-    [cw, ch, endDrag, onBoundsChange]
-  )
+    dragCleanupRef.current = () => {
+      window.removeEventListener("pointermove", onMove)
+      window.removeEventListener("pointerup", onUp)
+      window.removeEventListener("pointercancel", onUp)
+    }
+  }
 
   const onTitlePointerDown = (e: React.PointerEvent) => {
     if (e.button !== 0) return

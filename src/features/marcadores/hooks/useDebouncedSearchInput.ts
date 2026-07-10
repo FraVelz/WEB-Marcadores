@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 type Args = {
   query: string
@@ -9,32 +9,27 @@ type Args = {
 }
 
 export function useDebouncedSearchInput({ query, onQueryChange, delayMs = 250 }: Args) {
-  const [draft, setDraftState] = useState(query)
+  const [draftState, setDraftState] = useState({ query, draft: query })
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  useEffect(() => {
-    setDraftState(query)
-  }, [query])
+  const draft = draftState.query === query ? draftState.draft : query
 
-  const flush = useCallback(() => {
+  const flush = () => {
     if (timerRef.current) {
       clearTimeout(timerRef.current)
       timerRef.current = null
     }
     onQueryChange(draft)
-  }, [draft, onQueryChange])
+  }
 
-  const setDraft = useCallback(
-    (value: string) => {
-      setDraftState(value)
-      if (timerRef.current) clearTimeout(timerRef.current)
-      timerRef.current = setTimeout(() => {
-        onQueryChange(value)
-        timerRef.current = null
-      }, delayMs)
-    },
-    [delayMs, onQueryChange]
-  )
+  const setDraft = (value: string) => {
+    setDraftState({ query, draft: value })
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => {
+      onQueryChange(value)
+      timerRef.current = null
+    }, delayMs)
+  }
 
   useEffect(() => {
     return () => {

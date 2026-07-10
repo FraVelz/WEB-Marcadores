@@ -1,16 +1,6 @@
 "use client"
 
-import {
-  createContext,
-  use,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useSyncExternalStore,
-  type ReactNode,
-} from "react"
+import { createContext, use, useEffect, useLayoutEffect, useRef, useSyncExternalStore, type ReactNode } from "react"
 
 import {
   type AppAppearanceState,
@@ -126,10 +116,10 @@ export function AppAppearanceProvider({
     syncDom(appearance)
   }, [appearance])
 
-  const update = useCallback((updater: (prev: AppAppearanceState) => AppAppearanceState) => {
+  const update = (updater: (prev: AppAppearanceState) => AppAppearanceState) => {
     const next = updater(readAppearanceSnapshot())
     persistState(next)
-  }, [])
+  }
 
   useEffect(() => {
     if (appearance.theme !== "system") return
@@ -143,95 +133,60 @@ export function AppAppearanceProvider({
     return () => mq.removeEventListener("change", onChange)
   }, [appearance.theme])
 
-  const setTheme = useCallback(
-    (t: AppThemePreset) => {
-      update((prev) => ({ ...prev, theme: t }))
-    },
-    [update]
-  )
+  const setTheme = (t: AppThemePreset) => {
+    update((prev) => ({ ...prev, theme: t }))
+  }
 
-  const setUseCustomPalette = useCallback(
-    (v: boolean) => {
-      update((prev) => ({ ...prev, useCustomPalette: v }))
-    },
-    [update]
-  )
+  const setUseCustomPalette = (v: boolean) => {
+    update((prev) => ({ ...prev, useCustomPalette: v }))
+  }
 
-  const setCustomColor = useCallback(
-    (key: keyof AppCustomColors, value: string) => {
-      update((prev) => ({
-        ...prev,
-        customColors: { ...prev.customColors, [key]: value },
-      }))
-    },
-    [update]
-  )
+  const setCustomColor = (key: keyof AppCustomColors, value: string) => {
+    update((prev) => ({
+      ...prev,
+      customColors: { ...prev.customColors, [key]: value },
+    }))
+  }
 
-  const resetCustomColors = useCallback(() => {
+  const resetCustomColors = () => {
     update((prev) => ({ ...prev, customColors: {} }))
-  }, [update])
+  }
 
-  const setWallpaper = useCallback(
-    (dataUrl: string | null) => {
-      update((prev) => ({ ...prev, wallpaperDataUrl: dataUrl }))
-    },
-    [update]
-  )
+  const setWallpaper = (dataUrl: string | null) => {
+    update((prev) => ({ ...prev, wallpaperDataUrl: dataUrl }))
+  }
 
-  const setWallpaperVeil = useCallback(
-    (v: number) => {
-      update((prev) => ({ ...prev, wallpaperVeil: v }))
-    },
-    [update]
-  )
+  const setWallpaperVeil = (v: number) => {
+    update((prev) => ({ ...prev, wallpaperVeil: v }))
+  }
 
-  const setDeskWindowTransparency = useCallback(
-    (v: number) => {
-      update((prev) => ({ ...prev, deskWindowTransparency: v }))
-    },
-    [update]
-  )
+  const setDeskWindowTransparency = (v: number) => {
+    update((prev) => ({ ...prev, deskWindowTransparency: v }))
+  }
 
-  const setTextSelection = useCallback(
-    (value: string | null) => {
-      update((prev) => ({
-        ...prev,
-        textSelection: value == null || value.trim() === "" ? null : value.trim(),
-      }))
-    },
-    [update]
-  )
+  const setTextSelection = (value: string | null) => {
+    update((prev) => ({
+      ...prev,
+      textSelection: value == null || value.trim() === "" ? null : value.trim(),
+    }))
+  }
 
-  const resetAllAppearance = useCallback(() => {
+  const resetAllAppearance = () => {
     persistState({ ...defaultAppAppearanceState })
-  }, [])
+  }
 
-  const value = useMemo<AppAppearanceContextValue>(
-    () => ({
-      appearance,
-      setTheme,
-      setUseCustomPalette,
-      setCustomColor,
-      resetCustomColors,
-      setWallpaper,
-      setWallpaperVeil,
-      setDeskWindowTransparency,
-      setTextSelection,
-      resetAllAppearance,
-    }),
-    [
-      appearance,
-      setTheme,
-      setUseCustomPalette,
-      setCustomColor,
-      resetCustomColors,
-      setWallpaper,
-      setWallpaperVeil,
-      setDeskWindowTransparency,
-      setTextSelection,
-      resetAllAppearance,
-    ]
-  )
+  const value = {
+    appearance,
+    setTheme,
+    setUseCustomPalette,
+    setCustomColor,
+    resetCustomColors,
+    setWallpaper,
+    setWallpaperVeil,
+    setDeskWindowTransparency,
+    setTextSelection,
+    resetAllAppearance,
+  }
 
   return <AppAppearanceContext.Provider value={value}>{children}</AppAppearanceContext.Provider>
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState, startTransition } from "react"
+import { useEffect, useState, startTransition } from "react"
 
 import { useDashboard } from "@/contexts/DashboardContext"
 import { createClient } from "@/lib/supabase/client"
@@ -27,7 +27,7 @@ export function useEstadisticasData() {
   const [folders, setFolders] = useState<FlatFolder[]>([])
   const [loading, setLoading] = useState(true)
 
-  const fetchData = useCallback(async () => {
+  const fetchData = async () => {
     setLoading(true)
     if (demoMode) {
       setBookmarks((DEMO_BOOKMARKS as Bookmark[]).map(normalizeBookmarkRow))
@@ -40,15 +40,28 @@ export function useEstadisticasData() {
       setFolders(fData || [])
     }
     setLoading(false)
-  }, [demoMode])
+  }
 
   useEffect(() => {
     startTransition(() => {
-      void fetchData()
+      void (async () => {
+        setLoading(true)
+        if (demoMode) {
+          setBookmarks((DEMO_BOOKMARKS as Bookmark[]).map(normalizeBookmarkRow))
+          setFolders(DEMO_FOLDERS)
+        } else {
+          const supabase = createClient()
+          const { data: bData } = await supabase.from("bookmarks").select("*").order("title")
+          setBookmarks((bData || []).map((r: Bookmark) => normalizeBookmarkRow(r)))
+          const { data: fData } = await supabase.from("folders").select("*").order("sort_order")
+          setFolders(fData || [])
+        }
+        setLoading(false)
+      })()
     })
-  }, [fetchData])
+  }, [demoMode])
 
-  const stats = useMemo(() => computeEstadisticas(bookmarks, folders), [bookmarks, folders])
+  const stats = computeEstadisticas(bookmarks, folders)
 
   return { loading, stats, demoMode, refresh: fetchData }
 }

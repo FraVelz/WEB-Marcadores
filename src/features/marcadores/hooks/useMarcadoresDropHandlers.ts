@@ -1,7 +1,5 @@
 "use client"
 
-import { useCallback } from "react"
-
 import type { Folder } from "@/contexts/DashboardContext"
 
 import type { Bookmark, GridItem } from "@/features/marcadores/utils/types"
@@ -74,41 +72,30 @@ export function useMarcadoresDropHandlers(opts: {
     setDeskPaneFolder,
   } = opts
 
-  const handleDrop = useCallback(
-    (sourceItem: GridItem, targetFolderId?: string | null) => {
-      const destId = targetFolderId === undefined ? defaultDropFolderId : targetFolderId
-      runDrop(sourceItem, destId, folders, bookmarks, handlePasteFolder, handlePasteLink, setPasteError)
-    },
-    [bookmarks, defaultDropFolderId, folders, handlePasteFolder, handlePasteLink, setPasteError]
-  )
+  const handleDrop = (sourceItem: GridItem, targetFolderId?: string | null) => {
+    const destId = targetFolderId === undefined ? defaultDropFolderId : targetFolderId
+    runDrop(sourceItem, destId, folders, bookmarks, handlePasteFolder, handlePasteLink, setPasteError)
+  }
 
-  const handleDoubleClick = useCallback(
-    (item: GridItem) => {
-      if (selectMode) return
-      if (item.type === "folder") onNavigateFolder(item.folderId)
-      else openBookmarkTab(item.bookmark)
-    },
-    [onNavigateFolder, openBookmarkTab, selectMode]
-  )
+  const handleDoubleClick = (item: GridItem) => {
+    if (selectMode) return
+    if (item.type === "folder") onNavigateFolder(item.folderId)
+    else openBookmarkTab(item.bookmark)
+  }
 
-  const makeDeskPaneDrop = useCallback(
+  const makeDeskPaneDrop =
     (winId: string, deskFolderByWin: Record<string, string | null>) =>
-      (sourceItem: GridItem, targetFolderId?: string | null) => {
-        const paneFolder = deskFolderByWin[winId] ?? null
-        const destId = targetFolderId === undefined ? paneFolder : targetFolderId
-        runDrop(sourceItem, destId, folders, bookmarks, handlePasteFolder, handlePasteLink, setPasteError)
-      },
-    [bookmarks, folders, handlePasteFolder, handlePasteLink, setPasteError]
-  )
+    (sourceItem: GridItem, targetFolderId?: string | null) => {
+      const paneFolder = deskFolderByWin[winId] ?? null
+      const destId = targetFolderId === undefined ? paneFolder : targetFolderId
+      runDrop(sourceItem, destId, folders, bookmarks, handlePasteFolder, handlePasteLink, setPasteError)
+    }
 
-  const makeDeskPaneDoubleClick = useCallback(
-    (winId: string) => (item: GridItem) => {
-      if (selectMode) return
-      if (item.type === "folder") setDeskPaneFolder(winId, item.folderId)
-      else openBookmarkTab(item.bookmark)
-    },
-    [openBookmarkTab, selectMode, setDeskPaneFolder]
-  )
+  const makeDeskPaneDoubleClick = (winId: string) => (item: GridItem) => {
+    if (selectMode) return
+    if (item.type === "folder") setDeskPaneFolder(winId, item.folderId)
+    else openBookmarkTab(item.bookmark)
+  }
 
   return { handleDrop, handleDoubleClick, makeDeskPaneDrop, makeDeskPaneDoubleClick }
 }

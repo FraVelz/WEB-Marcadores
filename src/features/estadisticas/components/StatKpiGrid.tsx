@@ -17,7 +17,7 @@ export function StatKpiGrid({ kpis }: { kpis: EstadisticasSnapshot["kpis"] }) {
   ]
 
   return (
-    <ul className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3" role="list">
+    <ul className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
       {items.map((item) => (
         <li
           key={item.label}

@@ -1,7 +1,5 @@
 "use client"
 
-import { useMemo } from "react"
-
 import type { DeskLibraryPaneUiState } from "@/features/marcadores/state/libraryPaneUiState"
 import { createDeskPaneScope, type LibraryPaneUiScope } from "@/features/marcadores/state/libraryPaneUiScope"
 
@@ -25,18 +23,10 @@ export function useResolvedLibraryPaneScope(opts: {
     getDeskSearchRef,
   } = opts
 
-  return useMemo(() => {
+  return (() => {
     if (desktopWindowChrome && resolvedDeskLibPaneId) {
       return createDeskPaneScope(resolvedDeskLibPaneId, deskUiByWin, updateDeskUi, getDeskItemRefs, getDeskSearchRef)
     }
     return globalScope
-  }, [
-    desktopWindowChrome,
-    resolvedDeskLibPaneId,
-    globalScope,
-    deskUiByWin,
-    updateDeskUi,
-    getDeskItemRefs,
-    getDeskSearchRef,
-  ])
+  })()
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { useMemo, useState } from "react"
+import { useState } from "react"
 
 import { SearchHighlightText } from "@/features/marcadores/components/SearchHighlightText"
 import {
@@ -58,15 +58,12 @@ export function LinkContent({
     }
   })()
 
-  const matchFields = useMemo(
-    () => getBookmarkMatchFields(bookmark, searchQuery, searchInDescription),
-    [bookmark, searchQuery, searchInDescription]
-  )
+  const matchFields = getBookmarkMatchFields(bookmark, searchQuery, searchInDescription)
 
-  const descriptionSnippet = useMemo(() => {
+  const descriptionSnippet = (() => {
     if (!matchFields || !shouldShowDescriptionSnippet(bookmark, matchFields)) return null
     return descriptionMatchSnippet(bookmark.description, searchQuery)
-  }, [bookmark, matchFields, searchQuery])
+  })()
 
   const highlight = searchQuery.trim() !== ""
   const tag = bookmark.tags?.[0] || folderName

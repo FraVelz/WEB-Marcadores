@@ -16,6 +16,7 @@ export default function ToolbarNewFolderSection({ newFolderName, setNewFolderNam
       <input
         type="text"
         placeholder="Nombre de carpeta"
+        aria-label="Nombre de carpeta"
         value={newFolderName}
         onChange={(e) => setNewFolderName(e.target.value)}
         onKeyDown={(e) => {
@@ -28,12 +29,14 @@ export default function ToolbarNewFolderSection({ newFolderName, setNewFolderNam
         )}
       />
       <button
+        type="button"
         onClick={onCreateFolder}
         className={cn("bg-app-primary hover:bg-app-primary-hover rounded px-2 py-1 text-sm text-white", FOCUS_RING)}
       >
         Crear
       </button>
       <button
+        type="button"
         onClick={onCancel}
         className={cn("text-app-fg-muted hover:bg-app-active rounded px-2 py-1 text-sm", FOCUS_RING)}
       >

@@ -95,6 +95,7 @@ export function MarcadoresContentHeader({
                   viewMode === "grid" ? "bg-app-primary text-white shadow-sm" : "text-app-fg-muted hover:text-app-fg"
                 )}
                 title="Vista cuadrícula"
+                aria-label="Vista cuadrícula"
                 onClick={() => viewMode !== "grid" && onToggleViewMode()}
               >
                 <svg className="size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -110,6 +111,7 @@ export function MarcadoresContentHeader({
                   viewMode === "tree" ? "bg-app-primary text-white shadow-sm" : "text-app-fg-muted hover:text-app-fg"
                 )}
                 title="Vista árbol"
+                aria-label="Vista árbol"
                 onClick={() => viewMode !== "tree" && onToggleViewMode()}
               >
                 <svg className="size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden>

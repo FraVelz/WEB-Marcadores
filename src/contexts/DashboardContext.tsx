@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, use, useRef, useCallback, useReducer } from "react"
+import { createContext, use, useRef, useReducer } from "react"
 
 import type { ReactNode } from "react"
 
@@ -31,39 +31,39 @@ export function DashboardProvider({ children, demoMode }: { children: React.Reac
     toggleCollapsed: toggleExplorerCollapsed,
   } = useSidebarTreeCollapse(folders)
 
-  const setViewMode = useCallback((m: ViewMode) => {
+  const setViewMode = (m: ViewMode) => {
     dispatchUi({ type: "view_mode", mode: m })
-  }, [])
+  }
 
-  const setSelectedFolderId = useCallback((id: string | null) => {
+  const setSelectedFolderId = (id: string | null) => {
     dispatchUi({ type: "selected_folder", id })
-  }, [])
+  }
 
-  const setCommandPaletteOpen = useCallback((updater: React.SetStateAction<boolean>) => {
+  const setCommandPaletteOpen = (updater: React.SetStateAction<boolean>) => {
     dispatchUi({ type: "command_palette", updater })
-  }, [])
+  }
 
-  const registerMarcadoresRuntime = useCallback((snapshot: MarcadoresRuntimeSnap | null) => {
+  const registerMarcadoresRuntime = (snapshot: MarcadoresRuntimeSnap | null) => {
     queueMicrotask(() => {
       dispatchUi({ type: "marcadores_palette", updater: snapshot })
     })
-  }, [])
+  }
 
-  const registerExplorerWideHeaderEnd = useCallback((node: ReactNode | null) => {
+  const registerExplorerWideHeaderEnd = (node: ReactNode | null) => {
     queueMicrotask(() => {
       dispatchUi({ type: "explorer_header_slot", updater: node })
     })
-  }, [])
+  }
   const editFolderRef = useRef<((id: string, name: string) => void) | null>(null)
 
-  const focusMain = useCallback(() => {
+  const focusMain = () => {
     mainRef.current?.focus()
-  }, [])
+  }
 
-  const focusSidebar = useCallback(() => {
+  const focusSidebar = () => {
     marcadoresExplorerPanelRef.current?.focus()
     sidebarRef.current?.focus()
-  }, [])
+  }
 
   return (
     <DashboardContext.Provider

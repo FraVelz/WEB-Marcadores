@@ -1,7 +1,5 @@
 "use client"
 
-import { useCallback } from "react"
-
 import type { BookmarkFormData } from "@/features/marcadores/components/bookmark/BookmarkModal"
 
 import type { Folder } from "@/contexts/DashboardContext"
@@ -65,12 +63,9 @@ export function useMarcadoresPageDnDLayer(p: {
 
   const { setDeskFolderByWin } = p
 
-  const setDeskPaneFolder = useCallback(
-    (winId: string, folderId: string) => {
-      setDeskFolderByWin((prev) => ({ ...prev, [winId]: folderId }))
-    },
-    [setDeskFolderByWin]
-  )
+  const setDeskPaneFolder = (winId: string, folderId: string) => {
+    setDeskFolderByWin((prev) => ({ ...prev, [winId]: folderId }))
+  }
 
   const dnd = useMarcadoresDropHandlers({
     folders: p.folders,

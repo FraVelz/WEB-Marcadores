@@ -1,7 +1,5 @@
 "use client"
 
-import { useCallback, useMemo } from "react"
-
 import { clampBounds, DESKTOP_MARGIN } from "@/features/marcadores/desktop/desktopWindowGeometry"
 import type { DesktopSurfaceTask, DesktopWmExtras, WindowBounds } from "@/features/marcadores/desktop/windowTypes"
 import { DESKTOP_DETAIL_WINDOW_ID } from "@/features/marcadores/desktop/windowTypes"
@@ -55,25 +53,19 @@ export function useDeskShellWorkflows(opts: {
     libraryWindowIds,
   })
 
-  const setLibBounds = useCallback(
-    (id: string, b: WindowBounds) => {
-      setLibFrames((prev) => {
-        const cur = prev[id]
-        if (!cur) return prev
-        return { ...prev, [id]: { ...cur, bounds: b } }
-      })
-    },
-    [setLibFrames]
-  )
+  const setLibBounds = (id: string, b: WindowBounds) => {
+    setLibFrames((prev) => {
+      const cur = prev[id]
+      if (!cur) return prev
+      return { ...prev, [id]: { ...cur, bounds: b } }
+    })
+  }
 
-  const setDetailBounds = useCallback(
-    (b: WindowBounds) => {
-      setDetailFrame((prev) => (prev ? { ...prev, bounds: b } : prev))
-    },
-    [setDetailFrame]
-  )
+  const setDetailBounds = (b: WindowBounds) => {
+    setDetailFrame((prev) => (prev ? { ...prev, bounds: b } : prev))
+  }
 
-  const tileTwoColumns = useCallback(() => {
+  const tileTwoColumns = () => {
     if (libraryWindowIds.length !== 2) return
     const cw = canvas.w
     const ch = canvas.h
@@ -98,29 +90,26 @@ export function useDeskShellWorkflows(opts: {
         [rightId]: { ...b, bounds: rightBounds, maximized: false, minimized: false },
       }
     })
-  }, [canvas.h, canvas.w, libraryWindowIds, setLibFrames])
+  }
 
-  const focusTask = useCallback(
-    (id: string) => {
-      if (id === DESKTOP_DETAIL_WINDOW_ID) {
-        zSeqRef.current += 1
-        setZDetail(zSeqRef.current)
-        setPreferLibraryInStrip(false)
-        setDetailFrame((prev) => (prev?.minimized ? { ...prev, minimized: false } : prev))
-        return
-      }
+  const focusTask = (id: string) => {
+    if (id === DESKTOP_DETAIL_WINDOW_ID) {
       zSeqRef.current += 1
-      setZLib((z) => ({ ...z, [id]: zSeqRef.current }))
-      setPreferLibraryInStrip(true)
-      setLibFrames((prev) => {
-        const cur = prev[id]
-        if (!cur?.minimized) return prev
-        return { ...prev, [id]: { ...cur, minimized: false } }
-      })
-      onFocusLibraryPane(id)
-    },
-    [onFocusLibraryPane, setDetailFrame, setLibFrames, setPreferLibraryInStrip, setZDetail, setZLib, zSeqRef]
-  )
+      setZDetail(zSeqRef.current)
+      setPreferLibraryInStrip(false)
+      setDetailFrame((prev) => (prev?.minimized ? { ...prev, minimized: false } : prev))
+      return
+    }
+    zSeqRef.current += 1
+    setZLib((z) => ({ ...z, [id]: zSeqRef.current }))
+    setPreferLibraryInStrip(true)
+    setLibFrames((prev) => {
+      const cur = prev[id]
+      if (!cur?.minimized) return prev
+      return { ...prev, [id]: { ...cur, minimized: false } }
+    })
+    onFocusLibraryPane(id)
+  }
 
   const { minimizeAllWindows, restoreMinimizedWindows, maximizeAllWindows, restoreWindowSizes } =
     useDeskBulkWindowTransforms({
@@ -132,7 +121,7 @@ export function useDeskShellWorkflows(opts: {
       setDetailFrame,
     })
 
-  const desktopWm = useMemo((): DesktopWmExtras => {
+  const desktopWm = ((): DesktopWmExtras => {
     const tasks: DesktopSurfaceTask[] = libraryWindowIds.map((wid, idx) => {
       const f = libFrames[wid]
       return {
@@ -164,26 +153,11 @@ export function useDeskShellWorkflows(opts: {
       maximizeAll: maximizeAllWindows,
       restoreWindowSizes,
     }
-  }, [
-    detailFrame,
-    detailOpen,
-    detailTitle,
-    focusTask,
-    focusedSurface,
-    libFrames,
-    libraryWindowIds,
-    maximizeAllWindows,
-    minimizeAllWindows,
-    restoreMinimizedWindows,
-    restoreWindowSizes,
-  ])
+  })()
 
-  const focusLibraryFromWin = useCallback(
-    (winId: string) => {
-      onFocusLibraryPane(winId)
-    },
-    [onFocusLibraryPane]
-  )
+  const focusLibraryFromWin = (winId: string) => {
+    onFocusLibraryPane(winId)
+  }
 
   return {
     desktopWm,

@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { useDashboard } from "@/contexts/DashboardContext"
 
@@ -54,7 +54,7 @@ export function MarcadoresExplorerRail({
   })
   const innerRef = useRef<HTMLDivElement>(null)
 
-  const persistOpen = useCallback((next: boolean) => {
+  const persistOpen = (next: boolean) => {
     setOpen(next)
     if (typeof window === "undefined") return
     const value = next ? "1" : "0"
@@ -63,7 +63,7 @@ export function MarcadoresExplorerRail({
     } catch {
       /* ignore */
     }
-  }, [])
+  }
 
   useEffect(() => {
     if (!registerGlobalExplorerRef) return
@@ -117,10 +117,8 @@ export function MarcadoresExplorerRail({
           </span>
         </div>
       ) : (
-        <div
+        <nav
           ref={innerRef}
-          tabIndex={0}
-          role="navigation"
           aria-label="Explorador de carpetas"
           data-marcadores-explorer-rail
           className={cn(
@@ -157,7 +155,7 @@ export function MarcadoresExplorerRail({
               />
             </div>
           </div>
-        </div>
+        </nav>
       )}
     </div>
   )

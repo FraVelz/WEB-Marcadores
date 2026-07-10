@@ -18,10 +18,7 @@ export function StatBookmarkList({
   }
 
   return (
-    <ul
-      className="border-app-border-muted divide-app-border-muted bg-app-raised divide-y overflow-hidden rounded-xl border"
-      role="list"
-    >
+    <ul className="border-app-border-muted divide-app-border-muted bg-app-raised divide-y overflow-hidden rounded-xl border">
       {rows.map((row) => (
         <li key={row.id} className="px-4 py-3">
           <p className="text-app-fg truncate text-sm font-medium">{row.title}</p>
@@ -46,10 +43,7 @@ export function StatDuplicateList({ groups }: { groups: StatDuplicateGroup[] }) 
   }
 
   return (
-    <ul
-      className="border-app-border-muted divide-app-border-muted bg-app-raised divide-y overflow-hidden rounded-xl border"
-      role="list"
-    >
+    <ul className="border-app-border-muted divide-app-border-muted bg-app-raised divide-y overflow-hidden rounded-xl border">
       {groups.map((g) => (
         <li key={g.key} className="px-4 py-3">
           <div className="flex items-baseline justify-between gap-2">

@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react"
 import type { SetStateAction } from "react"
-import { useCallback, useEffect, useMemo, useReducer, useRef } from "react"
+import { useEffect, useReducer, useRef } from "react"
 
 import { useDashboard } from "@/contexts/DashboardContext"
 
@@ -66,25 +66,25 @@ export function MarcadoresDesktopShell({
 
   const [desk, dispatchDesk] = useReducer(deskShellReducer, INITIAL_DESK_SHELL)
 
-  const applyDesk = useCallback((updater: (s: DeskShellState) => DeskShellState) => {
+  const applyDesk = (updater: (s: DeskShellState) => DeskShellState) => {
     dispatchDesk({ type: "apply", updater })
-  }, [])
+  }
 
-  const setLibFrames = useCallback((u: SetStateAction<DeskShellState["libFrames"]>) => {
+  const setLibFrames = (u: SetStateAction<DeskShellState["libFrames"]>) => {
     dispatchDesk({ type: "apply", updater: (s) => applyDeskPatch("libFrames", u, s) })
-  }, [])
+  }
 
-  const setDetailFrame = useCallback((u: SetStateAction<DeskShellState["detailFrame"]>) => {
+  const setDetailFrame = (u: SetStateAction<DeskShellState["detailFrame"]>) => {
     dispatchDesk({ type: "apply", updater: (s) => applyDeskPatch("detailFrame", u, s) })
-  }, [])
+  }
 
-  const setZLib = useCallback((u: SetStateAction<DeskShellState["zLib"]>) => {
+  const setZLib = (u: SetStateAction<DeskShellState["zLib"]>) => {
     dispatchDesk({ type: "apply", updater: (s) => applyDeskPatch("zLib", u, s) })
-  }, [])
+  }
 
-  const setZDetail = useCallback((u: SetStateAction<DeskShellState["zDetail"]>) => {
+  const setZDetail = (u: SetStateAction<DeskShellState["zDetail"]>) => {
     dispatchDesk({ type: "apply", updater: (s) => applyDeskPatch("zDetail", u, s) })
-  }, [])
+  }
 
   const canvas = desk.canvas
   const libFrames = desk.libFrames
@@ -93,13 +93,13 @@ export function MarcadoresDesktopShell({
   const zDetail = desk.zDetail
   const deskReady = desk.deskReady
 
-  const libraryPreMaxMap = useMemo(() => {
+  const libraryPreMaxMap = (() => {
     const m = new Map<string, PreMaxBox>()
     for (const id of libraryWindowIds) {
       m.set(id, { current: null } satisfies PreMaxBox)
     }
     return m
-  }, [libraryWindowIds])
+  })()
 
   const preMaxDetail = useRef<WindowBounds | null>(null)
 
@@ -115,7 +115,7 @@ export function MarcadoresDesktopShell({
 
   const { deskCanvasDropHighlight, setDeskCanvasDropHighlight } = useDeskCanvasDropHighlight()
 
-  useDeskShellDragClear(useCallback(() => setDeskCanvasDropHighlight(false), [setDeskCanvasDropHighlight]))
+  useDeskShellDragClear(() => setDeskCanvasDropHighlight(false))
 
   useDeskShellHydration({
     hostRef,
@@ -159,10 +159,10 @@ export function MarcadoresDesktopShell({
     focusedLibraryPaneId,
   })
 
-  const minimizeAllAndFocusMain = useCallback(() => {
+  const minimizeAllAndFocusMain = () => {
     minimizeAllWindows()
     queueMicrotask(() => focusMain())
-  }, [focusMain, minimizeAllWindows])
+  }
 
   const canCloseLibrary = libraryWindowIds.length > 1
   const deskSurfaceReady = deskReady && canvas.w >= MIN_CANVAS && canvas.h >= MIN_CANVAS

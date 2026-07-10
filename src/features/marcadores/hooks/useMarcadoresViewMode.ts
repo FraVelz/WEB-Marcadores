@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useSyncExternalStore } from "react"
+import { useSyncExternalStore } from "react"
 
 const MARCADORES_VIEW_MODE_STORAGE_KEY = "marcadores-view-mode"
 
@@ -62,8 +62,8 @@ function setMarcadoresViewMode(next: MarcadoresViewMode) {
  */
 export function useMarcadoresViewMode() {
   const mode = useSyncExternalStore(subscribe, readModeFromStorage, getServerSnapshot)
-  const setMode = useCallback((next: MarcadoresViewMode) => {
+  const setMode = (next: MarcadoresViewMode) => {
     setMarcadoresViewMode(next)
-  }, [])
+  }
   return { mode, setMode } as const
 }

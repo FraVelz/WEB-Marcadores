@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useId, useRef } from "react"
+import { useId, useRef } from "react"
 
 import { cn, cnLines } from "@/lib/utils"
 import { FOCUS_RING_INSET, KEYBOARD_SELECTED } from "@/lib/focusStyles"
@@ -62,13 +62,10 @@ export function TreeRow({
   const targetFolderId = isFolder ? item.id : (item.bookmark.folder_id ?? null)
   const nodeRef = useRef<HTMLDivElement | null>(null)
 
-  const setNodeRef = useCallback(
-    (el: HTMLDivElement | null) => {
-      nodeRef.current = el
-      itemRef(el)
-    },
-    [itemRef]
-  )
+  const setNodeRef = (el: HTMLDivElement | null) => {
+    nodeRef.current = el
+    itemRef(el)
+  }
 
   useBookmarkDraggable(nodeRef, item)
   useBookmarkDropTarget({

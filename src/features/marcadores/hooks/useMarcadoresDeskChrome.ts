@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useMemo, useRef, useState } from "react"
+import { useRef, useState } from "react"
 
 import {
   createDefaultDeskLibraryPaneUi,
@@ -23,47 +23,41 @@ export function useMarcadoresDeskChrome(opts: {
   const itemRefsMapRef = useRef<Map<string, React.MutableRefObject<Map<number, HTMLDivElement>>>>(new Map())
   const searchRefMapRef = useRef<Map<string, React.RefObject<HTMLInputElement | null>>>(new Map())
 
-  const resolvedDeskLibPaneId = useMemo(() => {
+  const resolvedDeskLibPaneId = (() => {
     if (focusedDeskLibId && deskLibWinIds.includes(focusedDeskLibId)) return focusedDeskLibId
     return deskLibWinIds[0] ?? null
-  }, [deskLibWinIds, focusedDeskLibId])
+  })()
 
   const activeBrowseFolderId =
     desktopWindowChrome && resolvedDeskLibPaneId ? (deskFolderByWin[resolvedDeskLibPaneId] ?? null) : selectedFolderId
 
-  const setActiveBrowseFolderId = useCallback(
-    (id: string | null) => {
-      if (desktopWindowChrome && resolvedDeskLibPaneId) {
-        setDeskFolderByWin((prev) => ({ ...prev, [resolvedDeskLibPaneId]: id }))
-      } else {
-        setSelectedFolderId(id)
-      }
-    },
-    [desktopWindowChrome, resolvedDeskLibPaneId, setSelectedFolderId]
-  )
+  const setActiveBrowseFolderId = (id: string | null) => {
+    if (desktopWindowChrome && resolvedDeskLibPaneId) {
+      setDeskFolderByWin((prev) => ({ ...prev, [resolvedDeskLibPaneId]: id }))
+    } else {
+      setSelectedFolderId(id)
+    }
+  }
 
-  const updateDeskUi = useCallback((winId: string, recipe: (s: DeskLibraryPaneUiState) => DeskLibraryPaneUiState) => {
+  const updateDeskUi = (winId: string, recipe: (s: DeskLibraryPaneUiState) => DeskLibraryPaneUiState) => {
     setDeskUiByWin((prev) => {
       const winPrev = prev[winId] ?? createDefaultDeskLibraryPaneUi()
       const winNext = recipe(winPrev)
       if (winNext === winPrev) return prev
       return { ...prev, [winId]: winNext }
     })
-  }, [])
+  }
 
-  const toggleDeskTreeFolderCollapse = useCallback(
-    (winId: string, folderId: string) => {
-      updateDeskUi(winId, (s) => {
-        const next = new Set(s.treeCollapsedIds)
-        if (next.has(folderId)) next.delete(folderId)
-        else next.add(folderId)
-        return { ...s, treeCollapsedIds: next }
-      })
-    },
-    [updateDeskUi]
-  )
+  const toggleDeskTreeFolderCollapse = (winId: string, folderId: string) => {
+    updateDeskUi(winId, (s) => {
+      const next = new Set(s.treeCollapsedIds)
+      if (next.has(folderId)) next.delete(folderId)
+      else next.add(folderId)
+      return { ...s, treeCollapsedIds: next }
+    })
+  }
 
-  const getDeskItemRefs = useCallback((winId: string) => {
+  const getDeskItemRefs = (winId: string) => {
     const m = itemRefsMapRef.current
     let ref = m.get(winId)
     if (!ref) {
@@ -71,9 +65,9 @@ export function useMarcadoresDeskChrome(opts: {
       m.set(winId, ref)
     }
     return ref
-  }, [])
+  }
 
-  const getDeskSearchRef = useCallback((winId: string): React.RefObject<HTMLInputElement | null> => {
+  const getDeskSearchRef = (winId: string): React.RefObject<HTMLInputElement | null> => {
     const m = searchRefMapRef.current
     let ref = m.get(winId)
     if (!ref) {
@@ -81,16 +75,16 @@ export function useMarcadoresDeskChrome(opts: {
       m.set(winId, ref)
     }
     return ref
-  }, [])
+  }
 
-  const addDeskLibraryWindow = useCallback(() => {
+  const addDeskLibraryWindow = () => {
     const id = makeDeskLibWinId()
     setDeskLibWinIds((prev) => [...prev, id])
     setDeskUiByWin((prev) => ({ ...prev, [id]: createDefaultDeskLibraryPaneUi() }))
     queueMicrotask(() => setFocusedDeskLibId(id))
-  }, [])
+  }
 
-  const closeDeskLibraryWindow = useCallback((id: string) => {
+  const closeDeskLibraryWindow = (id: string) => {
     itemRefsMapRef.current.delete(id)
     searchRefMapRef.current.delete(id)
     setDeskLibWinIds((prev) => (prev.length <= 1 ? prev : prev.filter((w) => w !== id)))
@@ -106,11 +100,11 @@ export function useMarcadoresDeskChrome(opts: {
       delete next[id]
       return next
     })
-  }, [])
+  }
 
-  const focusDeskLibraryPane = useCallback((id: string) => {
+  const focusDeskLibraryPane = (id: string) => {
     setFocusedDeskLibId(id)
-  }, [])
+  }
 
   return {
     deskLibWinIds,

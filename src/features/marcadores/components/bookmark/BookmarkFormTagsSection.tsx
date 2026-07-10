@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState } from "react"
 import TagAutocomplete from "@/features/marcadores/components/bookmark/TagAutocomplete"
 import { cn } from "@/lib/utils"
 import { splitCommaTags } from "@/lib/comma-tags"
@@ -15,13 +15,10 @@ type Props = {
 export default function BookmarkFormTagsSection({ value, onChange, options, tagInputRef }: Props) {
   const [tagInputValue, setTagInputValue] = useState("")
 
-  const syncDraftToRef = useCallback(
-    (v: string) => {
-      setTagInputValue(v)
-      if (tagInputRef) tagInputRef.current = v
-    },
-    [tagInputRef]
-  )
+  const syncDraftToRef = (v: string) => {
+    setTagInputValue(v)
+    if (tagInputRef) tagInputRef.current = v
+  }
 
   const handleSelectTag = (tag: string) => {
     const current = splitCommaTags(value)

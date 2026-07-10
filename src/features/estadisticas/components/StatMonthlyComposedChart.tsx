@@ -1,7 +1,5 @@
 "use client"
 
-import { useMemo } from "react"
-
 import { Bar, EvilComposedChart, Grid, Tooltip, XAxis, YAxis } from "@/components/evilcharts/charts/composed-chart"
 import type { ChartConfig } from "@/components/evilcharts/ui/chart"
 import { buildStatChartAriaLabel } from "@/features/estadisticas/components/statChartA11y"
@@ -17,12 +15,6 @@ const MONTHLY_CHART_CONFIG = {
   },
 } satisfies ChartConfig
 
-type MonthDatum = {
-  month: string
-  altas: number
-  monthKey: string
-}
-
 function formatMonthTick(value: string): string {
   const parts = value.trim().split(/\s+/)
   if (parts.length < 2) return value.slice(0, 3)
@@ -36,15 +28,11 @@ type StatMonthlyComposedChartProps = {
 }
 
 export function StatMonthlyComposedChart({ caption, rows, emptyLabel = "Sin datos" }: StatMonthlyComposedChartProps) {
-  const data = useMemo<MonthDatum[]>(
-    () =>
-      rows.map((row) => ({
-        month: row.label,
-        altas: row.value,
-        monthKey: row.hint ?? row.label,
-      })),
-    [rows]
-  )
+  const data = rows.map((row) => ({
+    month: row.label,
+    altas: row.value,
+    monthKey: row.hint ?? row.label,
+  }))
 
   if (data.length === 0) {
     return (

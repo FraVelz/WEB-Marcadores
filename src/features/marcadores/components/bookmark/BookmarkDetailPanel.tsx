@@ -171,7 +171,6 @@ function BookmarkDetailPanelInner({
   const panelContent = (
     <aside
       ref={panelRef}
-      role="complementary"
       aria-label="Detalle del marcador"
       data-no-vim
       onKeyDown={(e) => e.stopPropagation()}

@@ -23,6 +23,7 @@ export default function ToolbarSelectActions({
   return (
     <div className="flex min-w-0 flex-shrink-0 flex-wrap items-center gap-1">
       <button
+        type="button"
         onClick={() => {
           setSelectMode((m) => !m)
           if (selectMode) setSelectedIds(new Set())
@@ -38,6 +39,7 @@ export default function ToolbarSelectActions({
       {selectMode && selectedIds.size > 0 && (
         <>
           <button
+            type="button"
             onClick={onEdit}
             disabled={selectedIds.size !== 1}
             className={cn(
@@ -49,6 +51,7 @@ export default function ToolbarSelectActions({
             Editar
           </button>
           <button
+            type="button"
             onClick={onDelete}
             className={cn("text-app-danger-fg rounded px-2 py-1 text-xs", FOCUS_RING, "hover:bg-app-danger/20")}
           >

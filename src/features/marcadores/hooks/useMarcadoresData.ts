@@ -1,17 +1,13 @@
 "use client"
 
-import { useState, useCallback, useMemo, useEffect, startTransition } from "react"
+import { useState, useEffect, startTransition } from "react"
 
 import { useDashboard } from "@/contexts/DashboardContext"
 import { createClient } from "@/lib/supabase/client"
 import { DEMO_BOOKMARKS, DEMO_FOLDERS } from "@/lib/demo-data"
 
 import { deriveBookmarkFields } from "../views/bookmarkDerived"
-import {
-  buildSearchResultGridItems,
-  filterBookmarksBySearch,
-  type BookmarkSearchOptions,
-} from "../utils/bookmarkSearch"
+import { buildSearchResultGridItems, filterBookmarksBySearch } from "../utils/bookmarkSearch"
 import { buildFoldersByParentIndex } from "../utils/folderIndex"
 import type { BookmarkSortOrder } from "../state/libraryPaneUiState"
 import { buildFolderTree, getFolderPath } from "../utils/utils"
@@ -85,7 +81,7 @@ export function useMarcadoresData(
   const [folders, setFolders] = useState<FlatFolder[]>([])
   const [loading, setLoading] = useState(true)
 
-  const fetchData = useCallback(async () => {
+  const fetchData = async () => {
     if (demoMode) {
       setBookmarks((DEMO_BOOKMARKS as Bookmark[]).map(normalizeBookmarkRow))
       setFolders(DEMO_FOLDERS)
@@ -102,47 +98,58 @@ export function useMarcadoresData(
       setCtxFolders(buildFolderTree(flat))
     }
     setLoading(false)
-  }, [demoMode, setCtxFolders, setAllTagsFromBookmarks])
+  }
 
   useEffect(() => {
     startTransition(() => {
-      void fetchData()
+      void (async () => {
+        if (demoMode) {
+          setBookmarks((DEMO_BOOKMARKS as Bookmark[]).map(normalizeBookmarkRow))
+          setFolders(DEMO_FOLDERS)
+          setCtxFolders(buildFolderTree(DEMO_FOLDERS))
+        } else {
+          const supabase = createClient()
+          const { data: bData } = await supabase.from("bookmarks").select("*").order("title")
+          const rows = (bData || []).map((r: Bookmark) => normalizeBookmarkRow(r))
+          setBookmarks(rows)
+          setAllTagsFromBookmarks(rows)
+          const { data: fData } = await supabase.from("folders").select("*").order("sort_order")
+          const flat = fData || []
+          setFolders(flat)
+          setCtxFolders(buildFolderTree(flat))
+        }
+        setLoading(false)
+      })()
     })
-  }, [fetchData])
+  }, [demoMode, setAllTagsFromBookmarks, setCtxFolders])
 
-  const bookmarksVisible = useMemo(() => bookmarks.filter((b) => !b.archived_at), [bookmarks])
+  const bookmarksVisible = bookmarks.filter((b) => !b.archived_at)
 
-  const derivedRows = useMemo(
-    () => bookmarksVisible.map((b) => ({ b, d: deriveBookmarkFields(b) })),
-    [bookmarksVisible]
-  )
+  const derivedRows = bookmarksVisible.map((b) => ({ b, d: deriveBookmarkFields(b) }))
 
-  const searchOpts = useMemo(
-    (): BookmarkSearchOptions => ({
-      query: search.query,
-      folderId: search.folderId,
-      folders,
-      searchInSubfolders: search.searchInSubfolders,
-      searchInDescription: search.searchInDescription,
-    }),
-    [search.query, search.folderId, search.searchInSubfolders, search.searchInDescription, folders]
-  )
+  const searchOpts = {
+    query: search.query,
+    folderId: search.folderId,
+    folders,
+    searchInSubfolders: search.searchInSubfolders,
+    searchInDescription: search.searchInDescription,
+  }
 
-  const filteredBySearch = useMemo(() => {
+  const filteredBySearch = (() => {
     if (!search.enabled) return bookmarksVisible
     return filterBookmarksBySearch(bookmarksVisible, derivedRows, searchOpts)
-  }, [bookmarksVisible, derivedRows, search.enabled, searchOpts])
+  })()
 
   const filteredBookmarks = filteredBySearch
 
-  const flatList = useMemo((): GridItem[] => {
+  const flatList = ((): GridItem[] => {
     if (!search.enabled) {
       return buildMarcadoresFlatList(folders, bookmarksVisible, search.folderId, search.bookmarkSort)
     }
     return buildSearchResultGridItems(folders, filteredBookmarks, searchOpts, search.bookmarkSort)
-  }, [search.enabled, search.folderId, search.bookmarkSort, folders, bookmarksVisible, filteredBookmarks, searchOpts])
+  })()
 
-  const breadcrumb = useMemo(() => getFolderPath(folders, search.folderId), [folders, search.folderId])
+  const breadcrumb = getFolderPath(folders, search.folderId)
 
   return {
     bookmarks,

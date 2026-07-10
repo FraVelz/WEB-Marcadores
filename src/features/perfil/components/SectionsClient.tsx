@@ -1,6 +1,9 @@
 "use client"
 
-import { useAuthActions, useBookmarkCount, useChangePassword, useUser } from "../hooks"
+import { useAuthActions } from "../hooks/useAuthActions"
+import { useBookmarkCount } from "../hooks/useBookmarkCount"
+import { useChangePassword } from "../hooks/useChangePassword"
+import { useUser } from "../hooks/useUser"
 import { useDashboard } from "@/contexts/DashboardContext"
 
 import { cn } from "@/lib/utils"
@@ -57,6 +60,7 @@ export function SectionsClient() {
           <input
             type="password"
             placeholder="Nueva contraseña"
+            aria-label="Nueva contraseña"
             value={newPassword}
             data-no-vim
             onChange={(e) => setNewPassword(e.target.value)}

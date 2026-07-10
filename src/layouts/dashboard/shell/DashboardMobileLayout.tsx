@@ -62,7 +62,6 @@ export function DashboardMobileLayout({ pathname, children, sidebarRef, mainRef 
 
           <main
             ref={mainRef}
-            tabIndex={0}
             className={cn(
               "flex min-h-0 flex-1 flex-col overflow-hidden",
               HOTKEY_SCOPE_FOCUS,

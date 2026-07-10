@@ -21,9 +21,7 @@ import {
   createContext,
   isValidElement,
   use,
-  useCallback,
   useId,
-  useMemo,
   useRef,
   useState,
   type ComponentProps,
@@ -183,38 +181,22 @@ export function EvilComposedChart<
   const displayData = showBrush && !isLoading ? visibleData : data
 
   // Updates selection state and notifies the parent
-  const selectDataKey = useCallback(
-    (newSelectedDataKey: string | null) => {
-      setSelectedDataKey(newSelectedDataKey)
-      onSelectionChange?.(newSelectedDataKey)
-    },
-    [onSelectionChange]
-  )
+  const selectDataKey = (newSelectedDataKey: string | null) => {
+    setSelectedDataKey(newSelectedDataKey)
+    onSelectionChange?.(newSelectedDataKey)
+  }
 
-  const contextValue = useMemo<ComposedChartContextValue>(
-    () => ({
-      config,
-      curveType,
-      animationType,
-      introStartedAt,
-      dataLength: displayData.length,
-      isLoading,
-      hoveredIndex,
-      selectedDataKey: activeSelectedDataKey,
-      selectDataKey,
-    }),
-    [
-      config,
-      curveType,
-      animationType,
-      introStartedAt,
-      displayData.length,
-      isLoading,
-      hoveredIndex,
-      activeSelectedDataKey,
-      selectDataKey,
-    ]
-  )
+  const contextValue = {
+    config,
+    curveType,
+    animationType,
+    introStartedAt,
+    dataLength: displayData.length,
+    isLoading,
+    hoveredIndex,
+    selectedDataKey: activeSelectedDataKey,
+    selectDataKey,
+  }
 
   return (
     <LazyMotion features={domAnimation} strict>
@@ -1218,21 +1200,16 @@ const generateEasedGradientStops = (steps: number = 17, minOpacity: number = 0.0
  * timing drift issues from setTimeout/setInterval.
  */
 export function useLoadingData(isLoading: boolean, loadingBars: number = 12) {
-  const [loadingDataKey, setLoadingDataKey] = useState(false)
+  const [, forceLoadingDataRefresh] = useState(false)
 
   // Callback fired by motion.dev when the shimmer exits the visible area
-  const onShimmerExit = useCallback(() => {
+  const onShimmerExit = () => {
     if (isLoading) {
-      setLoadingDataKey((prev) => !prev)
+      forceLoadingDataRefresh((prev) => !prev)
     }
-  }, [isLoading])
+  }
 
-  const loadingData = useMemo(
-    () => getLoadingData(loadingBars, 20, 80),
-    // loadingDataKey toggle triggers re-computation when the shimmer exits
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loadingBars, loadingDataKey]
-  )
+  const loadingData = getLoadingData(loadingBars, 20, 80)
 
   return { loadingData, onShimmerExit }
 }
