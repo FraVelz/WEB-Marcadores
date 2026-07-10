@@ -3,6 +3,14 @@
 Usar cuando el usuario invoque **`/update-docs`**, adjunte `.cursor/commands/update-docs.md` o mencione esta
 instrucción, con uno o más archivos Markdown (`@`).
 
+## Modos
+
+- **Por defecto / `@` archivos:** ortografía + sync del par bilingüe (según idioma fuente).
+- **`sync-en` / "sincronizar a inglés":** tomar `README.md` (y docs ES si aplica) como
+  **fuente** y **actualizar o crear** el espejo EN (`README.EN.md` / `README.en.md`). No
+  reescribir el ES salvo typos. En el EN, la cabecera debe incluir:
+  `This document is in English. [Versión en español](./README.md)`.
+
 ## Objetivo
 
 1. **Revisar ortografía y redacción** del archivo fuente (según el idioma del documento) y **aplicar correcciones en el
@@ -85,9 +93,8 @@ Si no es posible inferir el tipo, **preguntar al usuario** solo cuando haga falt
 
 Cuando el usuario actualice `README.md` o su homólogo en inglés en la **raíz del repo**:
 
-1. **Enlace bilingüe** justo tras el `#` del título: el **texto del enlace** va en el idioma del archivo **destino** (p.
-   ej. en `README.md` → «English version» hacia `./README.EN.md`; en el inglés → «Versión en español» hacia
-   `./README.md`).
+1. **Enlace bilingüe** justo tras el `#` del título: en `README.md` → «English version» hacia `./README.EN.md` (o
+   `./README.en.md`); en el inglés, la cabecera debe incluir: `This document is in English. [Versión en español](./README.md)`.
 2. **Conservar** el orden y los encabezados de secciones ya establecidos en ese README (no reordenar ni fusionar sin
    petición explícita).
 3. **Contrastar** con el código: `package.json` (scripts, gestor `pnpm`/`npm`), estructura real de carpetas en bloques
