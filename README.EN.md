@@ -1,6 +1,6 @@
 # Marcadores
 
-[Versión en español](./README.md)
+This document is in English. [Versión en español](./README.md)
 
 **Published site:** [web-marcadores.vercel.app](https://web-marcadores.vercel.app) (default deployment if
 `NEXT_PUBLIC_SITE_URL` is unset; source on [GitHub](https://github.com/FraVelz/WEB-Marcadores)).
