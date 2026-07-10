@@ -39,18 +39,24 @@ export default function ToolbarNavigationButtons({
 
   return (
     <>
-      <button type="button" onClick={onNavigateUp} className={iconBtn} title="Subir">
+      <button type="button" onClick={onNavigateUp} className={iconBtn} title="Subir" aria-label="Subir">
         <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z" />
         </svg>
       </button>
       <div className="bg-app-active mx-1 h-5 w-px" />
-      <button type="button" onClick={onAddBookmark} className={iconBtn} title="Nuevo marcador">
+      <button
+        type="button"
+        onClick={onAddBookmark}
+        className={iconBtn}
+        title="Nuevo marcador"
+        aria-label="Nuevo marcador"
+      >
         <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
           <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
         </svg>
       </button>
-      <button type="button" onClick={onNewFolder} className={iconBtn} title="Nueva carpeta">
+      <button type="button" onClick={onNewFolder} className={iconBtn} title="Nueva carpeta" aria-label="Nueva carpeta">
         <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
           <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
         </svg>
@@ -61,6 +67,7 @@ export default function ToolbarNavigationButtons({
           onClick={onDeleteFocused}
           className={cn(iconBtn, "hover:bg-app-danger/15 hover:text-app-danger-fg")}
           title="Eliminar (dd)"
+          aria-label="Eliminar (dd)"
         >
           <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
             <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
@@ -72,6 +79,7 @@ export default function ToolbarNavigationButtons({
         onClick={onToggleInfoPanel}
         className={cn(iconBtn, infoPanelEnabled ? "bg-app-active text-app-fg" : "")}
         title="Modo información (i)"
+        aria-label="Modo información (i)"
       >
         <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-4h-2V7h2v2z" />
@@ -84,6 +92,7 @@ export default function ToolbarNavigationButtons({
           onClick={onToggleTreeView}
           className={cn(iconBtn, treeView ? "bg-app-active text-app-fg" : "")}
           title={treeView ? "Vista cuadrícula" : "Vista árbol en el contenido principal"}
+          aria-label={treeView ? "Vista cuadrícula" : "Vista árbol en el contenido principal"}
         >
           {treeView ? (
             <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
@@ -101,6 +110,7 @@ export default function ToolbarNavigationButtons({
         onClick={onToggleSearch}
         className={cn(iconBtn, showSearch ? "bg-app-active text-app-fg" : "")}
         title="Buscar (Ctrl+F)"
+        aria-label="Buscar (Ctrl+F)"
       >
         <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
           <path

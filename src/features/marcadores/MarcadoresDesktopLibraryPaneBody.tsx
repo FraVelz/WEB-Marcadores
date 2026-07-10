@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo } from "react"
+import { useEffect } from "react"
 
 import type { FlatFolder } from "@/features/marcadores/utils/types"
 
@@ -76,10 +76,7 @@ export function MarcadoresDesktopLibraryPaneBody(props: MarcadoresDesktopLibrary
 
   const pane = desktopPaneDerived?.[winId]
   const ui = deskUiByWin[winId] ?? createDefaultDeskLibraryPaneUi()
-  const paneScope = useMemo(
-    () => createDeskPaneScope(winId, deskUiByWin, updateDeskUi, getDeskItemRefs, getDeskSearchRef),
-    [winId, deskUiByWin, updateDeskUi, getDeskItemRefs, getDeskSearchRef]
-  )
+  const paneScope = createDeskPaneScope(winId, deskUiByWin, updateDeskUi, getDeskItemRefs, getDeskSearchRef)
   const b = paneScope.bindings as DeskPaneUiBindings
 
   const paneFlatList = pane?.flatList ?? flatListFallback

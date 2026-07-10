@@ -1,7 +1,5 @@
 "use client"
 
-import { useCallback } from "react"
-
 import type { BookmarkFormData } from "@/features/marcadores/components/bookmark/BookmarkModal"
 
 import type { Bookmark } from "@/features/marcadores/utils/types"
@@ -62,32 +60,29 @@ export function useMarcadoresPageInteractions(opts: {
     setRenameFolderName,
   } = opts
 
-  const onConfirmDelete = useCallback(
-    async (item: GridItem) => {
-      if (item.type === "folder") {
-        await handleDeleteFolder(item.id)
-      } else {
-        await handleDelete(new Set([item.bookmark.id]), setSelectedIds, setSelectMode)
-      }
-      setSelectedIndex(0)
-    },
-    [handleDelete, handleDeleteFolder, setSelectMode, setSelectedIds, setSelectedIndex]
-  )
+  const onConfirmDelete = async (item: GridItem) => {
+    if (item.type === "folder") {
+      await handleDeleteFolder(item.id)
+    } else {
+      await handleDelete(new Set([item.bookmark.id]), setSelectedIds, setSelectMode)
+    }
+    setSelectedIndex(0)
+  }
 
-  const handleAdd = useCallback(() => {
+  const handleAdd = () => {
     setBookmarkModalNonce((n) => n + 1)
     setEditingBookmark(null)
     setModalOpen(true)
-  }, [setBookmarkModalNonce, setEditingBookmark, setModalOpen])
+  }
 
-  const onCreateFolder = useCallback(async () => {
+  const onCreateFolder = async () => {
     if (!newFolderName.trim()) return
     await handleCreateFolder(newFolderName)
     setNewFolderName("")
     setShowNewFolder(false)
-  }, [newFolderName, handleCreateFolder, setNewFolderName, setShowNewFolder])
+  }
 
-  const handleEdit = useCallback(() => {
+  const handleEdit = () => {
     const ids = Array.from(selectedIds)
     if (ids.length === 1) {
       const b = bookmarks.find((x) => x.id === ids[0])
@@ -96,45 +91,36 @@ export function useMarcadoresPageInteractions(opts: {
         setModalOpen(true)
       }
     }
-  }, [selectedIds, bookmarks, setEditingBookmark, setModalOpen])
+  }
 
-  const onModalSubmit = useCallback(
-    async (data: BookmarkFormData) => {
-      await handleModalSubmit(data, editingBookmark)
-      setEditingBookmark(null)
-    },
-    [handleModalSubmit, editingBookmark, setEditingBookmark]
-  )
+  const onModalSubmit = async (data: BookmarkFormData) => {
+    await handleModalSubmit(data, editingBookmark)
+    setEditingBookmark(null)
+  }
 
-  const onDelete = useCallback(async () => {
+  const onDelete = async () => {
     await handleDelete(selectedIds, setSelectedIds, setSelectMode)
-  }, [handleDelete, selectedIds, setSelectMode, setSelectedIds])
+  }
 
-  const onBookmarkUpdate = useCallback(
-    async (id: string, updates: Partial<Bookmark>) => {
-      await handleBookmarkUpdate(id, updates, detailBookmark)
-    },
-    [handleBookmarkUpdate, detailBookmark]
-  )
+  const onBookmarkUpdate = async (id: string, updates: Partial<Bookmark>) => {
+    await handleBookmarkUpdate(id, updates, detailBookmark)
+  }
 
-  const toggleSelect = useCallback(
-    (id: string) => {
-      setSelectedIds((prev) => {
-        const next = new Set(prev)
-        if (next.has(id)) next.delete(id)
-        else next.add(id)
-        return next
-      })
-    },
-    [setSelectedIds]
-  )
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
 
-  const onRenameFolder = useCallback(async () => {
+  const onRenameFolder = async () => {
     if (!editingFolder || !renameFolderName.trim()) return
     await handleRenameFolder(editingFolder.id, renameFolderName)
     setEditingFolder(null)
     setRenameFolderName("")
-  }, [editingFolder, renameFolderName, handleRenameFolder, setEditingFolder, setRenameFolderName])
+  }
 
   return {
     onConfirmDelete,

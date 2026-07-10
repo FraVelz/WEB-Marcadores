@@ -1,7 +1,5 @@
 "use client"
 
-import { useCallback, useMemo } from "react"
-
 type BrowseScopeMode = "global" | "desk"
 
 type BrowseScopeConfig = {
@@ -30,31 +28,25 @@ export function useBrowseScope(opts: {
     resolvedDeskLibPaneId,
   } = opts
 
-  const folderId = useMemo(() => {
+  const folderId = (() => {
     if (desktopWindowChrome && resolvedDeskLibPaneId) {
       return deskFolderByWin[resolvedDeskLibPaneId] ?? null
     }
     return selectedFolderId
-  }, [desktopWindowChrome, deskFolderByWin, resolvedDeskLibPaneId, selectedFolderId])
+  })()
 
-  const setFolderId = useCallback(
-    (id: string | null) => {
-      if (desktopWindowChrome && resolvedDeskLibPaneId) {
-        setDeskFolderByWin((prev) => ({ ...prev, [resolvedDeskLibPaneId]: id }))
-        return
-      }
-      setSelectedFolderId(id)
-    },
-    [desktopWindowChrome, resolvedDeskLibPaneId, setDeskFolderByWin, setSelectedFolderId]
-  )
+  const setFolderId = (id: string | null) => {
+    if (desktopWindowChrome && resolvedDeskLibPaneId) {
+      setDeskFolderByWin((prev) => ({ ...prev, [resolvedDeskLibPaneId]: id }))
+      return
+    }
+    setSelectedFolderId(id)
+  }
 
-  return useMemo(
-    (): BrowseScopeConfig => ({
-      mode: desktopWindowChrome ? "desk" : "global",
-      folderId,
-      setFolderId,
-      winId: desktopWindowChrome ? resolvedDeskLibPaneId : null,
-    }),
-    [desktopWindowChrome, folderId, resolvedDeskLibPaneId, setFolderId]
-  )
+  return {
+    mode: desktopWindowChrome ? "desk" : "global",
+    folderId,
+    setFolderId,
+    winId: desktopWindowChrome ? resolvedDeskLibPaneId : null,
+  }
 }

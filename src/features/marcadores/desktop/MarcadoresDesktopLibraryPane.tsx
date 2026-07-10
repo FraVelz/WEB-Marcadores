@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useRef } from "react"
+import { useRef } from "react"
 
 import BookmarkGrid from "@/features/marcadores/components/BookmarkGrid"
 import MarcadoresBreadcrumb from "@/features/marcadores/components/MarcadoresBreadcrumb"
@@ -19,13 +19,10 @@ export function MarcadoresDesktopLibraryPane(props: MarcadoresDesktopLibraryPane
 
   const { paneId, onRequestFocusPane } = props
 
-  const focusHandlers = useMemo(
-    () => ({
-      onPointerDownCapture: () => onRequestFocusPane(paneId),
-      onFocusCapture: () => onRequestFocusPane(paneId),
-    }),
-    [paneId, onRequestFocusPane]
-  )
+  const focusHandlers = {
+    onPointerDownCapture: () => onRequestFocusPane(paneId),
+    onFocusCapture: () => onRequestFocusPane(paneId),
+  }
 
   const focusFlatList = props.primaryViewMode === "tree" ? props.treeFlatRows.map((r) => r.item) : props.flatListGrid
 

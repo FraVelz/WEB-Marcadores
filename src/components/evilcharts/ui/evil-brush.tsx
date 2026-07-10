@@ -3,7 +3,7 @@
 import { domAnimation, LazyMotion, m, useMotionValue, useMotionValueEvent, useSpring, useTransform } from "motion/react"
 import { ResponsiveContainer, AreaChart, Area, LineChart, Line, BarChart, Bar } from "recharts"
 import { ChartStyle, getColorsCount, type ChartConfig } from "@/components/evilcharts/ui/chart"
-import { useCallback, type ComponentProps } from "react"
+import { type ComponentProps } from "react"
 import type { MotionValue } from "motion/react"
 import { cn } from "@/lib/utils"
 import * as React from "react"
@@ -99,69 +99,57 @@ function useBrushDrag({
   const dragRef = React.useRef<DragState | null>(null)
   const [isDragging, setIsDragging] = React.useState(false)
 
-  const toIndexDelta = useCallback(
-    (px: number) => {
-      if (!containerRef.current || totalPoints <= 1) return 0
-      return Math.round((px / containerRef.current.getBoundingClientRect().width) * (totalPoints - 1))
-    },
-    [totalPoints, containerRef]
-  )
+  const toIndexDelta = (px: number) => {
+    if (!containerRef.current || totalPoints <= 1) return 0
+    return Math.round((px / containerRef.current.getBoundingClientRect().width) * (totalPoints - 1))
+  }
 
-  const onPointerDown = useCallback(
-    (e: React.PointerEvent, type: DragType) => {
-      e.preventDefault()
-      ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
-      dragRef.current = { type, originX: e.clientX, originRange: { ...range } }
-      setIsDragging(true)
-    },
-    [range]
-  )
+  const onPointerDown = (e: React.PointerEvent, type: DragType) => {
+    e.preventDefault()
+    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+    dragRef.current = { type, originX: e.clientX, originRange: { ...range } }
+    setIsDragging(true)
+  }
 
-  const onPointerMove = useCallback(
-    (e: React.PointerEvent) => {
-      const d = dragRef.current
-      if (!d) return
+  const onPointerMove = (e: React.PointerEvent) => {
+    const d = dragRef.current
+    if (!d) return
 
-      const delta = toIndexDelta(e.clientX - d.originX)
-      const { type, originRange: o } = d
+    const delta = toIndexDelta(e.clientX - d.originX)
+    const { type, originRange: o } = d
 
-      if (type === "left") {
-        commit({ startIndex: o.startIndex + delta, endIndex: o.endIndex }, "left")
-      } else if (type === "right") {
-        commit({ startIndex: o.startIndex, endIndex: o.endIndex + delta }, "right")
-      } else {
-        const span = o.endIndex - o.startIndex
-        let s = o.startIndex + delta
-        let e2 = s + span
-        if (s < 0) {
-          s = 0
-          e2 = span
-        }
-        if (e2 > totalPoints - 1) {
-          e2 = totalPoints - 1
-          s = Math.max(0, e2 - span)
-        }
-        commit({ startIndex: s, endIndex: e2 }, "middle")
+    if (type === "left") {
+      commit({ startIndex: o.startIndex + delta, endIndex: o.endIndex }, "left")
+    } else if (type === "right") {
+      commit({ startIndex: o.startIndex, endIndex: o.endIndex + delta }, "right")
+    } else {
+      const span = o.endIndex - o.startIndex
+      let s = o.startIndex + delta
+      let e2 = s + span
+      if (s < 0) {
+        s = 0
+        e2 = span
       }
-    },
-    [toIndexDelta, totalPoints, commit]
-  )
+      if (e2 > totalPoints - 1) {
+        e2 = totalPoints - 1
+        s = Math.max(0, e2 - span)
+      }
+      commit({ startIndex: s, endIndex: e2 }, "middle")
+    }
+  }
 
-  const onPointerUp = useCallback((e: React.PointerEvent) => {
+  const onPointerUp = (e: React.PointerEvent) => {
     ;(e.target as HTMLElement).releasePointerCapture(e.pointerId)
     dragRef.current = null
     setIsDragging(false)
-  }, [])
+  }
 
   // Helper to bind all three pointer handlers for a given drag type
-  const bind = useCallback(
-    (type: DragType) => ({
-      onPointerDown: (e: React.PointerEvent) => onPointerDown(e, type),
-      onPointerMove,
-      onPointerUp,
-    }),
-    [onPointerDown, onPointerMove, onPointerUp]
-  )
+  const bind = (type: DragType) => ({
+    onPointerDown: (e: React.PointerEvent) => onPointerDown(e, type),
+    onPointerMove,
+    onPointerUp,
+  })
 
   return { isDragging, bind }
 }
@@ -192,7 +180,7 @@ function EvilBrush({
   skipStyle = false,
 }: EvilBrushProps) {
   const containerRef = React.useRef<HTMLDivElement>(null)
-  const keys = React.useMemo(() => dataKeys ?? Object.keys(chartConfig), [dataKeys, chartConfig])
+  const keys = dataKeys ?? Object.keys(chartConfig)
   const totalPoints = data.length
   const chartId = React.useId().replace(/:/g, "")
 
@@ -224,59 +212,53 @@ function EvilBrush({
 
   // ── Clamping & committing ───────────────────────────────────────────────
 
-  const clampRange = useCallback(
-    (range: EvilBrushRange, mode?: DragType): EvilBrushRange => {
-      let { startIndex, endIndex } = range
-      const maxIndex = Math.max(0, totalPoints - 1)
+  const clampRange = (range: EvilBrushRange, mode?: DragType): EvilBrushRange => {
+    let { startIndex, endIndex } = range
+    const maxIndex = Math.max(0, totalPoints - 1)
 
-      startIndex = Math.max(0, Math.min(startIndex, maxIndex))
-      endIndex = Math.max(0, Math.min(endIndex, maxIndex))
+    startIndex = Math.max(0, Math.min(startIndex, maxIndex))
+    endIndex = Math.max(0, Math.min(endIndex, maxIndex))
 
-      if (mode === "left") {
-        const maxStart = Math.max(0, endIndex - minSpan)
-        startIndex = Math.min(startIndex, maxStart)
-        return { startIndex, endIndex }
-      }
-
-      if (mode === "right") {
-        const minEnd = Math.min(maxIndex, startIndex + minSpan)
-        endIndex = Math.max(endIndex, minEnd)
-        return { startIndex, endIndex }
-      }
-
-      if (endIndex - startIndex < minSpan) {
-        endIndex = Math.min(startIndex + minSpan, maxIndex)
-        if (endIndex - startIndex < minSpan) {
-          startIndex = Math.max(0, endIndex - minSpan)
-        }
-      }
+    if (mode === "left") {
+      const maxStart = Math.max(0, endIndex - minSpan)
+      startIndex = Math.min(startIndex, maxStart)
       return { startIndex, endIndex }
-    },
-    [totalPoints, minSpan]
-  )
+    }
 
-  const commit = useCallback(
-    (next: EvilBrushRange, mode?: DragType) => {
-      const clamped = clampRange(next, mode)
-      const last = lastCommittedRef.current
+    if (mode === "right") {
+      const minEnd = Math.min(maxIndex, startIndex + minSpan)
+      endIndex = Math.max(endIndex, minEnd)
+      return { startIndex, endIndex }
+    }
 
-      // Only update if the range has actually changed — avoids unnecessary
-      // re-renders when the brush is at a boundary and small mouse movements
-      // don't produce index changes
-      if (last.startIndex === clamped.startIndex && last.endIndex === clamped.endIndex) {
-        return
+    if (endIndex - startIndex < minSpan) {
+      endIndex = Math.min(startIndex + minSpan, maxIndex)
+      if (endIndex - startIndex < minSpan) {
+        startIndex = Math.max(0, endIndex - minSpan)
       }
+    }
+    return { startIndex, endIndex }
+  }
 
-      lastCommittedRef.current = clamped
-      setInternalRange(clamped)
-      // Defer the parent callback — chart re-render happens at lower priority,
-      // React can skip intermediate frames during fast drags
-      React.startTransition(() => {
-        onChange?.(clamped)
-      })
-    },
-    [clampRange, onChange]
-  )
+  const commit = (next: EvilBrushRange, mode?: DragType) => {
+    const clamped = clampRange(next, mode)
+    const last = lastCommittedRef.current
+
+    // Only update if the range has actually changed — avoids unnecessary
+    // re-renders when the brush is at a boundary and small mouse movements
+    // don't produce index changes
+    if (last.startIndex === clamped.startIndex && last.endIndex === clamped.endIndex) {
+      return
+    }
+
+    lastCommittedRef.current = clamped
+    setInternalRange(clamped)
+    // Defer the parent callback — chart re-render happens at lower priority,
+    // React can skip intermediate frames during fast drags
+    React.startTransition(() => {
+      onChange?.(clamped)
+    })
+  }
 
   // ── Drag ────────────────────────────────────────────────────────────────
 
@@ -321,21 +303,18 @@ function EvilBrush({
   const rightOverlayWidth = useTransform(rightSpring, (v) => `${Math.max(0, 100 - v)}%`)
   const selectedWidth = useMotionValue(`${Math.max(0, rightPct - leftPct)}%`)
 
-  const updateSelectedWidth = useCallback(() => {
+  const updateSelectedWidth = () => {
     selectedWidth.set(`${Math.max(0, rightSpring.get() - leftSpring.get())}%`)
-  }, [leftSpring, rightSpring, selectedWidth])
+  }
 
   useMotionValueEvent(leftSpring, "change", updateSelectedWidth)
   useMotionValueEvent(rightSpring, "change", updateSelectedWidth)
 
-  const getLabel = useCallback(
-    (idx: number) => {
-      if (!xDataKey) return String(idx)
-      const v = data[idx]?.[xDataKey]
-      return formatLabel ? formatLabel(v, idx) : String(v ?? idx)
-    },
-    [data, xDataKey, formatLabel]
-  )
+  const getLabel = (idx: number) => {
+    if (!xDataKey) return String(idx)
+    const v = data[idx]?.[xDataKey]
+    return formatLabel ? formatLabel(v, idx) : String(v ?? idx)
+  }
 
   // ── Render ──────────────────────────────────────────────────────────────
 
@@ -486,7 +465,7 @@ function MiniChart({
   connectNulls?: boolean
   barRadius?: number
 }) {
-  const gradients = React.useMemo(() => {
+  const gradients = (() => {
     const keySet = new Set(keys)
     const entries: { dataKey: string; colorsCount: number }[] = []
     for (const [dataKey, config] of Object.entries(chartConfig)) {
@@ -494,7 +473,7 @@ function MiniChart({
       entries.push({ dataKey, colorsCount: getColorsCount(config) })
     }
     return entries
-  }, [chartConfig, keys])
+  })()
 
   const dashArray = strokeVariant === "dashed" || strokeVariant === "animated-dashed" ? "4 4" : undefined
 
@@ -659,10 +638,7 @@ function useEvilBrush<TData extends Record<string, unknown>>({
     })
   }
 
-  const visibleData = React.useMemo(
-    () => data.slice(deferredRange.startIndex, deferredRange.endIndex + 1),
-    [data, deferredRange.startIndex, deferredRange.endIndex]
-  )
+  const visibleData = data.slice(deferredRange.startIndex, deferredRange.endIndex + 1)
 
   return {
     range,

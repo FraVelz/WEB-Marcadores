@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 
 import type { Folder } from "@/contexts/DashboardContext"
 
@@ -22,7 +22,7 @@ export function useMarcadoresTreeDerived(opts: {
 
   const [treeCollapsedIds, setTreeCollapsedIds] = useState<Set<string>>(() => new Set())
 
-  const treeFlatRows = useMemo((): TreeFlatRow[] => {
+  const treeFlatRows = ((): TreeFlatRow[] => {
     const result: TreeFlatRow[] = []
     const walk = (parentId: string | null, depth: number) => {
       const subfolders = folders
@@ -44,19 +44,19 @@ export function useMarcadoresTreeDerived(opts: {
     }
     walk(null, 0)
     return result
-  }, [folders, filteredBookmarks, treeCollapsedIds])
+  })()
 
   const primaryViewMode = viewMode
   const focusFlatList = primaryViewMode === "tree" ? treeFlatRows.map((r) => r.item) : flatList
 
-  const toggleTreeFolderCollapse = useCallback((folderId: string) => {
+  const toggleTreeFolderCollapse = (folderId: string) => {
     setTreeCollapsedIds((prev) => {
       const next = new Set(prev)
       if (next.has(folderId)) next.delete(folderId)
       else next.add(folderId)
       return next
     })
-  }, [])
+  }
 
   useEffect(() => {
     queueMicrotask(() => {

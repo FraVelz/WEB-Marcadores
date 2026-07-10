@@ -14,9 +14,7 @@ import {
   createContext,
   isValidElement,
   use,
-  useCallback,
   useId,
-  useMemo,
   useState,
   type ComponentProps,
   type FC,
@@ -117,36 +115,30 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
   const activeSelectedSector = selectedSector ?? defaultSelectedSector
 
   // Updates selection state and notifies the parent with the sector's value
-  const selectSector = useCallback(
-    (sectorName: string | null) => {
-      setSelectedSector(sectorName)
+  const selectSector = (sectorName: string | null) => {
+    setSelectedSector(sectorName)
 
-      if (sectorName === null) {
-        onSelectionChange?.(null)
-        return
-      }
+    if (sectorName === null) {
+      onSelectionChange?.(null)
+      return
+    }
 
-      const selectedItem = data.find((item) => (item[nameKey] as string) === sectorName)
+    const selectedItem = data.find((item) => (item[nameKey] as string) === sectorName)
 
-      if (selectedItem) {
-        onSelectionChange?.({ dataKey: sectorName, value: selectedItem[dataKey] as number })
-      }
-    },
-    [data, dataKey, nameKey, onSelectionChange]
-  )
+    if (selectedItem) {
+      onSelectionChange?.({ dataKey: sectorName, value: selectedItem[dataKey] as number })
+    }
+  }
 
-  const contextValue = useMemo<PieChartContextValue>(
-    () => ({
-      config,
-      data,
-      dataKey,
-      nameKey,
-      isLoading,
-      selectedSector: activeSelectedSector,
-      selectSector,
-    }),
-    [config, data, dataKey, nameKey, isLoading, activeSelectedSector, selectSector]
-  )
+  const contextValue = {
+    config,
+    data,
+    dataKey,
+    nameKey,
+    isLoading,
+    selectedSector: activeSelectedSector,
+    selectSector,
+  }
 
   return (
     <LazyMotion features={domAnimation} strict>

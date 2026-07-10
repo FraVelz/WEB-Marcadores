@@ -1,7 +1,5 @@
 "use client"
 
-import { useMemo } from "react"
-
 import type { DashboardContextType } from "@/contexts/dashboardContextContract"
 
 import { deriveAllDesktopPanes } from "@/features/marcadores/core/deriveDesktopPaneEntry"
@@ -43,7 +41,7 @@ export function useMarcadoresPageBookmarksBootstrap(p: {
     p.dash.setFolders
   )
 
-  const desktopPaneDerived = useMemo((): Record<string, DesktopPaneDerivedEntry> | null => {
+  const desktopPaneDerived = ((): Record<string, DesktopPaneDerivedEntry> | null => {
     if (!p.desktopWindowChrome) return null
     return deriveAllDesktopPanes(
       data.folders,
@@ -53,7 +51,7 @@ export function useMarcadoresPageBookmarksBootstrap(p: {
       p.deskUiByWin,
       createDefaultDeskLibraryPaneUi
     )
-  }, [data.folders, data.filteredBookmarks, p.desktopWindowChrome, p.deskFolderByWin, p.deskLibWinIds, p.deskUiByWin])
+  })()
 
   const actions = useMarcadoresActions({
     bookmarks: data.bookmarks,
@@ -72,7 +70,7 @@ export function useMarcadoresPageBookmarksBootstrap(p: {
     setDetailBookmark: p.setDetailBookmark,
   })
 
-  const duplicateClusterCount = useMemo(() => countDuplicateClusters(data.bookmarks), [data.bookmarks])
+  const duplicateClusterCount = countDuplicateClusters(data.bookmarks)
 
   return { ...data, desktopPaneDerived, duplicateClusterCount, ...actions }
 }

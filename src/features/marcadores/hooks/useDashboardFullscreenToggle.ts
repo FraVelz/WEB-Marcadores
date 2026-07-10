@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState, type RefObject } from "react"
+import { useEffect, useState, type RefObject } from "react"
 
 import { useDashboard } from "@/contexts/DashboardContext"
 import {
@@ -22,11 +22,11 @@ export function useDashboardFullscreenToggle(fullscreenTargetRef?: RefObject<HTM
     return unsub
   }, [fullscreenTargetRef, dashboardFullscreenHostRef])
 
-  const toggleFullscreen = useCallback(async () => {
+  const toggleFullscreen = async () => {
     const targetRef = fullscreenTargetRef ?? dashboardFullscreenHostRef
     await toggleElementFullscreen(targetRef.current)
     setFullscreen(isElementFullscreen(targetRef.current))
-  }, [fullscreenTargetRef, dashboardFullscreenHostRef])
+  }
 
   return { fullscreen, toggleFullscreen }
 }

@@ -15,7 +15,7 @@ on:
       - "global.d.ts"
       - "knip.json"
       - "vercel.json"
-      - "react-doctor.config.json"
+      - "doctor.config.json"
       - ".github/workflows/**"
   pull_request:
     branches: [main]
@@ -31,7 +31,7 @@ on:
       - "global.d.ts"
       - "knip.json"
       - "vercel.json"
-      - "react-doctor.config.json"
+      - "doctor.config.json"
       - ".github/workflows/**"
 
 concurrency:

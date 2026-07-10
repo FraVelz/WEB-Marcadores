@@ -2,7 +2,7 @@ import type { ElementDragPayload } from "@atlaskit/pragmatic-drag-and-drop/eleme
 
 import type { GridItem } from "@/features/marcadores/utils/types"
 
-export const BOOKMARK_DRAG_TYPE = "bookmark-item" as const
+const BOOKMARK_DRAG_TYPE = "bookmark-item" as const
 
 export type BookmarkDragData = {
   bookmarkDragType: typeof BOOKMARK_DRAG_TYPE
@@ -63,7 +63,7 @@ export function dragDataToGridItem(data: Record<string, unknown>): GridItem | nu
   return null
 }
 
-export function isBookmarkDragData(data: Record<string, unknown>): data is BookmarkDragData {
+function isBookmarkDragData(data: Record<string, unknown>): data is BookmarkDragData {
   return data.bookmarkDragType === BOOKMARK_DRAG_TYPE
 }
 

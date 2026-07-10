@@ -73,10 +73,7 @@ export function AtajosPage() {
                 ) : null}
               </div>
 
-              <ul
-                className="border-app-border-muted divide-app-border-muted bg-app-raised divide-y overflow-hidden rounded-xl border"
-                role="list"
-              >
+              <ul className="border-app-border-muted divide-app-border-muted bg-app-raised divide-y overflow-hidden rounded-xl border">
                 {section.rows.map((row) => (
                   <li key={`${section.title}::${row.keys}::${row.desc}`} className="group relative">
                     <div

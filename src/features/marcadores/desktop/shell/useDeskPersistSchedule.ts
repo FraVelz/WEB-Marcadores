@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useRef } from "react"
+import { useEffect, useRef } from "react"
 
 import type { MarcadoresDesktopLayoutV2 } from "@/features/marcadores/desktop/windowTypes"
 
@@ -16,7 +16,7 @@ export function useDeskPersistSchedule(opts: {
   const { libraryWindowIds, libFrames, detailFrame } = opts
   const persistTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const schedulePersist = useCallback(() => {
+  const schedulePersist = () => {
     if (typeof window === "undefined") return
     if (persistTimer.current) clearTimeout(persistTimer.current)
     persistTimer.current = setTimeout(() => {
@@ -24,14 +24,22 @@ export function useDeskPersistSchedule(opts: {
       const payload: MarcadoresDesktopLayoutV2 = buildPersistedLayoutPayload(libraryWindowIds, libFrames, detailFrame)
       persistDeskLayoutJson(DESKTOP_WM_STORAGE_KEY, payload)
     }, 300)
-  }, [detailFrame, libFrames, libraryWindowIds])
+  }
 
   useEffect(() => {
-    schedulePersist()
+    if (typeof window === "undefined") return
+    if (persistTimer.current) clearTimeout(persistTimer.current)
+    const timer = setTimeout(() => {
+      persistTimer.current = null
+      const payload: MarcadoresDesktopLayoutV2 = buildPersistedLayoutPayload(libraryWindowIds, libFrames, detailFrame)
+      persistDeskLayoutJson(DESKTOP_WM_STORAGE_KEY, payload)
+    }, 300)
+    persistTimer.current = timer
     return () => {
-      if (persistTimer.current) clearTimeout(persistTimer.current)
+      clearTimeout(timer)
+      if (persistTimer.current === timer) persistTimer.current = null
     }
-  }, [schedulePersist])
+  }, [detailFrame, libFrames, libraryWindowIds])
 
   return { schedulePersist }
 }

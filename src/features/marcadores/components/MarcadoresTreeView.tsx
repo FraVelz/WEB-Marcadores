@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useRef, useState } from "react"
+import { useRef, useState } from "react"
 
 import { APP_DROP_PANEL_OVERLAY_CLASS } from "../utils/dragDropUi"
 import type { Bookmark, CutItem, FlatFolder, GridItem } from "../utils/types"
@@ -64,7 +64,7 @@ export default function MarcadoresTreeView({
   const [dropPreview, setDropPreview] = useState<DropPreview | null>(null)
   const panelRef = useRef<HTMLDivElement | null>(null)
 
-  const clearDropPreview = useCallback(() => setDropPreview(null), [])
+  const clearDropPreview = () => setDropPreview(null)
 
   useBookmarkDragMonitor(clearDropPreview)
 

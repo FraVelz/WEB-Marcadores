@@ -60,6 +60,7 @@ export function MarcadoresSearchField({
           ref={searchRef}
           type={isPill ? "search" : "text"}
           placeholder={placeholder}
+          aria-label={placeholder}
           data-no-vim
           value={draft}
           onChange={(e) => setDraft(e.target.value)}

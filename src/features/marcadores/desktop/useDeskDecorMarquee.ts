@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useRef, useState } from "react"
+import { useRef, useState } from "react"
 
 type MarqueeDraft = { x0: number; y0: number; x1: number; y1: number }
 
@@ -9,7 +9,7 @@ export function useDeskDecorMarquee() {
   const [marquee, setMarquee] = useState<MarqueeDraft | null>(null)
   const trackingRef = useRef(false)
 
-  const onPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0) return
     if (e.target !== e.currentTarget) return
     const el = e.currentTarget
@@ -19,18 +19,18 @@ export function useDeskDecorMarquee() {
     trackingRef.current = true
     setMarquee({ x0: x, y0: y, x1: x, y1: y })
     el.setPointerCapture(e.pointerId)
-  }, [])
+  }
 
-  const onPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!trackingRef.current) return
     const el = e.currentTarget
     const b = el.getBoundingClientRect()
     const x = e.clientX - b.left
     const y = e.clientY - b.top
     setMarquee((m) => (m ? { ...m, x1: x, y1: y } : null))
-  }, [])
+  }
 
-  const end = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+  const end = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!trackingRef.current) return
     trackingRef.current = false
     try {
@@ -39,21 +39,15 @@ export function useDeskDecorMarquee() {
       /* ignore */
     }
     setMarquee(null)
-  }, [])
+  }
 
-  const onPointerUp = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
-      end(e)
-    },
-    [end]
-  )
+  const onPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    end(e)
+  }
 
-  const onPointerCancel = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
-      end(e)
-    },
-    [end]
-  )
+  const onPointerCancel = (e: React.PointerEvent<HTMLDivElement>) => {
+    end(e)
+  }
 
   return {
     marquee,

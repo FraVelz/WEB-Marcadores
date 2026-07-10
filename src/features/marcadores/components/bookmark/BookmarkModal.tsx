@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useRef, useMemo } from "react"
+import { useEffect, useState, useRef } from "react"
 import { buildFolderOptions } from "@/lib/bookmark-utils"
 import { FOCUS_RING } from "@/lib/focusStyles"
 import { cn } from "@/lib/utils"
@@ -38,14 +38,11 @@ const emptyForm: BookmarkFormData = {
 }
 
 export default function BookmarkModal({ onClose, onSubmit, initialData, allTags, folders, currentFolderId }: Props) {
-  const merged = useMemo(
-    () => ({
-      ...emptyForm,
-      folder_id: currentFolderId || "",
-      ...initialData,
-    }),
-    [initialData, currentFolderId]
-  )
+  const merged = {
+    ...emptyForm,
+    folder_id: currentFolderId || "",
+    ...initialData,
+  }
   const [tagsValue, setTagsValue] = useState(merged.tags)
   const [folderId, setFolderId] = useState(merged.folder_id)
   const [submitting, setSubmitting] = useState(false)

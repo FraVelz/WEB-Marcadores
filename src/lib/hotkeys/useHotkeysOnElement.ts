@@ -18,7 +18,10 @@ export function useHotkeysOnElement(
   deps: ReadonlyArray<unknown> = []
 ) {
   const handlerRef = useRef(handler)
-  handlerRef.current = handler
+
+  useLayoutEffect(() => {
+    handlerRef.current = handler
+  }, [handler])
 
   const { enabled = true } = options
 

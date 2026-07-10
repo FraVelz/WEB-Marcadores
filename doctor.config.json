@@ -1,0 +1,178 @@
+{
+  "ignore": {
+    "overrides": [
+      {
+        "files": ["src/components/evilcharts/**"],
+        "rules": ["react-doctor/prefer-dynamic-import", "react-doctor/rerender-state-only-in-handlers"]
+      },
+      {
+        "files": ["src/components/evilcharts/ui/chart.tsx"],
+        "rules": ["react-doctor/no-multi-comp", "react-doctor/only-export-components"]
+      },
+      {
+        "files": ["src/contexts/AppAppearanceContext.tsx"],
+        "rules": ["react-doctor/prefer-module-scope-pure-function"]
+      },
+      {
+        "files": ["src/features/marcadores/MarcadoresDesktopLibraryPaneBody.tsx"],
+        "rules": ["react-doctor/no-pass-data-to-parent"]
+      },
+      {
+        "files": ["src/features/marcadores/components/BookmarkGrid.tsx"],
+        "rules": ["react-doctor/exhaustive-deps"]
+      },
+      {
+        "files": ["src/features/marcadores/components/BookmarkGridItem.tsx"],
+        "rules": ["react-doctor/no-noninteractive-element-interactions", "react-doctor/prefer-tag-over-role"]
+      },
+      {
+        "files": ["src/features/marcadores/components/DeleteConfirmModal.tsx"],
+        "rules": ["react-doctor/prefer-html-dialog", "react-doctor/prefer-tag-over-role"]
+      },
+      {
+        "files": ["src/features/marcadores/components/MarcadoresContentHeader.tsx"],
+        "rules": ["react-doctor/prefer-tag-over-role"]
+      },
+      {
+        "files": ["src/features/marcadores/components/MarcadoresExplorerRail.tsx"],
+        "rules": ["react-doctor/no-noninteractive-tabindex", "react-doctor/prefer-tag-over-role"]
+      },
+      {
+        "files": ["src/features/marcadores/components/ToolbarSearchOptions.tsx"],
+        "rules": ["react-doctor/prefer-html-dialog", "react-doctor/prefer-tag-over-role"]
+      },
+      {
+        "files": ["src/features/marcadores/components/bookmark/BookmarkDetailPanel.tsx"],
+        "rules": [
+          "react-doctor/no-giant-component",
+          "react-doctor/no-noninteractive-element-interactions",
+          "react-doctor/prefer-useReducer"
+        ]
+      },
+      {
+        "files": ["src/features/marcadores/components/bookmark/BookmarkModal.tsx"],
+        "rules": ["react-doctor/prefer-html-dialog", "react-doctor/prefer-tag-over-role"]
+      },
+      {
+        "files": ["src/features/marcadores/components/bookmark/TagAutocomplete.tsx"],
+        "rules": ["react-doctor/no-noninteractive-element-interactions", "react-doctor/role-supports-aria-props"]
+      },
+      {
+        "files": ["src/features/marcadores/components/bookmarkGrid/BookmarkGridItemBodies.tsx"],
+        "rules": ["react-doctor/only-export-components"]
+      },
+      {
+        "files": ["src/features/marcadores/components/marcadoresTree/TreeRow.tsx"],
+        "rules": ["react-doctor/no-noninteractive-element-interactions", "react-doctor/prefer-tag-over-role"]
+      },
+      {
+        "files": ["src/features/marcadores/desktop/MarcadoresDesktopLibraryPane.tsx"],
+        "rules": ["react-doctor/rerender-lazy-ref-init"]
+      },
+      {
+        "files": ["src/features/marcadores/desktop/MarcadoresDesktopTaskStrip.tsx"],
+        "rules": ["react-doctor/no-interactive-element-to-noninteractive-role", "react-doctor/prefer-tag-over-role"]
+      },
+      {
+        "files": ["src/features/marcadores/desktop/shell/useDeskShellHydration.ts"],
+        "rules": ["react-doctor/no-pass-data-to-parent"]
+      },
+      {
+        "files": ["src/features/marcadores/hooks/useDashboardFullscreenToggle.ts"],
+        "rules": ["react-doctor/no-derived-state"]
+      },
+      {
+        "files": ["src/features/marcadores/hooks/useDebouncedSearchInput.ts"],
+        "rules": ["react-doctor/exhaustive-deps"]
+      },
+      {
+        "files": ["src/features/marcadores/hooks/useMarcadoresData.ts"],
+        "rules": ["deslop/circular-dependency"]
+      },
+      {
+        "files": ["src/features/marcadores/hooks/useMarcadoresDeskChrome.ts"],
+        "rules": ["react-doctor/rerender-lazy-ref-init"]
+      },
+      {
+        "files": ["src/features/marcadores/hooks/useMarcadoresEffects.ts"],
+        "rules": ["react-doctor/no-pass-data-to-parent"]
+      },
+      {
+        "files": ["src/features/marcadores/hooks/useMarcadoresTreeDerived.ts"],
+        "rules": ["react-doctor/no-event-handler"]
+      },
+      {
+        "files": ["src/features/marcadores/hooks/useMarcadoresViewMode.ts"],
+        "rules": ["react-doctor/prefer-module-scope-pure-function"]
+      },
+      {
+        "files": ["src/features/marcadores/page/useMarcadoresPageUiState.ts"],
+        "rules": ["react-doctor/rerender-lazy-ref-init"]
+      },
+      {
+        "files": ["src/features/perfil/hooks/index.ts"],
+        "rules": ["deslop/unused-file"]
+      },
+      {
+        "files": ["src/layouts/dashboard/components/DashboardCommandPalette.tsx"],
+        "rules": [
+          "react-doctor/control-has-associated-label",
+          "react-doctor/prefer-html-dialog",
+          "react-doctor/prefer-tag-over-role"
+        ]
+      },
+      {
+        "files": ["src/layouts/dashboard/hooks/useFocusMainOnMarcadoresRoute.ts"],
+        "rules": ["react-doctor/no-event-handler"]
+      },
+      {
+        "files": ["src/layouts/dashboard/shell/DashboardMobileLayout.tsx"],
+        "rules": ["react-doctor/no-noninteractive-tabindex"]
+      },
+      {
+        "files": ["src/layouts/dashboard/sidebar/DashboardMobileDrawer.tsx"],
+        "rules": ["react-doctor/no-noninteractive-tabindex"]
+      },
+      {
+        "files": ["src/lib/demo-data.ts"],
+        "rules": ["react-doctor/insecure-session-cookie"]
+      },
+      {
+        "files": ["src/lib/drag-and-drop/useBookmarkDeskCanvasTarget.ts"],
+        "rules": ["react-doctor/exhaustive-deps"]
+      },
+      {
+        "files": ["src/lib/drag-and-drop/useBookmarkDragBubbleBlocker.ts"],
+        "rules": ["react-doctor/exhaustive-deps"]
+      },
+      {
+        "files": ["src/lib/drag-and-drop/useBookmarkDragMonitor.ts"],
+        "rules": ["react-doctor/exhaustive-deps"]
+      },
+      {
+        "files": ["src/lib/drag-and-drop/useBookmarkDraggable.ts"],
+        "rules": ["react-doctor/exhaustive-deps"]
+      },
+      {
+        "files": ["src/lib/drag-and-drop/useBookmarkDropPanel.ts"],
+        "rules": ["react-doctor/exhaustive-deps"]
+      },
+      {
+        "files": ["src/lib/drag-and-drop/useBookmarkDropTarget.ts"],
+        "rules": ["react-doctor/exhaustive-deps"]
+      },
+      {
+        "files": ["src/lib/hotkeys/useHotkeys.ts"],
+        "rules": ["react-doctor/exhaustive-deps"]
+      },
+      {
+        "files": ["src/lib/hotkeys/useHotkeysOnElement.ts"],
+        "rules": ["react-doctor/exhaustive-deps"]
+      },
+      {
+        "files": [".next/static/chunks/**"],
+        "rules": ["react-doctor/artifact-baas-authority-surface"]
+      }
+    ]
+  }
+}

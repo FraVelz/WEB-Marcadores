@@ -1,7 +1,7 @@
 "use client"
 
 import type { Dispatch, SetStateAction } from "react"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { cn } from "@/lib/utils"
 import { FOCUS_RING } from "@/lib/focusStyles"
@@ -32,6 +32,8 @@ type Props = {
   folders?: import("../utils/types").FlatFolder[]
 }
 
+const EMPTY_FOLDERS: NonNullable<Props["folders"]> = []
+
 export default function BookmarkGrid({
   flatList,
   selectedIndex,
@@ -50,7 +52,7 @@ export default function BookmarkGrid({
   searchQuery = "",
   searchInDescription = true,
   onToggleFavorite,
-  folders = [],
+  folders = EMPTY_FOLDERS,
 }: Props) {
   const [dropPanelSlot, setDropPanelSlot] = useState(false)
   const [dropItemIdx, setDropItemIdx] = useState<number | null>(null)
@@ -99,85 +101,82 @@ export default function BookmarkGrid({
     }
   }, [])
 
-  const onSurfacePointerDown = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
-      if (!setSelectedIds || !setSelectMode || e.button !== 0) return
-      const root = scrollRef.current
-      if (!root) return
-      if (isLikelyScrollbarPointer(root, e)) return
+  const onSurfacePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!setSelectedIds || !setSelectMode || e.button !== 0) return
+    const root = scrollRef.current
+    if (!root) return
+    if (isLikelyScrollbarPointer(root, e)) return
 
-      const target = e.target as HTMLElement
-      if (target.closest("[data-bookmark-grid-item]")) return
-      if (target.closest("button, a, input, textarea, select, label")) return
+    const target = e.target as HTMLElement
+    if (target.closest("[data-bookmark-grid-item]")) return
+    if (target.closest("button, a, input, textarea, select, label")) return
 
-      marqueeSessionRef.current = {
-        pointerId: e.pointerId,
-        startX: e.clientX,
-        startY: e.clientY,
-        additive: e.ctrlKey || e.metaKey,
-        dragging: false,
+    marqueeSessionRef.current = {
+      pointerId: e.pointerId,
+      startX: e.clientX,
+      startY: e.clientY,
+      additive: e.ctrlKey || e.metaKey,
+      dragging: false,
+    }
+
+    const onMove = (ev: PointerEvent) => {
+      const s = marqueeSessionRef.current
+      if (!s || ev.pointerId !== s.pointerId) return
+      const dx = ev.clientX - s.startX
+      const dy = ev.clientY - s.startY
+      if (!s.dragging) {
+        if (Math.hypot(dx, dy) < 6) return
+        s.dragging = true
       }
+      ev.preventDefault()
+      setMarqueeClient({
+        x1: s.startX,
+        y1: s.startY,
+        x2: ev.clientX,
+        y2: ev.clientY,
+      })
+    }
 
-      const onMove = (ev: PointerEvent) => {
-        const s = marqueeSessionRef.current
-        if (!s || ev.pointerId !== s.pointerId) return
-        const dx = ev.clientX - s.startX
-        const dy = ev.clientY - s.startY
-        if (!s.dragging) {
-          if (Math.hypot(dx, dy) < 6) return
-          s.dragging = true
-        }
-        ev.preventDefault()
-        setMarqueeClient({
-          x1: s.startX,
-          y1: s.startY,
-          x2: ev.clientX,
-          y2: ev.clientY,
-        })
-      }
+    const cleanup = () => {
+      window.removeEventListener("pointermove", onMove)
+      window.removeEventListener("pointerup", onUp)
+      window.removeEventListener("pointercancel", onUp)
+      marqueeCleanupRef.current = null
+    }
 
-      const cleanup = () => {
-        window.removeEventListener("pointermove", onMove)
-        window.removeEventListener("pointerup", onUp)
-        window.removeEventListener("pointercancel", onUp)
-        marqueeCleanupRef.current = null
-      }
+    const onUp = (ev: PointerEvent) => {
+      const s = marqueeSessionRef.current
+      if (!s || ev.pointerId !== s.pointerId) return
+      cleanup()
 
-      const onUp = (ev: PointerEvent) => {
-        const s = marqueeSessionRef.current
-        if (!s || ev.pointerId !== s.pointerId) return
-        cleanup()
-
-        if (s.dragging && setSelectedIds) {
-          const box = normalizeMarqueeClientRect(s.startX, s.startY, ev.clientX, ev.clientY)
-          const ids = collectMarqueeBookmarkIds(itemRefs.current, flatList, box)
-          setSelectedIds((prev) => {
-            if (s.additive) {
-              const next = new Set(prev)
-              ids.forEach((id) => next.add(id))
-              return next
-            }
-            return ids
-          })
-          if (ids.size > 0) {
-            setSelectMode(true)
-            const list = flatList
-            const firstIdx = list.findIndex((it) => it.type === "link" && ids.has(it.bookmark.id))
-            if (firstIdx >= 0) onSelectIndex(firstIdx)
+      if (s.dragging && setSelectedIds) {
+        const box = normalizeMarqueeClientRect(s.startX, s.startY, ev.clientX, ev.clientY)
+        const ids = collectMarqueeBookmarkIds(itemRefs.current, flatList, box)
+        setSelectedIds((prev) => {
+          if (s.additive) {
+            const next = new Set(prev)
+            ids.forEach((id) => next.add(id))
+            return next
           }
+          return ids
+        })
+        if (ids.size > 0) {
+          setSelectMode(true)
+          const list = flatList
+          const firstIdx = list.findIndex((it) => it.type === "link" && ids.has(it.bookmark.id))
+          if (firstIdx >= 0) onSelectIndex(firstIdx)
         }
-
-        marqueeSessionRef.current = null
-        setMarqueeClient(null)
       }
 
-      marqueeCleanupRef.current = cleanup
-      window.addEventListener("pointermove", onMove, { passive: false })
-      window.addEventListener("pointerup", onUp)
-      window.addEventListener("pointercancel", onUp)
-    },
-    [flatList, itemRefs, onSelectIndex, setSelectedIds, setSelectMode]
-  )
+      marqueeSessionRef.current = null
+      setMarqueeClient(null)
+    }
+
+    marqueeCleanupRef.current = cleanup
+    window.addEventListener("pointermove", onMove, { passive: false })
+    window.addEventListener("pointerup", onUp)
+    window.addEventListener("pointercancel", onUp)
+  }
 
   const showAppPanelDropFrame = Boolean(onDrop && dropPanelSlot && dropItemIdx === null)
 
@@ -319,6 +318,7 @@ function EmptyState({ onAddBookmark, onNewFolder }: { onAddBookmark: () => void;
       </svg>
       <p className="text-sm">Esta carpeta está vacía</p>
       <button
+        type="button"
         onClick={onAddBookmark}
         className={cn(
           "bg-app-primary hover:bg-app-primary-hover mt-2 rounded px-4 py-2 text-sm text-white",
@@ -328,6 +328,7 @@ function EmptyState({ onAddBookmark, onNewFolder }: { onAddBookmark: () => void;
         Agregar marcador
       </button>
       <button
+        type="button"
         onClick={onNewFolder}
         className={cn(
           "border-app-input-border text-app-fg-secondary mt-2 rounded border px-4 py-2 text-sm",

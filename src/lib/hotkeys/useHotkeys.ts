@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useLayoutEffect, useRef } from "react"
 
 import hotkeys, { type KeyHandler } from "hotkeys-js"
 
@@ -24,7 +24,10 @@ export function useHotkeys(
   deps: ReadonlyArray<unknown> = []
 ) {
   const handlerRef = useRef(handler)
-  handlerRef.current = handler
+
+  useLayoutEffect(() => {
+    handlerRef.current = handler
+  }, [handler])
 
   const { enabled = true, scope, element, keyup, keydown, capture, splitKey, single } = options
 

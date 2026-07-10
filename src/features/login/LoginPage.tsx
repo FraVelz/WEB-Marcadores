@@ -22,6 +22,7 @@ export function LoginPage({ demo }: { demo: boolean }) {
           <input
             type="email"
             placeholder="Email"
+            aria-label="Email"
             value={email}
             data-no-vim
             onChange={(e) => setEmail(e.target.value)}
@@ -35,6 +36,7 @@ export function LoginPage({ demo }: { demo: boolean }) {
           <input
             type="password"
             placeholder="Contraseña"
+            aria-label="Contraseña"
             value={password}
             data-no-vim
             onChange={(e) => setPassword(e.target.value)}

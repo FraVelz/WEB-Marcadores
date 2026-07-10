@@ -1,7 +1,5 @@
 "use client"
 
-import { useCallback } from "react"
-
 import { clampBounds } from "@/features/marcadores/desktop/desktopWindowGeometry"
 import type { WindowBounds } from "@/features/marcadores/desktop/windowTypes"
 
@@ -20,7 +18,7 @@ export function useDeskBulkWindowTransforms(opts: {
 }) {
   const { canvas, libraryWindowIds, libraryPreMaxMap, preMaxDetail, setLibFrames, setDetailFrame } = opts
 
-  const minimizeAllWindows = useCallback(() => {
+  const minimizeAllWindows = () => {
     setLibFrames((prev) => {
       const next = { ...prev }
       for (const wid of libraryWindowIds) {
@@ -30,9 +28,9 @@ export function useDeskBulkWindowTransforms(opts: {
       return next
     })
     setDetailFrame((prev) => (prev ? { ...prev, minimized: true } : prev))
-  }, [libraryWindowIds, setDetailFrame, setLibFrames])
+  }
 
-  const restoreMinimizedWindows = useCallback(() => {
+  const restoreMinimizedWindows = () => {
     setLibFrames((prev) => {
       const next = { ...prev }
       for (const wid of libraryWindowIds) {
@@ -42,9 +40,9 @@ export function useDeskBulkWindowTransforms(opts: {
       return next
     })
     setDetailFrame((prev) => (prev ? { ...prev, minimized: false } : prev))
-  }, [libraryWindowIds, setDetailFrame, setLibFrames])
+  }
 
-  const maximizeAllWindows = useCallback(() => {
+  const maximizeAllWindows = () => {
     const { w: cw, h: ch } = canvas
     if (cw < MIN_CANVAS || ch < MIN_CANVAS) return
     setLibFrames((prev) => {
@@ -63,9 +61,9 @@ export function useDeskBulkWindowTransforms(opts: {
       if (!prev.maximized) preMaxDetail.current = { ...clampBounds(prev.bounds, cw, ch) }
       return { ...prev, minimized: false, maximized: true }
     })
-  }, [canvas, libraryPreMaxMap, libraryWindowIds, preMaxDetail, setDetailFrame, setLibFrames])
+  }
 
-  const restoreWindowSizes = useCallback(() => {
+  const restoreWindowSizes = () => {
     const { w: cw, h: ch } = canvas
     if (cw < MIN_CANVAS || ch < MIN_CANVAS) return
     setLibFrames((prev) => {
@@ -91,7 +89,7 @@ export function useDeskBulkWindowTransforms(opts: {
       preMaxDetail.current = null
       return { ...prev, maximized: false, bounds }
     })
-  }, [canvas, libraryPreMaxMap, libraryWindowIds, preMaxDetail, setDetailFrame, setLibFrames])
+  }
 
   return {
     minimizeAllWindows,

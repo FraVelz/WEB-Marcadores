@@ -1,7 +1,5 @@
 "use client"
 
-import { useCallback, useMemo } from "react"
-
 import type { DeskLibraryPaneUiState } from "@/features/marcadores/state/libraryPaneUiState"
 import type { LibraryPaneUiScope } from "@/features/marcadores/state/libraryPaneUiScope"
 import type { Bookmark } from "@/features/marcadores/utils/types"
@@ -39,13 +37,13 @@ export function useBookmarkModalController(opts: {
 
   const { bindings } = libraryPaneScope
 
-  const hostWinId = useMemo(() => {
+  const hostWinId = (() => {
     if (!desktopWindowChrome) return null
     for (const id of deskLibWinIds) {
       if (deskUiByWin[id]?.modalOpen) return id
     }
     return null
-  }, [desktopWindowChrome, deskLibWinIds, deskUiByWin])
+  })()
 
   const deskUi = hostWinId ? deskUiByWin[hostWinId] : null
   const globalUi = libraryPaneScope.getState()
@@ -56,15 +54,12 @@ export function useBookmarkModalController(opts: {
 
   const folderId = desktopWindowChrome && hostWinId ? (deskFolderByWin[hostWinId] ?? null) : activeBrowseFolderId
 
-  const patchDeskModal = useCallback(
-    (recipe: (s: DeskLibraryPaneUiState) => DeskLibraryPaneUiState) => {
-      if (!hostWinId) return
-      updateDeskUi(hostWinId, recipe)
-    },
-    [hostWinId, updateDeskUi]
-  )
+  const patchDeskModal = (recipe: (s: DeskLibraryPaneUiState) => DeskLibraryPaneUiState) => {
+    if (!hostWinId) return
+    updateDeskUi(hostWinId, recipe)
+  }
 
-  const openCreate = useCallback(() => {
+  const openCreate = () => {
     if (desktopWindowChrome && hostWinId) {
       patchDeskModal((s) => ({
         ...s,
@@ -77,21 +72,18 @@ export function useBookmarkModalController(opts: {
     bindings.setEditingBookmark(null)
     bindings.setBookmarkModalNonce((n) => n + 1)
     bindings.setModalOpen(true)
-  }, [bindings, desktopWindowChrome, hostWinId, patchDeskModal])
+  }
 
-  const openEdit = useCallback(
-    (bookmark: Bookmark) => {
-      if (desktopWindowChrome && hostWinId) {
-        patchDeskModal((s) => ({ ...s, modalOpen: true, editingBookmark: bookmark }))
-        return
-      }
-      bindings.setEditingBookmark(bookmark)
-      bindings.setModalOpen(true)
-    },
-    [bindings, desktopWindowChrome, hostWinId, patchDeskModal]
-  )
+  const openEdit = (bookmark: Bookmark) => {
+    if (desktopWindowChrome && hostWinId) {
+      patchDeskModal((s) => ({ ...s, modalOpen: true, editingBookmark: bookmark }))
+      return
+    }
+    bindings.setEditingBookmark(bookmark)
+    bindings.setModalOpen(true)
+  }
 
-  const close = useCallback(() => {
+  const close = () => {
     if (desktopWindowChrome && hostWinId) {
       patchDeskModal((s) => ({ ...s, modalOpen: false, editingBookmark: null }))
     } else {
@@ -99,7 +91,7 @@ export function useBookmarkModalController(opts: {
       bindings.setEditingBookmark(null)
     }
     requestAnimationFrame(() => focusMain())
-  }, [bindings, desktopWindowChrome, focusMain, hostWinId, patchDeskModal])
+  }
 
   return {
     open,

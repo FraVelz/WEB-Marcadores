@@ -6,7 +6,6 @@ import { MarcadoresExplorerRail } from "@/features/marcadores/components/Marcado
 import MarcadoresTreeView from "@/features/marcadores/components/MarcadoresTreeView"
 import type { MarcadoresPageModel } from "@/features/marcadores/useMarcadoresPage"
 import type { Bookmark } from "@/features/marcadores/utils/types"
-import { useMemo } from "react"
 
 function buildFolderBookmarkCounts(bookmarks: Bookmark[]): Map<string | null, number> {
   const counts = new Map<string | null, number>()
@@ -22,7 +21,7 @@ export function MarcadoresStackedPageSlot({ m }: { m: MarcadoresPageModel }) {
   const scope = m.libraryPaneScope
   const pane = scope.getState()
 
-  const folderBookmarkCounts = useMemo(() => buildFolderBookmarkCounts(m.bookmarks), [m.bookmarks])
+  const folderBookmarkCounts = buildFolderBookmarkCounts(m.bookmarks)
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-row overflow-hidden">

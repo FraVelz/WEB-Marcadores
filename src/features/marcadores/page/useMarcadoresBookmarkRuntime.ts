@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect } from "react"
+import { useEffect } from "react"
 
 import type { LibraryPaneUiBindings } from "@/features/marcadores/state/libraryPaneUiScope"
 import type { Bookmark } from "@/features/marcadores/utils/types"
@@ -20,18 +20,15 @@ export function useMarcadoresBookmarkRuntime(opts: {
   const { bookmarks, registerMarcadoresRuntime, recordBookmarkOpened, paneBindings } = opts
   const { setDetailBookmark, setInfoPanelEnabled } = paneBindings
 
-  const closeBookmarkDetailPanel = useCallback(() => {
+  const closeBookmarkDetailPanel = () => {
     setDetailBookmark(null)
     setInfoPanelEnabled(false)
-  }, [setDetailBookmark, setInfoPanelEnabled])
+  }
 
-  const openBookmarkTab = useCallback(
-    (b: Bookmark) => {
-      window.open(b.url, "_blank", "noopener,noreferrer")
-      void recordBookmarkOpened(b.id)
-    },
-    [recordBookmarkOpened]
-  )
+  const openBookmarkTab = (b: Bookmark) => {
+    window.open(b.url, "_blank", "noopener,noreferrer")
+    void recordBookmarkOpened(b.id)
+  }
 
   useEffect(() => {
     registerMarcadoresRuntime({

@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { DesktopShortcut } from "@/features/marcadores/desktop/DesktopShortcut"
 
@@ -53,40 +53,35 @@ export function DesktopDraggableLibraryShortcut(props: {
     latestPosRef.current = pos
   }, [pos])
 
-  const persist = useCallback(
-    (p: { x: number; y: number }) => {
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(p))
-      } catch {
-        /* ignore */
-      }
-    },
-    [storageKey]
-  )
+  const persist = (p: { x: number; y: number }) => {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(p))
+    } catch {
+      /* ignore */
+    }
+  }
 
-  const reclamp = useCallback(() => {
-    const host = hostRef.current
-    const el = wrapRef.current
-    if (!host || !el) return
-    const hr = host.getBoundingClientRect()
-    const er = el.getBoundingClientRect()
-    if (hr.width <= 0 || hr.height <= 0 || er.width <= 0 || er.height <= 0) return
-    setPos((prev) => {
-      const next = clampPos(prev.x, prev.y, hr.width, hr.height, er.width, er.height)
-      if (next.x === prev.x && next.y === prev.y) return prev
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(next))
-      } catch {
-        /* ignore */
-      }
-      return next
-    })
-  }, [hostRef, storageKey])
-
-  const reclampRef = useRef(reclamp)
+  const reclampRef = useRef<() => void>(() => {})
   useEffect(() => {
-    reclampRef.current = reclamp
-  }, [reclamp])
+    reclampRef.current = () => {
+      const host = hostRef.current
+      const el = wrapRef.current
+      if (!host || !el) return
+      const hr = host.getBoundingClientRect()
+      const er = el.getBoundingClientRect()
+      if (hr.width <= 0 || hr.height <= 0 || er.width <= 0 || er.height <= 0) return
+      setPos((prev) => {
+        const next = clampPos(prev.x, prev.y, hr.width, hr.height, er.width, er.height)
+        if (next.x === prev.x && next.y === prev.y) return prev
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(next))
+        } catch {
+          /* ignore */
+        }
+        return next
+      })
+    }
+  }, [hostRef, storageKey])
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -104,82 +99,79 @@ export function DesktopDraggableLibraryShortcut(props: {
     const host = hostRef.current
     if (!host || typeof ResizeObserver === "undefined") return
     const ro = new ResizeObserver(() => {
-      queueMicrotask(reclamp)
+      queueMicrotask(() => reclampRef.current())
     })
     ro.observe(host)
     return () => ro.disconnect()
-  }, [hostRef, reclamp])
+  }, [hostRef])
 
   useEffect(() => () => gestureCleanupRef.current?.(), [])
 
-  const onPointerDown = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
-      if (e.button !== 0) return
-      const t = e.target
-      if (!(t instanceof Node) || !wrapRef.current?.contains(t)) return
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0) return
+    const t = e.target
+    if (!(t instanceof Node) || !wrapRef.current?.contains(t)) return
 
-      const host = hostRef.current
-      const el = wrapRef.current
-      if (!host || !el) return
+    const host = hostRef.current
+    const el = wrapRef.current
+    if (!host || !el) return
 
-      gestureCleanupRef.current?.()
-      onSelect()
+    gestureCleanupRef.current?.()
+    onSelect()
 
-      const pointerId = e.pointerId
-      const startX = e.clientX
-      const startY = e.clientY
-      const er0 = el.getBoundingClientRect()
-      const dx = e.clientX - er0.left
-      const dy = e.clientY - er0.top
-      let kind: "pending" | "drag" = "pending"
+    const pointerId = e.pointerId
+    const startX = e.clientX
+    const startY = e.clientY
+    const er0 = el.getBoundingClientRect()
+    const dx = e.clientX - er0.left
+    const dy = e.clientY - er0.top
+    let kind: "pending" | "drag" = "pending"
 
-      const onMove = (ev: PointerEvent) => {
-        if (ev.pointerId !== pointerId) return
-        const h = hostRef.current
-        const box = wrapRef.current
-        if (!h || !box) return
-        const hr = h.getBoundingClientRect()
-        const er = box.getBoundingClientRect()
-        if (kind === "pending") {
-          if (Math.abs(ev.clientX - startX) < DRAG_SLIP_PX && Math.abs(ev.clientY - startY) < DRAG_SLIP_PX) return
-          kind = "drag"
-        }
-        const next = clampPos(
-          ev.clientX - hr.left - dx,
-          ev.clientY - hr.top - dy,
-          hr.width,
-          hr.height,
-          er.width,
-          er.height
-        )
-        latestPosRef.current = next
-        setPos(next)
+    const onMove = (ev: PointerEvent) => {
+      if (ev.pointerId !== pointerId) return
+      const h = hostRef.current
+      const box = wrapRef.current
+      if (!h || !box) return
+      const hr = h.getBoundingClientRect()
+      const er = box.getBoundingClientRect()
+      if (kind === "pending") {
+        if (Math.abs(ev.clientX - startX) < DRAG_SLIP_PX && Math.abs(ev.clientY - startY) < DRAG_SLIP_PX) return
+        kind = "drag"
       }
+      const next = clampPos(
+        ev.clientX - hr.left - dx,
+        ev.clientY - hr.top - dy,
+        hr.width,
+        hr.height,
+        er.width,
+        er.height
+      )
+      latestPosRef.current = next
+      setPos(next)
+    }
 
-      const onUpOrCancel = (ev: PointerEvent) => {
-        if (ev.pointerId !== pointerId) return
-        document.removeEventListener("pointermove", onMove)
-        document.removeEventListener("pointerup", onUpOrCancel)
-        document.removeEventListener("pointercancel", onUpOrCancel)
-        gestureCleanupRef.current = null
-        if (kind === "drag") {
-          persist(latestPosRef.current)
-        }
+    const onUpOrCancel = (ev: PointerEvent) => {
+      if (ev.pointerId !== pointerId) return
+      document.removeEventListener("pointermove", onMove)
+      document.removeEventListener("pointerup", onUpOrCancel)
+      document.removeEventListener("pointercancel", onUpOrCancel)
+      gestureCleanupRef.current = null
+      if (kind === "drag") {
+        persist(latestPosRef.current)
       }
+    }
 
-      gestureCleanupRef.current = () => {
-        document.removeEventListener("pointermove", onMove)
-        document.removeEventListener("pointerup", onUpOrCancel)
-        document.removeEventListener("pointercancel", onUpOrCancel)
-        gestureCleanupRef.current = null
-      }
+    gestureCleanupRef.current = () => {
+      document.removeEventListener("pointermove", onMove)
+      document.removeEventListener("pointerup", onUpOrCancel)
+      document.removeEventListener("pointercancel", onUpOrCancel)
+      gestureCleanupRef.current = null
+    }
 
-      document.addEventListener("pointermove", onMove)
-      document.addEventListener("pointerup", onUpOrCancel)
-      document.addEventListener("pointercancel", onUpOrCancel)
-    },
-    [hostRef, onSelect, persist]
-  )
+    document.addEventListener("pointermove", onMove)
+    document.addEventListener("pointerup", onUpOrCancel)
+    document.addEventListener("pointercancel", onUpOrCancel)
+  }
 
   return (
     <div

@@ -170,6 +170,7 @@ export function AppearanceSettings() {
                 spellCheck={false}
                 value={appearance.textSelection ?? ""}
                 placeholder={selectionFallback}
+                aria-label={selectionFallback}
                 onChange={(e) => setTextSelection(e.target.value || null)}
                 className={cn(
                   "border-app-input-border bg-app-raised-muted text-app-fg min-w-[7rem] flex-1 rounded border px-2 py-1.5 font-mono text-xs sm:max-w-[11rem]",
@@ -235,6 +236,7 @@ export function AppearanceSettings() {
                         spellCheck={false}
                         value={stored ?? ""}
                         placeholder={display}
+                        aria-label={display}
                         onChange={(e) => setCustomColor(key, e.target.value)}
                         className={cn(
                           "border-app-input-border bg-app-raised-muted text-app-fg min-w-0 flex-1 rounded border px-2 py-1.5 font-mono text-xs",

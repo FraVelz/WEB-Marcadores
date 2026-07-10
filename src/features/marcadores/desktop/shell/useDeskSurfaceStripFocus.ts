@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useMemo, useState } from "react"
+import { useState } from "react"
 
 export type DeskFocusedSurface = { kind: "library"; id: string } | { kind: "detail" }
 
@@ -14,16 +14,16 @@ export function useDeskSurfaceStripFocus(opts: {
 
   const [preferLibraryWhileDetailOpen, setPreferLibraryWhileDetailOpen] = useState(false)
 
-  const focusedSurface = useMemo((): DeskFocusedSurface => {
+  const focusedSurface = ((): DeskFocusedSurface => {
     if (detailOpen && detailFrame && !preferLibraryWhileDetailOpen) return { kind: "detail" }
     const first = libraryWindowIds[0] ?? ""
     const id = focusedLibraryPaneId && libraryWindowIds.includes(focusedLibraryPaneId) ? focusedLibraryPaneId : first
     return { kind: "library", id }
-  }, [detailFrame, detailOpen, focusedLibraryPaneId, libraryWindowIds, preferLibraryWhileDetailOpen])
+  })()
 
-  const setPreferLibraryInStrip = useCallback((preferLibrary: boolean) => {
+  const setPreferLibraryInStrip = (preferLibrary: boolean) => {
     setPreferLibraryWhileDetailOpen(preferLibrary)
-  }, [])
+  }
 
   return { focusedSurface, setPreferLibraryInStrip }
 }

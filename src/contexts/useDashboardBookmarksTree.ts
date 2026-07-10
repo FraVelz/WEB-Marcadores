@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useEffectEvent, useState } from "react"
+import { useEffect, useEffectEvent, useState } from "react"
 
 import { createClient } from "@/lib/supabase/client"
 import { sortedUniqueTagsFromRows } from "@/lib/bookmark-tags"
@@ -12,7 +12,7 @@ export function useDashboardBookmarksTree(demoMode: boolean) {
   const [allTags, setAllTags] = useState<string[]>([])
   const [folders, setFolders] = useState<Folder[]>([])
 
-  const refreshTags = useCallback(async () => {
+  const refreshTags = async () => {
     if (demoMode) {
       setAllTags(DEMO_TAGS)
       return
@@ -20,13 +20,13 @@ export function useDashboardBookmarksTree(demoMode: boolean) {
     const supabase = createClient()
     const { data } = await supabase.from("bookmarks").select("tags")
     setAllTags(sortedUniqueTagsFromRows(data || []))
-  }, [demoMode])
+  }
 
-  const setAllTagsFromBookmarks = useCallback((rows: { tags?: string[] | null }[]) => {
+  const setAllTagsFromBookmarks = (rows: { tags?: string[] | null }[]) => {
     setAllTags(sortedUniqueTagsFromRows(rows))
-  }, [])
+  }
 
-  const refreshFolders = useCallback(async () => {
+  const refreshFolders = async () => {
     if (demoMode) return
     const supabase = createClient()
     const { data } = await supabase.from("folders").select("*").order("sort_order")
@@ -42,7 +42,7 @@ export function useDashboardBookmarksTree(demoMode: boolean) {
       return list.sort((a, b) => a.sort_order - b.sort_order).map((f) => ({ ...f, children: buildTree(f.id) }))
     }
     setFolders(buildTree("root"))
-  }, [demoMode])
+  }
 
   const refreshTagsEffect = useEffectEvent(() => {
     void refreshTags()

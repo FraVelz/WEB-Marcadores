@@ -38,7 +38,6 @@ export function DashboardMobileDrawer({ pathname, open, onClose, sidebarRef }: P
       </div>
       <div
         ref={sidebarRef}
-        tabIndex={0}
         className={cn(
           HOTKEY_SCOPE_FOCUS,
           "flex min-h-0 shrink-0 flex-col",

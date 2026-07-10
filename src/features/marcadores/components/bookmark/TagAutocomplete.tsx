@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect, useMemo } from "react"
+import { useState, useRef, useEffect } from "react"
 import { cn } from "@/lib/utils"
 
 type Props = {
@@ -32,11 +32,11 @@ export default function TagAutocomplete({
   const listRef = useRef<HTMLUListElement>(null)
   const inputRef = externalRef || internalRef
 
-  const filtered = useMemo(() => {
+  const filtered = (() => {
     const q = value.trim().toLowerCase()
     if (!q) return options
     return options.filter((t) => t.toLowerCase().includes(q))
-  }, [options, value])
+  })()
 
   const maxIdx = filtered.length > 0 ? filtered.length - 1 : 0
   const effectiveIndex = Math.min(Math.max(0, highlightedIndex), maxIdx)
@@ -113,7 +113,6 @@ export default function TagAutocomplete({
         ref={inputRef as React.RefObject<HTMLInputElement>}
         id={id}
         type="text"
-        role="combobox"
         value={value}
         onChange={(e) => {
           setHighlightedIndex(0)
@@ -124,19 +123,15 @@ export default function TagAutocomplete({
         onBlur={() => setTimeout(() => setIsOpen(false), 150)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
+        aria-label={placeholder}
         autoComplete="off"
         data-no-vim
         className={className}
-        aria-autocomplete="list"
-        aria-expanded={isOpen}
-        aria-controls="tag-listbox"
-        aria-activedescendant={isOpen && filtered[effectiveIndex] ? `tag-opt-${effectiveIndex}` : undefined}
       />
       {isOpen && filtered.length > 0 && (
         <ul
           id="tag-listbox"
           ref={listRef}
-          role="listbox"
           className={cn(
             "absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-lg",
             "border-app-input-border bg-app-raised-muted border py-1 shadow-lg"
@@ -146,8 +141,6 @@ export default function TagAutocomplete({
             <li
               key={tag}
               id={`tag-opt-${i}`}
-              role="option"
-              aria-selected={i === effectiveIndex}
               className={`cursor-pointer px-3 py-2 text-sm ${
                 i === effectiveIndex ? "bg-app-hover text-app-fg" : "text-app-fg-secondary hover:bg-app-hover"
               }`}

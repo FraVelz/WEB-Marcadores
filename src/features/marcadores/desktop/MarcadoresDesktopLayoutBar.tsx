@@ -57,6 +57,7 @@ export function MarcadoresDesktopLayoutBar({
         disabled={!deskSurfaceReady}
         className={deskReadyBtn}
         title="Minimizar todas las ventanas del escritorio"
+        aria-label="Minimizar todas las ventanas del escritorio"
         onClick={() => deskSurfaceReady && onMinimizeAll()}
       >
         <svg className="size-4 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -70,6 +71,7 @@ export function MarcadoresDesktopLayoutBar({
         disabled={!deskSurfaceReady}
         className={deskReadyBtn}
         title="Desplegar ventanas minimizadas"
+        aria-label="Desplegar ventanas minimizadas"
         onClick={() => deskSurfaceReady && onRestoreMinimized()}
       >
         <svg className="size-4 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -83,6 +85,7 @@ export function MarcadoresDesktopLayoutBar({
         disabled={!deskSurfaceReady}
         className={deskReadyBtn}
         title="Maximizar todas las ventanas al lienzo"
+        aria-label="Maximizar todas las ventanas al lienzo"
         onClick={() => deskSurfaceReady && onMaximizeAll()}
       >
         <svg className="size-4 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -96,6 +99,7 @@ export function MarcadoresDesktopLayoutBar({
         disabled={!deskSurfaceReady}
         className={deskReadyBtn}
         title="Restaurar tamaño de ventanas (salir de maximizado)"
+        aria-label="Restaurar tamaño de ventanas (salir de maximizado)"
         onClick={() => deskSurfaceReady && onRestoreWindowSizes()}
       >
         <svg className="size-4 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -111,6 +115,11 @@ export function MarcadoresDesktopLayoutBar({
         disabled={!canTileTwoColumns}
         className={tileBtn}
         title={
+          canTileTwoColumns
+            ? "Colocar las dos ventanas de Marcadores mitad y mitad"
+            : "Activa solo con dos ventanas de biblioteca abiertas"
+        }
+        aria-label={
           canTileTwoColumns
             ? "Colocar las dos ventanas de Marcadores mitad y mitad"
             : "Activa solo con dos ventanas de biblioteca abiertas"

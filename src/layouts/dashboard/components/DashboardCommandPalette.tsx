@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useId, useMemo, useRef, useState } from "react"
+import { useEffect, useId, useRef, useState } from "react"
 
 import Link from "next/link"
 
@@ -29,7 +29,7 @@ export function DashboardCommandPalette() {
     return () => cancelAnimationFrame(t)
   }, [commandPaletteOpen])
 
-  const bookmarkHits = useMemo(() => {
+  const bookmarkHits = (() => {
     const palette = marcadoresPalette
     const q = norm(query)
     if (!palette || !q || q.length < 2) return []
@@ -46,7 +46,7 @@ export function DashboardCommandPalette() {
       if (out.length >= 25) break
     }
     return out
-  }, [marcadoresPalette, query])
+  })()
 
   const close = () => setCommandPaletteOpen(false)
 
@@ -75,6 +75,7 @@ export function DashboardCommandPalette() {
             id={`${id}-input`}
             ref={inputRef}
             value={query}
+            aria-label="Buscar marcadores"
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Marcador…"
             className="placeholder:text-app-fg-muted bg-app-hover text-app-fg focus:border-app-input-border focus:ring-app-focus w-full rounded-md border border-transparent px-3 py-2 text-sm outline-none focus:ring-1"
