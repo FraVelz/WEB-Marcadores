@@ -8,14 +8,18 @@ export const shortcutSections: ShortcutSection[] = [
     hint: "Saltar entre vistas del panel principal.",
     rows: [
       { keys: "Ctrl+1", desc: "Ir a Marcadores" },
-      { keys: "Ctrl+2", desc: "Ir a Atajos" },
-      { keys: "Ctrl+3", desc: "Ir a Perfil" },
+      { keys: "Ctrl+2", desc: "Ir a Estadísticas" },
+      { keys: "Ctrl+3", desc: "Ir a Atajos" },
+      { keys: "Ctrl+4", desc: "Ir a Perfil" },
       { keys: "n", desc: "Alternar foco entre sidebar y área de marcadores" },
     ],
   },
   {
     title: "Búsqueda",
-    rows: [{ keys: "Ctrl+F / Ctrl+K", desc: "Abrir búsqueda (título, descripción, URL, tags)" }],
+    rows: [
+      { keys: "Ctrl+K / Cmd+K", desc: "Abrir paleta de comandos (buscar marcadores y navegar)" },
+      { keys: "Ctrl+F", desc: "Abrir búsqueda en Marcadores (título, descripción, URL, tags)" },
+    ],
   },
   {
     title: "Sidebar (carpetas)",

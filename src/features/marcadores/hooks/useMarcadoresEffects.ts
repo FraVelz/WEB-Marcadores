@@ -64,7 +64,7 @@ export function useMarcadoresEffects<T>(params: Params<T>) {
   }, [pasteError, setPasteError])
 
   useHotkeys(
-    "ctrl+f,ctrl+k",
+    "ctrl+f",
     (event) => {
       event.preventDefault()
       setShowSearch(true)
