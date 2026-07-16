@@ -114,6 +114,8 @@ export function useMarcadoresPageDataHooks() {
     handlePasteFolder,
     handlePasteLink,
     recordBookmarkOpened,
+    handleExportJson,
+    handleImportFile,
   } = b
 
   const { openBookmarkTab, closeBookmarkDetailPanel } = useMarcadoresBookmarkRuntime({
@@ -220,6 +222,8 @@ export function useMarcadoresPageDataHooks() {
     handlePasteFolder,
     handlePasteLink,
     onBookmarkUpdate: interactions.onBookmarkUpdate,
+    handleExportJson,
+    handleImportFile,
   }
 }
 

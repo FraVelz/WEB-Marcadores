@@ -57,6 +57,8 @@ export function MarcadoresPageStackedChrome({ m }: { m: MarcadoresPageModel }) {
         setRenameFolderName={b.setRenameFolderName}
         onRenameFolder={m.onRenameFolder}
         duplicateClusterCount={m.duplicateClusterCount}
+        onExportJson={m.handleExportJson}
+        onImportFile={m.handleImportFile}
       />
 
       {pane.pasteError || m.demoMode ? (
