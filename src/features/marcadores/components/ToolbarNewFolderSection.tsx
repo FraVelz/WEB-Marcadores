@@ -1,47 +1,138 @@
 "use client"
 
-import { cn } from "@/lib/utils"
+import { useId, useRef, useState } from "react"
+
+import { MARCADORES_GLOBAL_ALERT_Z_CLASS } from "@/features/marcadores/utils/layerZIndex"
+import { useHotkeys } from "@/lib/hotkeys/useHotkeys"
 import { FOCUS_RING } from "@/lib/focusStyles"
+import { useDialogFocusTrap } from "@/lib/useDialogFocusTrap"
+import { cn } from "@/lib/utils"
 
 type Props = {
   newFolderName: string
   setNewFolderName: (v: string) => void
-  onCreateFolder: () => void
+  onCreateFolder: () => void | Promise<void>
   onCancel: () => void
 }
 
-export default function ToolbarNewFolderSection({ newFolderName, setNewFolderName, onCreateFolder, onCancel }: Props) {
+export default function ToolbarNewFolderSection({
+  newFolderName,
+  setNewFolderName,
+  onCreateFolder,
+  onCancel,
+}: Props) {
+  const titleId = useId()
+  const errorId = useId()
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+
+  useDialogFocusTrap(dialogRef, { initialFocusRef: inputRef })
+  useHotkeys("esc", () => onCancel(), { enabled: !submitting }, [onCancel, submitting])
+
+  const submit = async () => {
+    if (submitting) return
+    if (!newFolderName.trim()) {
+      setError("Escribe un nombre para la carpeta.")
+      inputRef.current?.focus()
+      return
+    }
+    setError(null)
+    setSubmitting(true)
+    try {
+      await onCreateFolder()
+    } catch {
+      setError("No se pudo crear la carpeta.")
+      setSubmitting(false)
+    }
+  }
+
   return (
-    <div className="flex min-w-0 flex-wrap items-center gap-2 md:ml-2">
-      <input
-        type="text"
-        placeholder="Nombre de carpeta"
-        aria-label="Nombre de carpeta"
-        value={newFolderName}
-        onChange={(e) => setNewFolderName(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") onCreateFolder()
-          if (e.key === "Escape") onCancel()
-        }}
-        className={cn(
-          "border-app-input-border bg-app-raised-muted text-app-fg min-w-0 flex-1 rounded border px-2 py-1 text-sm",
-          "placeholder-app-fg-label focus:border-app-focus focus:outline-none md:max-w-xs"
-        )}
-      />
+    <div
+      ref={dialogRef}
+      className={cn(
+        "bg-app-overlay fixed inset-0 flex items-center justify-center p-4",
+        MARCADORES_GLOBAL_ALERT_Z_CLASS
+      )}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      data-testid="new-folder-dialog"
+      data-no-vim
+      onKeyDown={(e) => e.stopPropagation()}
+    >
       <button
         type="button"
-        onClick={onCreateFolder}
-        className={cn("bg-app-primary hover:bg-app-primary-hover rounded px-2 py-1 text-sm text-white", FOCUS_RING)}
-      >
-        Crear
-      </button>
-      <button
-        type="button"
+        className="absolute inset-0 z-0 cursor-default border-none bg-transparent p-0"
+        aria-label="Cancelar nueva carpeta"
+        disabled={submitting}
         onClick={onCancel}
-        className={cn("text-app-fg-muted hover:bg-app-active rounded px-2 py-1 text-sm", FOCUS_RING)}
-      >
-        Cancelar
-      </button>
+      />
+      <div className="border-app-border bg-app-raised relative z-10 w-full max-w-md rounded-xl border p-6 shadow-xl">
+        <h2 id={titleId} className="text-app-fg text-lg font-semibold">
+          Nueva carpeta
+        </h2>
+        <label className="mt-4 block">
+          <span className="text-app-fg-secondary mb-1.5 block text-sm">Nombre</span>
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder="Nombre de carpeta"
+            aria-label="Nombre de carpeta"
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? errorId : undefined}
+            value={newFolderName}
+            disabled={submitting}
+            onChange={(e) => {
+              setNewFolderName(e.target.value)
+              if (error) setError(null)
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault()
+                void submit()
+              }
+            }}
+            className={cn(
+              "border-app-input-border bg-app-raised-muted text-app-fg w-full rounded-lg border px-3 py-2 text-sm",
+              "placeholder-app-fg-label focus:border-app-focus focus:outline-none",
+              error && "border-app-danger"
+            )}
+          />
+        </label>
+        {error ? (
+          <p id={errorId} role="alert" className="text-app-danger-fg mt-2 text-sm">
+            {error}
+          </p>
+        ) : null}
+        <div className="mt-6 flex justify-end gap-2">
+          <button
+            type="button"
+            disabled={submitting}
+            onClick={onCancel}
+            className={cn(
+              "border-app-input-border text-app-fg-secondary rounded-lg border px-4 py-2 text-sm",
+              FOCUS_RING,
+              "hover:bg-app-raised-muted disabled:opacity-50"
+            )}
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            disabled={submitting}
+            onClick={() => void submit()}
+            className={cn(
+              "bg-app-primary hover:bg-app-primary-hover rounded-lg px-4 py-2 text-sm font-medium text-white",
+              FOCUS_RING,
+              "disabled:opacity-50"
+            )}
+          >
+            {submitting ? "Creando…" : "Crear"}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
