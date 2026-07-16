@@ -9,6 +9,7 @@ import { useBookmarkDragMonitor, useBookmarkDropPanel } from "@/lib/drag-and-dro
 import type { GridItem, CutItem } from "../utils/types"
 import { APP_DROP_PANEL_OVERLAY_CLASS } from "../utils/dragDropUi"
 import BookmarkGridItem from "./BookmarkGridItem"
+import { EmptySearchState } from "./EmptySearchState"
 
 type Props = {
   flatList: GridItem[]
@@ -260,7 +261,12 @@ export default function BookmarkGrid({
           )
         })}
       </div>
-      {flatList.length === 0 && <EmptyState onAddBookmark={onAddBookmark} onNewFolder={onNewFolder} />}
+      {flatList.length === 0 &&
+        (searchQuery.trim() ? (
+          <EmptySearchState query={searchQuery} />
+        ) : (
+          <EmptyState onAddBookmark={onAddBookmark} onNewFolder={onNewFolder} />
+        ))}
     </div>
   )
 }
