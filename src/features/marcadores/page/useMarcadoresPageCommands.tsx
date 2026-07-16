@@ -18,6 +18,13 @@ export function useMarcadoresPageCommands(core: MarcadoresPageCore) {
   const pane = scope.getState()
   const b = scope.bindings
 
+  const deskId = core.resolvedDeskLibPaneId
+  const deskUi = deskId ? core.deskUiByWin[deskId] : undefined
+  const treeCollapsedIds = deskUi?.treeCollapsedIds ?? core.treeCollapsedIds
+  const onToggleFolderCollapse = deskId
+    ? (folderId: string) => core.toggleDeskTreeFolderCollapse(deskId, folderId)
+    : core.toggleTreeFolderCollapse
+
   useMarcadoresMainHotkeys({
     mainRef: core.mainRef,
     enabled: !pane.modalOpen,
@@ -55,6 +62,9 @@ export function useMarcadoresPageCommands(core: MarcadoresPageCore) {
       }
     },
     openBookmarkTab: core.openBookmarkTab,
+    treeMode: core.primaryViewMode === "tree",
+    treeCollapsedIds,
+    onToggleFolderCollapse,
   })
 
   const { editFolderRef } = core

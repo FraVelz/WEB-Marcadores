@@ -1,6 +1,18 @@
 import type { Dispatch, SetStateAction } from "react"
 
-import type { Bookmark, BreadcrumbPart, GridItem } from "../utils/types"
+import { folderHasChildren } from "../components/marcadoresTree/treeHelpers"
+import type { Bookmark, BreadcrumbPart, FlatFolder, GridItem } from "../utils/types"
+
+function parentFolderIdOf(item: GridItem, folders: FlatFolder[]): string | null {
+  if (item.type === "folder") {
+    return folders.find((f) => f.id === item.id)?.parent_id ?? null
+  }
+  return item.bookmark.folder_id ?? null
+}
+
+function findFolderIndex(flatList: GridItem[], folderId: string): number {
+  return flatList.findIndex((i) => i.type === "folder" && i.id === folderId)
+}
 
 export function applyMarcadoresBrowseNavigationKeys(
   e: KeyboardEvent,
@@ -17,6 +29,11 @@ export function applyMarcadoresBrowseNavigationKeys(
     openBookmarkTab: (bookmark: Bookmark) => void
     setInfoPanelEnabled: Dispatch<SetStateAction<boolean>>
     setDetailBookmark: Dispatch<SetStateAction<Bookmark | null>>
+    treeMode?: boolean
+    treeCollapsedIds?: Set<string>
+    onToggleFolderCollapse?: (folderId: string) => void
+    folders?: FlatFolder[]
+    bookmarks?: Bookmark[]
   }
 ): boolean {
   const {
@@ -32,6 +49,11 @@ export function applyMarcadoresBrowseNavigationKeys(
     openBookmarkTab,
     setInfoPanelEnabled,
     setDetailBookmark,
+    treeMode = false,
+    treeCollapsedIds,
+    onToggleFolderCollapse,
+    folders = [],
+    bookmarks = [],
   } = deps
 
   if (totalCount === 0) return false
@@ -63,6 +85,41 @@ export function applyMarcadoresBrowseNavigationKeys(
         else setDetailBookmark(null)
         return next
       })
+      return true
+    }
+  }
+
+  if (treeMode && treeCollapsedIds && onToggleFolderCollapse && item) {
+    if (e.key === "ArrowRight" || e.key === "l") {
+      e.preventDefault()
+      if (item.type === "folder" && folderHasChildren(folders, bookmarks, item.id) && treeCollapsedIds.has(item.id)) {
+        onToggleFolderCollapse(item.id)
+      } else {
+        setSelectedIndex((i) => Math.min(i + 1, totalCount - 1))
+      }
+      return true
+    }
+    if (e.key === "ArrowLeft" || e.key === "h") {
+      e.preventDefault()
+      if (item.type === "folder" && folderHasChildren(folders, bookmarks, item.id) && !treeCollapsedIds.has(item.id)) {
+        onToggleFolderCollapse(item.id)
+      } else {
+        const parentId = parentFolderIdOf(item, folders)
+        if (parentId) {
+          const parentIdx = findFolderIndex(flatList, parentId)
+          if (parentIdx >= 0) setSelectedIndex(parentIdx)
+        }
+      }
+      return true
+    }
+    if (e.key === "j" || e.key === "ArrowDown") {
+      e.preventDefault()
+      setSelectedIndex((i) => Math.min(i + 1, totalCount - 1))
+      return true
+    }
+    if (e.key === "k" || e.key === "ArrowUp") {
+      e.preventDefault()
+      setSelectedIndex((i) => Math.max(i - 1, 0))
       return true
     }
   }

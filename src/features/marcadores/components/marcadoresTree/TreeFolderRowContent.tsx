@@ -26,6 +26,8 @@ export function TreeFolderRowContent({
           !hasKids && "pointer-events-none invisible"
         )}
         aria-label={collapsedIds.has(item.id) ? "Expandir carpeta" : "Contraer carpeta"}
+        aria-expanded={hasKids ? !collapsedIds.has(item.id) : undefined}
+        tabIndex={-1}
         onClick={(e) => {
           e.stopPropagation()
           onToggleFolderCollapse(item.id)

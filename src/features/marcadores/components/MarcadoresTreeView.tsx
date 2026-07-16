@@ -88,7 +88,11 @@ export default function MarcadoresTreeView({
         {onDrop && dropPreview?.targetKey === TREE_DROP_PANEL_KEY ? (
           <div className={APP_DROP_PANEL_OVERLAY_CLASS} aria-hidden />
         ) : null}
-        <div className="relative mx-auto min-h-[120px] max-w-4xl space-y-0.5">
+        <div
+          className="relative mx-auto min-h-[120px] max-w-4xl space-y-0.5"
+          role="tree"
+          aria-label="Árbol de carpetas y marcadores"
+        >
           {onDrop && (
             <TreeRootDropRow
               dropActive={dropPreview?.targetKey === TREE_DROP_ROOT_KEY}

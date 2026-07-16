@@ -44,6 +44,9 @@ export function useMarcadoresMainHotkeys(params: Params) {
     onNewFolder,
     onEditItem,
     openBookmarkTab,
+    treeMode,
+    treeCollapsedIds,
+    onToggleFolderCollapse,
   } = params
 
   useHotkeysOnElement(
@@ -78,6 +81,9 @@ export function useMarcadoresMainHotkeys(params: Params) {
         onNewFolder,
         onEditItem,
         openBookmarkTab,
+        treeMode,
+        treeCollapsedIds,
+        onToggleFolderCollapse,
       })
     },
     { enabled },
@@ -109,6 +115,9 @@ export function useMarcadoresMainHotkeys(params: Params) {
       onNewFolder,
       onEditItem,
       openBookmarkTab,
+      treeMode,
+      treeCollapsedIds,
+      onToggleFolderCollapse,
     ]
   )
 }
