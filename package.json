@@ -12,7 +12,9 @@
     "format:check": "prettier --check .",
     "lint:md": "markdownlint-cli2",
     "lint:md:fix": "markdownlint-cli2 --fix",
-    "react:doctor": "react-doctor . --verbose"
+    "react:doctor": "react-doctor . --verbose",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@atlaskit/pragmatic-drag-and-drop": "^1.8.1",
@@ -43,6 +45,7 @@
     "prettier-plugin-tailwindcss": "^0.7.2",
     "react-doctor": "^0.5.7",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }
