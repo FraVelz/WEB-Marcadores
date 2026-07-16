@@ -5,5 +5,10 @@ minimumReleaseAge: 10080
 trustPolicy: no-downgrade
 
 allowBuilds:
-  sharp: set this to true or false
-  unrs-resolver: set this to true or false
+  "@sentry/cli": false
+  sharp: true
+  unrs-resolver: true
+
+onlyBuiltDependencies:
+  - sharp
+  - unrs-resolver

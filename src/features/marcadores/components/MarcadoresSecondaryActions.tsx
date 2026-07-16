@@ -3,6 +3,9 @@
 import { cn } from "@/lib/utils"
 import { FOCUS_RING_ICON_BTN } from "@/lib/focusStyles"
 
+import type { ImportSummary } from "../hooks/persistMarcadoresImport"
+
+import { ToolbarImportExportSection } from "./ToolbarImportExportSection"
 import ToolbarNewFolderSection from "./ToolbarNewFolderSection"
 import ToolbarRenameFolderSection from "./ToolbarRenameFolderSection"
 import ToolbarSelectActions from "./ToolbarSelectActions"
@@ -30,6 +33,8 @@ type Props = {
   setRenameFolderName: (v: string) => void
   onRenameFolder: () => void
   duplicateClusterCount?: number
+  onExportJson?: () => void
+  onImportFile?: (file: File) => Promise<ImportSummary>
 }
 
 /** Acciones secundarias compactas bajo la cabecera principal de Marcadores. */
@@ -56,6 +61,8 @@ export function MarcadoresSecondaryActions({
   setRenameFolderName,
   onRenameFolder,
   duplicateClusterCount,
+  onExportJson,
+  onImportFile,
 }: Props) {
   const iconBtn = cn(
     "text-app-fg-muted hover:bg-app-hover hover:text-app-fg rounded-lg p-2 transition-colors",
@@ -122,6 +129,13 @@ export function MarcadoresSecondaryActions({
           onEdit={onEdit}
           onDelete={onDelete}
         />
+
+        {onExportJson && onImportFile ? (
+          <>
+            <div className="bg-app-border mx-1 h-5 w-px" />
+            <ToolbarImportExportSection onExportJson={onExportJson} onImportFile={onImportFile} />
+          </>
+        ) : null}
 
         {duplicateClusterCount != null && duplicateClusterCount > 0 ? (
           <p className="text-app-fg-muted ml-auto shrink-0 text-[11px]">
