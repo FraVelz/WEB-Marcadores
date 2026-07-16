@@ -4,6 +4,7 @@ import type { Dispatch, SetStateAction } from "react"
 
 import type { BookmarkFormData } from "@/features/marcadores/components/bookmark/BookmarkModal"
 import { splitCommaTags } from "@/lib/comma-tags"
+import { BOOKMARK_URL_ERROR, isHttpUrl } from "@/lib/isHttpUrl"
 import type { createClient } from "@/lib/supabase/client"
 
 import type { Bookmark } from "../utils/types"
@@ -21,6 +22,11 @@ export async function persistMarcadoresBookmarkModal(
   editingBookmark: Bookmark | null
 ) {
   const { demoMode, supabase, setBookmarks, setDetailBookmark, refreshTags, fetchData } = deps
+
+  if (!isHttpUrl(data.url)) {
+    throw new Error(BOOKMARK_URL_ERROR)
+  }
+
   const tags = data.tags ? splitCommaTags(data.tags) : []
   const folder_id = data.folder_id || null
 

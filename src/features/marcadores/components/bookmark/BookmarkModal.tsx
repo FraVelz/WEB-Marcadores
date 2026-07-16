@@ -5,6 +5,7 @@ import { buildFolderOptions } from "@/lib/bookmark-utils"
 import { FOCUS_RING } from "@/lib/focusStyles"
 import { cn } from "@/lib/utils"
 import { splitCommaTags } from "@/lib/comma-tags"
+import { BOOKMARK_URL_ERROR, isHttpUrl } from "@/lib/isHttpUrl"
 import BookmarkFormBasicInfo from "./BookmarkFormBasicInfo"
 import BookmarkFormFolderSelect from "./BookmarkFormFolderSelect"
 import BookmarkFormTagsSection from "./BookmarkFormTagsSection"
@@ -47,6 +48,7 @@ export default function BookmarkModal({ onClose, onSubmit, initialData, allTags,
   const [folderId, setFolderId] = useState(merged.folder_id)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [urlError, setUrlError] = useState<string | null>(null)
   const firstInputRef = useRef<HTMLInputElement>(null)
   const modalContentRef = useRef<HTMLDivElement>(null)
   const tagInputRef = useRef<string>("")
@@ -91,23 +93,37 @@ export default function BookmarkModal({ onClose, onSubmit, initialData, allTags,
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setSubmitError(null)
+    setUrlError(null)
     setSubmitting(true)
     const form = e.currentTarget
     const trimmedPending = tagInputRef.current?.trim() ?? ""
     const finalTags = trimmedPending ? [...splitCommaTags(tagsValue), trimmedPending].join(", ") : tagsValue
+    const url = (form.elements.namedItem("url") as HTMLInputElement).value
     const formData: BookmarkFormData = {
       title: (form.elements.namedItem("title") as HTMLInputElement).value,
-      url: (form.elements.namedItem("url") as HTMLInputElement).value,
+      url,
       description: (form.elements.namedItem("description") as HTMLInputElement).value,
       folder_id: folderId || "",
       tags: finalTags,
     }
+
+    if (!isHttpUrl(url)) {
+      setUrlError(BOOKMARK_URL_ERROR)
+      setSubmitting(false)
+      return
+    }
+
     try {
       await onSubmit(formData)
       onClose()
       return
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "Error al guardar")
+      const message = err instanceof Error ? err.message : "Error al guardar"
+      if (message === BOOKMARK_URL_ERROR) {
+        setUrlError(message)
+      } else {
+        setSubmitError(message)
+      }
     }
     setSubmitting(false)
   }
@@ -143,6 +159,7 @@ export default function BookmarkModal({ onClose, onSubmit, initialData, allTags,
             url={merged.url}
             description={merged.description}
             firstInputRef={firstInputRef}
+            urlError={urlError}
           />
           <BookmarkFormFolderSelect folderId={folderId} folderOptions={folderOptions} onChange={setFolderId} />
           <BookmarkFormTagsSection
