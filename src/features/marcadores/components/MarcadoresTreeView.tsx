@@ -5,6 +5,7 @@ import { useRef, useState } from "react"
 import { APP_DROP_PANEL_OVERLAY_CLASS } from "../utils/dragDropUi"
 import type { Bookmark, CutItem, FlatFolder, GridItem } from "../utils/types"
 import { useBookmarkDragMonitor, useBookmarkDropPanel } from "@/lib/drag-and-drop"
+import { EmptySearchState } from "./EmptySearchState"
 import { EmptyTreeState } from "./marcadoresTree/EmptyTreeState"
 import { TREE_DROP_PANEL_KEY, TREE_DROP_ROOT_KEY } from "./marcadoresTree/treeConstants"
 import { folderDestinationLine, rowTargetKey } from "./marcadoresTree/treeHelpers"
@@ -157,7 +158,12 @@ export default function MarcadoresTreeView({
             )
           })}
         </div>
-        {rows.length === 0 && <EmptyTreeState onAddBookmark={onAddBookmark} onNewFolder={onNewFolder} />}
+        {rows.length === 0 &&
+          (searchQuery.trim() ? (
+            <EmptySearchState query={searchQuery} />
+          ) : (
+            <EmptyTreeState onAddBookmark={onAddBookmark} onNewFolder={onNewFolder} />
+          ))}
       </div>
 
       {dropPreview && <TreeDropPreviewBar line={dropPreview.line} />}
