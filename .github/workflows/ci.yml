@@ -5,11 +5,15 @@ on:
     branches: [main]
     paths:
       - "src/**"
+      - "e2e/**"
+      - "supabase/**"
       - "public/**"
       - "package.json"
       - "pnpm-lock.yaml"
       - "next.config.*"
       - "tsconfig.json"
+      - "vitest.config.*"
+      - "playwright.config.*"
       - "postcss.config.*"
       - "eslint.config.*"
       - "global.d.ts"
@@ -21,11 +25,15 @@ on:
     branches: [main]
     paths:
       - "src/**"
+      - "e2e/**"
+      - "supabase/**"
       - "public/**"
       - "package.json"
       - "pnpm-lock.yaml"
       - "next.config.*"
       - "tsconfig.json"
+      - "vitest.config.*"
+      - "playwright.config.*"
       - "postcss.config.*"
       - "eslint.config.*"
       - "global.d.ts"
@@ -62,8 +70,20 @@ jobs:
       - name: Prettier
         run: pnpm run format:check
 
+      - name: Unit tests
+        run: pnpm run test
+
       - name: Build
         run: pnpm run build
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: E2E Playwright
+        run: pnpm run test:e2e
+        env:
+          CI: true
+          NEXT_PUBLIC_DEMO_MODE: "true"
 
       - name: React Doctor
         continue-on-error: true
