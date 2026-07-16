@@ -15,12 +15,7 @@ type Props = {
   onCancel: () => void
 }
 
-export default function ToolbarNewFolderSection({
-  newFolderName,
-  setNewFolderName,
-  onCreateFolder,
-  onCancel,
-}: Props) {
+export default function ToolbarNewFolderSection({ newFolderName, setNewFolderName, onCreateFolder, onCancel }: Props) {
   const titleId = useId()
   const errorId = useId()
   const dialogRef = useRef<HTMLDivElement>(null)
