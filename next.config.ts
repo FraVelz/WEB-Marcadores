@@ -1,5 +1,7 @@
 import type { NextConfig } from "next"
 
+import { getSecurityHeaders } from "./security-headers"
+
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
@@ -12,6 +14,14 @@ const nextConfig: NextConfig = {
         pathname: "/s2/favicons/**",
       },
     ],
+  },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: getSecurityHeaders(),
+      },
+    ]
   },
 }
 

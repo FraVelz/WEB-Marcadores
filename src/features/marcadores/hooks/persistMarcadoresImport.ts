@@ -12,9 +12,22 @@ import {
   parseMarcadoresBackupJson,
   type FlattenedImportItem,
 } from "../utils/marcadoresBackup"
+import {
+  assertImportItemCount,
+  assertImportRateLimit,
+  getDefaultImportRateStore,
+  recordImportAttempt,
+} from "../utils/importRateLimit"
 import { assertImportSize, parseNetscapeBookmarksHtml } from "../utils/netscapeBookmarks"
 import type { Bookmark, FlatFolder } from "../utils/types"
 import { buildFolderTree } from "../utils/utils"
+
+function beginImportGate(itemCount: number): void {
+  const store = getDefaultImportRateStore()
+  assertImportRateLimit(store)
+  assertImportItemCount(itemCount)
+  recordImportAttempt(store)
+}
 
 export type ImportSummary = {
   foldersCreated: number
@@ -162,6 +175,7 @@ export async function importNetscapeHtmlFile(deps: PersistDeps, file: File): Pro
   const text = await file.text()
   const parsed = parseNetscapeBookmarksHtml(text)
   const items = flattenNetscapeForest(parsed.roots)
+  beginImportGate(items.length)
   return persistFlattenedImport(deps, items, parsed.skippedLinks, "netscape")
 }
 
@@ -170,6 +184,6 @@ export async function importBackupJsonFile(deps: PersistDeps, file: File): Promi
   const text = await file.text()
   const backup = parseMarcadoresBackupJson(text)
   const items = flattenBackupForImport(backup)
-  const skippedInParse = 0
-  return persistFlattenedImport(deps, items, skippedInParse, "json")
+  beginImportGate(items.length)
+  return persistFlattenedImport(deps, items, 0, "json")
 }
