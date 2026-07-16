@@ -20,6 +20,7 @@ on:
       - "knip.json"
       - "vercel.json"
       - "doctor.config.json"
+      - "security-headers.ts"
       - ".github/workflows/**"
   pull_request:
     branches: [main]
@@ -40,7 +41,9 @@ on:
       - "knip.json"
       - "vercel.json"
       - "doctor.config.json"
+      - "security-headers.ts"
       - ".github/workflows/**"
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}
