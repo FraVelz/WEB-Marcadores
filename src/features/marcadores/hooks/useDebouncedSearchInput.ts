@@ -18,14 +18,22 @@ type Args = {
 export function useDebouncedSearchInput({ query, onQueryChange, delayMs = 250 }: Args) {
   const [draftState, setDraftState] = useState({ query, draft: query })
   const onQueryChangeRef = useRef(onQueryChange)
-  onQueryChangeRef.current = onQueryChange
-
   const schedulerRef = useRef<ReturnType<typeof createDebouncedScheduler> | null>(null)
-  if (!schedulerRef.current) {
-    schedulerRef.current = createDebouncedScheduler(delayMs, (value) => {
+
+  useEffect(() => {
+    onQueryChangeRef.current = onQueryChange
+  }, [onQueryChange])
+
+  useEffect(() => {
+    const scheduler = createDebouncedScheduler(delayMs, (value) => {
       onQueryChangeRef.current(value)
     })
-  }
+    schedulerRef.current = scheduler
+    return () => {
+      scheduler.cancel()
+      schedulerRef.current = null
+    }
+  }, [delayMs])
 
   const draft = draftState.query === query ? draftState.draft : query
 
@@ -37,12 +45,6 @@ export function useDebouncedSearchInput({ query, onQueryChange, delayMs = 250 }:
     setDraftState({ query, draft: value })
     schedulerRef.current?.schedule(value)
   }
-
-  useEffect(() => {
-    return () => {
-      schedulerRef.current?.cancel()
-    }
-  }, [])
 
   return { draft, setDraft, flush }
 }

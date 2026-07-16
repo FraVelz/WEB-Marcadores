@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import {
-  assertAcyclicFolderMove,
-  CyclicFolderMoveError,
-  CYCLIC_FOLDER_MOVE_MESSAGE,
-} from "./assertAcyclicFolderMove"
+import { assertAcyclicFolderMove, CyclicFolderMoveError, CYCLIC_FOLDER_MOVE_MESSAGE } from "./assertAcyclicFolderMove"
 import type { FlatFolder } from "./types"
 
 const folders: FlatFolder[] = [
@@ -34,10 +30,7 @@ describe("assertAcyclicFolderMove", () => {
   })
 
   it("allows moving a sibling under another root folder", () => {
-    const withSibling: FlatFolder[] = [
-      ...folders,
-      { id: "root-d", parent_id: null, name: "D", sort_order: 1 },
-    ]
+    const withSibling: FlatFolder[] = [...folders, { id: "root-d", parent_id: null, name: "D", sort_order: 1 }]
     expect(() => assertAcyclicFolderMove(withSibling, "child-b", "root-d")).not.toThrow()
   })
 

@@ -1,7 +1,6 @@
 const BLOCKED_SCHEME = /^(javascript|data|vbscript|file):/i
 
-export const BOOKMARK_URL_ERROR =
-  "La URL debe usar http:// o https:// (no javascript:, data: ni otros esquemas)."
+export const BOOKMARK_URL_ERROR = "La URL debe usar http:// o https:// (no javascript:, data: ni otros esquemas)."
 
 export function isHttpUrl(value: string): boolean {
   const trimmed = value.trim()
