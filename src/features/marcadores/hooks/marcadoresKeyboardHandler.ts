@@ -35,6 +35,9 @@ export function handleMarcadoresKeyDown(e: KeyboardEvent, ctx: MarcadoresKeyboar
     onNewFolder,
     onEditItem,
     openBookmarkTab,
+    treeMode,
+    treeCollapsedIds,
+    onToggleFolderCollapse,
   } = ctx
 
   const active = document.activeElement
@@ -139,6 +142,11 @@ export function handleMarcadoresKeyDown(e: KeyboardEvent, ctx: MarcadoresKeyboar
       openBookmarkTab,
       setInfoPanelEnabled,
       setDetailBookmark,
+      treeMode,
+      treeCollapsedIds,
+      onToggleFolderCollapse,
+      folders,
+      bookmarks,
     })
   )
     return

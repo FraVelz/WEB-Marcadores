@@ -77,12 +77,22 @@ export function TreeRow({
     onDragLeave: onDragClearHighlight,
   })
 
+  const hasKids = isFolder ? folderHasChildren(folders, bookmarks, item.id) : false
+  const isExpanded = isFolder ? hasKids && !collapsedIds.has(item.id) : undefined
+
   const activateFromKeyboard = (e: React.KeyboardEvent) => {
     if (e.target !== e.currentTarget) return
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault()
       if (!isFolder && selectMode) onToggleSelect(item.bookmark.id)
       else onSelect(idx)
+      return
+    }
+    if (isFolder && hasKids && (e.key === "ArrowRight" || e.key === "ArrowLeft")) {
+      e.preventDefault()
+      const collapsed = collapsedIds.has(item.id)
+      if (e.key === "ArrowRight" && collapsed) onToggleFolderCollapse(item.id)
+      if (e.key === "ArrowLeft" && !collapsed) onToggleFolderCollapse(item.id)
     }
   }
 
@@ -113,8 +123,11 @@ export function TreeRow({
   return (
     <div
       ref={setNodeRef}
-      role="button"
+      role="treeitem"
       tabIndex={0}
+      aria-level={depth + 1}
+      aria-selected={isSelected}
+      aria-expanded={isFolder ? (hasKids ? isExpanded : false) : undefined}
       aria-pressed={selectMode && !isFolder ? isChecked : undefined}
       style={{ paddingLeft: padLeft }}
       className={cn(baseClass, !isSelected && FOCUS_RING_INSET)}
@@ -152,7 +165,7 @@ export function TreeRow({
       {item.type === "folder" ? (
         <TreeFolderRowContent
           item={item}
-          hasKids={folderHasChildren(folders, bookmarks, item.id)}
+          hasKids={hasKids}
           collapsedIds={collapsedIds}
           onToggleFolderCollapse={onToggleFolderCollapse}
         />

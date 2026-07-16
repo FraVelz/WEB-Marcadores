@@ -30,4 +30,8 @@ export type MarcadoresKeyboardContext = {
   onNewFolder: () => void
   onEditItem: (item: GridItem) => void
   openBookmarkTab: (bookmark: Bookmark) => void
+  /** Tree view: ArrowLeft/Right expand/collapse + aria navigation. */
+  treeMode?: boolean
+  treeCollapsedIds?: Set<string>
+  onToggleFolderCollapse?: (folderId: string) => void
 }
