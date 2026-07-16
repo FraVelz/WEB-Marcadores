@@ -14,9 +14,15 @@ type Props = {
   onCancel: () => void
 }
 
+const FOCUSABLE_SELECTOR = [
+  "button:not([disabled]), input:not([disabled]), textarea:not([disabled]),",
+  "select:not([disabled]), [tabindex]:not([tabindex='-1'])",
+].join(" ")
+
 export default function DeleteConfirmModal({ item, onConfirm, onCancel }: Props) {
   const titleId = useId()
   const descriptionId = useId()
+  const dialogRef = useRef<HTMLDivElement>(null)
   const cancelRef = useRef<HTMLButtonElement>(null)
   const [deleting, setDeleting] = useState(false)
 
@@ -27,8 +33,37 @@ export default function DeleteConfirmModal({ item, onConfirm, onCancel }: Props)
   useHotkeys("esc", () => onCancel(), { enabled: !deleting }, [onCancel, deleting])
 
   useEffect(() => {
+    const trigger = document.activeElement instanceof HTMLElement ? document.activeElement : null
     requestAnimationFrame(() => cancelRef.current?.focus())
+    return () => {
+      if (trigger?.isConnected) {
+        requestAnimationFrame(() => trigger.focus())
+      }
+    }
   }, [])
+
+  useEffect(() => {
+    const el = dialogRef.current
+    if (!el) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return
+      const focusables = el.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      if (!first || !last) return
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault()
+          last.focus()
+        }
+      } else if (document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+    el.addEventListener("keydown", handleKeyDown)
+    return () => el.removeEventListener("keydown", handleKeyDown)
+  }, [deleting])
 
   const handleConfirm = async () => {
     if (deleting) return
@@ -42,6 +77,7 @@ export default function DeleteConfirmModal({ item, onConfirm, onCancel }: Props)
 
   return (
     <div
+      ref={dialogRef}
       className={cn(
         "bg-app-overlay fixed inset-0 flex items-center justify-center p-4",
         MARCADORES_GLOBAL_ALERT_Z_CLASS
