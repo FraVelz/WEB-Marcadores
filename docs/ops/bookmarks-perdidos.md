@@ -32,7 +32,7 @@ Policies en `supabase/rls-policies.sql` (solo `auth.uid() = user_id`).
 3. Si solo tiene HTML del navegador: import Netscape `.html`.
 4. Confirmar conteo de enlaces tras import.
 
-Sin backup: no hay papelera soft-delete aún — comunicar límite honesto.
+Sin backup: no hay papelera soft-delete (ADR `docs/adr/0002-no-soft-delete.md`) — comunicar límite honesto.
 
 ## 5. Mutaciones fallidas / Sentry
 
