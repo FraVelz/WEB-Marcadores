@@ -30,6 +30,8 @@ Implementación: `src/features/marcadores/utils/marcadoresBackup.ts`, `netscapeB
 
 - Solo URLs `http`/`https` se reimportan.
 - Límite de archivo de import: **5 MB**.
+- Rate limit import (cliente): **5 intentos / 10 min** + máx. **5000** nodos por archivo (`importRateLimit.ts`).
+- Soft delete / papelera: **no** en mid hired — ver `docs/adr/0002-no-soft-delete.md`.
 
 ## Restore
 
