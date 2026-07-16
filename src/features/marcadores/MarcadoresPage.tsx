@@ -2,6 +2,7 @@
 
 import BookmarkModal from "@/features/marcadores/components/bookmark/BookmarkModal"
 import DeleteConfirmModal from "@/features/marcadores/components/DeleteConfirmModal"
+import DemoBanner from "@/features/marcadores/components/DemoBanner"
 import MarcadoresFooter from "@/features/marcadores/components/MarcadoresFooter"
 import { MarcadoresDesktopPageSlot } from "@/features/marcadores/MarcadoresDesktopPageSlot"
 import { MarcadoresPageMainLayout } from "@/features/marcadores/MarcadoresPageMainLayout"
@@ -14,7 +15,14 @@ export function MarcadoresPage() {
   const modal = m.bookmarkModal
   const pane = m.libraryPaneScope.getState()
 
-  if (m.loading) return <div className="text-app-fg-label flex flex-1 items-center justify-center">Cargando…</div>
+  if (m.loading) {
+    return (
+      <div className="flex flex-1 flex-col overflow-hidden">
+        {m.demoMode ? <DemoBanner /> : null}
+        <div className="text-app-fg-label flex flex-1 items-center justify-center">Cargando…</div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
