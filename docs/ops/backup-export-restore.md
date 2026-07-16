@@ -2,11 +2,11 @@
 
 ## Qué hay en la app
 
-| Acción | Dónde | Formato |
-|--------|--------|---------|
-| **Exportar** | Toolbar secundaria → icono subir/export | JSON `marcadores-backup-YYYY-MM-DD.json` |
+| Acción                | Dónde                                     | Formato                                      |
+| --------------------- | ----------------------------------------- | -------------------------------------------- |
+| **Exportar**          | Toolbar secundaria → icono subir/export   | JSON `marcadores-backup-YYYY-MM-DD.json`     |
 | **Importar Netscape** | Toolbar → icono import → `.html` / `.htm` | Netscape Bookmark File (Chrome/Firefox/Edge) |
-| **Restaurar backup** | Mismo import → `.json` | Schema v1 (`docs` abajo) |
+| **Restaurar backup**  | Mismo import → `.json`                    | Schema v1 (`docs` abajo)                     |
 
 Implementación: `src/features/marcadores/utils/marcadoresBackup.ts`, `netscapeBookmarks.ts`, `persistMarcadoresImport.ts`.
 

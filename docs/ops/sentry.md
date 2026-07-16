@@ -2,12 +2,12 @@
 
 ## Comportamiento
 
-| Pieza | Path |
-|-------|------|
-| Client init | `src/instrumentation-client.ts` |
-| Server register | `src/instrumentation.ts` |
-| Helper mutaciones | `src/lib/sentry/captureMutationError.ts` |
-| Call sites | `useMarcadoresActions`, `persistMarcadoresImport` |
+| Pieza             | Path                                              |
+| ----------------- | ------------------------------------------------- |
+| Client init       | `src/instrumentation-client.ts`                   |
+| Server register   | `src/instrumentation.ts`                          |
+| Helper mutaciones | `src/lib/sentry/captureMutationError.ts`          |
+| Call sites        | `useMarcadoresActions`, `persistMarcadoresImport` |
 
 - **Sin DSN → no-op** (local/CI seguros).
 - Sample traces: `0.05`. Replay: off.

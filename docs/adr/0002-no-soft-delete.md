@@ -29,11 +29,11 @@ Ship soft delete when pursuing **mid** signal on tree+authz (guide §12 weeks 13
 
 ## Alternatives considered
 
-| Option | Why not now |
-|--------|-------------|
-| Soft delete now | Mid feature; schema + purge ops exceed Oleada 3 polish |
-| Soft delete folders only | Incomplete story; still needs restore UX |
-| Undo toast (60s) | Nice UX but not a substitute for 30-day trash; optional later |
+| Option                   | Why not now                                                   |
+| ------------------------ | ------------------------------------------------------------- |
+| Soft delete now          | Mid feature; schema + purge ops exceed Oleada 3 polish        |
+| Soft delete folders only | Incomplete story; still needs restore UX                      |
+| Undo toast (60s)         | Nice UX but not a substitute for 30-day trash; optional later |
 
 ## References
 
