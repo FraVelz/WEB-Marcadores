@@ -5,12 +5,7 @@ const isDev = process.env.NODE_ENV !== "production"
  * Allowlist: Next hydration, Vercel Analytics, Sentry, Supabase, Google favicons.
  */
 function buildContentSecurityPolicy(): string {
-  const scriptSrc = [
-    "'self'",
-    "'unsafe-inline'",
-    "https://va.vercel-scripts.com",
-    "https://*.sentry-cdn.com",
-  ]
+  const scriptSrc = ["'self'", "'unsafe-inline'", "https://va.vercel-scripts.com", "https://*.sentry-cdn.com"]
   const connectSrc = [
     "'self'",
     "https://*.supabase.co",

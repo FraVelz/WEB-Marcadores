@@ -9,13 +9,13 @@ Este archivo **no** es evidencia. Solo guía qué registrar. No inventar fechas,
 
 ### Opción A — Uso personal ≥ 2 semanas
 
-| Campo | Valor |
-|-------|--------|
-| Fecha inicio (ISO) | _pendiente_ |
-| Fecha fin (≥ +14 días) | _pendiente_ |
-| Cuenta / entorno | producción / preview (indicar URL) |
-| Sesiones aproximadas | _n_ |
-| Notas (qué usaste: carpetas, import, demo vs authed) | _…_ |
+| Campo                                                | Valor                              |
+| ---------------------------------------------------- | ---------------------------------- |
+| Fecha inicio (ISO)                                   | _pendiente_                        |
+| Fecha fin (≥ +14 días)                               | _pendiente_                        |
+| Cuenta / entorno                                     | producción / preview (indicar URL) |
+| Sesiones aproximadas                                 | _n_                                |
+| Notas (qué usaste: carpetas, import, demo vs authed) | _…_                                |
 
 Evidencia adjunta (links o paths, no capturas con secretos):
 
@@ -24,13 +24,13 @@ Evidencia adjunta (links o paths, no capturas con secretos):
 
 ### Opción B — Usuario externo + feedback
 
-| Campo | Valor |
-|-------|--------|
-| Fecha | _pendiente_ |
-| Relación (amigo / colega; sin PII innecesaria) | _…_ |
-| Canal de feedback | issue / email / nota |
-| Resumen feedback (1–3 bullets) | _…_ |
-| Link o path a la nota | _…_ |
+| Campo                                          | Valor                |
+| ---------------------------------------------- | -------------------- |
+| Fecha                                          | _pendiente_          |
+| Relación (amigo / colega; sin PII innecesaria) | _…_                  |
+| Canal de feedback                              | issue / email / nota |
+| Resumen feedback (1–3 bullets)                 | _…_                  |
+| Link o path a la nota                          | _…_                  |
 
 ## Cómo cerrar el ticket
 

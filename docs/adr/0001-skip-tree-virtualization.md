@@ -13,13 +13,13 @@ Plan 12 Oleada 3 asks for tree virtualization **if** measured libraries exceed *
 Synthetic libraries via `measureTreeFlatten` / `measureTreeFlatten.test.ts` (same walk as production tree flatten, no collapse):
 
 | Nodes | Avg flatten (local Node) |
-|------:|--------------------------:|
-| 100 | ~0.03 ms |
-| 300 | ~0.05 ms |
-| 500 | ~0.08 ms |
-| 1000 | ~0.15 ms |
+| ----: | -----------------------: |
+|   100 |                 ~0.03 ms |
+|   300 |                 ~0.05 ms |
+|   500 |                 ~0.08 ms |
+|  1000 |                 ~0.15 ms |
 
-CI gate in the unit test: flatten at ≥300 nodes stays **&lt; 5 ms** (orders of magnitude under the INP budget for the *data* walk). Real-usage checklist (`docs/ops/uso-real-checklist.md`) has **no** evidence yet of a personal library ≥300 nodes.
+CI gate in the unit test: flatten at ≥300 nodes stays **&lt; 5 ms** (orders of magnitude under the INP budget for the _data_ walk). Real-usage checklist (`docs/ops/uso-real-checklist.md`) has **no** evidence yet of a personal library ≥300 nodes.
 
 DOM cost of ~300 simple rows is acceptable for mid polish; adding `react-window` / Virtuoso would force rework of:
 
@@ -46,10 +46,10 @@ Then prefer windowing **or** stronger lazy-by-folder loading, with an ADR update
 
 ## Alternatives considered
 
-| Option | Why not now |
-|--------|-------------|
-| Always virtualize | Complexity vs unproven need; breaks current tree a11y path |
-| Cap UI at 300 | Bad UX; import already allows larger trees |
+| Option               | Why not now                                                 |
+| -------------------- | ----------------------------------------------------------- |
+| Always virtualize    | Complexity vs unproven need; breaks current tree a11y path  |
+| Cap UI at 300        | Bad UX; import already allows larger trees                  |
 | Only virtualize grid | Same DnD/ref issues; grid is folder-scoped, usually smaller |
 
 ## References

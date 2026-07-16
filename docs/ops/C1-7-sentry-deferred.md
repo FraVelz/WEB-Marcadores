@@ -10,4 +10,3 @@ Ver [`sentry.md`](./sentry.md) y [`alerts-mutations.md`](./alerts-mutations.md).
 `@sentry/nextjs` no estaba en dependencies en oleada 1; se aplazó a C2-4.
 
 Actualizado: 2026-07-15.
-

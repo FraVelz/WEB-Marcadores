@@ -4,12 +4,12 @@
 
 ## 1. Triage rápido (2 min)
 
-| Pregunta | Si sí… |
-|----------|--------|
-| ¿Está en `/demo`? | Demo es **memoria de sesión**; no es la cuenta. Salir de demo e iniciar sesión. |
-| ¿Otra cuenta / otro navegador? | Comprobar email en Perfil; no hay sync cross-account. |
-| ¿Filtro de búsqueda activo? | Limpiar búsqueda; empty search ≠ carpeta vacía. |
-| ¿Carpeta distinta / árbol colapsado? | Breadcrumb → raíz; expandir árbol. |
+| Pregunta                             | Si sí…                                                                          |
+| ------------------------------------ | ------------------------------------------------------------------------------- |
+| ¿Está en `/demo`?                    | Demo es **memoria de sesión**; no es la cuenta. Salir de demo e iniciar sesión. |
+| ¿Otra cuenta / otro navegador?       | Comprobar email en Perfil; no hay sync cross-account.                           |
+| ¿Filtro de búsqueda activo?          | Limpiar búsqueda; empty search ≠ carpeta vacía.                                 |
+| ¿Carpeta distinta / árbol colapsado? | Breadcrumb → raíz; expandir árbol.                                              |
 
 ## 2. ¿Datos en Supabase?
 
