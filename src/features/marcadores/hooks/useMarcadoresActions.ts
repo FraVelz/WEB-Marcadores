@@ -2,6 +2,7 @@
 
 import { useDashboard } from "@/contexts/DashboardContext"
 import { createClient } from "@/lib/supabase/client"
+import { assertAcyclicFolderMove, CyclicFolderMoveError } from "../utils/assertAcyclicFolderMove"
 import { buildFolderTree } from "../utils/utils"
 import { repointBrowseAfterFolderDelete } from "../utils/folderBrowseRepoint"
 import { collectFolderSubtreeIds } from "../utils/folderDescendants"
@@ -139,6 +140,13 @@ export function useMarcadoresActions({
   }
 
   const handlePasteFolder = async (folderId: string, destParentId: string | null) => {
+    try {
+      assertAcyclicFolderMove(folders, folderId, destParentId)
+    } catch (error) {
+      if (error instanceof CyclicFolderMoveError) return
+      throw error
+    }
+
     if (demoMode) {
       setFolders((prev) => {
         const next = prev.map((f) => (f.id === folderId ? { ...f, parent_id: destParentId } : f))

@@ -2,8 +2,12 @@
 
 import type { Folder } from "@/contexts/DashboardContext"
 
+import {
+  assertAcyclicFolderMove,
+  CyclicFolderMoveError,
+  CYCLIC_FOLDER_MOVE_MESSAGE,
+} from "@/features/marcadores/utils/assertAcyclicFolderMove"
 import type { Bookmark, GridItem } from "@/features/marcadores/utils/types"
-import { isFolderDescendant } from "@/features/marcadores/utils/utils"
 
 function runDrop(
   sourceItem: GridItem,
@@ -27,9 +31,14 @@ function runDrop(
       setPasteError("Ya existe una carpeta con ese nombre en el destino")
       return
     }
-    if (destId === sourceItem.id || (destId && isFolderDescendant(folders, destId, sourceItem.id))) {
-      setPasteError("No se puede mover una carpeta dentro de sí misma o de sus subcarpetas")
-      return
+    try {
+      assertAcyclicFolderMove(folders, sourceItem.id, destId)
+    } catch (error) {
+      if (error instanceof CyclicFolderMoveError) {
+        setPasteError(CYCLIC_FOLDER_MOVE_MESSAGE)
+        return
+      }
+      throw error
     }
     handlePasteFolder(sourceItem.id, destId)
     return

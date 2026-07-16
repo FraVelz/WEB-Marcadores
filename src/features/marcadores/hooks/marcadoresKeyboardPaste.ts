@@ -1,6 +1,10 @@
 import type { Dispatch, SetStateAction } from "react"
 
-import { isFolderDescendant } from "../utils/utils"
+import {
+  assertAcyclicFolderMove,
+  CyclicFolderMoveError,
+  CYCLIC_FOLDER_MOVE_MESSAGE,
+} from "../utils/assertAcyclicFolderMove"
 import type { Bookmark, CutItem, FlatFolder } from "../utils/types"
 
 export function pasteCutFromKeyboard(
@@ -24,9 +28,14 @@ export function pasteCutFromKeyboard(
       setPasteError("Ya existe una carpeta con ese nombre en el destino")
       return
     }
-    if (destId === cutItem.id || (destId && isFolderDescendant(folders, destId, cutItem.id))) {
-      setPasteError("No se puede mover una carpeta dentro de sí misma o de sus subcarpetas")
-      return
+    try {
+      assertAcyclicFolderMove(folders, cutItem.id, destId)
+    } catch (error) {
+      if (error instanceof CyclicFolderMoveError) {
+        setPasteError(CYCLIC_FOLDER_MOVE_MESSAGE)
+        return
+      }
+      throw error
     }
     void handlePasteFolder(cutItem.id, destId)
     setCutItem(null)
