@@ -30,23 +30,25 @@ export function ToolbarImportExportSection({ onExportJson, onImportFile, busy = 
     inputRef.current?.click()
   }
 
-  const handleFile = async (file: File | undefined) => {
+  const handleFile = (file: File | undefined) => {
     if (!file) return
     setImporting(true)
     setError(null)
     setStatus(null)
-    try {
-      const summary = await onImportFile(file)
-      setStatus(
-        `Importado: ${summary.bookmarksCreated} enlaces, ${summary.foldersCreated} carpetas` +
-          (summary.skippedLinks ? ` (${summary.skippedLinks} omitidos)` : "")
-      )
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo importar el archivo")
-    } finally {
-      setImporting(false)
-      if (inputRef.current) inputRef.current.value = ""
-    }
+    void onImportFile(file)
+      .then((summary) => {
+        setStatus(
+          `Importado: ${summary.bookmarksCreated} enlaces, ${summary.foldersCreated} carpetas` +
+            (summary.skippedLinks ? ` (${summary.skippedLinks} omitidos)` : "")
+        )
+      })
+      .catch((err) => {
+        setError(err instanceof Error ? err.message : "No se pudo importar el archivo")
+      })
+      .finally(() => {
+        setImporting(false)
+        if (inputRef.current) inputRef.current.value = ""
+      })
   }
 
   const disabled = busy || importing
@@ -84,7 +86,8 @@ export function ToolbarImportExportSection({ onExportJson, onImportFile, busy = 
           type="file"
           accept=".html,.htm,.json,text/html,application/json"
           className="sr-only"
-          onChange={(e) => void handleFile(e.target.files?.[0])}
+          aria-label="Importar HTML Netscape o JSON"
+          onChange={(e) => handleFile(e.target.files?.[0])}
         />
       </div>
       {status ? <p className="text-app-fg-muted text-[11px]">{status}</p> : null}

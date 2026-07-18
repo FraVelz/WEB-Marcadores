@@ -3,7 +3,7 @@ import { isHttpUrl } from "@/lib/isHttpUrl"
 import type { Bookmark, FlatFolder } from "./types"
 import type { NetscapeNode } from "./netscapeBookmarks"
 
-export const MARCADORES_BACKUP_VERSION = 1 as const
+const MARCADORES_BACKUP_VERSION = 1 as const
 
 export type MarcadoresBackupV1 = {
   version: typeof MARCADORES_BACKUP_VERSION
@@ -157,7 +157,7 @@ export function flattenNetscapeForest(
 
 /** Convierte backup JSON a filas planas (ids del backup como tempId para remap). */
 export function flattenBackupForImport(backup: MarcadoresBackupV1): FlattenedImportItem[] {
-  const foldersSorted = [...backup.folders].sort((a, b) => {
+  const foldersSorted = backup.folders.toSorted((a, b) => {
     const depth = (id: string, seen = new Set<string>()): number => {
       if (seen.has(id)) return 0
       seen.add(id)

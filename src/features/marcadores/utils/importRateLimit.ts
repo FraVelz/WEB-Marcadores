@@ -1,6 +1,6 @@
 /** Client-side import rate limit (C3-3). Import runs via Supabase client, not a server action. */
 
-export const IMPORT_RATE_WINDOW_MS = 10 * 60 * 1000
+const IMPORT_RATE_WINDOW_MS = 10 * 60 * 1000
 export const IMPORT_RATE_MAX = 5
 export const IMPORT_MAX_ITEMS = 5_000
 
