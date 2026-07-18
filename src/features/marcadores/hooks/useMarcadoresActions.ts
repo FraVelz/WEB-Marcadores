@@ -27,6 +27,15 @@ function downloadTextFile(filename: string, content: string, mime: string) {
   URL.revokeObjectURL(url)
 }
 
+async function withMutationError<T>(mutation: string, fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn()
+  } catch (error) {
+    captureMutationError(error, { mutation })
+    throw error
+  }
+}
+
 export function useMarcadoresActions({
   bookmarks,
   setBookmarks,
@@ -49,54 +58,48 @@ export function useMarcadoresActions({
   const handleCreateFolder = async (newFolderName: string) => {
     const name = newFolderName.trim()
     if (!name) return
-    try {
+    await withMutationError("create_folder", async () => {
       if (demoMode) {
         const id = `f-${Date.now()}`
         setFolders((prev) => [...prev, { id, parent_id: selectedFolderId, name, sort_order: prev.length }])
         setCtxFolders(
           buildFolderTree([...folders, { id, parent_id: selectedFolderId, name, sort_order: folders.length }])
         )
-      } else {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser()
-        if (!user) return
-        const { data, error } = await supabase
-          .from("folders")
-          .insert({
-            user_id: user.id,
-            parent_id: selectedFolderId,
-            name,
-            sort_order: folders.length,
-          })
-          .select()
-          .single()
-        if (error) throw error
-        if (data) {
-          setFolders((prev) => [...prev, data])
-          refreshFolders()
-        }
+        return
       }
-    } catch (error) {
-      captureMutationError(error, { mutation: "create_folder" })
-      throw error
-    }
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) return
+      const { data, error } = await supabase
+        .from("folders")
+        .insert({
+          user_id: user.id,
+          parent_id: selectedFolderId,
+          name,
+          sort_order: folders.length,
+        })
+        .select()
+        .single()
+      if (error) throw error
+      if (data) {
+        setFolders((prev) => [...prev, data])
+        refreshFolders()
+      }
+    })
   }
 
   const handleModalSubmit = async (
     data: import("@/features/marcadores/components/bookmark/BookmarkModal").BookmarkFormData,
     editingBookmark: Bookmark | null
   ) => {
-    try {
+    await withMutationError(editingBookmark ? "update_bookmark" : "create_bookmark", async () => {
       await persistMarcadoresBookmarkModal(
         { demoMode, supabase, setBookmarks, setDetailBookmark, refreshTags, fetchData },
         data,
         editingBookmark
       )
-    } catch (error) {
-      captureMutationError(error, { mutation: editingBookmark ? "update_bookmark" : "create_bookmark" })
-      throw error
-    }
+    })
   }
 
   const handleDelete = async (
@@ -105,7 +108,7 @@ export function useMarcadoresActions({
     setSelectMode: (v: boolean) => void
   ) => {
     if (selectedIds.size === 0) return
-    try {
+    await withMutationError("delete_bookmarks", async () => {
       if (demoMode) {
         setBookmarks((prev) => prev.filter((b) => !selectedIds.has(b.id)))
         setSelectedIds(new Set())
@@ -117,10 +120,7 @@ export function useMarcadoresActions({
       setBookmarks((prev) => prev.filter((b) => !selectedIds.has(b.id)))
       setSelectedIds(new Set())
       setSelectMode(false)
-    } catch (error) {
-      captureMutationError(error, { mutation: "delete_bookmarks" })
-      throw error
-    }
+    })
   }
 
   const handleDeleteFolder = async (folderId: string) => {
@@ -136,7 +136,7 @@ export function useMarcadoresActions({
       setDeskFolderByWin,
     })
 
-    try {
+    await withMutationError("delete_folder", async () => {
       if (demoMode) {
         setBookmarks((prev) =>
           prev.map((b) => (b.folder_id && descendantIds.has(b.folder_id) ? { ...b, folder_id: parentId } : b))
@@ -156,14 +156,11 @@ export function useMarcadoresActions({
       if (moveRes.error) throw moveRes.error
       if (delRes.error) throw delRes.error
       await fetchData()
-    } catch (error) {
-      captureMutationError(error, { mutation: "delete_folder" })
-      throw error
-    }
+    })
   }
 
   const handleBookmarkUpdate = async (id: string, updates: Partial<Bookmark>, detailBookmark: Bookmark | null) => {
-    try {
+    await withMutationError("update_bookmark_fields", async () => {
       if (demoMode) {
         setBookmarks((prev) => prev.map((b) => (b.id === id ? { ...b, ...updates } : b)))
         if (detailBookmark?.id === id) setDetailBookmark((prev) => (prev ? { ...prev, ...updates } : null))
@@ -175,10 +172,7 @@ export function useMarcadoresActions({
       setBookmarks((prev) => prev.map((b) => (b.id === id ? { ...b, ...updates } : b)))
       if (detailBookmark?.id === id) setDetailBookmark((prev) => (prev ? { ...prev, ...updates } : null))
       refreshTags()
-    } catch (error) {
-      captureMutationError(error, { mutation: "update_bookmark_fields" })
-      throw error
-    }
+    })
   }
 
   const handlePasteFolder = async (folderId: string, destParentId: string | null) => {
@@ -189,58 +183,49 @@ export function useMarcadoresActions({
       throw error
     }
 
-    try {
+    await withMutationError("move_folder", async () => {
       if (demoMode) {
         setFolders((prev) => {
           const next = prev.map((f) => (f.id === folderId ? { ...f, parent_id: destParentId } : f))
           setCtxFolders(buildFolderTree(next))
           return next
         })
-      } else {
-        const { error } = await supabase.from("folders").update({ parent_id: destParentId }).eq("id", folderId)
-        if (error) throw error
-        await fetchData()
+        return
       }
-    } catch (error) {
-      captureMutationError(error, { mutation: "move_folder" })
-      throw error
-    }
+      const { error } = await supabase.from("folders").update({ parent_id: destParentId }).eq("id", folderId)
+      if (error) throw error
+      await fetchData()
+    })
   }
 
   const handleRenameFolder = async (folderId: string, newName: string) => {
     const name = newName.trim()
     if (!name) return
-    try {
+    await withMutationError("rename_folder", async () => {
       if (demoMode) {
         setFolders((prev) => {
           const next = prev.map((f) => (f.id === folderId ? { ...f, name } : f))
           setCtxFolders(buildFolderTree(next))
           return next
         })
-      } else {
-        const { error } = await supabase.from("folders").update({ name }).eq("id", folderId)
-        if (error) throw error
-        await fetchData()
+        return
       }
-    } catch (error) {
-      captureMutationError(error, { mutation: "rename_folder" })
-      throw error
-    }
+      const { error } = await supabase.from("folders").update({ name }).eq("id", folderId)
+      if (error) throw error
+      await fetchData()
+    })
   }
 
   const handlePasteLink = async (bookmarkId: string, destFolderId: string | null) => {
-    try {
+    await withMutationError("move_bookmark", async () => {
       if (demoMode) {
         setBookmarks((prev) => prev.map((b) => (b.id === bookmarkId ? { ...b, folder_id: destFolderId } : b)))
-      } else {
-        const { error } = await supabase.from("bookmarks").update({ folder_id: destFolderId }).eq("id", bookmarkId)
-        if (error) throw error
-        await fetchData()
+        return
       }
-    } catch (error) {
-      captureMutationError(error, { mutation: "move_bookmark" })
-      throw error
-    }
+      const { error } = await supabase.from("bookmarks").update({ folder_id: destFolderId }).eq("id", bookmarkId)
+      if (error) throw error
+      await fetchData()
+    })
   }
 
   const recordBookmarkOpened = async (bookmarkId: string) => {

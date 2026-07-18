@@ -128,7 +128,6 @@ export function TreeRow({
       aria-level={depth + 1}
       aria-selected={isSelected}
       aria-expanded={isFolder ? (hasKids ? isExpanded : false) : undefined}
-      aria-pressed={selectMode && !isFolder ? isChecked : undefined}
       style={{ paddingLeft: padLeft }}
       className={cn(baseClass, !isSelected && FOCUS_RING_INSET)}
       onClick={() => {

@@ -1,6 +1,12 @@
 import * as Sentry from "@sentry/nextjs"
 
 const SENSITIVE_QUERY = /([?&](?:token|access_token|refresh_token|key|api_key|apikey|auth|password|secret)=)[^&]*/gi
+const SENSITIVE_KEY_EXACT = new Set(["authorization"])
+
+function isSensitiveKey(key: string): boolean {
+  if (SENSITIVE_KEY_EXACT.has(key)) return true
+  return key.includes("token") || key.includes("password") || key.includes("secret")
+}
 
 /** Redacta query params sensibles en URLs antes de enviar a Sentry. */
 export function scrubUrlForSentry(value: string): string {
@@ -17,7 +23,7 @@ function scrubUnknown(value: unknown): unknown {
     const out: Record<string, unknown> = {}
     for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
       const key = k.toLowerCase()
-      if (key.includes("token") || key.includes("password") || key.includes("secret") || key === "authorization") {
+      if (isSensitiveKey(key)) {
         out[k] = "[redacted]"
       } else {
         out[k] = scrubUnknown(v)

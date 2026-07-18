@@ -1,11 +1,9 @@
 "use client"
 
-import { useId, useRef, useState } from "react"
+import { useEffect, useEffectEvent, useId, useRef, useState } from "react"
 
 import { MARCADORES_GLOBAL_ALERT_Z_CLASS } from "@/features/marcadores/utils/layerZIndex"
-import { useHotkeys } from "@/lib/hotkeys/useHotkeys"
 import { FOCUS_RING } from "@/lib/focusStyles"
-import { useDialogFocusTrap } from "@/lib/useDialogFocusTrap"
 import { cn } from "@/lib/utils"
 
 type Props = {
@@ -18,13 +16,31 @@ type Props = {
 export default function ToolbarNewFolderSection({ newFolderName, setNewFolderName, onCreateFolder, onCancel }: Props) {
   const titleId = useId()
   const errorId = useId()
-  const dialogRef = useRef<HTMLDivElement>(null)
+  const dialogRef = useRef<HTMLDialogElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  useDialogFocusTrap(dialogRef, { initialFocusRef: inputRef })
-  useHotkeys("esc", () => onCancel(), { enabled: !submitting }, [onCancel, submitting])
+  const handleDialogCancel = useEffectEvent((e: Event) => {
+    if (submitting) {
+      e.preventDefault()
+      return
+    }
+    onCancel()
+  })
+
+  useEffect(() => {
+    const dialog = dialogRef.current
+    if (!dialog) return
+    const onCancelEvent = (e: Event) => handleDialogCancel(e)
+    dialog.addEventListener("cancel", onCancelEvent)
+    dialog.showModal()
+    requestAnimationFrame(() => inputRef.current?.focus())
+    return () => {
+      dialog.removeEventListener("cancel", onCancelEvent)
+      if (dialog.open) dialog.close()
+    }
+  }, [])
 
   const submit = async () => {
     if (submitting) return
@@ -44,18 +60,16 @@ export default function ToolbarNewFolderSection({ newFolderName, setNewFolderNam
   }
 
   return (
-    <div
+    <dialog
       ref={dialogRef}
       className={cn(
-        "bg-app-overlay fixed inset-0 flex items-center justify-center p-4",
+        "backdrop:bg-app-overlay m-0 h-full max-h-none w-full max-w-none border-0 bg-transparent p-4",
+        "fixed inset-0 flex items-center justify-center",
         MARCADORES_GLOBAL_ALERT_Z_CLASS
       )}
-      role="dialog"
-      aria-modal="true"
       aria-labelledby={titleId}
       data-testid="new-folder-dialog"
       data-no-vim
-      onKeyDown={(e) => e.stopPropagation()}
     >
       <button
         type="button"
@@ -64,7 +78,10 @@ export default function ToolbarNewFolderSection({ newFolderName, setNewFolderNam
         disabled={submitting}
         onClick={onCancel}
       />
-      <div className="border-app-border bg-app-raised relative z-10 w-full max-w-md rounded-xl border p-6 shadow-xl">
+      <div
+        className="border-app-border bg-app-raised relative z-10 w-full max-w-md rounded-xl border p-6 shadow-xl"
+        onKeyDown={(e) => e.stopPropagation()}
+      >
         <h2 id={titleId} className="text-app-fg text-lg font-semibold">
           Nueva carpeta
         </h2>
@@ -128,6 +145,6 @@ export default function ToolbarNewFolderSection({ newFolderName, setNewFolderNam
           </button>
         </div>
       </div>
-    </div>
+    </dialog>
   )
 }

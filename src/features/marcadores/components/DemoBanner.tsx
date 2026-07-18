@@ -5,8 +5,7 @@ import { MARCADORES_GLOBAL_ALERT_Z_CLASS } from "@/features/marcadores/utils/lay
 
 export default function DemoBanner() {
   return (
-    <div
-      role="status"
+    <output
       aria-live="polite"
       data-testid="demo-banner"
       className={cn(
@@ -35,6 +34,6 @@ export default function DemoBanner() {
       <span className="text-app-warn-fg-accent">
         Datos de ejemplo en memoria: no son tus marcadores ni se guardan en tu cuenta.
       </span>
-    </div>
+    </output>
   )
 }
