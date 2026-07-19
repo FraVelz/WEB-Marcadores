@@ -93,7 +93,7 @@ export function McpSetupModal({ open, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-[2px]"
+      className="bg-app-overlay fixed inset-0 z-50 flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
@@ -105,24 +105,26 @@ export function McpSetupModal({ open, onClose }: Props) {
         aria-label="Cerrar"
         onClick={onClose}
       />
-      <div className="relative z-10 w-full max-w-[22rem] rounded-2xl border border-white/10 bg-zinc-950 p-5 shadow-2xl">
+      <div className="border-app-border bg-app-raised relative z-10 w-full max-w-[22rem] rounded-xl border p-5 shadow-xl">
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 items-start gap-3">
-            <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-white/5 text-zinc-200 ring-1 ring-white/10">
+            <div className="bg-app-raised-muted text-app-primary border-app-border mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg border">
               <McpCodeIcon className="size-4" />
             </div>
             <div className="min-w-0">
-              <h2 id={titleId} className="text-[15px] font-semibold tracking-tight text-zinc-50">
+              <h2 id={titleId} className="text-app-fg text-[15px] font-semibold tracking-tight">
                 Add MCP server
               </h2>
-              <p className="mt-1 text-[13px] leading-snug text-zinc-400">Acceso a tus marcadores desde el agente.</p>
+              <p className="text-app-fg-muted mt-1 text-[13px] leading-snug">
+                Acceso a tus marcadores desde el agente.
+              </p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
             className={cn(
-              "shrink-0 rounded-lg p-1.5 text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200",
+              "text-app-fg-muted hover:bg-app-hover hover:text-app-fg shrink-0 rounded-lg p-1.5 transition-colors",
               FOCUS_RING
             )}
             aria-label="Cerrar"
@@ -140,20 +142,20 @@ export function McpSetupModal({ open, onClose }: Props) {
             aria-expanded={agentMenuOpen}
             onClick={() => setAgentMenuOpen((v) => !v)}
             className={cn(
-              "flex w-full items-center justify-between rounded-xl border border-white/10 bg-zinc-900/90 px-3.5 py-2.5 text-left text-sm text-zinc-100",
-              "transition-colors hover:border-white/15",
+              "border-app-input-border bg-app-raised-muted text-app-fg flex w-full items-center justify-between rounded-lg border px-3.5 py-2.5 text-left text-sm",
+              "hover:border-app-focus transition-colors",
               FOCUS_RING
             )}
           >
             <span>{agentLabel}</span>
-            <svg className="size-4 text-zinc-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+            <svg className="text-app-fg-muted size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
               <path d="M7 10l5 5 5-5H7z" />
             </svg>
           </button>
           {agentMenuOpen ? (
             <ul
               role="listbox"
-              className="absolute z-20 mt-1.5 w-full overflow-hidden rounded-xl border border-white/10 bg-zinc-900 py-1 shadow-xl"
+              className="border-app-border bg-app-raised absolute z-20 mt-1.5 w-full overflow-hidden rounded-lg border py-1 shadow-xl"
             >
               {AGENTS.map((item) => (
                 <li key={item.id} role="option" aria-selected={agent === item.id}>
@@ -162,8 +164,8 @@ export function McpSetupModal({ open, onClose }: Props) {
                     className={cn(
                       "flex w-full items-center justify-between px-3.5 py-2.5 text-left text-sm",
                       agent === item.id
-                        ? "bg-white/10 text-zinc-50"
-                        : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
+                        ? "bg-app-primary/15 text-app-fg"
+                        : "text-app-fg-secondary hover:bg-app-hover hover:text-app-fg"
                     )}
                     onClick={() => {
                       setAgent(item.id)
@@ -172,7 +174,7 @@ export function McpSetupModal({ open, onClose }: Props) {
                   >
                     {item.label}
                     {agent === item.id ? (
-                      <svg className="size-4 text-sky-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                      <svg className="text-app-primary size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                         <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                       </svg>
                     ) : null}
@@ -183,19 +185,19 @@ export function McpSetupModal({ open, onClose }: Props) {
           ) : null}
         </div>
 
-        <div className="relative mt-3 overflow-hidden rounded-xl border border-white/10 bg-zinc-900/90">
+        <div className="border-app-border bg-app-raised-muted relative mt-3 overflow-hidden rounded-lg border">
           <button
             type="button"
             onClick={() => void copySnippet()}
             className={cn(
-              "absolute top-2.5 right-2.5 z-10 rounded-lg p-1.5 text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200",
+              "text-app-fg-muted hover:bg-app-hover hover:text-app-fg absolute top-2.5 right-2.5 z-10 rounded-lg p-1.5 transition-colors",
               FOCUS_RING
             )}
             title="Copiar"
             aria-label={copied ? "Copiado" : "Copiar"}
           >
             {copied ? (
-              <svg className="size-4 text-sky-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <svg className="text-app-primary size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                 <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
               </svg>
             ) : (
@@ -212,15 +214,15 @@ export function McpSetupModal({ open, onClose }: Props) {
               </svg>
             )}
           </button>
-          <pre className="max-h-40 overflow-auto p-3.5 pr-11 font-mono text-[11px] leading-relaxed whitespace-pre-wrap text-zinc-300">
+          <pre className="text-app-fg-secondary max-h-40 overflow-auto p-3.5 pr-11 font-mono text-[11px] leading-relaxed whitespace-pre-wrap">
             {snippet}
           </pre>
         </div>
 
-        <p className="mt-3 text-center text-[12px] text-zinc-500">
+        <p className="mt-3 text-center text-[12px]">
           <Link
             href="/perfil"
-            className="text-zinc-400 underline-offset-2 hover:text-zinc-200 hover:underline"
+            className="text-app-primary hover:text-app-primary-hover underline-offset-2 hover:underline"
             onClick={onClose}
           >
             Obtener clave
