@@ -114,11 +114,12 @@ export default function DeleteConfirmModal({ item, onConfirm, onCancel }: Props)
 
           <div className="min-w-0 flex-1">
             <h2 id={titleId} className="text-app-fg text-lg font-semibold">
-              ¿Eliminar {typeLabel}?
+              ¿Mover {typeLabel} a la papelera?
             </h2>
             <p id={descriptionId} className="text-app-fg-secondary mt-2 text-sm leading-relaxed">
-              <span className="text-app-fg font-medium">&quot;{label}&quot;</span> se eliminará de forma permanente.
-              {isFolder ? " Los marcadores dentro se moverán a la carpeta superior." : null}
+              <span className="text-app-fg font-medium">&quot;{label}&quot;</span> se moverá a la papelera durante{" "}
+              <strong>30 días</strong>. Después se eliminará de forma permanente.
+              {isFolder ? " La carpeta y su contenido se eliminarán juntos (puedes restaurar el lote)." : null}
             </p>
           </div>
         </div>

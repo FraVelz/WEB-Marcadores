@@ -29,6 +29,17 @@ export async function persistMarcadoresBookmarkModal(
 
   const tags = data.tags ? splitCommaTags(data.tags) : []
   const folder_id = data.folder_id || null
+  let metadata: Record<string, unknown> = {}
+  try {
+    const parsed: unknown = JSON.parse(data.metadata?.trim() || "{}")
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      metadata = parsed as Record<string, unknown>
+    } else {
+      throw new Error("metadata must be a JSON object")
+    }
+  } catch {
+    throw new Error("Metadata JSON inválido")
+  }
 
   if (demoMode) {
     if (editingBookmark) {
@@ -42,13 +53,22 @@ export async function persistMarcadoresBookmarkModal(
                 description: data.description || undefined,
                 folder_id,
                 tags,
+                metadata,
               }
             : b
         )
       )
       setDetailBookmark((prev) =>
         prev?.id === editingBookmark.id
-          ? { ...prev, title: data.title, url: data.url, description: data.description, folder_id, tags }
+          ? {
+              ...prev,
+              title: data.title,
+              url: data.url,
+              description: data.description,
+              folder_id,
+              tags,
+              metadata,
+            }
           : prev
       )
     } else {
@@ -61,6 +81,7 @@ export async function persistMarcadoresBookmarkModal(
           description: data.description || undefined,
           folder_id,
           tags,
+          metadata,
           created_at: new Date().toISOString(),
         },
       ])
@@ -80,6 +101,7 @@ export async function persistMarcadoresBookmarkModal(
     description: data.description || null,
     folder_id,
     tags: data.tags ? splitCommaTags(data.tags) : [],
+    metadata,
   }
 
   if (editingBookmark) {
