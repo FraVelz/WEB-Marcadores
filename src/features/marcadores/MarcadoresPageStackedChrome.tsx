@@ -38,7 +38,14 @@ export function MarcadoresPageStackedChrome({ m }: { m: MarcadoresPageModel }) {
           const item = m.focusFlatList[pane.selectedIndex]
           if (item) b.setDeleteConfirmItem(item)
         }}
+        onRenameFocused={() => {
+          const item = m.focusFlatList[pane.selectedIndex]
+          if (item?.type !== "folder") return
+          b.setEditingFolder({ id: item.id, name: item.label })
+          b.setRenameFolderName(item.label)
+        }}
         hasFocusedItem={m.focusFlatList.length > 0 && !!m.focusFlatList[pane.selectedIndex]}
+        focusedIsFolder={m.focusFlatList[pane.selectedIndex]?.type === "folder"}
         selectMode={pane.selectMode}
         setSelectMode={b.setSelectMode}
         selectedIds={pane.selectedIds}

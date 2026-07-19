@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 
 import {
   bookmarkIdsOutsideDeletedFolders,
+  collectAllFolderIds,
   gridItemSelectionId,
   partitionSelectedIds,
   topmostSelectedFolderIds,
@@ -39,5 +40,16 @@ describe("selectionIds", () => {
 
   it("bookmarkIdsOutsideDeletedFolders skips links covered by folder delete", () => {
     expect(bookmarkIdsOutsideDeletedFolders(bookmarks, ["b1", "b2"], folders, ["f1"])).toEqual(["b2"])
+  })
+
+  it("collectAllFolderIds walks nested children", () => {
+    expect(
+      [
+        ...collectAllFolderIds([
+          { id: "a", children: [{ id: "b", children: [{ id: "c" }] }] },
+          { id: "d" },
+        ]),
+      ].sort()
+    ).toEqual(["a", "b", "c", "d"])
   })
 })

@@ -6,6 +6,25 @@ export function gridItemSelectionId(item: GridItem): string {
   return item.type === "folder" ? item.id : item.bookmark.id
 }
 
+/** Incluye hijos si `folders` viene como árbol (`children`). */
+export function collectAllFolderIds(folders: Array<{ id: string; children?: unknown[] }>): Set<string> {
+  const ids = new Set<string>()
+  const stack = [...folders]
+  while (stack.length > 0) {
+    const f = stack.pop()
+    if (!f) continue
+    ids.add(f.id)
+    if (Array.isArray(f.children)) {
+      for (const child of f.children) {
+        if (child && typeof child === "object" && "id" in child && typeof (child as { id: unknown }).id === "string") {
+          stack.push(child as { id: string; children?: unknown[] })
+        }
+      }
+    }
+  }
+  return ids
+}
+
 export function partitionSelectedIds(
   selectedIds: Set<string>,
   folders: FlatFolder[],

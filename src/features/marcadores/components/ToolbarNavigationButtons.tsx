@@ -9,7 +9,9 @@ type Props = {
   onAddBookmark: () => void
   onNewFolder: () => void
   onDeleteFocused?: () => void
+  onRenameFocused?: () => void
   hasFocusedItem: boolean
+  focusedIsFolder?: boolean
   infoPanelEnabled: boolean
   onToggleInfoPanel: () => void
   showSearch: boolean
@@ -25,7 +27,9 @@ export default function ToolbarNavigationButtons({
   onAddBookmark,
   onNewFolder,
   onDeleteFocused,
+  onRenameFocused,
   hasFocusedItem,
+  focusedIsFolder = false,
   infoPanelEnabled,
   onToggleInfoPanel,
   showSearch,
@@ -61,6 +65,19 @@ export default function ToolbarNavigationButtons({
           <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
         </svg>
       </button>
+      {hasFocusedItem && focusedIsFolder && onRenameFocused ? (
+        <button
+          type="button"
+          onClick={onRenameFocused}
+          className={iconBtn}
+          title="Renombrar carpeta (r)"
+          aria-label="Renombrar carpeta (r)"
+        >
+          <svg className="size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+          </svg>
+        </button>
+      ) : null}
       {hasFocusedItem && onDeleteFocused && (
         <button
           type="button"

@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils"
 import { FOCUS_RING } from "@/lib/focusStyles"
 
 import type { FlatFolder } from "../utils/types"
+import { collectAllFolderIds } from "../utils/selectionIds"
 
 type Props = {
   selectMode: boolean
@@ -25,7 +26,7 @@ export default function ToolbarSelectActions({
   onEdit,
   onDelete,
 }: Props) {
-  const folderIdSet = new Set(folders.map((f) => f.id))
+  const folderIdSet = collectAllFolderIds(folders)
   const singleId = selectedIds.size === 1 ? [...selectedIds][0] : null
   const canRenameFolder = singleId != null && folderIdSet.has(singleId)
   const canEditBookmark = singleId != null && !canRenameFolder

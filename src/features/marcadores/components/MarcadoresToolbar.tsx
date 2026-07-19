@@ -73,7 +73,16 @@ export default function MarcadoresToolbar(props: Props) {
             onAddBookmark={props.onAddBookmark}
             onNewFolder={() => props.setShowNewFolder(true)}
             onDeleteFocused={props.onDeleteFocused}
+            onRenameFocused={
+              item?.type === "folder"
+                ? () => {
+                    props.setEditingFolder({ id: item.id, name: item.label })
+                    props.setRenameFolderName(item.label)
+                  }
+                : undefined
+            }
             hasFocusedItem={!!item && flatList.length > 0}
+            focusedIsFolder={item?.type === "folder"}
             infoPanelEnabled={props.infoPanelEnabled}
             onToggleInfoPanel={handleToggleInfoPanel}
             showSearch={props.showSearch}
