@@ -89,10 +89,7 @@ export async function updateBookmark(
     const currentMeta = ((current.metadata as Record<string, unknown>) ?? {}) as Record<string, unknown>
     let nextMeta = currentMeta
     if (patch.metadata != null) {
-      nextMeta = mergeMetadata(currentMeta, patch.metadata, patch.metadata_mode ?? "merge") as Record<
-        string,
-        unknown
-      >
+      nextMeta = mergeMetadata(currentMeta, patch.metadata, patch.metadata_mode ?? "merge") as Record<string, unknown>
     }
     if (patch.is_favorite != null) {
       nextMeta = { ...nextMeta, is_favorite: patch.is_favorite }
