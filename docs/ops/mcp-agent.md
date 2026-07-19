@@ -41,6 +41,15 @@ Deletes from UI, API, and MCP set `deleted_at` (30-day retention). Hard purge re
 
 See [trash-purge.md](./trash-purge.md).
 
+## Folder write tools (MCP)
+
+| Tool            | Purpose                                      |
+| --------------- | -------------------------------------------- |
+| `create_folder` | Create under optional `parent_id`            |
+| `update_folder` | Rename / reparent / `sort_order`             |
+| `move_folder`   | Reparent only (`parent_id` null = root)      |
+| `delete_folder` | Soft-delete folder + subtree (30-day trash)  |
+
 ## Env
 
 - `SUPABASE_SERVICE_ROLE_KEY` (required for agent/MCP)

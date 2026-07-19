@@ -5,7 +5,7 @@ import type { AgentAuthContext } from "@/lib/agent/auth"
 import { requireScope } from "@/lib/agent/auth"
 import { writeAudit } from "@/lib/agent/audit"
 import { getBookmark, getStats, listAliveFolders, listTags, listTrash, searchBookmarks } from "@/lib/agent/queries"
-import { createBookmark, createFolder, updateBookmark } from "@/lib/agent/mutations"
+import { createBookmark, createFolder, moveFolder, updateBookmark, updateFolder } from "@/lib/agent/mutations"
 import {
   emptyTrash,
   purgeTrashItem,
@@ -158,6 +158,42 @@ export function createMarcadoresMcpServer(ctx: AgentAuthContext, req: Request): 
       return audited("mcp_create_folder", () =>
         createFolder(ctx.userId, { name: args.name, parent_id: args.parent_id })
       )
+    }
+  )
+
+  server.registerTool(
+    "update_folder",
+    {
+      description: "Update a folder (rename, reparent, or sort_order)",
+      inputSchema: {
+        id: z.string(),
+        name: z.string().optional(),
+        parent_id: z.string().nullable().optional(),
+        sort_order: z.number().optional(),
+      },
+    },
+    async (args) => {
+      requireScope(ctx, "bookmarks:write")
+      const { id, ...patch } = args
+      return audited("mcp_update_folder", () => updateFolder(ctx.userId, id, patch), { id })
+    }
+  )
+
+  server.registerTool(
+    "move_folder",
+    {
+      description: "Move a folder to a new parent (null = library root)",
+      inputSchema: {
+        id: z.string(),
+        parent_id: z.string().nullable(),
+      },
+    },
+    async (args) => {
+      requireScope(ctx, "bookmarks:write")
+      return audited("mcp_move_folder", () => moveFolder(ctx.userId, args.id, args.parent_id), {
+        id: args.id,
+        parent_id: args.parent_id,
+      })
     }
   )
 
