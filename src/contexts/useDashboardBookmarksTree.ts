@@ -18,7 +18,7 @@ export function useDashboardBookmarksTree(demoMode: boolean) {
       return
     }
     const supabase = createClient()
-    const { data } = await supabase.from("bookmarks").select("tags")
+    const { data } = await supabase.from("bookmarks").select("tags").is("deleted_at", null)
     setAllTags(sortedUniqueTagsFromRows(data || []))
   }
 
@@ -29,7 +29,7 @@ export function useDashboardBookmarksTree(demoMode: boolean) {
   const refreshFolders = async () => {
     if (demoMode) return
     const supabase = createClient()
-    const { data } = await supabase.from("folders").select("*").order("sort_order")
+    const { data } = await supabase.from("folders").select("*").is("deleted_at", null).order("sort_order")
     if (!data) return
     const byParent: Record<string, Folder[]> = {}
     for (const f of data) {

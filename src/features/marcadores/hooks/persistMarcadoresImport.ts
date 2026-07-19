@@ -153,7 +153,10 @@ async function persistFlattenedImport(
           title: item.title,
           url: item.url,
           folder_id: resolveParent(item.parentTempId),
-          tags: [],
+          tags: item.tags ?? [],
+          description: item.description ?? null,
+          is_favorite: item.is_favorite ?? false,
+          metadata: item.metadata ?? {},
         })
         if (error) throw error
         bookmarksCreated += 1

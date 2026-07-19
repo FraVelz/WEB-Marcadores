@@ -22,6 +22,9 @@ function normalizeBookmarkRow(raw: Bookmark): Bookmark {
     opened_at: raw.opened_at ?? null,
     updated_at: raw.updated_at ?? null,
     tags: raw.tags ?? [],
+    deleted_at: raw.deleted_at ?? null,
+    deleted_batch_id: raw.deleted_batch_id ?? null,
+    metadata: raw.metadata ?? {},
   }
 }
 
@@ -88,11 +91,11 @@ export function useMarcadoresData(
       setCtxFolders(buildFolderTree(DEMO_FOLDERS))
     } else {
       const supabase = createClient()
-      const { data: bData } = await supabase.from("bookmarks").select("*").order("title")
+      const { data: bData } = await supabase.from("bookmarks").select("*").is("deleted_at", null).order("title")
       const rows = (bData || []).map((r: Bookmark) => normalizeBookmarkRow(r))
       setBookmarks(rows)
       setAllTagsFromBookmarks(rows)
-      const { data: fData } = await supabase.from("folders").select("*").order("sort_order")
+      const { data: fData } = await supabase.from("folders").select("*").is("deleted_at", null).order("sort_order")
       const flat = fData || []
       setFolders(flat)
       setCtxFolders(buildFolderTree(flat))
@@ -109,11 +112,11 @@ export function useMarcadoresData(
           setCtxFolders(buildFolderTree(DEMO_FOLDERS))
         } else {
           const supabase = createClient()
-          const { data: bData } = await supabase.from("bookmarks").select("*").order("title")
+          const { data: bData } = await supabase.from("bookmarks").select("*").is("deleted_at", null).order("title")
           const rows = (bData || []).map((r: Bookmark) => normalizeBookmarkRow(r))
           setBookmarks(rows)
           setAllTagsFromBookmarks(rows)
-          const { data: fData } = await supabase.from("folders").select("*").order("sort_order")
+          const { data: fData } = await supabase.from("folders").select("*").is("deleted_at", null).order("sort_order")
           const flat = fData || []
           setFolders(flat)
           setCtxFolders(buildFolderTree(flat))
@@ -123,7 +126,7 @@ export function useMarcadoresData(
     })
   }, [demoMode, setAllTagsFromBookmarks, setCtxFolders])
 
-  const bookmarksVisible = bookmarks.filter((b) => !b.archived_at)
+  const bookmarksVisible = bookmarks.filter((b) => !b.archived_at && !b.deleted_at)
 
   const derivedRows = bookmarksVisible.map((b) => ({ b, d: deriveBookmarkFields(b) }))
 

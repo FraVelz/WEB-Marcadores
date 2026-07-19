@@ -13,18 +13,32 @@ describe("marcadoresBackup", () => {
   it("round-trips export JSON", () => {
     const backup = buildMarcadoresBackupJson(
       [{ id: "f1", parent_id: null, name: "A", sort_order: 0 }],
-      [{ id: "b1", title: "T", url: "https://example.com", folder_id: "f1", tags: ["x"] }]
+      [{ id: "b1", title: "T", url: "https://example.com", folder_id: "f1", tags: ["x"], metadata: { src: "test" } }]
     )
+    expect(backup.version).toBe(2)
     const raw = stringifyMarcadoresBackup(backup)
     const parsed = parseMarcadoresBackupJson(raw)
     expect(parsed.folders).toHaveLength(1)
     expect(parsed.bookmarks[0]?.url).toBe("https://example.com")
     expect(parsed.bookmarks[0]?.folder_id).toBe("f1")
+    expect(parsed.bookmarks[0]?.metadata).toEqual({ src: "test" })
+  })
+
+  it("accepts backup version 1 and upgrades to v2", () => {
+    const raw = JSON.stringify({
+      version: 1,
+      exportedAt: "2026-07-15T00:00:00.000Z",
+      folders: [],
+      bookmarks: [{ title: "T", url: "https://example.com" }],
+    })
+    const parsed = parseMarcadoresBackupJson(raw)
+    expect(parsed.version).toBe(2)
+    expect(parsed.bookmarks[0]?.metadata).toEqual({})
   })
 
   it("rejects non-http urls in backup bookmarks", () => {
     const raw = JSON.stringify({
-      version: 1,
+      version: 2,
       exportedAt: "2026-07-15T00:00:00.000Z",
       folders: [],
       bookmarks: [{ title: "x", url: "javascript:alert(1)" }],
@@ -50,13 +64,13 @@ describe("marcadoresBackup", () => {
 
   it("flattens backup folders parents-first", () => {
     const items = flattenBackupForImport({
-      version: 1,
+      version: 2,
       exportedAt: "2026-07-15T00:00:00.000Z",
       folders: [
         { id: "child", parent_id: "root", name: "Child", sort_order: 0 },
         { id: "root", parent_id: null, name: "Root", sort_order: 0 },
       ],
-      bookmarks: [{ title: "L", url: "https://example.com", folder_id: "child" }],
+      bookmarks: [{ title: "L", url: "https://example.com", folder_id: "child", metadata: {} }],
     })
     const folderIds = items.filter((i) => i.type === "folder").map((i) => i.tempId)
     expect(folderIds.indexOf("root")).toBeLessThan(folderIds.indexOf("child"))

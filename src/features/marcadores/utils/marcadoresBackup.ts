@@ -3,9 +3,9 @@ import { isHttpUrl } from "@/lib/isHttpUrl"
 import type { Bookmark, FlatFolder } from "./types"
 import type { NetscapeNode } from "./netscapeBookmarks"
 
-const MARCADORES_BACKUP_VERSION = 1 as const
+export const MARCADORES_BACKUP_VERSION = 2 as const
 
-export type MarcadoresBackupV1 = {
+export type MarcadoresBackupV2 = {
   version: typeof MARCADORES_BACKUP_VERSION
   exportedAt: string
   folders: Array<{
@@ -21,8 +21,14 @@ export type MarcadoresBackupV1 = {
     folder_id?: string | null
     tags?: string[]
     is_favorite?: boolean
+    metadata?: Record<string, unknown>
   }>
 }
+
+/** @deprecated Use MarcadoresBackupV2 */
+export type MarcadoresBackupV1 = Omit<MarcadoresBackupV2, "version"> & { version: 1 }
+
+export type MarcadoresBackup = MarcadoresBackupV1 | MarcadoresBackupV2
 
 export type FlattenedImportItem =
   | { type: "folder"; tempId: string; parentTempId: string | null; name: string; sort_order: number }
@@ -32,10 +38,14 @@ export type FlattenedImportItem =
       parentTempId: string | null
       title: string
       url: string
+      description?: string
+      tags?: string[]
+      is_favorite?: boolean
+      metadata?: Record<string, unknown>
     }
 
-/** Serializa el estado actual a JSON de backup (solo datos del usuario en memoria). */
-export function buildMarcadoresBackupJson(folders: FlatFolder[], bookmarks: Bookmark[]): MarcadoresBackupV1 {
+/** Serializa el estado actual a JSON de backup (solo vivos; sin trash). */
+export function buildMarcadoresBackupJson(folders: FlatFolder[], bookmarks: Bookmark[]): MarcadoresBackupV2 {
   return {
     version: MARCADORES_BACKUP_VERSION,
     exportedAt: new Date().toISOString(),
@@ -52,15 +62,16 @@ export function buildMarcadoresBackupJson(folders: FlatFolder[], bookmarks: Book
       folder_id: b.folder_id ?? null,
       tags: b.tags ?? [],
       is_favorite: b.is_favorite ?? false,
+      metadata: b.metadata ?? {},
     })),
   }
 }
 
-export function stringifyMarcadoresBackup(backup: MarcadoresBackupV1): string {
+export function stringifyMarcadoresBackup(backup: MarcadoresBackup): string {
   return `${JSON.stringify(backup, null, 2)}\n`
 }
 
-export function parseMarcadoresBackupJson(raw: string): MarcadoresBackupV1 {
+export function parseMarcadoresBackupJson(raw: string): MarcadoresBackupV2 {
   let parsed: unknown
   try {
     parsed = JSON.parse(raw)
@@ -69,14 +80,15 @@ export function parseMarcadoresBackupJson(raw: string): MarcadoresBackupV1 {
   }
   if (!parsed || typeof parsed !== "object") throw new Error("JSON de backup inválido")
   const obj = parsed as Record<string, unknown>
-  if (obj.version !== MARCADORES_BACKUP_VERSION) {
-    throw new Error(`Versión de backup no soportada (esperado ${MARCADORES_BACKUP_VERSION})`)
+  const version = obj.version
+  if (version !== 1 && version !== 2) {
+    throw new Error("Versión de backup no soportada (esperado 1 o 2)")
   }
   if (!Array.isArray(obj.folders) || !Array.isArray(obj.bookmarks)) {
     throw new Error("Backup incompleto: faltan folders o bookmarks")
   }
 
-  const folders: MarcadoresBackupV1["folders"] = []
+  const folders: MarcadoresBackupV2["folders"] = []
   for (const row of obj.folders) {
     if (!row || typeof row !== "object") continue
     const f = row as Record<string, unknown>
@@ -91,7 +103,7 @@ export function parseMarcadoresBackupJson(raw: string): MarcadoresBackupV1 {
     })
   }
 
-  const bookmarks: MarcadoresBackupV1["bookmarks"] = []
+  const bookmarks: MarcadoresBackupV2["bookmarks"] = []
   let skipped = 0
   for (const row of obj.bookmarks) {
     if (!row || typeof row !== "object") continue
@@ -102,6 +114,10 @@ export function parseMarcadoresBackupJson(raw: string): MarcadoresBackupV1 {
       skipped += 1
       continue
     }
+    const metadata =
+      b.metadata && typeof b.metadata === "object" && !Array.isArray(b.metadata)
+        ? (b.metadata as Record<string, unknown>)
+        : {}
     bookmarks.push({
       title,
       url,
@@ -109,6 +125,7 @@ export function parseMarcadoresBackupJson(raw: string): MarcadoresBackupV1 {
       folder_id: b.folder_id == null || b.folder_id === "" ? null : String(b.folder_id),
       tags: Array.isArray(b.tags) ? b.tags.map(String) : [],
       is_favorite: Boolean(b.is_favorite),
+      metadata,
     })
   }
 
@@ -156,7 +173,7 @@ export function flattenNetscapeForest(
 }
 
 /** Convierte backup JSON a filas planas (ids del backup como tempId para remap). */
-export function flattenBackupForImport(backup: MarcadoresBackupV1): FlattenedImportItem[] {
+export function flattenBackupForImport(backup: MarcadoresBackup): FlattenedImportItem[] {
   const foldersSorted = backup.folders.toSorted((a, b) => {
     const depth = (id: string, seen = new Set<string>()): number => {
       if (seen.has(id)) return 0
@@ -185,6 +202,10 @@ export function flattenBackupForImport(backup: MarcadoresBackupV1): FlattenedImp
       parentTempId: b.folder_id ?? null,
       title: b.title,
       url: b.url,
+      description: b.description,
+      tags: b.tags,
+      is_favorite: b.is_favorite,
+      metadata: "metadata" in b ? b.metadata : undefined,
     })
   }
   return items

@@ -34,9 +34,9 @@ export function useEstadisticasData() {
       setFolders(DEMO_FOLDERS)
     } else {
       const supabase = createClient()
-      const { data: bData } = await supabase.from("bookmarks").select("*").order("title")
+      const { data: bData } = await supabase.from("bookmarks").select("*").is("deleted_at", null).order("title")
       setBookmarks((bData || []).map((r: Bookmark) => normalizeBookmarkRow(r)))
-      const { data: fData } = await supabase.from("folders").select("*").order("sort_order")
+      const { data: fData } = await supabase.from("folders").select("*").is("deleted_at", null).order("sort_order")
       setFolders(fData || [])
     }
     setLoading(false)
@@ -51,9 +51,9 @@ export function useEstadisticasData() {
           setFolders(DEMO_FOLDERS)
         } else {
           const supabase = createClient()
-          const { data: bData } = await supabase.from("bookmarks").select("*").order("title")
+          const { data: bData } = await supabase.from("bookmarks").select("*").is("deleted_at", null).order("title")
           setBookmarks((bData || []).map((r: Bookmark) => normalizeBookmarkRow(r)))
-          const { data: fData } = await supabase.from("folders").select("*").order("sort_order")
+          const { data: fData } = await supabase.from("folders").select("*").is("deleted_at", null).order("sort_order")
           setFolders(fData || [])
         }
         setLoading(false)
