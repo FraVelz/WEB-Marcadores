@@ -13,6 +13,16 @@ type Props = {
   onClose: () => void
 }
 
+type AgentId = "claude" | "cursor" | "codex"
+
+const AGENTS: { id: AgentId; label: string }[] = [
+  { id: "claude", label: "Claude Code" },
+  { id: "cursor", label: "Cursor" },
+  { id: "codex", label: "Codex" },
+]
+
+const TOKEN_PLACEHOLDER = "PEGA_AQUI_TU_CLAVE_wm"
+
 function publishedSiteOrigin(): string | null {
   const site = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "").trim()
   return site || null
@@ -22,22 +32,34 @@ function mcpUrlFromOrigin(origin: string): string {
   return `${origin.replace(/\/$/, "")}/api/mcp/mcp`
 }
 
-function cursorConfigSnippet(url: string): string {
-  return `{
+function snippetForAgent(agent: AgentId, url: string): string {
+  const auth = `Bearer ${TOKEN_PLACEHOLDER}`
+  switch (agent) {
+    case "claude":
+      return `claude mcp add --transport http web-marcadores ${url} \\\n  --header "Authorization: ${auth}"`
+    case "cursor":
+      return `{
   "mcpServers": {
     "web-marcadores": {
       "url": "${url}",
       "headers": {
-        "Authorization": "Bearer PEGA_AQUI_TU_CLAVE"
+        "Authorization": "${auth}"
       }
     }
   }
 }`
+    case "codex":
+      return `[mcp_servers.web-marcadores]
+url = "${url}"
+http_headers = { "Authorization" = "${auth}" }`
+  }
 }
 
 export function McpSetupModal({ open, onClose }: Props) {
   const titleId = useId()
-  const [copied, setCopied] = useState<"url" | "json" | null>(null)
+  const [agent, setAgent] = useState<AgentId>("cursor")
+  const [agentMenuOpen, setAgentMenuOpen] = useState(false)
+  const [copied, setCopied] = useState(false)
   const [urlChoice, setUrlChoice] = useState<"published" | "current">("published")
 
   const published = useMemo(() => publishedSiteOrigin(), [])
@@ -52,19 +74,20 @@ export function McpSetupModal({ open, onClose }: Props) {
       : currentOrigin || published || "https://web-marcadores.vercel.app"
 
   const url = mcpUrlFromOrigin(preferredOrigin)
-  const snippet = cursorConfigSnippet(url)
+  const snippet = snippetForAgent(agent, url)
+  const agentLabel = AGENTS.find((a) => a.id === agent)?.label ?? "Cursor"
   const isLocalhost = /localhost|127\.0\.0\.1/.test(preferredOrigin)
 
   useHotkeys("esc", () => onClose(), { enabled: open }, [onClose, open])
 
   if (!open) return null
 
-  const copy = async (kind: "url" | "json", text: string) => {
+  const copySnippet = async () => {
     try {
-      await navigator.clipboard.writeText(text)
-      setCopied(kind)
-      toast.success({ text: "Copiado al portapapeles" })
-      window.setTimeout(() => setCopied(null), 1500)
+      await navigator.clipboard.writeText(snippet)
+      setCopied(true)
+      toast.success({ text: "Copiado" })
+      window.setTimeout(() => setCopied(false), 1500)
     } catch {
       toast.error({ text: "No se pudo copiar" })
     }
@@ -86,171 +109,148 @@ export function McpSetupModal({ open, onClose }: Props) {
       />
       <div
         className={cn(
-          "relative z-10 max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-xl",
+          "relative z-10 w-full max-w-md overflow-visible rounded-xl",
           "border-app-border bg-app-raised border p-6 shadow-xl"
         )}
       >
-        <h2 id={titleId} className="text-app-fg text-xl font-semibold">
-          Usar Marcadores desde Cursor
-        </h2>
-        <p className="text-app-fg-secondary mt-2 text-sm leading-relaxed">
-          Esto permite que el chat de <strong className="text-app-fg font-medium">Cursor</strong> busque, organice o
-          edite <em>tus</em> marcadores (con tu permiso). No hace falta instalar nada extra en esta web: solo crear una
-          clave aquí y pegarla en Cursor.
-        </p>
-
-        <div className="mt-5 space-y-5">
-          <section className="border-app-border-muted rounded-lg border p-4">
-            <h3 className="text-app-fg text-sm font-semibold">1. Crea una clave de acceso en esta web</h3>
-            <ol className="text-app-fg-secondary mt-2 list-decimal space-y-2 pl-5 text-sm leading-relaxed">
-              <li>
-                Abre{" "}
-                <Link href="/perfil" className="text-app-primary font-medium underline" onClick={onClose}>
-                  Perfil
-                </Link>{" "}
-                (icono de usuario en la barra izquierda).
-              </li>
-              <li>
-                Busca la sección <strong className="text-app-fg font-medium">Agent Access</strong>.
-              </li>
-              <li>
-                Pon un nombre (ej. <em>Cursor</em>), deja marcados al menos{" "}
-                <strong className="text-app-fg font-medium">leer marcadores</strong> y pulsa{" "}
-                <strong className="text-app-fg font-medium">Crear token</strong>.
-              </li>
-              <li>
-                Aparecerá una clave larga que empieza por <code className="text-xs">wm_</code>.{" "}
-                <strong className="text-app-fg font-medium">Cópiala ya</strong>: solo se muestra una vez. Si la pierdes,
-                crea otra.
-              </li>
-            </ol>
-            <Link
-              href="/perfil"
-              onClick={onClose}
-              className={cn(
-                "bg-app-primary mt-3 inline-flex rounded-lg px-3 py-2 text-sm font-medium text-white",
-                FOCUS_RING,
-                "hover:bg-app-primary-hover"
-              )}
-            >
-              Ir a Perfil a crear la clave
-            </Link>
-          </section>
-
-          <section className="border-app-border-muted rounded-lg border p-4">
-            <h3 className="text-app-fg text-sm font-semibold">2. Elige la dirección del servidor</h3>
-            <p className="text-app-fg-secondary mt-1 text-sm leading-relaxed">
-              Cursor se conecta a una URL de esta app. Para el día a día usa la{" "}
-              <strong className="text-app-fg font-medium">web publicada</strong>, no localhost.
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 id={titleId} className="text-app-fg font-mono text-lg font-semibold tracking-tight">
+              Add MCP server
+            </h2>
+            <p className="text-app-fg-secondary mt-2 text-sm leading-relaxed">
+              Da a tu agente acceso a tus marcadores, carpetas y papelera de esta web.
             </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className={cn("text-app-fg-muted hover:text-app-fg -mt-1 -mr-1 rounded-md p-1.5", FOCUS_RING)}
+            aria-label="Cerrar"
+          >
+            <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+              <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
 
+        <div className="border-app-border-muted mt-4 space-y-2 rounded-lg border p-3 text-sm">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <span className="text-app-fg-label text-xs font-medium uppercase">URL</span>
             {published && currentOrigin && published !== currentOrigin ? (
-              <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Elegir URL">
+              <div className="flex gap-1">
                 <button
                   type="button"
                   onClick={() => setUrlChoice("published")}
                   className={cn(
-                    "rounded-lg border px-3 py-1.5 text-xs font-medium",
-                    FOCUS_RING,
-                    urlChoice === "published"
-                      ? "border-app-primary bg-app-primary/15 text-app-fg"
-                      : "border-app-input-border text-app-fg-secondary hover:bg-app-raised-muted"
+                    "rounded px-1.5 py-0.5 text-[10px] font-medium",
+                    urlChoice === "published" ? "text-app-primary" : "text-app-fg-muted hover:text-app-fg"
                   )}
                 >
-                  Web publicada (recomendada)
+                  Publicada
                 </button>
                 <button
                   type="button"
                   onClick={() => setUrlChoice("current")}
                   className={cn(
-                    "rounded-lg border px-3 py-1.5 text-xs font-medium",
-                    FOCUS_RING,
-                    urlChoice === "current"
-                      ? "border-app-primary bg-app-primary/15 text-app-fg"
-                      : "border-app-input-border text-app-fg-secondary hover:bg-app-raised-muted"
+                    "rounded px-1.5 py-0.5 text-[10px] font-medium",
+                    urlChoice === "current" ? "text-app-primary" : "text-app-fg-muted hover:text-app-fg"
                   )}
                 >
-                  Esta pestaña ({isLocalhost || /localhost|127\.0\.0\.1/.test(currentOrigin) ? "local" : "actual"})
+                  Esta pestaña
                 </button>
               </div>
             ) : null}
-
-            <div className="border-app-border bg-app-raised-muted mt-3 flex items-start gap-2 rounded-lg border p-3">
-              <code className="text-app-fg min-w-0 flex-1 text-xs break-all">{url}</code>
-              <button
-                type="button"
-                onClick={() => void copy("url", url)}
-                className={cn("text-app-primary shrink-0 text-xs font-medium underline", FOCUS_RING)}
-              >
-                {copied === "url" ? "Copiado" : "Copiar URL"}
-              </button>
-            </div>
-            {isLocalhost ? (
-              <p className="text-app-fg-muted mt-2 text-xs leading-relaxed">
-                Estás en local: Cursor solo podrá conectar si tienes <code className="text-xs">pnpm dev</code> en marcha
-                en este PC. En producción usa la web publicada.
-              </p>
-            ) : null}
-          </section>
-
-          <section className="border-app-border-muted rounded-lg border p-4">
-            <h3 className="text-app-fg text-sm font-semibold">3. Pégalo en Cursor</h3>
-            <ol className="text-app-fg-secondary mt-2 list-decimal space-y-2 pl-5 text-sm leading-relaxed">
-              <li>
-                En Cursor abre <strong className="text-app-fg font-medium">Settings</strong> (engranaje) →{" "}
-                <strong className="text-app-fg font-medium">MCP</strong> (o “Tools &amp; MCP”).
-              </li>
-              <li>
-                Pulsa <strong className="text-app-fg font-medium">Add new MCP server</strong> / edita el JSON de
-                servidores MCP.
-              </li>
-              <li>
-                Pega el bloque de abajo y <strong className="text-app-fg font-medium">sustituye</strong>{" "}
-                <code className="text-xs">PEGA_AQUI_TU_CLAVE</code> por la clave <code className="text-xs">wm_…</code>{" "}
-                que copiaste (sin comillas extra; deja la palabra <code className="text-xs">Bearer</code>).
-              </li>
-              <li>Guarda y reinicia o recarga el servidor MCP si Cursor lo pide. Debería aparecer “web-marcadores”.</li>
-            </ol>
-
-            <div className="border-app-border bg-app-raised-muted relative mt-3 rounded-lg border p-3">
-              <button
-                type="button"
-                onClick={() => void copy("json", snippet)}
-                className={cn("text-app-primary absolute top-2 right-2 text-xs font-medium underline", FOCUS_RING)}
-              >
-                {copied === "json" ? "Copiado" : "Copiar JSON"}
-              </button>
-              <pre className="text-app-fg overflow-x-auto pr-16 text-[11px] leading-relaxed whitespace-pre-wrap">
-                {snippet}
-              </pre>
-            </div>
-          </section>
-
-          <section className="border-app-border-muted bg-app-raised-muted/50 rounded-lg border p-4">
-            <h3 className="text-app-fg text-sm font-semibold">¿Qué puede hacer Cursor?</h3>
-            <ul className="text-app-fg-secondary mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed">
-              <li>Buscar y listar tus marcadores y carpetas.</li>
-              <li>Crear o editar enlaces (si activaste permisos de escritura al crear la clave).</li>
-              <li>Ver la papelera y restaurar (si diste permiso de papelera).</li>
-            </ul>
-            <p className="text-app-fg-muted mt-2 text-xs leading-relaxed">
-              Si estás en <strong>modo demo</strong> (sin cuenta), no puedes crear claves: inicia sesión primero.
-            </p>
-          </section>
+          </div>
+          <code className="text-app-fg block text-xs break-all">{url}</code>
+          {isLocalhost ? (
+            <p className="text-app-fg-muted text-[11px]">Solo útil con el servidor local en marcha.</p>
+          ) : null}
+          <p className="text-app-fg-secondary text-xs leading-relaxed">
+            Auth: Bearer con clave <code className="text-[11px]">wm_…</code> creada en{" "}
+            <Link href="/perfil" className="text-app-primary underline" onClick={onClose}>
+              Perfil → Agent Access
+            </Link>
+            . Sustituye <code className="text-[11px]">{TOKEN_PLACEHOLDER}</code> en el snippet.
+          </p>
         </div>
 
-        <div className="mt-5 flex justify-end gap-2">
+        <div className="relative mt-4">
           <button
             type="button"
-            onClick={onClose}
+            aria-haspopup="listbox"
+            aria-expanded={agentMenuOpen}
+            onClick={() => setAgentMenuOpen((v) => !v)}
             className={cn(
-              "border-app-input-border text-app-fg-secondary rounded-lg border px-4 py-2 text-sm",
-              FOCUS_RING,
-              "hover:bg-app-raised-muted cursor-pointer"
+              "border-app-input-border bg-app-raised-muted text-app-fg flex w-full items-center justify-between rounded-lg border px-3 py-2.5 text-left text-sm",
+              FOCUS_RING
             )}
           >
-            Cerrar
+            <span>{agentLabel}</span>
+            <svg className="text-app-fg-muted size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <path d="M7 10l5 5 5-5H7z" />
+            </svg>
           </button>
+          {agentMenuOpen ? (
+            <ul
+              role="listbox"
+              className="border-app-border bg-app-raised absolute z-20 mt-1 w-full overflow-hidden rounded-lg border shadow-lg"
+            >
+              {AGENTS.map((item) => (
+                <li key={item.id} role="option" aria-selected={agent === item.id}>
+                  <button
+                    type="button"
+                    className={cn(
+                      "flex w-full items-center justify-between px-3 py-2.5 text-left text-sm",
+                      agent === item.id ? "bg-app-hover text-app-fg" : "text-app-fg-secondary hover:bg-app-hover"
+                    )}
+                    onClick={() => {
+                      setAgent(item.id)
+                      setAgentMenuOpen(false)
+                    }}
+                  >
+                    {item.label}
+                    {agent === item.id ? (
+                      <svg className="size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                      </svg>
+                    ) : null}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+
+        <div className="border-app-border bg-app-raised-muted relative mt-3 rounded-lg border">
+          <button
+            type="button"
+            onClick={() => void copySnippet()}
+            className={cn("text-app-fg-muted hover:text-app-fg absolute top-2 right-2 rounded-md p-1.5", FOCUS_RING)}
+            title="Copiar"
+            aria-label={copied ? "Copiado" : "Copiar configuración"}
+          >
+            {copied ? (
+              <svg className="size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+              </svg>
+            ) : (
+              <svg
+                className="size-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                aria-hidden
+              >
+                <rect x="9" y="9" width="11" height="11" rx="1.5" />
+                <path d="M5 15V5h10" strokeLinecap="round" />
+              </svg>
+            )}
+          </button>
+          <pre className="text-app-fg max-h-48 overflow-auto p-3 pr-10 font-mono text-[11px] leading-relaxed whitespace-pre-wrap">
+            {snippet}
+          </pre>
         </div>
       </div>
     </div>
