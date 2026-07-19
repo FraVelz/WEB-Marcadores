@@ -1,9 +1,3 @@
 {
-  "framework": "nextjs",
-  "crons": [
-    {
-      "path": "/api/agent/v1/cron/purge-trash",
-      "schedule": "0 4 * * *"
-    }
-  ]
+  "framework": "nextjs"
 }

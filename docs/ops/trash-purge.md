@@ -2,9 +2,42 @@
 
 Soft-deleted bookmarks and folders stay in trash until `deleted_at + 30 days`, then are hard-deleted.
 
-## Automatic purge
+## Automatic purge (sin Vercel Cron)
 
-Call periodically (Vercel Cron, GitHub Action, or `pg_cron` HTTP):
+Vercel Cron requiere plan de pago. En Hobby usamos una de estas opciones gratuitas:
+
+### Opción A — GitHub Actions (recomendada)
+
+Workflow: [`.github/workflows/purge-trash.yml`](../../.github/workflows/purge-trash.yml) (diario 04:00 UTC + `workflow_dispatch`).
+
+Secrets del repo:
+
+| Secret | Valor |
+| --- | --- |
+| `CRON_SECRET` | mismo que en Vercel / `.env` |
+| `SITE_URL` | `https://web-marcadores.vercel.app` (sin slash final) |
+
+### Opción B — Supabase `pg_cron` + SQL
+
+Si tienes `pg_cron` habilitado en el proyecto:
+
+```sql
+-- Hard-delete past retention (adjust interval if TRASH_RETENTION_DAYS changes)
+select cron.schedule(
+  'purge-marcadores-trash',
+  '0 4 * * *',
+  $$
+    delete from public.bookmarks
+    where deleted_at is not null
+      and deleted_at < now() - interval '30 days';
+    delete from public.folders
+    where deleted_at is not null
+      and deleted_at < now() - interval '30 days';
+  $$
+);
+```
+
+### Endpoint HTTP (cualquier cron externo)
 
 ```http
 POST /api/agent/v1/cron/purge-trash

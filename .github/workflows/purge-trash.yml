@@ -1,0 +1,38 @@
+# Purge soft-deleted bookmarks/folders past 30-day retention.
+# Free alternative to Vercel Cron (Hobby has no cron jobs).
+#
+# Secrets (repo → Settings → Secrets):
+#   CRON_SECRET  — same value as production CRON_SECRET
+#   SITE_URL     — e.g. https://web-marcadores.vercel.app (no trailing slash)
+
+name: Purge trash
+
+on:
+  schedule:
+    # Daily 04:00 UTC
+    - cron: "0 4 * * *"
+  workflow_dispatch:
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call purge endpoint
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SITE_URL: ${{ secrets.SITE_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CRON_SECRET:-}" ] || [ -z "${SITE_URL:-}" ]; then
+            echo "Missing CRON_SECRET or SITE_URL secret; skip."
+            exit 0
+          fi
+          url="${SITE_URL%/}/api/agent/v1/cron/purge-trash"
+          code=$(curl -sS -o /tmp/purge-body.json -w "%{http_code}" \
+            -X POST "$url" \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            -H "Content-Type: application/json")
+          echo "HTTP $code"
+          cat /tmp/purge-body.json
+          echo
+          test "$code" = "200"

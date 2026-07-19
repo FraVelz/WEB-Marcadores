@@ -10,7 +10,7 @@ Remote MCP (Streamable HTTP) and Agent REST for WEB-Marcadores.
 | Agent REST       | `/api/agent/v1/*`                                                            |
 | OpenAPI          | `GET /api/agent/v1/openapi`                                                  |
 | Health           | `GET /api/agent/v1/health`                                                   |
-| Trash purge cron | `POST /api/agent/v1/cron/purge-trash` (`Authorization: Bearer $CRON_SECRET`) |
+| Trash purge | `POST /api/agent/v1/cron/purge-trash` (`Authorization: Bearer $CRON_SECRET`) — schedule via GitHub Actions (not Vercel Cron on Hobby) |
 
 ## Cursor MCP config
 
@@ -37,7 +37,7 @@ Token CRUD uses the browser session cookie only (not PATs).
 
 ## Soft-delete / trash
 
-Deletes from UI, API, and MCP set `deleted_at` (30-day retention). Hard purge requires `confirm: true` + `trash:write`, or the cron job after retention.
+Deletes from UI, API, and MCP set `deleted_at` (30-day retention). Hard purge requires `confirm: true` + `trash:write`, or the scheduled GitHub Action / `pg_cron` after retention.
 
 See [trash-purge.md](./trash-purge.md).
 
