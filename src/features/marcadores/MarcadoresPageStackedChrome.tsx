@@ -43,6 +43,7 @@ export function MarcadoresPageStackedChrome({ m }: { m: MarcadoresPageModel }) {
         setSelectMode={b.setSelectMode}
         selectedIds={pane.selectedIds}
         setSelectedIds={b.setSelectedIds}
+        folders={m.folders}
         onEdit={m.handleEdit}
         onDelete={m.onDelete}
         showNewFolder={pane.showNewFolder}

@@ -1,6 +1,6 @@
 "use client"
 
-import type { GridItem } from "../utils/types"
+import type { FlatFolder, GridItem } from "../utils/types"
 import ToolbarNavigationButtons from "./ToolbarNavigationButtons"
 import ToolbarSearchSection from "./ToolbarSearchSection"
 import ToolbarNewFolderSection from "./ToolbarNewFolderSection"
@@ -35,6 +35,7 @@ type Props = {
   setSelectMode: (v: boolean | ((prev: boolean) => boolean)) => void
   selectedIds: Set<string>
   setSelectedIds: React.Dispatch<React.SetStateAction<Set<string>>>
+  folders?: FlatFolder[]
   onEdit: () => void
   onDelete: () => void
   infoPanelEnabled: boolean
@@ -87,6 +88,7 @@ export default function MarcadoresToolbar(props: Props) {
             setSelectMode={props.setSelectMode}
             selectedIds={props.selectedIds}
             setSelectedIds={props.setSelectedIds}
+            folders={props.folders}
             onEdit={props.onEdit}
             onDelete={props.onDelete}
           />

@@ -3,11 +3,15 @@
 import { cn } from "@/lib/utils"
 import { FOCUS_RING } from "@/lib/focusStyles"
 
+import type { FlatFolder } from "../utils/types"
+
 type Props = {
   selectMode: boolean
   setSelectMode: (v: boolean | ((prev: boolean) => boolean)) => void
   selectedIds: Set<string>
   setSelectedIds: React.Dispatch<React.SetStateAction<Set<string>>>
+  /** Ids de carpetas vivas; si hay exactamente una seleccionada, el botón dice Renombrar. */
+  folders?: FlatFolder[]
   onEdit: () => void
   onDelete: () => void
 }
@@ -17,9 +21,16 @@ export default function ToolbarSelectActions({
   setSelectMode,
   selectedIds,
   setSelectedIds,
+  folders = [],
   onEdit,
   onDelete,
 }: Props) {
+  const folderIdSet = new Set(folders.map((f) => f.id))
+  const singleId = selectedIds.size === 1 ? [...selectedIds][0] : null
+  const canRenameFolder = singleId != null && folderIdSet.has(singleId)
+  const canEditBookmark = singleId != null && !canRenameFolder
+  const canPrimaryEdit = canRenameFolder || canEditBookmark
+
   return (
     <div className="flex min-w-0 flex-shrink-0 flex-wrap items-center gap-1">
       <button
@@ -41,14 +52,14 @@ export default function ToolbarSelectActions({
           <button
             type="button"
             onClick={onEdit}
-            disabled={selectedIds.size !== 1}
+            disabled={!canPrimaryEdit}
             className={cn(
               "text-app-fg-muted rounded px-2 py-1 text-xs disabled:opacity-50",
               FOCUS_RING,
               "hover:bg-app-active hover:text-app-fg"
             )}
           >
-            Editar
+            {canRenameFolder ? "Renombrar" : "Editar"}
           </button>
           <button
             type="button"

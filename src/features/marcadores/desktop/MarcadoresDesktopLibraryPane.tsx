@@ -56,6 +56,7 @@ export function MarcadoresDesktopLibraryPane(props: MarcadoresDesktopLibraryPane
         setSelectMode={props.setSelectMode}
         selectedIds={props.selectedIds}
         setSelectedIds={props.setSelectedIds}
+        folders={props.folders}
         onEdit={props.onEdit}
         onDelete={props.onDelete}
         infoPanelEnabled={props.infoPanelEnabled}

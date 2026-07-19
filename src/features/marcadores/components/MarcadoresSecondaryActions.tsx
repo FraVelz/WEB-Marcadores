@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils"
 import { FOCUS_RING_ICON_BTN } from "@/lib/focusStyles"
 
 import type { ImportSummary } from "../hooks/persistMarcadoresImport"
+import type { FlatFolder } from "../utils/types"
 
 import { ToolbarImportExportSection } from "./ToolbarImportExportSection"
 import ToolbarNewFolderSection from "./ToolbarNewFolderSection"
@@ -20,6 +21,7 @@ type Props = {
   setSelectMode: (v: boolean | ((prev: boolean) => boolean)) => void
   selectedIds: Set<string>
   setSelectedIds: React.Dispatch<React.SetStateAction<Set<string>>>
+  folders?: FlatFolder[]
   onEdit: () => void
   onDelete: () => void
   showNewFolder: boolean
@@ -48,6 +50,7 @@ export function MarcadoresSecondaryActions({
   setSelectMode,
   selectedIds,
   setSelectedIds,
+  folders = [],
   onEdit,
   onDelete,
   showNewFolder,
@@ -126,6 +129,7 @@ export function MarcadoresSecondaryActions({
           setSelectMode={setSelectMode}
           selectedIds={selectedIds}
           setSelectedIds={setSelectedIds}
+          folders={folders}
           onEdit={onEdit}
           onDelete={onDelete}
         />

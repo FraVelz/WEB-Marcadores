@@ -91,6 +91,13 @@ export function useMarcadoresPageInteractions(opts: {
 
   const handleEdit = () => {
     const { folderIds, bookmarkIds } = partitionSelectedIds(selectedIds, folders, bookmarks)
+    if (folderIds.length === 1 && bookmarkIds.length === 0) {
+      const folder = folders.find((x) => x.id === folderIds[0])
+      if (!folder) return
+      setEditingFolder({ id: folder.id, name: folder.name })
+      setRenameFolderName(folder.name)
+      return
+    }
     if (folderIds.length > 0 || bookmarkIds.length !== 1) return
     const b = bookmarks.find((x) => x.id === bookmarkIds[0])
     if (b) {
