@@ -106,10 +106,10 @@ export function AgentAccessSettings({ enabled }: { enabled: boolean }) {
   return (
     <div className="border-app-border-muted bg-app-raised space-y-4 rounded-lg border p-6">
       <div>
-        <h2 className="text-app-fg text-lg font-semibold">Agent Access (MCP / API)</h2>
+        <h2 className="text-app-fg text-lg font-semibold">Claves para Cursor (Agent Access)</h2>
         <p className="text-app-fg-secondary mt-1 text-sm">
-          Tokens personales <code className="text-xs">wm_…</code> para Cursor MCP y{" "}
-          <code className="text-xs">/api/agent/v1</code>. Endpoint MCP: <code className="text-xs">/api/mcp/mcp</code>.
+          Aquí creas la clave que pegarás en Cursor. Empieza por <code className="text-xs">wm_</code> y solo se muestra
+          una vez. Guía completa: en Marcadores pulsa el botón <strong>MCP</strong> de la cabecera.
         </p>
       </div>
 
