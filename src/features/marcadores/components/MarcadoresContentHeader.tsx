@@ -8,6 +8,7 @@ import { FOCUS_RING_ICON_BTN } from "@/lib/focusStyles"
 import type { BookmarkSortOrder } from "@/features/marcadores/state/libraryPaneUiState"
 import { MarcadoresSearchField } from "./MarcadoresSearchField"
 import { McpSetupModal } from "./McpSetupModal"
+import { McpCodeIcon } from "./icons/McpCodeIcon"
 
 type Props = {
   searchValue: string
@@ -138,16 +139,7 @@ export function MarcadoresContentHeader({
               title="Configurar MCP para Cursor"
               aria-label="Configurar MCP"
             >
-              <svg
-                className="size-4 shrink-0"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.75"
-                aria-hidden
-              >
-                <path d="M16 18l6-6-6-6M8 6l-6 6 6 6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              <McpCodeIcon className="size-4 shrink-0" />
               <span>MCP</span>
             </button>
           </div>
