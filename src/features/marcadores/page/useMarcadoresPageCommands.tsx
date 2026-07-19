@@ -4,6 +4,7 @@ import { useEffect, type ReactNode } from "react"
 
 import { MarcadoresDesktopFloatingOverlays } from "@/features/marcadores/page/MarcadoresDesktopFloatingOverlays"
 import type { MarcadoresDesktopLibraryPaneBodyProps } from "@/features/marcadores/MarcadoresDesktopLibraryPaneBody"
+import { useMarcadoresClipboardHotkeys } from "@/features/marcadores/hooks/useMarcadoresClipboardHotkeys"
 import { useMarcadoresEffects } from "@/features/marcadores/hooks/useMarcadoresEffects"
 import { useMarcadoresMainHotkeys } from "@/features/marcadores/hooks/useMarcadoresMainHotkeys"
 import type { MarcadoresPageCore } from "@/features/marcadores/page/useMarcadoresPageDataHooks"
@@ -25,9 +26,7 @@ export function useMarcadoresPageCommands(core: MarcadoresPageCore) {
     ? (folderId: string) => core.toggleDeskTreeFolderCollapse(deskId, folderId)
     : core.toggleTreeFolderCollapse
 
-  useMarcadoresMainHotkeys({
-    mainRef: core.mainRef,
-    enabled: !pane.modalOpen,
+  const hotkeyCtx = {
     breadcrumb: core.breadcrumb,
     deleteConfirmItem: pane.deleteConfirmItem,
     setDeleteConfirmItem: b.setDeleteConfirmItem,
@@ -51,7 +50,7 @@ export function useMarcadoresPageCommands(core: MarcadoresPageCore) {
     handlePasteLink: core.handlePasteLink,
     onAddBookmark: core.handleAdd,
     onNewFolder: () => b.setShowNewFolder(true),
-    onEditItem: (item) => {
+    onEditItem: (item: (typeof core.focusFlatList)[number]) => {
       if (item.type === "link") {
         b.setEditingBookmark(item.bookmark)
         b.setModalOpen(true)
@@ -64,6 +63,17 @@ export function useMarcadoresPageCommands(core: MarcadoresPageCore) {
     treeMode: core.primaryViewMode === "tree",
     treeCollapsedIds,
     onToggleFolderCollapse,
+  }
+
+  useMarcadoresMainHotkeys({
+    mainRef: core.mainRef,
+    enabled: !pane.modalOpen,
+    ...hotkeyCtx,
+  })
+
+  useMarcadoresClipboardHotkeys({
+    enabled: !pane.modalOpen,
+    ...hotkeyCtx,
   })
 
   const { editFolderRef } = core
