@@ -7,6 +7,7 @@ import Script from "next/script"
 import { Analytics } from "@vercel/analytics/next"
 import { Geist, Geist_Mono } from "next/font/google"
 
+import { ToasterTheme } from "@/components/ui/ToasterTheme"
 import { AppAppearanceProvider } from "@/contexts/AppAppearanceContext"
 import { loadAppAppearanceFromCookies } from "@/lib/appAppearance"
 
@@ -68,7 +69,10 @@ export default async function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
         <Script src="/appearance-init.js" strategy="beforeInteractive" />
 
-        <AppAppearanceProvider initialAppearance={appearance}>{children}</AppAppearanceProvider>
+        <AppAppearanceProvider initialAppearance={appearance}>
+          {children}
+          <ToasterTheme />
+        </AppAppearanceProvider>
         <Analytics />
       </body>
     </html>

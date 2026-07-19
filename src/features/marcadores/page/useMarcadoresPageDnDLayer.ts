@@ -72,7 +72,6 @@ export function useMarcadoresPageDnDLayer(p: {
     bookmarks: p.bookmarks,
     handlePasteFolder: p.handlePasteFolder,
     handlePasteLink: p.handlePasteLink,
-    setPasteError: b.setPasteError,
     selectMode: ui.selectMode,
     openBookmarkTab: p.openBookmarkTab,
     defaultDropFolderId: p.activeBrowseFolderId,

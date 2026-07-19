@@ -7,6 +7,7 @@ import {
   CyclicFolderMoveError,
   CYCLIC_FOLDER_MOVE_MESSAGE,
 } from "@/features/marcadores/utils/assertAcyclicFolderMove"
+import { notifyPasteError } from "@/features/marcadores/utils/notifyPasteError"
 import type { Bookmark, GridItem } from "@/features/marcadores/utils/types"
 
 function runDrop(
@@ -15,10 +16,8 @@ function runDrop(
   folders: Folder[],
   bookmarks: Bookmark[],
   handlePasteFolder: (folderId: string, destFolderId: string | null) => void,
-  handlePasteLink: (bookmarkId: string, destFolderId: string | null) => void,
-  setPasteError: React.Dispatch<React.SetStateAction<string | null>>
+  handlePasteLink: (bookmarkId: string, destFolderId: string | null) => void
 ): void {
-  setPasteError(null)
   if (sourceItem.type === "folder") {
     if (destId === sourceItem.id) return
     const sameName = folders.some(
@@ -28,14 +27,14 @@ function runDrop(
         f.id !== sourceItem.id
     )
     if (sameName) {
-      setPasteError("Ya existe una carpeta con ese nombre en el destino")
+      notifyPasteError("Ya existe una carpeta con ese nombre en el destino")
       return
     }
     try {
       assertAcyclicFolderMove(folders, sourceItem.id, destId)
     } catch (error) {
       if (error instanceof CyclicFolderMoveError) {
-        setPasteError(CYCLIC_FOLDER_MOVE_MESSAGE)
+        notifyPasteError(CYCLIC_FOLDER_MOVE_MESSAGE)
         return
       }
       throw error
@@ -50,7 +49,7 @@ function runDrop(
     (b) => (b.folder_id || null) === destId && b.url === sourceItem.bookmark.url && b.id !== sourceItem.bookmark.id
   )
   if (sameUrl) {
-    setPasteError("Ya existe un enlace con esa URL en el destino")
+    notifyPasteError("Ya existe un enlace con esa URL en el destino")
     return
   }
   handlePasteLink(sourceItem.bookmark.id, destId)
@@ -61,7 +60,6 @@ export function useMarcadoresDropHandlers(opts: {
   bookmarks: Bookmark[]
   handlePasteFolder: (folderId: string, destFolderId: string | null) => void
   handlePasteLink: (bookmarkId: string, destFolderId: string | null) => void
-  setPasteError: React.Dispatch<React.SetStateAction<string | null>>
   selectMode: boolean
   openBookmarkTab: (b: Bookmark) => void
   defaultDropFolderId: string | null
@@ -73,7 +71,6 @@ export function useMarcadoresDropHandlers(opts: {
     bookmarks,
     handlePasteFolder,
     handlePasteLink,
-    setPasteError,
     selectMode,
     openBookmarkTab,
     defaultDropFolderId,
@@ -83,7 +80,7 @@ export function useMarcadoresDropHandlers(opts: {
 
   const handleDrop = (sourceItem: GridItem, targetFolderId?: string | null) => {
     const destId = targetFolderId === undefined ? defaultDropFolderId : targetFolderId
-    runDrop(sourceItem, destId, folders, bookmarks, handlePasteFolder, handlePasteLink, setPasteError)
+    runDrop(sourceItem, destId, folders, bookmarks, handlePasteFolder, handlePasteLink)
   }
 
   const handleDoubleClick = (item: GridItem) => {
@@ -97,7 +94,7 @@ export function useMarcadoresDropHandlers(opts: {
     (sourceItem: GridItem, targetFolderId?: string | null) => {
       const paneFolder = deskFolderByWin[winId] ?? null
       const destId = targetFolderId === undefined ? paneFolder : targetFolderId
-      runDrop(sourceItem, destId, folders, bookmarks, handlePasteFolder, handlePasteLink, setPasteError)
+      runDrop(sourceItem, destId, folders, bookmarks, handlePasteFolder, handlePasteLink)
     }
 
   const makeDeskPaneDoubleClick = (winId: string) => (item: GridItem) => {

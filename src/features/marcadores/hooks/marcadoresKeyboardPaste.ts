@@ -5,6 +5,7 @@ import {
   CyclicFolderMoveError,
   CYCLIC_FOLDER_MOVE_MESSAGE,
 } from "../utils/assertAcyclicFolderMove"
+import { notifyPasteError } from "../utils/notifyPasteError"
 import type { Bookmark, CutItem, FlatFolder } from "../utils/types"
 
 export function pasteCutFromKeyboard(
@@ -12,12 +13,10 @@ export function pasteCutFromKeyboard(
   selectedFolderId: string | null,
   folders: FlatFolder[],
   bookmarks: Bookmark[],
-  setPasteError: (v: string | null) => void,
   setCutItem: Dispatch<SetStateAction<CutItem | null>>,
   handlePasteFolder: (folderId: string, destParentId: string | null) => Promise<void>,
   handlePasteLink: (bookmarkId: string, destFolderId: string | null) => Promise<void>
 ) {
-  setPasteError(null)
   if (cutItem.type === "folder") {
     const destId = selectedFolderId
     const sameName = folders.some(
@@ -25,14 +24,14 @@ export function pasteCutFromKeyboard(
         (f.parent_id || null) === destId && f.name.toLowerCase() === cutItem.name.toLowerCase() && f.id !== cutItem.id
     )
     if (sameName) {
-      setPasteError("Ya existe una carpeta con ese nombre en el destino")
+      notifyPasteError("Ya existe una carpeta con ese nombre en el destino")
       return
     }
     try {
       assertAcyclicFolderMove(folders, cutItem.id, destId)
     } catch (error) {
       if (error instanceof CyclicFolderMoveError) {
-        setPasteError(CYCLIC_FOLDER_MOVE_MESSAGE)
+        notifyPasteError(CYCLIC_FOLDER_MOVE_MESSAGE)
         return
       }
       throw error
@@ -46,7 +45,7 @@ export function pasteCutFromKeyboard(
     (b) => (b.folder_id || null) === destId && b.url === cutItem.bookmark.url && b.id !== cutItem.bookmark.id
   )
   if (sameUrl) {
-    setPasteError("Ya existe un enlace con esa URL en el destino")
+    notifyPasteError("Ya existe un enlace con esa URL en el destino")
     return
   }
   void handlePasteLink(cutItem.bookmark.id, destId)

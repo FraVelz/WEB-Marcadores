@@ -26,7 +26,6 @@ export type LibraryPaneUiBindings = {
   setEditingFolder: Setter<LibraryPaneUiState["editingFolder"]>
   setRenameFolderName: Setter<string>
   setCutItem: Setter<LibraryPaneUiState["cutItem"]>
-  setPasteError: Setter<string | null>
   setDeleteConfirmItem: Setter<LibraryPaneUiState["deleteConfirmItem"]>
   setSearchValue: Setter<string>
   setSearchInSubfolders: Setter<boolean>
@@ -62,7 +61,6 @@ export function createLibraryPaneBindings(
     setEditingFolder: (a) => patch("editingFolder", a),
     setRenameFolderName: (a) => patch("renameFolderName", a),
     setCutItem: (a) => patch("cutItem", a),
-    setPasteError: (a) => patch("pasteError", a),
     setDeleteConfirmItem: (a) => patch("deleteConfirmItem", a),
     setSearchValue: (a) => patch("searchValue", a),
     setSearchInSubfolders: (a) => patch("searchInSubfolders", a),

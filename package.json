@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@atlaskit/pragmatic-drag-and-drop": "^1.8.1",
+    "@pheralb/toast": "^1.0.0",
     "@sentry/nextjs": "^10.64.0",
     "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.98.0",

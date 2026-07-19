@@ -3,6 +3,7 @@
 import { useDashboard } from "@/contexts/DashboardContext"
 import { createClient } from "@/lib/supabase/client"
 import { captureMutationError } from "@/lib/sentry/captureMutationError"
+import { toast } from "@pheralb/toast"
 import { assertAcyclicFolderMove, CyclicFolderMoveError } from "../utils/assertAcyclicFolderMove"
 import { buildMarcadoresBackupJson, stringifyMarcadoresBackup } from "../utils/marcadoresBackup"
 import { buildFolderTree } from "../utils/utils"
@@ -32,6 +33,9 @@ async function withMutationError<T>(mutation: string, fn: () => Promise<T>): Pro
     return await fn()
   } catch (error) {
     captureMutationError(error, { mutation })
+    toast.error({
+      text: error instanceof Error ? error.message : "No se pudo completar la operación",
+    })
     throw error
   }
 }

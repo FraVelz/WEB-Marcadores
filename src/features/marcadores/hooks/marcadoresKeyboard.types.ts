@@ -18,7 +18,6 @@ export type MarcadoresKeyboardContext = {
   bookmarks: Bookmark[]
   cutItem: CutItem | null
   setCutItem: Dispatch<SetStateAction<CutItem | null>>
-  setPasteError: (v: string | null) => void
   setSelectedIds: Dispatch<SetStateAction<Set<string>>>
   setSelectedIndex: Dispatch<SetStateAction<number>>
   setSelectedFolderId: (id: string | null) => void

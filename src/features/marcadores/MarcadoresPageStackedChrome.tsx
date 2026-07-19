@@ -5,7 +5,6 @@ import { MarcadoresContentHeader } from "@/features/marcadores/components/Marcad
 import { MarcadoresGlobalAlertLayer } from "@/features/marcadores/components/MarcadoresGlobalAlertLayer"
 import { MarcadoresSecondaryActions } from "@/features/marcadores/components/MarcadoresSecondaryActions"
 import MarcadoresBreadcrumb from "@/features/marcadores/components/MarcadoresBreadcrumb"
-import PasteErrorBanner from "@/features/marcadores/components/PasteErrorBanner"
 import type { MarcadoresPageModel } from "@/features/marcadores/useMarcadoresPage"
 
 export function MarcadoresPageStackedChrome({ m }: { m: MarcadoresPageModel }) {
@@ -61,10 +60,9 @@ export function MarcadoresPageStackedChrome({ m }: { m: MarcadoresPageModel }) {
         onImportFile={m.handleImportFile}
       />
 
-      {pane.pasteError || m.demoMode ? (
+      {m.demoMode ? (
         <MarcadoresGlobalAlertLayer variant="stacked">
-          {pane.pasteError ? <PasteErrorBanner message={pane.pasteError} /> : null}
-          {m.demoMode ? <DemoBanner /> : null}
+          <DemoBanner />
         </MarcadoresGlobalAlertLayer>
       ) : null}
 
