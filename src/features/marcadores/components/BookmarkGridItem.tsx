@@ -5,9 +5,9 @@ import { useId, useRef } from "react"
 import { cn, cnLines } from "@/lib/utils"
 import { FOCUS_RING_INSET, KEYBOARD_SELECTED } from "@/lib/focusStyles"
 import { useBookmarkDraggable, useBookmarkDropTarget } from "@/lib/drag-and-drop"
-import type { GridItem } from "../utils/types"
+import { gridItemSelectionId } from "../utils/selectionIds"
+import type { FlatFolder, GridItem } from "../utils/types"
 import { FolderContent, LinkContent, resolveFolderName } from "./bookmarkGrid/BookmarkGridItemBodies"
-import type { FlatFolder } from "../utils/types"
 
 type Props = {
   item: GridItem
@@ -72,11 +72,13 @@ function BookmarkGridItem({
     onDragLeave: onBookmarkDragHoverLeave,
   })
 
+  const selectionId = gridItemSelectionId(item)
+
   const activateFromKeyboard = (e: React.KeyboardEvent) => {
     if (e.target !== e.currentTarget) return
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault()
-      if (selectMode && !isFolder) onToggleSelect(item.bookmark.id)
+      if (selectMode) onToggleSelect(selectionId)
       else onSelect(idx)
     }
   }
@@ -99,8 +101,10 @@ function BookmarkGridItem({
         ? KEYBOARD_SELECTED
         : cnLines("border-app-border bg-app-raised", "hover:border-app-input-border hover:shadow-sm")),
     dropFrameClass,
-    selectMode && !isFolder ? "cursor-pointer" : ""
+    selectMode ? "cursor-pointer" : ""
   )
+
+  const selectLabel = isFolder ? item.label : item.bookmark.title
 
   return (
     <div
@@ -108,10 +112,10 @@ function BookmarkGridItem({
       data-bookmark-grid-item
       role="button"
       tabIndex={0}
-      aria-pressed={selectMode && !isFolder ? isChecked : undefined}
+      aria-pressed={selectMode ? isChecked : undefined}
       className={cn(baseClass, "z-[1] cursor-grab active:cursor-grabbing", !isSelected && FOCUS_RING_INSET)}
       onClick={() => {
-        if (selectMode && !isFolder) onToggleSelect(item.bookmark.id)
+        if (selectMode) onToggleSelect(selectionId)
         else onSelect(idx)
       }}
       onFocus={(e) => {
@@ -120,9 +124,9 @@ function BookmarkGridItem({
       onKeyDown={activateFromKeyboard}
       onDoubleClick={() => onDoubleClick(item)}
     >
-      {selectMode && !isFolder && (
+      {selectMode && (
         <label className="absolute top-3 left-3 z-10" htmlFor={selectControlId} onClick={(e) => e.stopPropagation()}>
-          <span className="sr-only">Seleccionar {item.bookmark.title}</span>
+          <span className="sr-only">Seleccionar {selectLabel}</span>
           <input
             id={selectControlId}
             type="checkbox"
@@ -131,7 +135,7 @@ function BookmarkGridItem({
             className="border-app-input-border bg-app-raised-muted accent-app-primary size-4 rounded"
             onClick={(e) => {
               e.stopPropagation()
-              onToggleSelect(item.bookmark.id)
+              onToggleSelect(selectionId)
             }}
           />
         </label>

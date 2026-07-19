@@ -6,6 +6,7 @@ import { cn, cnLines } from "@/lib/utils"
 import { FOCUS_RING_INSET, KEYBOARD_SELECTED } from "@/lib/focusStyles"
 import { useBookmarkDraggable, useBookmarkDropTarget } from "@/lib/drag-and-drop"
 import type { Bookmark, FlatFolder, GridItem } from "../../utils/types"
+import { gridItemSelectionId } from "../../utils/selectionIds"
 import { TreeFolderRowContent } from "./TreeFolderRowContent"
 import { folderHasChildren } from "./treeHelpers"
 import { TreeLinkCell } from "./TreeLinkCell"
@@ -79,12 +80,14 @@ export function TreeRow({
 
   const hasKids = isFolder ? folderHasChildren(folders, bookmarks, item.id) : false
   const isExpanded = isFolder ? hasKids && !collapsedIds.has(item.id) : undefined
+  const selectionId = gridItemSelectionId(item)
+  const selectLabel = isFolder ? item.label : item.bookmark.title
 
   const activateFromKeyboard = (e: React.KeyboardEvent) => {
     if (e.target !== e.currentTarget) return
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault()
-      if (!isFolder && selectMode) onToggleSelect(item.bookmark.id)
+      if (selectMode) onToggleSelect(selectionId)
       else onSelect(idx)
       return
     }
@@ -114,7 +117,7 @@ export function TreeRow({
         "ring-app-accent/25 outline-app-accent/85 ring-2 outline outline-2 outline-offset-[-2px] outline-dashed",
         "dark:bg-app-accent/[0.11]"
       ),
-    selectMode && !isFolder ? "cursor-pointer" : "",
+    selectMode ? "cursor-pointer" : "",
     "cursor-grab active:cursor-grabbing"
   )
 
@@ -131,7 +134,7 @@ export function TreeRow({
       style={{ paddingLeft: padLeft }}
       className={cn(baseClass, !isSelected && FOCUS_RING_INSET)}
       onClick={() => {
-        if (!isFolder && selectMode) onToggleSelect(item.bookmark.id)
+        if (selectMode) onToggleSelect(selectionId)
         else onSelect(idx)
       }}
       onFocus={(e) => {
@@ -140,14 +143,14 @@ export function TreeRow({
       onKeyDown={activateFromKeyboard}
       onDoubleClick={() => onDoubleClick(item)}
     >
-      {selectMode && !isFolder && (
+      {selectMode && (
         <label
           className="absolute top-2 z-10"
           style={{ left: padLeft }}
           htmlFor={selectControlId}
           onClick={(e) => e.stopPropagation()}
         >
-          <span className="sr-only">Seleccionar {item.bookmark.title}</span>
+          <span className="sr-only">Seleccionar {selectLabel}</span>
           <input
             id={selectControlId}
             type="checkbox"
@@ -156,7 +159,7 @@ export function TreeRow({
             className="border-app-input-border bg-app-raised-muted accent-app-primary size-4 rounded"
             onClick={(e) => {
               e.stopPropagation()
-              onToggleSelect(item.bookmark.id)
+              onToggleSelect(selectionId)
             }}
           />
         </label>
@@ -167,6 +170,7 @@ export function TreeRow({
           hasKids={hasKids}
           collapsedIds={collapsedIds}
           onToggleFolderCollapse={onToggleFolderCollapse}
+          padForCheckbox={selectMode}
         />
       ) : (
         <TreeLinkCell

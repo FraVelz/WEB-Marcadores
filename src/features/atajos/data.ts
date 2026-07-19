@@ -61,7 +61,7 @@ export const shortcutSections: ShortcutSection[] = [
     rows: [
       { keys: "r", desc: "Modificar enlace o renombrar carpeta" },
       { keys: "i", desc: "Ver/ocultar propiedades del marcador (solo enlaces)" },
-      { keys: "Enter", desc: "Seleccionar/deseleccionar enlace (modo selección)" },
+      { keys: "Enter", desc: "Seleccionar/deseleccionar ítem (modo selección)" },
       { keys: "Esc", desc: "Cerrar modal, panel de detalle o cancelar" },
       { keys: "Doble clic", desc: "Abrir marcador en nueva pestaña" },
     ],

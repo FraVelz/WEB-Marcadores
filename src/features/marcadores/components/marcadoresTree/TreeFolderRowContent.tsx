@@ -10,11 +10,13 @@ export function TreeFolderRowContent({
   hasKids,
   collapsedIds,
   onToggleFolderCollapse,
+  padForCheckbox = false,
 }: {
   item: Extract<GridItem, { type: "folder" }>
   hasKids: boolean
   collapsedIds: Set<string>
   onToggleFolderCollapse: (folderId: string) => void
+  padForCheckbox?: boolean
 }) {
   return (
     <>
@@ -23,6 +25,7 @@ export function TreeFolderRowContent({
         className={cn(
           "text-app-fg-label flex size-7 shrink-0 items-center justify-center rounded text-xs",
           FOCUS_RING_ICON_BTN,
+          padForCheckbox && "ml-6",
           !hasKids && "pointer-events-none invisible"
         )}
         aria-label={collapsedIds.has(item.id) ? "Expandir carpeta" : "Contraer carpeta"}

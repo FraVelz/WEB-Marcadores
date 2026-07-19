@@ -46,6 +46,7 @@ export function useMarcadoresPageDnDLayer(p: {
     newFolderName: ui.newFolderName,
     setNewFolderName: b.setNewFolderName,
     setShowNewFolder: b.setShowNewFolder,
+    folders: p.folders,
     bookmarks: p.bookmarksForModal,
     setEditingBookmark: b.setEditingBookmark,
     setModalOpen: b.setModalOpen,

@@ -59,13 +59,14 @@ export function applyMarcadoresBrowseNavigationKeys(
   if (totalCount === 0) return false
   const item = flatList[selectedIndex]
 
-  if (selectMode && item?.type === "link") {
+  if (selectMode && item) {
     if (e.key === "Enter") {
       e.preventDefault()
+      const id = item.type === "folder" ? item.id : item.bookmark.id
       setSelectedIds((prev) => {
         const next = new Set(prev)
-        if (next.has(item.bookmark.id)) next.delete(item.bookmark.id)
-        else next.add(item.bookmark.id)
+        if (next.has(id)) next.delete(id)
+        else next.add(id)
         return next
       })
       return true

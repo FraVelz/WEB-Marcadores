@@ -8,6 +8,7 @@ import { FOCUS_RING } from "@/lib/focusStyles"
 import { useBookmarkDragMonitor, useBookmarkDropPanel } from "@/lib/drag-and-drop"
 import type { GridItem, CutItem } from "../utils/types"
 import { APP_DROP_PANEL_OVERLAY_CLASS } from "../utils/dragDropUi"
+import { gridItemSelectionId } from "../utils/selectionIds"
 import BookmarkGridItem from "./BookmarkGridItem"
 import { EmptySearchState } from "./EmptySearchState"
 
@@ -152,7 +153,7 @@ export default function BookmarkGrid({
 
       if (s.dragging && setSelectedIds) {
         const box = normalizeMarqueeClientRect(s.startX, s.startY, ev.clientX, ev.clientY)
-        const ids = collectMarqueeBookmarkIds(itemRefs.current, flatList, box)
+        const ids = collectMarqueeSelectionIds(itemRefs.current, flatList, box)
         setSelectedIds((prev) => {
           if (s.additive) {
             const next = new Set(prev)
@@ -164,7 +165,7 @@ export default function BookmarkGrid({
         if (ids.size > 0) {
           setSelectMode(true)
           const list = flatList
-          const firstIdx = list.findIndex((it) => it.type === "link" && ids.has(it.bookmark.id))
+          const firstIdx = list.findIndex((it) => ids.has(gridItemSelectionId(it)))
           if (firstIdx >= 0) onSelectIndex(firstIdx)
         }
       }
@@ -229,7 +230,7 @@ export default function BookmarkGrid({
               isSelected={idx === selectedIndex}
               isCut={!!isCut}
               selectMode={selectMode}
-              isChecked={!isFolder && selectedIds.has(item.bookmark.id)}
+              isChecked={selectedIds.has(isFolder ? item.id : item.bookmark.id)}
               dropHighlight={dropItemIdx === idx}
               itemRef={(el) => {
                 if (el) itemRefs.current.set(idx, el)
@@ -296,7 +297,7 @@ function marqueeClientRectsIntersect(a: DOMRect, b: { left: number; top: number;
   return !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom)
 }
 
-function collectMarqueeBookmarkIds(
+function collectMarqueeSelectionIds(
   refs: Map<number, HTMLDivElement>,
   flatList: GridItem[],
   box: { left: number; top: number; right: number; bottom: number }
@@ -304,9 +305,9 @@ function collectMarqueeBookmarkIds(
   const ids = new Set<string>()
   refs.forEach((el, idx) => {
     const item = flatList[idx]
-    if (!item || item.type !== "link") return
+    if (!item) return
     const r = el.getBoundingClientRect()
-    if (marqueeClientRectsIntersect(r, box)) ids.add(item.bookmark.id)
+    if (marqueeClientRectsIntersect(r, box)) ids.add(gridItemSelectionId(item))
   })
   return ids
 }

@@ -2,8 +2,13 @@
 
 import type { BookmarkFormData } from "@/features/marcadores/components/bookmark/BookmarkModal"
 
-import type { Bookmark } from "@/features/marcadores/utils/types"
+import type { Bookmark, FlatFolder } from "@/features/marcadores/utils/types"
 import type { GridItem } from "@/features/marcadores/utils/types"
+import {
+  bookmarkIdsOutsideDeletedFolders,
+  partitionSelectedIds,
+  topmostSelectedFolderIds,
+} from "@/features/marcadores/utils/selectionIds"
 
 export function useMarcadoresPageInteractions(opts: {
   handleDeleteFolder: (id: string) => Promise<void>
@@ -20,6 +25,7 @@ export function useMarcadoresPageInteractions(opts: {
   newFolderName: string
   setNewFolderName: React.Dispatch<React.SetStateAction<string>>
   setShowNewFolder: React.Dispatch<React.SetStateAction<boolean>>
+  folders: FlatFolder[]
   bookmarks: Bookmark[]
   setEditingBookmark: React.Dispatch<React.SetStateAction<Bookmark | null>>
   setModalOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -45,6 +51,7 @@ export function useMarcadoresPageInteractions(opts: {
     newFolderName,
     setNewFolderName,
     setShowNewFolder,
+    folders,
     bookmarks,
     setEditingBookmark,
     setModalOpen,
@@ -83,13 +90,12 @@ export function useMarcadoresPageInteractions(opts: {
   }
 
   const handleEdit = () => {
-    const ids = Array.from(selectedIds)
-    if (ids.length === 1) {
-      const b = bookmarks.find((x) => x.id === ids[0])
-      if (b) {
-        setEditingBookmark(b)
-        setModalOpen(true)
-      }
+    const { folderIds, bookmarkIds } = partitionSelectedIds(selectedIds, folders, bookmarks)
+    if (folderIds.length > 0 || bookmarkIds.length !== 1) return
+    const b = bookmarks.find((x) => x.id === bookmarkIds[0])
+    if (b) {
+      setEditingBookmark(b)
+      setModalOpen(true)
     }
   }
 
@@ -99,7 +105,21 @@ export function useMarcadoresPageInteractions(opts: {
   }
 
   const onDelete = async () => {
-    await handleDelete(selectedIds, setSelectedIds, setSelectMode)
+    const { folderIds, bookmarkIds } = partitionSelectedIds(selectedIds, folders, bookmarks)
+    if (folderIds.length === 0 && bookmarkIds.length === 0) return
+
+    const foldersToDelete = topmostSelectedFolderIds(folders, folderIds)
+    const linksToDelete = bookmarkIdsOutsideDeletedFolders(bookmarks, bookmarkIds, folders, foldersToDelete)
+
+    for (const folderId of foldersToDelete) {
+      await handleDeleteFolder(folderId)
+    }
+    if (linksToDelete.length > 0) {
+      await handleDelete(new Set(linksToDelete), setSelectedIds, setSelectMode)
+    } else {
+      setSelectedIds(new Set())
+      setSelectMode(false)
+    }
   }
 
   const onBookmarkUpdate = async (id: string, updates: Partial<Bookmark>) => {

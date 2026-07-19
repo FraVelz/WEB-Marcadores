@@ -138,7 +138,7 @@ export default function MarcadoresTreeView({
                 }
                 onDragClearHighlight={clearDropPreview}
                 selectMode={selectMode}
-                isChecked={!isFolder && selectedIds.has(item.bookmark.id)}
+                isChecked={selectedIds.has(isFolder ? item.id : item.bookmark.id)}
                 collapsedIds={collapsedIds}
                 onToggleFolderCollapse={onToggleFolderCollapse}
                 itemRef={(el) => {
