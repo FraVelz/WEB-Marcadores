@@ -1,3 +1,5 @@
+export type BookmarkMetadata = Record<string, unknown>
+
 export type Bookmark = {
   id: string
   title: string
@@ -11,6 +13,9 @@ export type Bookmark = {
   archived_at?: string | null
   opened_at?: string | null
   open_count?: number
+  deleted_at?: string | null
+  deleted_batch_id?: string | null
+  metadata?: BookmarkMetadata
 }
 
 export type FlatFolder = {
@@ -18,6 +23,8 @@ export type FlatFolder = {
   parent_id: string | null
   name: string
   sort_order: number
+  deleted_at?: string | null
+  deleted_batch_id?: string | null
 }
 
 export type GridItem =
@@ -29,3 +36,24 @@ export type CutItem =
   | { type: "link"; bookmark: Bookmark; sourceFolderId: string | null }
 
 export type BreadcrumbPart = { id: string | null; label: string }
+
+export type TrashItem =
+  | {
+      type: "bookmark"
+      id: string
+      title: string
+      url: string
+      deleted_at: string
+      deleted_batch_id: string | null
+      purge_at: string
+      days_left: number
+    }
+  | {
+      type: "folder"
+      id: string
+      name: string
+      deleted_at: string
+      deleted_batch_id: string | null
+      purge_at: string
+      days_left: number
+    }
