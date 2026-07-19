@@ -5,6 +5,7 @@ import { useEffect, useId, useRef, useState } from "react"
 import Link from "next/link"
 
 import { useDashboard } from "@/contexts/DashboardContext"
+import { useFocusTrap } from "@/hooks/useFocusTrap"
 
 import { cn } from "@/lib/utils"
 import { FOCUS_RING } from "@/lib/focusStyles"
@@ -15,18 +16,19 @@ function norm(s: string) {
 
 export function DashboardCommandPalette() {
   const id = useId()
+  const dialogRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const { commandPaletteOpen, setCommandPaletteOpen, marcadoresPalette } = useDashboard()
 
   const [query, setQuery] = useState("")
+
+  useFocusTrap(dialogRef, { enabled: commandPaletteOpen, initialFocusRef: inputRef })
 
   useEffect(() => {
     if (!commandPaletteOpen) return
     queueMicrotask(() => {
       setQuery("")
     })
-    const t = requestAnimationFrame(() => inputRef.current?.focus())
-    return () => cancelAnimationFrame(t)
   }, [commandPaletteOpen])
 
   const bookmarkHits = (() => {
@@ -59,7 +61,14 @@ export function DashboardCommandPalette() {
   }
 
   return (
-    <div className="fixed inset-0 z-[100]" role="dialog" aria-labelledby={`${id}-title`}>
+    <div
+      ref={dialogRef}
+      className="fixed inset-0 z-[100]"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={`${id}-title`}
+      onKeyDown={(e) => e.stopPropagation()}
+    >
       <button
         type="button"
         className="bg-app-overlay-strong absolute inset-0 cursor-default border-0"

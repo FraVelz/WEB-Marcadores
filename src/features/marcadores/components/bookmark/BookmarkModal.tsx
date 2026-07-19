@@ -1,7 +1,8 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useState, useRef } from "react"
 import { buildFolderOptions } from "@/lib/bookmark-utils"
+import { useFocusTrap } from "@/hooks/useFocusTrap"
 import { FOCUS_RING } from "@/lib/focusStyles"
 import { cn } from "@/lib/utils"
 import { splitCommaTags } from "@/lib/comma-tags"
@@ -57,39 +58,7 @@ export default function BookmarkModal({ onClose, onSubmit, initialData, allTags,
   const tagInputRef = useRef<string>("")
 
   useHotkeys("esc", () => onClose(), {}, [onClose])
-
-  useEffect(() => {
-    requestAnimationFrame(() => firstInputRef.current?.focus())
-  }, [])
-
-  useEffect(() => {
-    const el = modalContentRef.current
-    if (!el) return
-    const focusables = el.querySelectorAll<HTMLElement>(
-      [
-        "input:not([disabled]), textarea:not([disabled]), button:not([disabled]),",
-        "select:not([disabled]), [tabindex]:not([tabindex='-1'])",
-      ].join(" ")
-    )
-    const first = focusables[0]
-    const last = focusables[focusables.length - 1]
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== "Tab") return
-      if (e.shiftKey) {
-        if (document.activeElement === first) {
-          e.preventDefault()
-          last?.focus()
-        }
-      } else {
-        if (document.activeElement === last) {
-          e.preventDefault()
-          first?.focus()
-        }
-      }
-    }
-    el.addEventListener("keydown", handleKeyDown)
-    return () => el.removeEventListener("keydown", handleKeyDown)
-  }, [])
+  useFocusTrap(modalContentRef, { initialFocusRef: firstInputRef })
 
   const folderOptions = buildFolderOptions(folders)
 

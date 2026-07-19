@@ -12,10 +12,10 @@ Workflow: [`.github/workflows/purge-trash.yml`](../../.github/workflows/purge-tr
 
 Secrets del repo:
 
-| Secret | Valor |
-| --- | --- |
-| `CRON_SECRET` | mismo que en Vercel / `.env` |
-| `SITE_URL` | `https://web-marcadores.vercel.app` (sin slash final) |
+| Secret        | Valor                                                 |
+| ------------- | ----------------------------------------------------- |
+| `CRON_SECRET` | mismo que en Vercel / `.env`                          |
+| `SITE_URL`    | `https://web-marcadores.vercel.app` (sin slash final) |
 
 ### Opción B — Supabase `pg_cron` + SQL
 

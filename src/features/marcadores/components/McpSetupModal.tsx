@@ -4,6 +4,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react"
 import Link from "next/link"
 import { toast } from "@pheralb/toast"
 
+import { useFocusTrap } from "@/hooks/useFocusTrap"
 import { cn } from "@/lib/utils"
 import { FOCUS_RING } from "@/lib/focusStyles"
 import { useHotkeys } from "@/lib/hotkeys/useHotkeys"
@@ -58,6 +59,8 @@ http_headers = { "Authorization" = "${auth}" }`
 
 export function McpSetupModal({ open, onClose }: Props) {
   const titleId = useId()
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const agentButtonRef = useRef<HTMLButtonElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const [agent, setAgent] = useState<AgentId>("cursor")
   const [agentMenuOpen, setAgentMenuOpen] = useState(false)
@@ -67,6 +70,7 @@ export function McpSetupModal({ open, onClose }: Props) {
   const snippet = snippetForAgent(agent, url)
   const agentLabel = AGENTS.find((a) => a.id === agent)?.label ?? "Cursor"
 
+  useFocusTrap(dialogRef, { enabled: open, initialFocusRef: agentButtonRef })
   useHotkeys("esc", () => onClose(), { enabled: open }, [onClose, open])
 
   useEffect(() => {
@@ -93,11 +97,13 @@ export function McpSetupModal({ open, onClose }: Props) {
 
   return (
     <div
+      ref={dialogRef}
       className="bg-app-overlay fixed inset-0 z-50 flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
       data-no-vim
+      onKeyDown={(e) => e.stopPropagation()}
     >
       <button
         type="button"
@@ -127,7 +133,7 @@ export function McpSetupModal({ open, onClose }: Props) {
               "text-app-fg-muted hover:bg-app-hover hover:text-app-fg shrink-0 rounded-lg p-1.5 transition-colors",
               FOCUS_RING
             )}
-            aria-label="Cerrar"
+            aria-label="Cerrar diálogo"
           >
             <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
               <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
@@ -137,6 +143,7 @@ export function McpSetupModal({ open, onClose }: Props) {
 
         <div className="relative mt-5" ref={menuRef}>
           <button
+            ref={agentButtonRef}
             type="button"
             aria-haspopup="listbox"
             aria-expanded={agentMenuOpen}
