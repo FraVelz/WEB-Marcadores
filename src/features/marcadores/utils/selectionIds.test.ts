@@ -44,12 +44,7 @@ describe("selectionIds", () => {
 
   it("collectAllFolderIds walks nested children", () => {
     expect(
-      [
-        ...collectAllFolderIds([
-          { id: "a", children: [{ id: "b", children: [{ id: "c" }] }] },
-          { id: "d" },
-        ]),
-      ].sort()
+      [...collectAllFolderIds([{ id: "a", children: [{ id: "b", children: [{ id: "c" }] }] }, { id: "d" }])].sort()
     ).toEqual(["a", "b", "c", "d"])
   })
 })
