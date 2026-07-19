@@ -4,12 +4,12 @@ Remote MCP (Streamable HTTP) and Agent REST for WEB-Marcadores.
 
 ## Endpoints
 
-| Surface          | URL                                                                          |
-| ---------------- | ---------------------------------------------------------------------------- |
-| MCP              | `POST/GET /api/mcp/mcp` (Bearer `wm_…` or Supabase JWT)                      |
-| Agent REST       | `/api/agent/v1/*`                                                            |
-| OpenAPI          | `GET /api/agent/v1/openapi`                                                  |
-| Health           | `GET /api/agent/v1/health`                                                   |
+| Surface     | URL                                                                                                                                   |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| MCP         | `POST/GET /api/mcp` (Bearer `wm_…` or Supabase JWT)                                                                                   |
+| Agent REST  | `/api/agent/v1/*`                                                                                                                     |
+| OpenAPI     | `GET /api/agent/v1/openapi`                                                                                                           |
+| Health      | `GET /api/agent/v1/health`                                                                                                            |
 | Trash purge | `POST /api/agent/v1/cron/purge-trash` (`Authorization: Bearer $CRON_SECRET`) — schedule via GitHub Actions (not Vercel Cron on Hobby) |
 
 ## Cursor MCP config
@@ -20,7 +20,7 @@ Create a PAT in **Perfil → Agent Access**, then add to Cursor MCP settings:
 {
   "mcpServers": {
     "web-marcadores": {
-      "url": "https://YOUR_HOST/api/mcp/mcp",
+      "url": "https://YOUR_HOST/api/mcp",
       "headers": {
         "Authorization": "Bearer wm_YOUR_TOKEN"
       }
