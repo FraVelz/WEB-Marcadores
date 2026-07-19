@@ -16,6 +16,8 @@ With this folder as the Cursor workspace root, the `/update-docs` and `/auto-com
 ## ✨ Features
 
 - Nested folders, bookmark grid, and a detail panel with metadata and tags
+- **Trash** with soft-delete and 30-day retention
+- **Agent API + remote MCP** (PAT `wm_…`) — see [docs/ops/mcp-agent.md](./docs/ops/mcp-agent.md)
 - Supabase authentication and SSR session handling via `@supabase/ssr`
 - **Demo mode** without `.env.local`: in-memory data and access via the login button or `/demo` route (set
   `NEXT_PUBLIC_DEMO_MODE=true` in production to force it)

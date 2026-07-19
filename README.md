@@ -15,6 +15,8 @@ Con esta carpeta como raíz del workspace en Cursor, los comandos `/update-docs`
 ## ✨ Características
 
 - Carpetas anidadas, cuadrícula de marcadores y panel de detalle con metadatos y etiquetas
+- **Papelera** con soft-delete y retención de 30 días
+- **Agent API + MCP remoto** (PAT `wm_…`) — ver [docs/ops/mcp-agent.md](./docs/ops/mcp-agent.md)
 - Autenticación con Supabase y sesión SSR mediante `@supabase/ssr`
 - **Modo demo** sin `.env.local`: datos en memoria y acceso por botón en login o ruta `/demo` (en producción puedes
   forzar con `NEXT_PUBLIC_DEMO_MODE=true`)

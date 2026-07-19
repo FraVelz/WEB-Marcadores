@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils"
 import { FOCUS_RING } from "@/lib/focusStyles"
 
 import { AppearanceSettings } from "./AppearanceSettings"
+import { AgentAccessSettings } from "./AgentAccessSettings"
 
 export function SectionsClient() {
   const { demoMode } = useDashboard()
@@ -22,6 +23,8 @@ export function SectionsClient() {
   return (
     <div className="mx-auto w-full max-w-2xl space-y-6 px-1 sm:px-0">
       <AppearanceSettings />
+
+      <AgentAccessSettings enabled={!demoMode && Boolean(user)} />
 
       <div className="border-app-border-muted bg-app-raised rounded-lg border p-6">
         {user ? (
