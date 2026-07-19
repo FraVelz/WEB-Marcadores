@@ -106,16 +106,17 @@ export function AgentAccessSettings({ enabled }: { enabled: boolean }) {
   return (
     <div className="border-app-border-muted bg-app-raised space-y-4 rounded-lg border p-6">
       <div>
-        <h2 className="text-app-fg text-lg font-semibold">Claves para Cursor (Agent Access)</h2>
+        <h2 className="text-app-fg text-lg font-semibold">Claves para agentes de IA (MCP / API)</h2>
         <p className="text-app-fg-secondary mt-1 text-sm">
-          Aquí creas la clave que pegarás en Cursor. Empieza por <code className="text-xs">wm_</code> y solo se muestra
-          una vez. Guía completa: en Marcadores pulsa el botón <strong>MCP</strong> de la cabecera.
+          Aquí creas la clave que pegarás en tu agente (Cursor, Claude Code, Codex, etc.). Empieza por{" "}
+          <code className="text-xs">wm_</code> y solo se muestra una vez. Guía completa: en Marcadores pulsa el botón{" "}
+          <strong>MCP</strong> de la cabecera.
         </p>
       </div>
 
       {createdSecret ? (
         <div className="border-app-border bg-app-raised-muted rounded-lg border p-3">
-          <p className="text-app-fg-secondary mb-2 text-xs font-medium uppercase">Secret (una sola vez)</p>
+          <p className="text-app-fg-secondary mb-2 text-xs font-medium">Secret (se muestra solo una vez)</p>
           <code className="text-app-fg block text-sm break-all">{createdSecret}</code>
           <button
             type="button"
@@ -134,7 +135,7 @@ export function AgentAccessSettings({ enabled }: { enabled: boolean }) {
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Nombre del token (ej. Cursor)"
+          placeholder="Nombre del token (ej. Cursor, Claude)"
           aria-label="Nombre del token"
           className={cn(
             "border-app-input-border bg-app-raised-muted text-app-fg w-full rounded-lg border px-4 py-2",

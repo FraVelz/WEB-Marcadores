@@ -15,12 +15,13 @@ type Props = {
   onClose: () => void
 }
 
-type AgentId = "claude" | "cursor" | "codex"
+type AgentId = "claude" | "cursor" | "codex" | "other"
 
 const AGENTS: { id: AgentId; label: string }[] = [
   { id: "claude", label: "Claude Code" },
   { id: "cursor", label: "Cursor" },
   { id: "codex", label: "Codex" },
+  { id: "other", label: "Otros agentes" },
 ]
 
 const TOKEN_PLACEHOLDER = "wm_TU_CLAVE"
@@ -54,6 +55,14 @@ function snippetForAgent(agent: AgentId, url: string): string {
       return `[mcp_servers.web-marcadores]
 url = "${url}"
 http_headers = { "Authorization" = "${auth}" }`
+    case "other":
+      return `# MCP HTTP (cualquier cliente compatible)
+# Transport: streamable HTTP
+# Endpoint: ${url}
+# Header:  Authorization: ${auth}
+#
+# Sustituye ${TOKEN_PLACEHOLDER} por la clave de /perfil.
+# Si tu agente usa JSON/TOML/CLI, adapta URL + header a su formato.`
   }
 }
 
@@ -68,7 +77,7 @@ export function McpSetupModal({ open, onClose }: Props) {
 
   const url = useMemo(() => (open ? mcpServerUrl() : ""), [open])
   const snippet = snippetForAgent(agent, url)
-  const agentLabel = AGENTS.find((a) => a.id === agent)?.label ?? "Cursor"
+  const agentLabel = AGENTS.find((a) => a.id === agent)?.label ?? "Otros agentes"
 
   useFocusTrap(dialogRef, { enabled: open, initialFocusRef: agentButtonRef })
   useHotkeys("esc", () => onClose(), { enabled: open }, [onClose, open])

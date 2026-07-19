@@ -9,6 +9,7 @@ import { DashboardIconRail, DashboardMobileDrawer, MobileDrawerBackdrop } from "
 import { useBodyScrollLock } from "@/layouts/dashboard/hooks/useBodyScrollLock"
 import { useMatchMediaMd } from "@/lib/hooks/useMatchMediaMd"
 import { applyWallpaperToHTMLElement } from "@/lib/appAppearance"
+import { isElementFullscreen, subscribeFullscreenChange } from "@/features/marcadores/desktop/desktopFullscreenDom"
 import { HOTKEY_SCOPE_FOCUS } from "@/lib/focusStyles"
 import { cn } from "@/lib/utils"
 
@@ -27,8 +28,22 @@ export function DashboardMobileLayout({ pathname, children, sidebarRef, mainRef 
   const { appearance } = useAppAppearance()
   const wallpaperActive = Boolean(appearance.wallpaperDataUrl)
 
+  // Tapiz en el host solo en fullscreen: en uso normal el backdrop fijo basta y
+  // `background-attachment: fixed` + overflow-hidden rompe el scroll anidado (/perfil).
   useLayoutEffect(() => {
-    applyWallpaperToHTMLElement(dashboardFullscreenHostRef.current, appearance)
+    const el = dashboardFullscreenHostRef.current
+    if (!el) return
+
+    const sync = () => {
+      const inFs = isElementFullscreen(el)
+      applyWallpaperToHTMLElement(
+        el,
+        inFs ? appearance : { wallpaperDataUrl: null, wallpaperVeil: appearance.wallpaperVeil }
+      )
+    }
+
+    sync()
+    return subscribeFullscreenChange(sync)
   }, [appearance, dashboardFullscreenHostRef])
 
   useBodyScrollLock(mobileSidebarOpen)

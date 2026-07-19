@@ -18,7 +18,8 @@ export function DashboardWallpaperBackdrop({ wallpaperDataUrl, wallpaperVeil }: 
         backgroundColor: layer.backgroundColor,
         backgroundImage: layer.backgroundImage,
         backgroundSize: layer.backgroundSize,
-        backgroundAttachment: layer.backgroundAttachment,
+        // Ya es `fixed inset-0`; `fixed` en attachment pisa mal el scroll del shell.
+        backgroundAttachment: "scroll",
         backgroundRepeat: layer.backgroundRepeat,
       }}
     />

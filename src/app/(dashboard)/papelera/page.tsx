@@ -16,7 +16,7 @@ export default function PapeleraPage() {
         title="Papelera"
         subtitle="Elementos eliminados se conservan 30 días antes de borrarse de forma permanente."
       />
-      <div className="overflow-auto p-4 pb-10 sm:p-6">
+      <div className="min-h-0 flex-1 overflow-auto p-4 pb-10 sm:p-6">
         <PapeleraClient />
       </div>
     </div>

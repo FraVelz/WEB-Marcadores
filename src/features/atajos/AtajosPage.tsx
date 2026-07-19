@@ -61,7 +61,7 @@ export function AtajosPage() {
         title="Atajos de teclado"
         subtitle="Referencia rápida de combinaciones. Las alternativas equivalentes se muestran como teclas separadas."
       />
-      <div className="overflow-auto p-4 pb-12 text-center sm:p-6">
+      <div className="min-h-0 flex-1 overflow-auto p-4 pb-12 text-center sm:p-6">
         <div className="mx-auto flex max-w-3xl flex-col gap-10">
           {shortcutSections.map((section) => (
             <section key={section.title} className="scroll-mt-6">

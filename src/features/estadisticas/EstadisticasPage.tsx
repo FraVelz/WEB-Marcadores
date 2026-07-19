@@ -45,7 +45,7 @@ export function EstadisticasPage() {
             : "Resumen de tu biblioteca de marcadores: uso, organización e higiene de datos."
         }
       />
-      <div className="overflow-auto p-4 pb-12 text-center sm:p-6">
+      <div className="min-h-0 flex-1 overflow-auto p-4 pb-12 text-center sm:p-6">
         <div className="mx-auto flex max-w-5xl flex-col gap-10">
           <StatSection title="Resumen" hint="Solo enlaces no archivados salvo donde se indica">
             <StatKpiGrid kpis={stats.kpis} />
