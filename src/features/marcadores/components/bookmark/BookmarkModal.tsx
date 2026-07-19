@@ -17,6 +17,8 @@ export type BookmarkFormData = {
   description: string
   folder_id: string
   tags: string
+  /** JSON object string for extension metadata */
+  metadata: string
 }
 
 type Folder = { id: string; parent_id: string | null; name: string; sort_order: number }
@@ -36,6 +38,7 @@ const emptyForm: BookmarkFormData = {
   description: "",
   folder_id: "",
   tags: "",
+  metadata: "{}",
 }
 
 export default function BookmarkModal({ onClose, onSubmit, initialData, allTags, folders, currentFolderId }: Props) {
@@ -105,6 +108,7 @@ export default function BookmarkModal({ onClose, onSubmit, initialData, allTags,
       description: (form.elements.namedItem("description") as HTMLInputElement).value,
       folder_id: folderId || "",
       tags: finalTags,
+      metadata: (form.elements.namedItem("metadata") as HTMLTextAreaElement).value,
     }
 
     if (!isHttpUrl(url)) {
@@ -168,6 +172,23 @@ export default function BookmarkModal({ onClose, onSubmit, initialData, allTags,
             options={allTags}
             tagInputRef={tagInputRef}
           />
+          <div>
+            <label htmlFor="bookmark-metadata" className="text-app-fg-label mb-1 block text-sm font-medium">
+              Metadata (JSON)
+            </label>
+            <textarea
+              id="bookmark-metadata"
+              name="metadata"
+              rows={3}
+              defaultValue={merged.metadata || "{}"}
+              spellCheck={false}
+              className={cn(
+                "border-app-input-border bg-app-raised-muted text-app-fg w-full rounded-lg border px-3 py-2 font-mono text-xs",
+                "placeholder-app-fg-label focus:border-app-focus focus:outline-none"
+              )}
+              placeholder="{}"
+            />
+          </div>
           {submitError && (
             <p
               className={cn(

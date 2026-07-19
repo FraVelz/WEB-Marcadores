@@ -90,6 +90,7 @@ export function DashboardCommandPalette() {
           <div className="text-app-fg-muted mb-1 px-2 text-[11px] font-semibold tracking-wide uppercase">Atajos</div>
           <div className="mb-3 flex flex-col gap-1">
             <ShortcutPaletteLink title="Marcadores" hint="Gestor principal" href="/marcadores" onNavigate={close} />
+            <ShortcutPaletteLink title="Papelera" hint="Restaurar eliminados" href="/papelera" onNavigate={close} />
             <ShortcutPaletteLink title="Perfil" hint="Preferencias & cuenta" href="/perfil" onNavigate={close} />
           </div>
 

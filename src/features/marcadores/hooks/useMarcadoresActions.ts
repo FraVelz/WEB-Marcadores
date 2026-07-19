@@ -1,9 +1,9 @@
 "use client"
 
+import { toast } from "@pheralb/toast"
 import { useDashboard } from "@/contexts/DashboardContext"
 import { createClient } from "@/lib/supabase/client"
 import { captureMutationError } from "@/lib/sentry/captureMutationError"
-import { toast } from "@pheralb/toast"
 import { assertAcyclicFolderMove, CyclicFolderMoveError } from "../utils/assertAcyclicFolderMove"
 import { buildMarcadoresBackupJson, stringifyMarcadoresBackup } from "../utils/marcadoresBackup"
 import { buildFolderTree } from "../utils/utils"
@@ -113,17 +113,25 @@ export function useMarcadoresActions({
   ) => {
     if (selectedIds.size === 0) return
     await withMutationError("delete_bookmarks", async () => {
+      const deletedAt = new Date().toISOString()
+      const batchId = crypto.randomUUID()
       if (demoMode) {
-        setBookmarks((prev) => prev.filter((b) => !selectedIds.has(b.id)))
+        setBookmarks((prev) =>
+          prev.map((b) => (selectedIds.has(b.id) ? { ...b, deleted_at: deletedAt, deleted_batch_id: batchId } : b))
+        )
         setSelectedIds(new Set())
         setSelectMode(false)
         return
       }
-      const { error } = await supabase.from("bookmarks").delete().in("id", Array.from(selectedIds))
+      const { error } = await supabase
+        .from("bookmarks")
+        .update({ deleted_at: deletedAt, deleted_batch_id: batchId })
+        .in("id", Array.from(selectedIds))
       if (error) throw error
       setBookmarks((prev) => prev.filter((b) => !selectedIds.has(b.id)))
       setSelectedIds(new Set())
       setSelectMode(false)
+      toast.success({ text: "Movido a la papelera (30 días)" })
     })
   }
 
@@ -141,9 +149,15 @@ export function useMarcadoresActions({
     })
 
     await withMutationError("delete_folder", async () => {
+      const deletedAt = new Date().toISOString()
+      const batchId = crypto.randomUUID()
       if (demoMode) {
         setBookmarks((prev) =>
-          prev.map((b) => (b.folder_id && descendantIds.has(b.folder_id) ? { ...b, folder_id: parentId } : b))
+          prev.map((b) =>
+            b.folder_id && descendantIds.has(b.folder_id)
+              ? { ...b, deleted_at: deletedAt, deleted_batch_id: batchId }
+              : b
+          )
         )
         setFolders((prev) => {
           const next = prev.filter((f) => !descendantIds.has(f.id))
@@ -153,13 +167,15 @@ export function useMarcadoresActions({
         refreshFolders()
         return
       }
-      const [moveRes, delRes] = await Promise.all([
-        supabase.from("bookmarks").update({ folder_id: parentId }).in("folder_id", Array.from(descendantIds)),
-        supabase.from("folders").delete().in("id", Array.from(descendantIds)),
+      const ids = Array.from(descendantIds)
+      const [bmRes, folderRes] = await Promise.all([
+        supabase.from("bookmarks").update({ deleted_at: deletedAt, deleted_batch_id: batchId }).in("folder_id", ids),
+        supabase.from("folders").update({ deleted_at: deletedAt, deleted_batch_id: batchId }).in("id", ids),
       ])
-      if (moveRes.error) throw moveRes.error
-      if (delRes.error) throw delRes.error
+      if (bmRes.error) throw bmRes.error
+      if (folderRes.error) throw folderRes.error
       await fetchData()
+      toast.success({ text: "Carpeta movida a la papelera (30 días)" })
     })
   }
 

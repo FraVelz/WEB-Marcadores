@@ -1,6 +1,7 @@
 /** Rutas del dashboard y título de la cabecera móvil por pathname. */
 export const dashboardNavItems = [
   { href: "/marcadores", label: "Marcadores" },
+  { href: "/papelera", label: "Papelera" },
   { href: "/estadisticas", label: "Estadísticas" },
   { href: "/atajos", label: "Atajos" },
   { href: "/perfil", label: "Perfil" },

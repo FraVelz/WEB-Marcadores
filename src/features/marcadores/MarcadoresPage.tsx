@@ -73,6 +73,7 @@ export function MarcadoresPage() {
                   description: modal.editing.description || "",
                   folder_id: modal.editing.folder_id || "",
                   tags: modal.editing.tags?.join(", ") || "",
+                  metadata: JSON.stringify(modal.editing.metadata ?? {}, null, 2),
                 }
               : null
           }
