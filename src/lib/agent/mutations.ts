@@ -21,6 +21,10 @@ export async function createBookmark(
     throw err
   }
   const admin = createAdminClient()
+  const metadata = sanitizeMetadata({
+    ...(input.metadata ?? {}),
+    ...(input.is_favorite != null ? { is_favorite: Boolean(input.is_favorite) } : {}),
+  })
   const { data, error } = await admin
     .from("bookmarks")
     .insert({
@@ -30,8 +34,7 @@ export async function createBookmark(
       description: input.description ?? null,
       folder_id: input.folder_id ?? null,
       tags: input.tags ?? [],
-      is_favorite: input.is_favorite ?? false,
-      metadata: sanitizeMetadata(input.metadata ?? {}),
+      metadata,
     })
     .select("*")
     .single()
@@ -82,13 +85,19 @@ export async function updateBookmark(
   if (patch.description !== undefined) updates.description = patch.description
   if (patch.folder_id !== undefined) updates.folder_id = patch.folder_id
   if (patch.tags != null) updates.tags = patch.tags
-  if (patch.is_favorite != null) updates.is_favorite = patch.is_favorite
-  if (patch.metadata != null) {
-    updates.metadata = mergeMetadata(
-      (current.metadata as Record<string, unknown>) ?? {},
-      patch.metadata,
-      patch.metadata_mode ?? "merge"
-    )
+  if (patch.is_favorite != null || patch.metadata != null) {
+    const currentMeta = ((current.metadata as Record<string, unknown>) ?? {}) as Record<string, unknown>
+    let nextMeta = currentMeta
+    if (patch.metadata != null) {
+      nextMeta = mergeMetadata(currentMeta, patch.metadata, patch.metadata_mode ?? "merge") as Record<
+        string,
+        unknown
+      >
+    }
+    if (patch.is_favorite != null) {
+      nextMeta = { ...nextMeta, is_favorite: patch.is_favorite }
+    }
+    updates.metadata = sanitizeMetadata(nextMeta)
   }
   const { data, error } = await admin
     .from("bookmarks")

@@ -33,7 +33,7 @@ export async function POST(req: Request) {
       folder_id: (body.folder_id as string | null | undefined) ?? null,
       tags: Array.isArray(body.tags) ? body.tags.map(String) : undefined,
       metadata: body.metadata as Record<string, unknown> | undefined,
-      is_favorite: Boolean(body.is_favorite),
+      ...(body.is_favorite !== undefined ? { is_favorite: Boolean(body.is_favorite) } : {}),
     })
     await writeAudit({
       ctx,
