@@ -54,7 +54,7 @@ export default function ToolbarNewFolderSection({ newFolderName, setNewFolderNam
     try {
       await onCreateFolder()
     } catch {
-      setError("No se pudo crear la carpeta.")
+      // Error already toasted in withMutationError
       setSubmitting(false)
     }
   }

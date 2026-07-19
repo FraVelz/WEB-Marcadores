@@ -23,7 +23,6 @@ export function handleMarcadoresKeyDown(e: KeyboardEvent, ctx: MarcadoresKeyboar
     bookmarks,
     cutItem,
     setCutItem,
-    setPasteError,
     setSelectedIds,
     setSelectedIndex,
     setSelectedFolderId,
@@ -118,7 +117,6 @@ export function handleMarcadoresKeyDown(e: KeyboardEvent, ctx: MarcadoresKeyboar
         selectedFolderId,
         folders,
         bookmarks,
-        setPasteError,
         setCutItem,
         handlePasteFolder,
         handlePasteLink

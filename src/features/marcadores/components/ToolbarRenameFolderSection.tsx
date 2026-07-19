@@ -54,7 +54,7 @@ export default function ToolbarRenameFolderSection({ folderName, setFolderName, 
     try {
       await onRename()
     } catch {
-      setError("No se pudo renombrar la carpeta.")
+      // Error already toasted in withMutationError
       setSubmitting(false)
     }
   }

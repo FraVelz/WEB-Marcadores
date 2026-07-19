@@ -42,7 +42,6 @@ export function useMarcadoresPageCommands(core: MarcadoresPageCore) {
     bookmarks: core.bookmarks,
     cutItem: pane.cutItem,
     setCutItem: b.setCutItem,
-    setPasteError: b.setPasteError,
     setSelectedIds: b.setSelectedIds,
     setSelectedIndex: b.setSelectedIndex,
     setSelectedFolderId: core.browseScope.setFolderId,
@@ -85,11 +84,9 @@ export function useMarcadoresPageCommands(core: MarcadoresPageCore) {
     selectedIndex: pane.selectedIndex,
     flatList: core.focusFlatList,
     infoPanelEnabled: pane.infoPanelEnabled,
-    pasteError: pane.pasteError,
     setSelectedIndex: b.setSelectedIndex,
     setGridCols: b.setGridCols,
     setDetailBookmark: b.setDetailBookmark,
-    setPasteError: b.setPasteError,
     setShowSearch: b.setShowSearch,
     itemRefs: scope.itemRefs,
     searchRef: scope.searchRef,
@@ -102,7 +99,7 @@ export function useMarcadoresPageCommands(core: MarcadoresPageCore) {
   }
 
   const desktopFloatingOverlays: ReactNode = core.desktopWindowChrome ? (
-    <MarcadoresDesktopFloatingOverlays demoMode={core.demoMode} pasteError={pane.pasteError} />
+    <MarcadoresDesktopFloatingOverlays demoMode={core.demoMode} />
   ) : null
 
   const paneBody: PaneBodyExtras = {

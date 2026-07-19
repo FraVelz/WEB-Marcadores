@@ -10,11 +10,9 @@ type Params<T> = {
   selectedIndex: number
   flatList: { type: string; bookmark?: T }[]
   infoPanelEnabled: boolean
-  pasteError: string | null
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>
   setGridCols: React.Dispatch<React.SetStateAction<number>>
   setDetailBookmark: React.Dispatch<React.SetStateAction<T | null>>
-  setPasteError: (v: string | null) => void
   setShowSearch: (v: boolean) => void
   itemRefs: React.MutableRefObject<Map<number, HTMLDivElement>>
   searchRef: React.RefObject<HTMLInputElement | null>
@@ -27,11 +25,9 @@ export function useMarcadoresEffects<T>(params: Params<T>) {
     selectedIndex,
     flatList,
     infoPanelEnabled,
-    pasteError,
     setSelectedIndex,
     setGridCols,
     setDetailBookmark,
-    setPasteError,
     setShowSearch,
     itemRefs,
     searchRef,
@@ -57,11 +53,6 @@ export function useMarcadoresEffects<T>(params: Params<T>) {
     const next = infoPanelEnabled && item?.type === "link" ? ((item.bookmark ?? null) as T | null) : null
     setDetailBookmark(next)
   }, [flatList, selectedIndex, infoPanelEnabled, setDetailBookmark])
-  useEffect(() => {
-    if (!pasteError) return
-    const t = setTimeout(() => setPasteError(null), 4000)
-    return () => clearTimeout(t)
-  }, [pasteError, setPasteError])
 
   useHotkeys(
     "ctrl+f",

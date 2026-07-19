@@ -18,7 +18,6 @@ export type LibraryPaneUiState = {
   editingFolder: { id: string; name: string } | null
   renameFolderName: string
   cutItem: CutItem | null
-  pasteError: string | null
   deleteConfirmItem: GridItem | null
   searchValue: string
   searchInSubfolders: boolean
@@ -50,7 +49,6 @@ export function createDefaultLibraryPaneUi(): LibraryPaneUiState {
     editingFolder: null,
     renameFolderName: "",
     cutItem: null,
-    pasteError: null,
     deleteConfirmItem: null,
     searchValue: "",
     searchInSubfolders: false,
