@@ -4,6 +4,10 @@ packages:
 minimumReleaseAge: 10080
 trustPolicy: no-downgrade
 
+# Dependabot (y bumps de @types/node) tiran de undici-types@6.x publicado
+# antes de provenance. El check es por fecha, no por semver.
+trustPolicyIgnoreAfter: 525600
+
 allowBuilds:
   "@sentry/cli": false
   sharp: true
