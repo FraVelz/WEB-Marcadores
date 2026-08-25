@@ -10,9 +10,11 @@ import { computeEstadisticas } from "@/features/estadisticas/computeEstadisticas
 import type { Bookmark, FlatFolder } from "@/features/marcadores/utils/types"
 
 function normalizeBookmarkRow(raw: Bookmark): Bookmark {
+  const meta = raw.metadata ?? {}
+  const metaFavorite = typeof meta.is_favorite === "boolean" ? meta.is_favorite : undefined
   return {
     ...raw,
-    is_favorite: raw.is_favorite ?? false,
+    is_favorite: raw.is_favorite ?? metaFavorite ?? false,
     open_count: raw.open_count ?? 0,
     archived_at: raw.archived_at ?? null,
     opened_at: raw.opened_at ?? null,

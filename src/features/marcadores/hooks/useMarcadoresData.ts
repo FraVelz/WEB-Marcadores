@@ -14,9 +14,11 @@ import { buildFolderTree, getFolderPath } from "../utils/utils"
 import type { Bookmark, FlatFolder, GridItem } from "../utils/types"
 
 function normalizeBookmarkRow(raw: Bookmark): Bookmark {
+  const meta = raw.metadata ?? {}
+  const metaFavorite = typeof meta.is_favorite === "boolean" ? meta.is_favorite : undefined
   return {
     ...raw,
-    is_favorite: raw.is_favorite ?? false,
+    is_favorite: raw.is_favorite ?? metaFavorite ?? false,
     open_count: raw.open_count ?? 0,
     archived_at: raw.archived_at ?? null,
     opened_at: raw.opened_at ?? null,
@@ -24,7 +26,7 @@ function normalizeBookmarkRow(raw: Bookmark): Bookmark {
     tags: raw.tags ?? [],
     deleted_at: raw.deleted_at ?? null,
     deleted_batch_id: raw.deleted_batch_id ?? null,
-    metadata: raw.metadata ?? {},
+    metadata: meta,
   }
 }
 
