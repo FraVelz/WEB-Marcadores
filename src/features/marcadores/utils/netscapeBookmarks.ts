@@ -2,8 +2,7 @@ import { isHttpUrl } from "@/lib/isHttpUrl"
 
 /** Nodo de carpeta o enlace parseado desde HTML Netscape Bookmark. */
 export type NetscapeNode =
-  | { type: "folder"; name: string; children: NetscapeNode[] }
-  | { type: "link"; title: string; url: string }
+  { type: "folder"; name: string; children: NetscapeNode[] } | { type: "link"; title: string; url: string }
 
 export type ParseNetscapeResult = {
   roots: NetscapeNode[]
@@ -65,10 +64,7 @@ export function parseNetscapeBookmarksHtml(html: string): ParseNetscapeResult {
 }
 
 type Token =
-  | { kind: "h3"; text: string }
-  | { kind: "a"; href: string; text: string }
-  | { kind: "dl_open" }
-  | { kind: "dl_close" }
+  { kind: "h3"; text: string } | { kind: "a"; href: string; text: string } | { kind: "dl_open" } | { kind: "dl_close" }
 
 function tokenizeNetscape(html: string): Token[] {
   const tokens: Token[] = []

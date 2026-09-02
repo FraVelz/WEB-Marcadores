@@ -52,7 +52,7 @@
     "prettier-plugin-tailwindcss": "^0.8.1",
     "react-doctor": "^0.9.12",
     "tailwindcss": "^4",
-    "typescript": "^7",
+    "typescript": "6.0.3",
     "vitest": "^4.1.11"
   },
   "packageManager": "pnpm@11.1.1"
