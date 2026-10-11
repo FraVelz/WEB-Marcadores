@@ -10,7 +10,6 @@ export async function register() {
       enabled: true,
       environment: process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.NODE_ENV,
       tracesSampleRate: 0.05,
-      sendDefaultPii: false,
     })
   }
 }
