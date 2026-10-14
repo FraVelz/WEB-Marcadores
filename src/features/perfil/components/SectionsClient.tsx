@@ -1,16 +1,18 @@
 "use client"
 
+import Link from "next/link"
+
+import { useDashboard } from "@/contexts/DashboardContext"
+import { LEGAL_LINKS } from "@/features/legal/legalLinks"
+import { FOCUS_RING } from "@/lib/focusStyles"
+import { cn } from "@/lib/utils"
+
 import { useAuthActions } from "../hooks/useAuthActions"
 import { useBookmarkCount } from "../hooks/useBookmarkCount"
 import { useChangePassword } from "../hooks/useChangePassword"
 import { useUser } from "../hooks/useUser"
-import { useDashboard } from "@/contexts/DashboardContext"
-
-import { cn } from "@/lib/utils"
-import { FOCUS_RING } from "@/lib/focusStyles"
-
-import { AppearanceSettings } from "./AppearanceSettings"
 import { AgentAccessSettings } from "./AgentAccessSettings"
+import { AppearanceSettings } from "./AppearanceSettings"
 
 export function SectionsClient() {
   const { demoMode } = useDashboard()
@@ -96,6 +98,14 @@ export function SectionsClient() {
           )}
         </form>
       )}
+
+      <nav className="text-app-fg-muted flex flex-wrap gap-x-4 gap-y-2 text-sm">
+        {LEGAL_LINKS.map((link) => (
+          <Link key={link.href} href={link.href} className={cn("hover:text-app-fg", FOCUS_RING)}>
+            {link.label}
+          </Link>
+        ))}
+      </nav>
     </div>
   )
 }

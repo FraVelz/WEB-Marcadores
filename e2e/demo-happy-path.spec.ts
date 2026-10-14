@@ -66,6 +66,20 @@ test("detail pencil opens the editor for the visible bookmark", async ({ page })
   await expect(dialog.getByLabel(/Título/)).toHaveValue("React")
 })
 
+test("legal pages are public and linked from login", async ({ page }) => {
+  await page.goto("/", { waitUntil: "networkidle" })
+  await expect(page.getByRole("link", { name: "Términos", exact: true })).toBeVisible()
+  await expect(page.getByRole("link", { name: "Privacidad", exact: true })).toBeVisible()
+  await expect(page.getByRole("link", { name: "Cookies", exact: true })).toBeVisible()
+
+  await page.goto("/terminos")
+  await expect(page.getByRole("heading", { name: "Términos y condiciones" })).toBeVisible()
+  await page.goto("/privacidad")
+  await expect(page.getByRole("heading", { name: "Política de privacidad" })).toBeVisible()
+  await page.goto("/cookies")
+  await expect(page.getByRole("heading", { name: "Cookies", exact: true })).toBeVisible()
+})
+
 test.describe("authed happy path", () => {
   test("login → marcadores without demo banner when credentials provided", async ({ page }) => {
     const email = process.env.E2E_EMAIL

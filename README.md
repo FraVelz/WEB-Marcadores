@@ -107,6 +107,7 @@ Sin `.env.local` o sin credenciales Supabase válidas se activa el modo demo (da
 - **`/atajos`** — página de atajos
 - **`/perfil`** — perfil y acciones de cuenta
 - **`/demo`** — redirección al dashboard con cookie de sesión demo
+- **`/terminos`**, **`/privacidad`**, **`/cookies`** — condiciones, privacidad y cookies (públicas, sin sesión)
 
 ## 📝 Información
 
@@ -132,5 +133,5 @@ Las mejoras y correcciones son bienvenidas mediante issues o pull requests en el
 
 Si te resulta útil el proyecto, una estrella en GitHub ayuda a darle visibilidad.
 
-> Este documento fue generado o actualizado con asistencia de inteligencia artificial. Última actualización: **10 de
-> mayo de 2026**.
+> Este documento fue generado o actualizado con asistencia de inteligencia artificial. Última actualización: **14 de
+> octubre de 2026**.

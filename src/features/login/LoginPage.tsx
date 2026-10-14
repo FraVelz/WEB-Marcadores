@@ -4,6 +4,7 @@ import { APP_SCREENSHOTS } from "@/lib/siteScreenshots"
 import { FOCUS_RING } from "@/lib/focusStyles"
 import { cn } from "@/lib/utils"
 
+import { LoginLegalNotice } from "./components/LoginLegalNotice"
 import { LoginScreenshotLink } from "./components/LoginScreenshotLink"
 import { useLogin } from "./useLogin"
 
@@ -84,6 +85,7 @@ export function LoginPage({ demo }: { demo: boolean }) {
               Registrarse
             </button>
           </div>
+          <LoginLegalNotice />
         </form>
 
         <div className="border-app-warn-border bg-app-warn-surface text-app-warn-fg mt-10 rounded-lg border p-3 text-sm">

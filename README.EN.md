@@ -108,6 +108,7 @@ Without a valid `.env.local` or Supabase credentials, the app runs in demo mode 
 - **`/atajos`** — shortcuts page
 - **`/perfil`** — profile and account actions
 - **`/demo`** — redirect into the dashboard with a demo session cookie
+- **`/terminos`**, **`/privacidad`**, **`/cookies`** — terms, privacy, and cookies (public, no session)
 
 ## 📝 Details
 
@@ -133,4 +134,4 @@ Issues and pull requests are welcome.
 
 If this project helps you, a GitHub star is appreciated.
 
-> This document was generated or updated with AI assistance. Last updated: **May 10, 2026**.
+> This document was generated or updated with AI assistance. Last updated: **October 14, 2026**.
