@@ -48,6 +48,24 @@ test.describe("demo banner + happy path", () => {
   })
 })
 
+test("detail pencil opens the editor for the visible bookmark", async ({ page }) => {
+  await page.goto("/demo", { waitUntil: "networkidle" })
+  await expect(page.getByTestId("demo-banner")).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByText("Cargando…")).toHaveCount(0, { timeout: 30_000 })
+
+  await domClick(page.getByRole("button", { name: /Frontend/ }))
+  const detail = page.getByRole("complementary", { name: "Detalle del marcador" })
+  await expect(detail.getByRole("heading", { name: "React" })).toBeVisible()
+  const edit = detail.getByRole("button", { name: "Editar" })
+  await expect(edit).toBeVisible()
+  await domClick(edit)
+
+  const dialog = page.getByRole("dialog")
+  await expect(dialog).toBeVisible()
+  await expect(dialog.getByRole("heading", { name: "Editar marcador" })).toBeVisible()
+  await expect(dialog.getByLabel(/Título/)).toHaveValue("React")
+})
+
 test.describe("authed happy path", () => {
   test("login → marcadores without demo banner when credentials provided", async ({ page }) => {
     const email = process.env.E2E_EMAIL

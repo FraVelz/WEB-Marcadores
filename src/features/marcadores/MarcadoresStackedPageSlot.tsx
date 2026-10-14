@@ -5,6 +5,7 @@ import BookmarkGrid from "@/features/marcadores/components/BookmarkGrid"
 import { MarcadoresExplorerRail } from "@/features/marcadores/components/MarcadoresExplorerRail"
 import MarcadoresTreeView from "@/features/marcadores/components/MarcadoresTreeView"
 import type { MarcadoresPageModel } from "@/features/marcadores/useMarcadoresPage"
+import { editDetailBookmark } from "@/features/marcadores/utils/editDetailBookmark"
 import type { Bookmark } from "@/features/marcadores/utils/types"
 
 function buildFolderBookmarkCounts(bookmarks: Bookmark[]): Map<string | null, number> {
@@ -74,7 +75,7 @@ export function MarcadoresStackedPageSlot({ m }: { m: MarcadoresPageModel }) {
           onClose={m.closeBookmarkDetailPanel}
           onUpdate={m.onBookmarkUpdate}
           onTelemetryOpen={m.recordBookmarkOpened}
-          onEdit={m.handleEdit}
+          onEdit={() => editDetailBookmark(pane.detailBookmark, m.bookmarkModal.openEdit)}
           onDelete={() => {
             const item = m.focusFlatList[pane.selectedIndex]
             if (item) scope.bindings.setDeleteConfirmItem(item)
