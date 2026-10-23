@@ -56,16 +56,11 @@ export function PapeleraClient() {
   const { demoMode } = useDashboard()
   const supabase = createClient()
   const [items, setItems] = useState<TrashItem[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!demoMode)
   const [busyId, setBusyId] = useState<string | null>(null)
 
-  const refresh = useCallback(async () => {
-    if (demoMode) {
-      setItems([])
-      setLoading(false)
-      return
-    }
-    setLoading(true)
+  const loadItems = useCallback(async () => {
+    if (demoMode) return
     const {
       data: { user },
     } = await supabase.auth.getUser()
@@ -110,9 +105,22 @@ export function PapeleraClient() {
     setLoading(false)
   }, [demoMode, supabase])
 
+  const refresh = useCallback(async () => {
+    if (demoMode) return
+    setLoading(true)
+    await loadItems()
+  }, [demoMode, loadItems])
+
   useEffect(() => {
-    void refresh()
-  }, [refresh])
+    if (demoMode) return
+    const id = window.setTimeout(() => {
+      void loadItems()
+    }, 0)
+    return () => window.clearTimeout(id)
+  }, [demoMode, loadItems])
+
+  const visibleItems = demoMode ? [] : items
+  const visibleLoading = demoMode ? false : loading
 
   const restore = async (item: TrashItem) => {
     if (demoMode) return
@@ -203,7 +211,7 @@ export function PapeleraClient() {
         </p>
         <button
           type="button"
-          disabled={items.length === 0 || busyId === "empty"}
+          disabled={visibleItems.length === 0 || busyId === "empty"}
           onClick={() => void emptyAll()}
           className={cn(
             "border-app-input-border text-app-fg-secondary rounded-lg border px-3 py-1.5 text-sm",
@@ -215,13 +223,13 @@ export function PapeleraClient() {
         </button>
       </div>
 
-      {loading ? (
+      {visibleLoading ? (
         <p className="text-app-fg-muted text-sm">Cargando…</p>
-      ) : items.length === 0 ? (
+      ) : visibleItems.length === 0 ? (
         <p className="text-app-fg-muted text-sm">La papelera está vacía.</p>
       ) : (
         <ul className="divide-app-border border-app-border divide-y rounded-lg border">
-          {items.map((item) => {
+          {visibleItems.map((item) => {
             const label = item.type === "bookmark" ? item.title : item.name
             return (
               <li key={`${item.type}-${item.id}`} className="flex flex-wrap items-center gap-3 px-4 py-3">

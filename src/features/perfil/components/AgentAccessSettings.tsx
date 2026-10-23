@@ -20,15 +20,14 @@ type TokenRow = {
 
 export function AgentAccessSettings({ enabled }: { enabled: boolean }) {
   const [tokens, setTokens] = useState<TokenRow[]>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(enabled)
   const [name, setName] = useState("")
   const [scopes, setScopes] = useState<AgentScope[]>(["bookmarks:read", "trash:read"])
   const [createdSecret, setCreatedSecret] = useState<string | null>(null)
   const [creating, setCreating] = useState(false)
 
-  const refresh = useCallback(async () => {
+  const loadTokens = useCallback(async () => {
     if (!enabled) return
-    setLoading(true)
     try {
       const res = await fetch("/api/agent/v1/tokens", { credentials: "include" })
       const json = (await res.json()) as { tokens?: TokenRow[]; error?: { message: string } }
@@ -41,9 +40,19 @@ export function AgentAccessSettings({ enabled }: { enabled: boolean }) {
     }
   }, [enabled])
 
+  const refresh = useCallback(async () => {
+    if (!enabled) return
+    setLoading(true)
+    await loadTokens()
+  }, [enabled, loadTokens])
+
   useEffect(() => {
-    void refresh()
-  }, [refresh])
+    if (!enabled) return
+    const id = window.setTimeout(() => {
+      void loadTokens()
+    }, 0)
+    return () => window.clearTimeout(id)
+  }, [enabled, loadTokens])
 
   const toggleScope = (scope: AgentScope) => {
     setScopes((prev) => (prev.includes(scope) ? prev.filter((s) => s !== scope) : [...prev, scope]))
