@@ -26,7 +26,7 @@ App pública para ordenar enlaces. Sin `.env.local` arranca en memoria. El sitio
   </a>
 </p>
 
-## ✨ Características
+## Características
 
 - Carpetas, cuadrícula y papelera de 30 días.
 - Modo demo sin Supabase.
@@ -36,13 +36,13 @@ App pública para ordenar enlaces. Sin `.env.local` arranca en memoria. El sitio
 > [!NOTE]
 > La licencia no está en el repositorio. Ese archivo es el hueco si quieres mostrarlo en serio.
 
-## 🛠️ Tecnologías
+## Tecnologías
 
 - **Next.js y React** — la aplicación.
 - **Supabase** — sesión y datos cuando hay entorno.
 - **pnpm** — instalación y scripts.
 
-## 🚀 Inicio rápido
+## Inicio rápido
 
 ```bash
 pnpm install
@@ -52,20 +52,20 @@ pnpm dev
 > [!IMPORTANT]
 > `pnpm test` es la prueba del repo. CI corre el workflow `ci.yml`.
 
-## 📖 Uso
+## Uso
 
 Sin credenciales, entra por el modo demo. Con Supabase, copia `.env.example` a `.env.local` y vuelve a arrancar.
 
 > [!TIP]
 > `pnpm lint` y `pnpm test` son los dos comandos que conviene pasar antes de un cambio.
 
-## 🤝 Contribuir
+## Contribuir
 
 Repositorio de [FraVelz](https://github.com/FraVelz). No hay `CONTRIBUTING.md`.
 
 > [!WARNING]
 > No subas `.env.local`. El ejemplo versionado es `.env.example`.
 
-## 📄 Licencia
+## Licencia
 
 Este repositorio no incluye un archivo de licencia.

@@ -26,7 +26,7 @@ Public app for organizing links. Without `.env.local` it runs in memory. The pub
   </a>
 </p>
 
-## ✨ Features
+## Features
 
 - Folders, a grid, and a 30-day trash.
 - Demo mode without Supabase.
@@ -36,13 +36,13 @@ Public app for organizing links. Without `.env.local` it runs in memory. The pub
 > [!NOTE]
 > The repository has no license file. That file is the gap if you want to show this seriously.
 
-## 🛠️ Tech stack
+## Tech stack
 
 - **Next.js and React** — the app.
 - **Supabase** — session and data when env is set.
 - **pnpm** — install and scripts.
 
-## 🚀 Quick start
+## Quick start
 
 ```bash
 pnpm install
@@ -52,20 +52,20 @@ pnpm dev
 > [!IMPORTANT]
 > `pnpm test` is the repo test script. CI runs the `ci.yml` workflow.
 
-## 📖 Usage
+## Usage
 
 Without credentials, use demo mode. With Supabase, copy `.env.example` to `.env.local` and start again.
 
 > [!TIP]
 > Run `pnpm lint` and `pnpm test` before a change.
 
-## 🤝 Contributing
+## Contributing
 
 Repository by [FraVelz](https://github.com/FraVelz). There is no `CONTRIBUTING.md`.
 
 > [!WARNING]
 > Do not commit `.env.local`. The tracked example is `.env.example`.
 
-## 📄 License
+## License
 
 This repository does not include a license file.
